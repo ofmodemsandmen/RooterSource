@@ -1,0 +1,22 @@
+Source-Makefile: feeds/luci/applications/luci-app-rosy-file-server/Makefile
+Build-Depends: lua/host luci-base/host LUCI_CSSTIDY:csstidy/host 
+
+Package: luci-app-rosy-file-server
+Submenu: 3. Applications
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +luci-compat +luci-base +rosy-file-server
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: LuCI Support for Rosy File Server
+Maintainer: 
+Source: 
+Type: ipkg
+Description: LuCI Support for Rosy File Server
+
+@@
+
+

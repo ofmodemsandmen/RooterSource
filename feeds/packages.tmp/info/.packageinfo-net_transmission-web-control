@@ -1,0 +1,24 @@
+Source-Makefile: feeds/packages/net/transmission-web-control/Makefile
+
+Package: transmission-web-control
+Submenu: BitTorrent
+Version: 2019-04-16-a747a87babb246b0d3e6dd108ad7b4c19462cfe6-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread @(PACKAGE_transmission-daemon-openssl||PACKAGE_transmission-daemon-mbedtls)
+Conflicts: transmission-web
+Menu-Depends: 
+Provides: 
+Section: net
+Category: Network
+Repository: base
+Title: Transmission Web Control
+Maintainer: Richard Yu <yurichard3839@gmail.com>
+Source: transmission-web-control-2019-04-16-a747a87babb246b0d3e6dd108ad7b4c19462cfe6.tar.xz
+License: MIT
+LicenseFiles: LICENSE
+Type: ipkg
+Description:  Transmission Web Control is a custom Web UI for Transmission.
+https://github.com/ronggang/transmission-web-control
+Richard Yu <yurichard3839@gmail.com>
+@@
+
+

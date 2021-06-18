@@ -1,0 +1,171 @@
+Source-Makefile: feeds/packages/utils/qemu/Makefile
+Build-Depends: !BUILD_NLS:libiconv !BUILD_NLS:gettext
+
+Package: virtio-console-helper
+Submenu: Virtualization
+Version: 4.0.0-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread @(TARGET_x86_64||TARGET_armvirt||TARGET_arm64||TARGET_malta)
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: utils
+Category: Utilities
+Repository: base
+Title: Helper script for vportNpn virtio-console devices
+Maintainer: Yousong Zhou <yszhou4tech@gmail.com>
+Source: qemu-4.0.0.tar.xz
+License: GPL-2.0
+LicenseFiles: LICENSE tcg/LICENSE
+Type: ipkg
+Description: Helper script for vportNpn virtio-console devices
+Yousong Zhou <yszhou4tech@gmail.com>
+@@
+
+Package: qemu-ga
+Submenu: Virtualization
+Version: 4.0.0-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +glib2 +virtio-console-helper +USE_UCLIBCXX:uclibcxx +USE_LIBSTDCXX:libstdcpp @(TARGET_x86_64||TARGET_armvirt||TARGET_arm64||TARGET_malta)
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: utils
+Category: Utilities
+Repository: base
+Title: QEMU Guest Agent
+Maintainer: Yousong Zhou <yszhou4tech@gmail.com>
+Source: qemu-4.0.0.tar.xz
+License: GPL-2.0
+LicenseFiles: LICENSE tcg/LICENSE
+Type: ipkg
+Description:   This package contains the QEMU Guest Agent daemon
+http://www.qemu.org
+Yousong Zhou <yszhou4tech@gmail.com>
+@@
+
+Package: qemu-bridge-helper
+Submenu: Virtualization
+Version: 4.0.0-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +glib2 +USE_UCLIBCXX:uclibcxx +USE_LIBSTDCXX:libstdcpp @(TARGET_x86_64||TARGET_sunxi)
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: utils
+Category: Utilities
+Repository: base
+Title: QEMU bridge helper
+Maintainer: Yousong Zhou <yszhou4tech@gmail.com>
+Source: qemu-4.0.0.tar.xz
+License: GPL-2.0
+LicenseFiles: LICENSE tcg/LICENSE
+Type: ipkg
+Description: QEMU bridge helper
+http://www.qemu.org
+Yousong Zhou <yszhou4tech@gmail.com>
+@@
+
+Package: qemu-img
+Submenu: Virtualization
+Version: 4.0.0-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +glib2 +USE_UCLIBCXX:uclibcxx +USE_LIBSTDCXX:libstdcpp @(TARGET_x86_64||TARGET_sunxi)
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: utils
+Category: Utilities
+Repository: base
+Title: QEMU Image utility
+Maintainer: Yousong Zhou <yszhou4tech@gmail.com>
+Source: qemu-4.0.0.tar.xz
+License: GPL-2.0
+LicenseFiles: LICENSE tcg/LICENSE
+Type: ipkg
+Description: QEMU Image utility
+http://www.qemu.org
+Yousong Zhou <yszhou4tech@gmail.com>
+@@
+
+Package: qemu-nbd
+Submenu: Virtualization
+Version: 4.0.0-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +glib2 +USE_UCLIBCXX:uclibcxx +USE_LIBSTDCXX:libstdcpp @(TARGET_x86_64||TARGET_sunxi) +kmod-nbd
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: utils
+Category: Utilities
+Repository: base
+Title: QEMU Network Block Device Utility
+Maintainer: Yousong Zhou <yszhou4tech@gmail.com>
+Source: qemu-4.0.0.tar.xz
+License: GPL-2.0
+LicenseFiles: LICENSE tcg/LICENSE
+Type: ipkg
+Description: QEMU Network Block Device Utility
+http://www.qemu.org
+Yousong Zhou <yszhou4tech@gmail.com>
+@@
+
+Package: qemu-blobs
+Submenu: Virtualization
+Version: 4.0.0-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread @(TARGET_x86_64||TARGET_sunxi)
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: utils
+Category: Utilities
+Repository: base
+Title: QEMU blobs of BIOS, VGA BIOS and keymaps
+Maintainer: Yousong Zhou <yszhou4tech@gmail.com>
+Source: qemu-4.0.0.tar.xz
+License: GPL-2.0
+LicenseFiles: LICENSE tcg/LICENSE
+Type: ipkg
+Description: QEMU blobs of BIOS, VGA BIOS and keymaps
+http://www.qemu.org
+Yousong Zhou <yszhou4tech@gmail.com>
+@@
+
+Package: qemu-x86_64-softmmu
+Submenu: Virtualization
+Version: 4.0.0-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +glib2 +libpthread +zlib +USE_UCLIBCXX:uclibcxx +USE_LIBSTDCXX:libstdcpp @(TARGET_x86_64||TARGET_sunxi) +libncurses +libfdt +pixman +qemu-blobs +BUILD_NLS:libiconv-full
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: utils
+Category: Utilities
+Repository: base
+Title: QEMU target x86_64-softmmu
+Maintainer: Yousong Zhou <yszhou4tech@gmail.com>
+Source: qemu-4.0.0.tar.xz
+License: GPL-2.0
+LicenseFiles: LICENSE tcg/LICENSE
+Type: ipkg
+Description:     This package contains the QEMU target x86_64-softmmu
+http://www.qemu.org
+Yousong Zhou <yszhou4tech@gmail.com>
+@@
+
+Package: qemu-arm-softmmu
+Submenu: Virtualization
+Version: 4.0.0-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +glib2 +libpthread +zlib +USE_UCLIBCXX:uclibcxx +USE_LIBSTDCXX:libstdcpp @(TARGET_x86_64||TARGET_sunxi) +libncurses +libfdt +pixman +qemu-blobs +BUILD_NLS:libiconv-full
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: utils
+Category: Utilities
+Repository: base
+Title: QEMU target arm-softmmu
+Maintainer: Yousong Zhou <yszhou4tech@gmail.com>
+Source: qemu-4.0.0.tar.xz
+License: GPL-2.0
+LicenseFiles: LICENSE tcg/LICENSE
+Type: ipkg
+Description:     This package contains the QEMU target arm-softmmu
+http://www.qemu.org
+Yousong Zhou <yszhou4tech@gmail.com>
+@@
+
+

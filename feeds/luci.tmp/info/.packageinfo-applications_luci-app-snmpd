@@ -1,0 +1,23 @@
+Source-Makefile: feeds/luci/applications/luci-app-snmpd/Makefile
+Build-Depends: lua/host luci-base/host LUCI_CSSTIDY:csstidy/host 
+
+Package: luci-app-snmpd
+Submenu: 3. Applications
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +luci-compat +luci-base
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: Net-SNMP LuCI interface
+Maintainer: Karl Palsson <karlp@etactica.com>
+Source: 
+License: Apache-2.0
+Type: ipkg
+Description:    Some common net-snmp config items. In no way is this comprehensive.
+Karl Palsson <karlp@etactica.com>
+@@
+
+

@@ -1,0 +1,48 @@
+Source-Makefile: feeds/packages/devel/meson/Makefile
+Build-Depends/host: ninja/host python3/host
+Build-Types: host
+
+Package: meson
+Version: 0.54.0-3
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +ninja +python3-pkg-resources
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Build-Variant: python3
+Section: devel
+Category: Development
+Repository: base
+Title: meson
+Maintainer: Andre Heider <a.heider@gmail.com>
+Source: meson-0.54.0.tar.gz
+License: Apache-2.0
+LicenseFiles: COPYING
+Type: ipkg
+Description:   Meson is an open source build system meant to be both extremely fast, and, even more importantly, as user friendly as possible.
+https://mesonbuild.com/
+Andre Heider <a.heider@gmail.com>
+@@
+
+Package: meson-src
+Version: 0.54.0-3
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread 
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Build-Variant: python3
+Section: devel
+Category: Development
+Repository: base
+Title: meson (sources)
+Maintainer: Andre Heider <a.heider@gmail.com>
+Source: meson-0.54.0.tar.gz
+License: Apache-2.0
+LicenseFiles: COPYING
+Type: ipkg
+Description:       Meson is an open source build system meant to be both extremely fast, and, even more importantly, as user friendly as possible..
+    (Contains the Python3 sources for this package).
+https://mesonbuild.com/
+Andre Heider <a.heider@gmail.com>
+@@
+
+

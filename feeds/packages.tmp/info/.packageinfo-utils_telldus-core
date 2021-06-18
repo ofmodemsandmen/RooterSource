@@ -1,0 +1,24 @@
+Source-Makefile: feeds/packages/utils/telldus-core/Makefile
+Build-Depends: argp-standalone !BUILD_NLS:libiconv !BUILD_NLS:gettext
+
+Package: telldus-core
+Version: 2.1.2-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +confuse +libftdi +libstdcpp +BUILD_NLS:libiconv-full
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: utils
+Category: Utilities
+Repository: base
+Title: Telldus TellStick USB interface
+Maintainer: Peter Liedholm <PeterFromSwe884@gmail.com>
+Source: telldus-core-2.1.2.tar.gz
+License: LGPL-2.1
+Type: ipkg
+Description: 	Telldus driver for USB-based 433 MHz RF transceiver for home automation.
+	MUST be built with full language support, (don't know how to DEPEND that)
+http://www.telldus.com
+Peter Liedholm <PeterFromSwe884@gmail.com>
+@@
+
+

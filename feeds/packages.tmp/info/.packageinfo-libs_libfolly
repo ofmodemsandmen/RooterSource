@@ -1,0 +1,27 @@
+Source-Makefile: feeds/packages/libs/libfolly/Makefile
+
+Package: libfolly
+Version: 2019.10.07.00-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +boost +boost-context +boost-filesystem +boost-program_options +boost-regex +libopenssl +libdouble-conversion +libevent2 +glog +libsodium +libaio +libatomic +libbz2 +zlib +libzstd +liblzma +liblz4 +PACKAGE_libunwind:libunwind
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: libs
+Category: Libraries
+Repository: base
+Title: An open-source C++ library developed and used at Facebook.
+Maintainer: Amol Bhave <ambhave@fb.com>
+Source: libfolly-2019.10.07.00.tar.gz
+License: Apache-2.0
+LicenseFiles: LICENSE
+Type: ipkg
+Description:   An open-source C++ library developed and used at Facebook.
+  Folly (acronymed loosely after Facebook Open Source Library) is a library of
+  C++14 components designed with practicality and efficiency in mind.
+  Folly contains a variety of core library components used extensively at Facebook.
+  This package includes the shared library.
+https://github.com/facebook/folly
+Amol Bhave <ambhave@fb.com>
+@@
+
+

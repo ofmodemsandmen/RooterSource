@@ -1,0 +1,16 @@
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1,4 +1,4 @@
+-bin_PROGRAMS=rtpproxy rtpproxy_debug
++bin_PROGRAMS=rtpproxy
+ BASE_SOURCES=main.c rtp.h rtpp_server.c rtpp_server.h \
+   rtpp_defines.h rtpp_log.h rtpp_record.c rtpp_record.h rtpp_session.h \
+   rtpp_util.c rtpp_util.h rtp.c rtp_resizer.c rtp_resizer.h rtpp_session.c \
+--- a/modules/acct_csv/Makefile.am
++++ b/modules/acct_csv/Makefile.am
+@@ -1,4 +1,4 @@
+-pkglib_LTLIBRARIES = rtpp_acct_csv.la rtpp_acct_csv_debug.la
++pkglib_LTLIBRARIES = rtpp_acct_csv.la
+ 
+ rtpp_acct_csv_la_SOURCES = rtpp_acct_csv.c
+ rtpp_acct_csv_la_LDFLAGS = -avoid-version -module -shared -export-dynamic
