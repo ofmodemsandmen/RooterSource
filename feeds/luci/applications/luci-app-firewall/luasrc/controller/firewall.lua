@@ -18,5 +18,11 @@ function index()
 		view("firewall/snats"), _("NAT Rules"), 40)
 
 	entry({"admin", "network", "firewall", "custom"},
-		view("firewall/custom"), _("Custom Rules"), 50).leaf = true
+		view("firewall/custom"), _("Custom Rules"), 45).leaf = true
+
+	if nixio.fs.access("/etc/config/modem") then
+		entry({"admin", "network", "firewall", "ttl"},
+			cbi("firewall/ttlx"),
+			_("Custom TTL Settings"), 50).leaf = true
+	end
 end

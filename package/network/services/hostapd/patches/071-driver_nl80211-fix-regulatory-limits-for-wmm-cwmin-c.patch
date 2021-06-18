@@ -45,3 +45,4 @@ Signed-off-by: Felix Fietkau <nbd@nbd.name>
  			chan->wmm_rules[ac].min_aifs =
  				nla_get_u8(tb_wmm[NL80211_WMMR_AIFSN]);
  			chan->wmm_rules[ac].max_txop =
+9°

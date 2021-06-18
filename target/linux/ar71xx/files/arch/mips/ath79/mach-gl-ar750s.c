@@ -14,6 +14,8 @@
 #include <linux/ath9k_platform.h>
 #include <linux/etherdevice.h>
 
+#include <linux/gpio.h>
+
 #include <linux/i2c.h>
 #include <linux/i2c-gpio.h>
 
@@ -77,10 +79,6 @@ static struct gpio_led gl_ar750s_leds_gpio[] __initdata = {
 		 .name           = "gl-ar750s:green:power",
 		 .gpio           = GL_AR750S_GPIO_LED_POWER,
 		.default_state  = LEDS_GPIO_DEFSTATE_KEEP,
-		.active_low     = 1,
-   	 },{
-		 .name           = "gl-ar750s:green:usbpower",
-		 .gpio           = GL_AR750S_GPIO_USB_POWER,
 		.active_low     = 1,
    	 },{
 		.name		= "gl-ar750s:green:wlan2g",
@@ -169,6 +167,10 @@ static void __init  gl_ar750s_setup(void)
 	ath79_register_mdio(0, 0x00);
 	ath79_register_eth(0);
 
+	/* enable usb */
+	gpio_request_one(GL_AR750S_GPIO_USB_POWER,
+				 GPIOF_OUT_INIT_HIGH | GPIOF_EXPORT_DIR_FIXED,
+	 			 "USB power");
 
 	ath79_register_usb();
 

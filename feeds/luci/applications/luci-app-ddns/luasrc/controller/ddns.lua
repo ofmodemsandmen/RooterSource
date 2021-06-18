@@ -65,14 +65,14 @@ function app_description()
 	tmp[#tmp+1] =	translate("Dynamic DNS allows that your router can be reached with \
 								a fixed hostname while having a dynamically changing IP address.")
 	tmp[#tmp+1] =	[[<br />]]
-	tmp[#tmp+1] =	translate("OpenWrt Wiki") .. ": "
-	tmp[#tmp+1] =	[[<a href="https://openwrt.org/docs/guide-user/services/ddns/client" target="_blank">]]
-	tmp[#tmp+1] =	translate("DDNS Client Documentation")
-	tmp[#tmp+1] =	[[</a>]]
-	tmp[#tmp+1] =	" --- "
-	tmp[#tmp+1] =	[[<a href="https://openwrt.org/docs/guide-user/base-system/ddns" target="_blank">]]
-	tmp[#tmp+1] =	translate("DDNS Client Configuration")
-	tmp[#tmp+1] =	[[</a>]]
+--	tmp[#tmp+1] =	translate("OpenWrt Wiki") .. ": "
+--	tmp[#tmp+1] =	[[<a href="https://openwrt.org/docs/guide-user/services/ddns/client" target="_blank">]]
+--	tmp[#tmp+1] =	translate("DDNS Client Documentation")
+--	tmp[#tmp+1] =	[[</a>]]
+--	tmp[#tmp+1] =	" --- "
+--	tmp[#tmp+1] =	[[<a href="https://openwrt.org/docs/guide-user/base-system/ddns" target="_blank">]]
+--	tmp[#tmp+1] =	translate("DDNS Client Configuration")
+--	tmp[#tmp+1] =	[[</a>]]
 	
 	return table.concat(tmp)
 end

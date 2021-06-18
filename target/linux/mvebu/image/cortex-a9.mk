@@ -43,7 +43,7 @@ TARGET_DEVICES += linksys_wrt3200acm
 define Device/linksys_wrt1900acs
   $(call Device/linksys,WRT1900ACS (Shelby))
   DEVICE_DTS := armada-385-linksys-shelby
-  DEVICE_PACKAGES += mwlwifi-firmware-88w8864
+  DEVICE_PACKAGES += mwlwifi-firmware-88w8864 kmod-usb3
   SUPPORTED_DEVICES := armada-385-linksys-shelby linksys,shelby
 endef
 TARGET_DEVICES += linksys_wrt1900acs

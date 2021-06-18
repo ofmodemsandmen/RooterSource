@@ -18,6 +18,7 @@ local show_hints = not (DDNS.env_info("has_ipv6")		-- IPv6 support
 		)
 local not_enabled = not SYS.init.enabled("ddns")
 local need_update = not CTRL.service_ok()
+local set_off = false
 
 -- html constants
 font_red = [[<font color="red">]]
@@ -50,7 +51,7 @@ a.template = "ddns/overview_status"
 
 -- SimpleSection definition -- #################################################
 -- show Hints to optimize installation and script usage
-if show_hints or need_update or not_enabled then
+if (show_hints or need_update or not_enabled) and set_off then
 
 	s = m:section( SimpleSection, translate("Hints") )
 
@@ -78,7 +79,7 @@ if show_hints or need_update or not_enabled then
 	end
 
 	-- Show more hints on a separate page
-	if show_hints then
+	if show_hints and set_off then
 		local dv = s:option(DummyValue, "_separate")
 		dv.titleref = DISP.build_url("admin", "services", "ddns", "hints")
 		dv.rawhtml  = true

@@ -1,0 +1,33 @@
+#!/bin/sh /etc/rc.common
+START=99
+STOP=10
+
+log() {
+	logger -t "YAMon 3 init.d : " "$@"
+}
+
+start() {
+	# commands to launch application
+	ENB=$(uci get yamon3.yamon3.enabled)
+	if [ $ENB = 1 ]; then
+		if [ -d /tmp/YAMon3.4-running ]; then
+			log "Unable to start, found /tmp/YAMon3.4-running directory"
+			return 1
+		fi
+		log "Starting YAMON3"
+		/etc/init.d/yamon3 enable
+		/usr/lib/YAMon3/startup.sh 10 &
+	fi
+}
+stop() {
+	/usr/lib/YAMon3/shutdown.sh
+	return 0
+}
+restart() {
+	/usr/lib/YAMon3/restart.sh
+	return 0
+}
+boot() {
+	start
+}
+

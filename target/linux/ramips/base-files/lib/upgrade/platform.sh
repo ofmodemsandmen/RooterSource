@@ -60,6 +60,8 @@ platform_do_upgrade() {
 	netgear,r6350|\
 	ubnt-erx|\
 	ubnt-erx-sfp|\
+	beeline,smartbox-pro|\
+	beeline,smartbox-turbo-plus|\
 	xiaomi,mir3g|\
 	xiaomi,mir3p)
 		nand_do_upgrade "$1"

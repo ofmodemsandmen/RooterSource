@@ -28,9 +28,9 @@ local ns = m:section( NamedSection, "global", "ddns",
 	.. [[<br /><strong>]]
 	.. translate("It is NOT recommended for casual users to change settings on this page.")
 	.. [[</strong><br />]]
-	.. [[<a href="https://openwrt.org/docs/guide-user/base-system/ddns#section_ddns" target="_blank">]]
-	.. translate("For detailed information about parameter settings look here.")
-	.. [[</a>]]
+--	.. [[<a href="https://openwrt.org/docs/guide-user/base-system/ddns#section_ddns" target="_blank">]]
+--	.. translate("For detailed information about parameter settings look here.")
+--	.. [[</a>]]
 	)
 
 -- section might not exist
@@ -54,9 +54,9 @@ ali.default	= "0"
 -- ddns_dateformat  -- #########################################################
 local df	= ns:option(Value, "ddns_dateformat")
 df.title	= translate("Date format")
-df.description	= [[<a href="http://www.cplusplus.com/reference/ctime/strftime/" target="_blank">]]
-		.. translate("For supported codes look here") 
-		.. [[</a>]]
+--df.description	= [[<a href="http://www.cplusplus.com/reference/ctime/strftime/" target="_blank">]]
+--		.. translate("For supported codes look here") 
+--		.. [[</a>]]
 df.template	= "ddns/global_value"
 df.default	= "%F %R"
 df.date_string	= ""

@@ -134,7 +134,7 @@ ppp_generic_setup() {
 	[ -n "$connect" ] || json_get_var connect connect
 	[ -n "$disconnect" ] || json_get_var disconnect disconnect
 
-	proto_run_command "$config" /usr/sbin/pppd \
+	proto_run_command "$config" /usr/sbin/pppd local \
 		nodetach ipparam "$config" \
 		ifname "$pppname" \
 		${localip:+$localip:} \

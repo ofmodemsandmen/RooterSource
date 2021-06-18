@@ -1,0 +1,108 @@
+##########################################################################
+# Yet Another Monitor (YAMon)
+# Copyright (c) 2013-present Al Caughey
+# All rights reserved.
+#
+# DEFAULT CONFIG FILE FOR YAMon...
+# tailor these values to suit your installation
+# * denotes default or recommended value.
+#
+##########################################################################
+
+# version 3.4.0 - uprev'd for new release
+# version 3.4.1 - removed _bridgeIP, _path2ip; added _multipleIPMAC
+# version 3.4.2 - added _logNoMatchingMac
+# version 3.4.4 - re-added _path2ip; renamed _webDir & _webIndex
+# version 3.4.5 - added _local_ip6
+# version 3.4.6 - added _includeIncomplete, _append_PPPOE & see note below
+# version 3.4.8 - added _guest_iface --> see note below
+
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\  ***  NOTE  ***  \\\\\\\\\\\\\\\\\\\\\\\\\\\#
+# NB - yamon.sh reloads these settings automatically if this file changes.
+#      However, it might be safer to run restart.sh after you've editted things here.
+#\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\#
+
+_firmware='1'                                # which firmware is running on the router: permitted values: 0->DD-WRT(*) || 1->OpenWrt || 2->Asuswrt-Merlin || 3->Asuswrt-Merlin || 4->LEDE || 5->Xwrt-Vortex || 6->Turris || 7->Padavan
+_updatefreq='30'                             # number of seconds between updates (* default `15` sec)
+_publishInterval='4'                         # number of intervals between updates for to the website (* default `12`)
+_ispBillingDay='5'                           # roll-over day of the month for ISP billing (* default `1`)
+_webDir='www/'                               # path to the web files (* default `www/`)
+_webIndex='index.html'                       # path to the index page (* default `index.html`)
+_dataDir='data/'                             # path to the data directory (* default `data/`)
+_logDir='logs/'                              # path to log files  (* default `logs/`)
+                                             #   NB - If _dataDir OR _logDir starts with a slash it will be an absolute path (and d_baseDir will be ignored)
+_symlink2data='1'                            # use a symbolic link to /opt/YAMon2/data rather than /tmp/www/data... permitted values: 0->false || 1->true(*)
+_wwwPath='/tmp/www/'                         # path to web directory (* default `/tmp/www/`)
+_wwwURL='/user'                              # path to reports (* default `/user`)
+_wwwData="data/"                             # path to web data directory(* default `data/`)
+_wwwJS='js/'                                 # path to JavaScript directory(* default `js/`)
+_wwwCSS='css/'                               # path to CSS directory(* default `css/`)
+_wwwImages='images/'                         # path to Images directory(* default `images/`)
+_usageFileName='mac_data.js'                 # file name for usage data (* default `mac_data.js`)
+_usersFileName='users.js'                    # file name for user/devices file (* default `users.js`)
+_configWWW="config$_file_version.js"         # file name for the js config file (* default `config3.x.js`)
+_enableLogging='1'                           # turn logging on/off: permitted values: 1->logging(*) || 0->no logging
+_log2file='1'                                # send logs to screen or file: permitted values: 0->screen || 1->file(*) || 2->both
+_loglevel='1'                                # amount of detail to include in the log: permitted values: -1->really verbose || 0->all || 1->most(*) || 2->serious only
+_scrlevel='1'                                # amount of detail to include in the screen updates: permitted values: -1->really verbose || 0->all || 1->most(*) || 2->serious only
+                                             #   NB - only required if _log2file == 0 || 2...
+_doDailyBU='1'                               # whether or not to make daily backups of user & usage data - values: 1-->Yes(*) || 0->No
+_dailyBUPath='daily-bu/'                     # path to back-ups directory (* default `daily bu/`)
+                                             #   NB - only required if doDailyBU == 1...
+                                             #   NB - if _dailyBU starts with a slash it will be an absolute path (and d_baseDir will be ignored)
+_tarBUs='1'                                  # permitted values: 0->no || 1->yes(*)
+                                             #   NB - if doDailyBU == 1 && _tarBUs==1, the daily backup files will be compressed
+_hourlyFileName='hourly_data.js'             # file name for hourly usage file (* default `hourly_data.js`)
+                                             #   NB - file extension changed from .html to .js
+_doLiveUpdates='1'                           # whether or not to record live usage - values: 1-->Yes(*) || 0->No
+_doCurrConnections=1                         # whether or not to include current connections in the live usage file - values: 1-->Yes(*) || 0->No
+_liveFileName='live_data3.js'                # file name for live usage data (* default `live_data.js`)
+                                             #   NB - only required if _doLiveUpdates == 1
+_doArchiveLiveUpdates='0'                    # whether or not to retain a copy of all of the live data - values: 1-->Yes(*) || 0->No
+                                             #   NB - only required if _doLiveUpdates == 1 & could get big!
+_monthlyDataCap='0'                          # Data cap as set by ISP ('0' default-->unlimited plan || '##'-->data cap in GB)
+_unlimited_usage='0'                         # whether or not you have an unlimited downloads time period: 0->No(*) || 1->Yes
+_unlimited_start='2:00'                      # the time (hours:minutes) when your unlimited downloads period starts
+_unlimited_end='8:00'                        # the time (hours:minutes) when your unlimited downloads period ends
+                                             #   NB - only required if _unlimited_usage == 1
+_settings_pswd=''                            # optionally password protect the Settings tab in the HTML reports (* default '' empty string or omitted)
+_dnsmasq_conf='/tmp/dnsmasq.conf'            # path to dnsmasq.conf (* default `/tmp/dnsmasq.conf`)
+                                             #   NB - if _firmware==1 (OpenWrt), use `/tmp/etc/dnsmasq.conf`
+_dnsmasq_leases='/tmp/dnsmasq.leases'        # path to dnsmasq.leases (* default `/tmp/dnsmasq.leases`)
+                                             #   NB - if _firmware==1 (OpenWrt), use `/tmp/dhcp.leases`
+_do_separator=''                             # a default character that separates the owner and device name in static leases or dnsmasq values, e.g., Al_iPhone (* default ``)
+_includeBridge=0                             # whether or not there is a bridge in your wireless configuration - values: 0-->No(*) || 1->Yes
+_bridgeMAC='XX:XX:XX:XX:XX:XX'               # mac address for the bridge device, or comma separated list if multiple bridges
+                                             #   NB - only required if _includeBridge == 1
+_defaultOwner='Unknown'                      # default owner name for new devices
+_defaultDeviceName='New Device'              # default name for new devices if nothing can be found by the script
+_includeIPv6='0'                             # whether or not your router is configured for IPv6: 0->no(*) || 1->yes
+_doLocalFiles='0'                            # make a local copy of JS, CSS and images: 0->no(*recommended) || 1->yes
+                                             #   NB - set to 1 if you do not want use the files hosted at my domain (usage-monitoring.com)
+_dbkey=''                                    # if not null, this option will sync settings across all of your devices... 
+                                             #   NB - get the value for this parameter from the settings tab
+_ignoreGateway=0                             # whether or not to exclude any updates involving your gateway: 0->no(*) || 1->yes
+_gatewayMAC=''                               # MAC address for the gateway
+_sendAlerts=0                                # whether or not to send alerts 0->no(*) || 1->yes (via usage-monitoring.com) || 2->via msmtp 
+                                             #   NB - currently only when a new entry is added to users.js or if iptables is corrupted
+_sendAlertTo=''                              #   NB - only required if _sendAlerts == 1
+_path2MSMTP=/opt/usr/bin/msmtp               #   NB - only required if _sendAlerts == 2
+_MSMTP_CONFIG=/opt/scripts/msmtprc           #   NB - only required if _sendAlerts == 2
+_organizeData='2'                            # whether or not to organize data files - values: 0->no || 1->by year || 2->by year & month(*)
+_allowMultipleIPsperMAC=0                    # set to 1 if you have virtual machines with their own IP on a single MAC address - values: 0-->No(*) || 1->Yes
+_multipleIPMAC='XX:XX:XX:XX:XX:XX'           # base MAC address for the virtual machines, or comma separated list if multiple base MAC address
+                                             #   NB - only required if _allowMultipleIPsperMAC == 1
+_enable_ftp='0'                              # set to 1 if you have an FTP site to mirror the data - values: 0-->No(*) || 1->Yes
+                                             #   NB - if _organizeData>0, you will have to create the subdirectories manually
+_ftp_site=''                                 # set to url to your FTP site... ***YOU*** must set up & configure your FTP server
+_ftp_user=''                                 # set to the username for your FTP site
+_ftp_pswd=''                                 # set to the password for your FTP site
+_ftp_dir=''                                  # set to root directory path to your desired storage location
+_useTMangle=0                                # whether or not to use the `-t mangle` option for ipchain: 0->no(*) || 1->yes
+_use_nf_conntrack=1                          # use nf_conntrack rather than ip_conntrack: 0->no(*) || 1->yes
+_logNoMatchingMac=0                          # add an iptables entry to log unknown traffic: 0->no(*) || 1->yes
+_path2ip=''                                  # path to the full version of ip if installed (manually)
+_local_ip6='fe80:'	                         # preface for local ip6 addresses (entered as a comma separated list)
+_includeIncomplete='0'	                     # option to include incomplete MAC entries from arp calls 0->exclude(*) || 1->include
+_append_PPPOE='0'	                         # option to append a PPPOE entry to the ifconfig list - 0->exclude(*) || 1->include (currently unused)
+_guest_iface=''          					 # interface name for guest network, or comma separated list if multiple interfaces

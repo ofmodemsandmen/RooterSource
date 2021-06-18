@@ -1,0 +1,34 @@
+#!/bin/sh
+
+#
+# /etc/hotplug.d/iface/19-rooter
+#
+
+IFACE="wan1"
+
+[ "$ACTION" = ifup -o "$ACTION" = ifupdate ] || exit 0
+
+if [ ${INTERFACE} = "$IFACE" ]; then
+	if [ ${ACTION} = "ifup" ]; then
+# TTL fix
+		ENB=$(uci get ttl.ttl.enabled)
+		if [ ! -z "$ENB" ]; then
+			exst=$(cat /etc/firewall.user | grep " mangle .* $DEVICE " | wc -l)
+			[ "$exst" -eq 4 ] || /usr/lib/custom/ttlx.sh
+		fi
+
+# configure custom MTU value in 'System - Startup - Local Startup' by using "echo 1500 > /tmp/wan1.mtu"
+
+		if [ -s /tmp/$IFACE.mtu ]; then
+			MTU=$(cat /tmp/$IFACE.mtu 2>/dev/null)
+			MTU=$(echo $MTU | grep -o "[[:digit:]]\{3,4\}")
+			if [ -n "$MTU" ]; then
+				ip link set mtu $MTU dev $DEVICE
+				logger -t "MTU adjustment" MTU size on $DEVICE set to $MTU
+			fi
+		fi
+	fi
+fi
+
+
+		

@@ -98,18 +98,6 @@
  }
  
  static void __init qca953x_usb_setup(void)
-@@ -254,10 +289,7 @@ static void __init qca953x_usb_setup(voi
- 	ath79_device_reset_clear(QCA953X_RESET_USB_HOST);
- 	udelay(1000);
- 
--	ath79_usb_register("ehci-platform", -1,
--			   QCA953X_EHCI_BASE, QCA953X_EHCI_SIZE,
--			   ATH79_CPU_IRQ(3),
--			   &ath79_ehci_pdata_v2, sizeof(ath79_ehci_pdata_v2));
-+	ar9xxx_ci_usb_setup(-1, ATH79_CPU_IRQ(3));
- }
- 
- static void qca955x_usb_reset_notifier(struct platform_device *pdev)
 @@ -285,10 +317,7 @@ static void __init qca955x_usb_setup(voi
  {
  	ath79_ehci_pdata_v2.reset_notifier = qca955x_usb_reset_notifier;

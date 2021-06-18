@@ -81,12 +81,22 @@ detect_mac80211() {
 		htmode=""
 		ht_capab=""
 
-		iw phy "$dev" info | grep -q 'Capabilities:' && htmode=HT20
+		iw phy "$dev" info | grep -q 'Capabilities:' && htmode=HT40
 
 		iw phy "$dev" info | grep -q '5180 MHz' && {
-			mode_band="a"
-			channel="36"
 			iw phy "$dev" info | grep -q 'VHT Capabilities' && htmode="VHT80"
+			t4=$(iw phy "$dev" info | grep '2412 MHz')
+			if [ ! -z "$t4" ]; then
+				if [ $htmode = "VHT80" ]; then
+					mode_band="a"
+					channel="36"
+				else
+					htmode="HT40"
+				fi
+			else
+				mode_band="a"
+				channel="36"
+			fi
 		}
 
 		[ -n "$htmode" ] && ht_capab="set wireless.radio${devidx}.htmode=$htmode"
@@ -106,6 +116,35 @@ detect_mac80211() {
 			dev_id="set wireless.radio${devidx}.macaddr=$(cat /sys/class/ieee80211/${dev}/macaddress)"
 		fi
 
+		if [ -e /etc/customwifi ]; then
+			I=0
+			while IFS=$'\n' read -r line
+			do
+				if [ $I = 0 ];then
+					SSID="$line"
+					I=1
+				else
+					if [ $I = 1 ];then
+						SSID5G="$line"
+						I=2
+					else
+						PASSW="$line"
+						break
+					fi
+				fi
+
+			done < /etc/customwifi
+		else
+			SSID="ROOter"
+			SSID5G="ROOter 5G"
+			PASSW="rooter2017"
+		fi
+		if [ $channel = "11" ]; then
+			SSID="$SSID"
+		else
+			SSID="$SSID5G"
+		fi
+
 		uci -q batch <<-EOF
 			set wireless.radio${devidx}=wifi-device
 			set wireless.radio${devidx}.type=mac80211
@@ -113,14 +152,16 @@ detect_mac80211() {
 			set wireless.radio${devidx}.hwmode=11${mode_band}
 			${dev_id}
 			${ht_capab}
-			set wireless.radio${devidx}.disabled=1
+			set wireless.radio${devidx}.disabled=0
+			set wireless.radio${devidx}.noscan=1
 
 			set wireless.default_radio${devidx}=wifi-iface
 			set wireless.default_radio${devidx}.device=radio${devidx}
 			set wireless.default_radio${devidx}.network=lan
 			set wireless.default_radio${devidx}.mode=ap
-			set wireless.default_radio${devidx}.ssid=OpenWrt
-			set wireless.default_radio${devidx}.encryption=none
+			set wireless.default_radio${devidx}.ssid='$SSID'
+			set wireless.default_radio${devidx}.encryption=psk2
+			set wireless.default_radio${devidx}.key=$PASSW
 EOF
 		uci -q commit wireless
 

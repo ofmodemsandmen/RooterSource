@@ -3,6 +3,18 @@
 # Copyright (C) 2010 Vertical Communications
 
 do_mount_root() {
+	#code for checking disks
+	if [ -x '/usr/sbin/fsck.ext4' ]; then
+			if [ -e '/dev/sda1' ]; then
+					echo "Checking disk /dev/sda1...."
+					/usr/sbin/fsck.ext4 -y /dev/sda1
+			fi
+			if [ -e '/dev/sda2' ]; then
+					echo "Checking disk /dev/sds2..."
+					/usr/sbin/fsck.ext4 -y /dev/sda2
+			fi
+	fi
+	
 	mount_root
 	boot_run_hook preinit_mount_root
 	[ -f /sysupgrade.tgz ] && {

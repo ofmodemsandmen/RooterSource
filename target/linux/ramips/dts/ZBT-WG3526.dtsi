@@ -38,8 +38,16 @@
 		compatible = "gpio-leds";
 
 		led_status: status {
-			label = "zbt-wg3526:green:status";
+			label = "green:status";
 			gpios = <&gpio0 24 GPIO_ACTIVE_LOW>;
+		};
+		signal {
+			label = "green:signal";
+			gpios = <&gpio0 10 GPIO_ACTIVE_LOW>;
+		};
+		globe {
+			label = "green:globe";
+			gpios = <&gpio0 12 GPIO_ACTIVE_LOW>;
 		};
 	};
 };
@@ -119,7 +127,7 @@
 &pinctrl {
 	state_default: pinctrl0 {
 		gpio {
-			ralink,group = "wdt", "rgmii2", "jtag", "mdio";
+			ralink,group = "wdt", "rgmii2", "jtag", "mdio", "ic2", "uart1", "uart2", "uart3";
 			ralink,function = "gpio";
 		};
 	};

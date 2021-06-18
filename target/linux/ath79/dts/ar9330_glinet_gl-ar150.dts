@@ -61,6 +61,14 @@
 			gpios = <&gpio 11 GPIO_ACTIVE_HIGH>;
 		};
 	};
+	gpio-export {
+		compatible = "gpio-export";
+
+		gpio_usb_vcc {
+			gpio-export,output = <1>;
+			gpios = <&gpio 6 GPIO_ACTIVE_HIGH>;
+		};
+	};
 };
 
 &uart {
@@ -74,7 +82,6 @@
 
 &usb_phy {
 	status = "okay";
-	gpios = <&gpio 6 GPIO_ACTIVE_HIGH>;
 };
 
 &spi {

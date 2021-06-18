@@ -158,6 +158,15 @@ endef
 
 TARGET_DEVICES += sun8i-h3-nanopi-neo
 
+define Device/sun8i-h3-nanopi-r1
+  DEVICE_TITLE:=FriendlyArm NanoPi R1
+  DEVICE_PACKAGES := kmod-rtc-sunxi kmod-usb-net-rtl8152 \
+	kmod-brcmfmac kmod-leds-gpio kmod-ledtrig-heartbeat wpad-basic \
+	brcmfmac-firmware-43430a0-sdio
+  SUPPORTED_DEVICES:=friendlyarm,nanopi-r1
+  SUNXI_DTS:=sun8i-h3-nanopi-r1
+endef
+TARGET_DEVICES += sun8i-h3-nanopi-r1
 
 define Device/sun8i-h3-orangepi-one
   DEVICE_TITLE:=Xunlong Orange Pi One

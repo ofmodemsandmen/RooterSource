@@ -39,3 +39,4 @@ Signed-off-by: Felix Fietkau <nbd@nbd.name>
  			chan->wmm_rules[ac].min_cwmin =
  				nla_get_u16(tb_wmm[NL80211_WMMR_CW_MIN]);
  			chan->wmm_rules[ac].min_cwmax =
+9°

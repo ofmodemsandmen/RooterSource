@@ -220,6 +220,14 @@ define Device/gnubee_gb-pc2
 endef
 TARGET_DEVICES += gnubee_gb-pc2
 
+define Device/hlk-7621a
+  DTS := HLK-7621A
+  DEVICE_TITLE := HiLink HLK-7621A
+  DEVICE_PACKAGES := kmod-usb3 kmod-usb-ledtrig-usbport
+  IMAGE_SIZE := $(ralink_default_fw_size_32M)
+endef
+TARGET_DEVICES += hlk-7621a
+
 define Device/hc5962
   DTS := HC5962
   BLOCKSIZE := 128k
@@ -297,6 +305,46 @@ define Device/xiaomi_mir3g
 	uboot-envtools
 endef
 TARGET_DEVICES += xiaomi_mir3g
+
+define Device/beeline_smartbox-turbo-plus
+  $(Device/uimage-lzma-loader)
+  DTS := BeelineSB-Turbo-plus
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_SIZE := 4096k
+  IMAGE_SIZE := 124416k
+  UBINIZE_OPTS := -E 5
+  IMAGES += kernel1.bin rootfs0.bin breed.bin
+  IMAGE/kernel1.bin := append-kernel
+  IMAGE/rootfs0.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/breed.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-kernel | \
+	pad-to $$(KERNEL_SIZE) | append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_TITLE := Beeline SmartBox TURBO+
+  DEVICE_PACKAGES := kmod-mt7603 kmod-mt7615e kmod-usb3 \
+	kmod-usb-ledtrig-usbport uboot-envtools wpad-basic
+endef
+TARGET_DEVICES += beeline_smartbox-turbo-plus
+
+define Device/beeline_smartbox-pro
+  $(Device/uimage-lzma-loader)
+  DTS := BeelineSB-Pro
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_SIZE:= 4096k
+  IMAGE_SIZE := 255488k
+  UBINIZE_OPTS := -E 5
+  IMAGES += kernel1.bin rootfs0.bin breed.bin
+  IMAGE/kernel1.bin := append-kernel
+  IMAGE/rootfs0.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/breed.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-kernel | \
+  	pad-to $$(KERNEL_SIZE) | append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_TITLE := Beeline SmartBox PRO
+  DEVICE_PACKAGES := kmod-mt76x2 kmod-usb3 kmod-usb-ledtrig-usbport uboot-envtools wpad-basic
+endef
+TARGET_DEVICES += beeline_smartbox-pro
+
 
 define Device/mt7621
   DTS := MT7621
@@ -412,6 +460,7 @@ define Device/mikrotik_rbm33g
   $(Device/MikroTik)
   DTS := RBM33G
   DEVICE_TITLE := MikroTik RouterBOARD M33G
+  DEVICE_PACKAGES := kmod-usb3 kmod-usb2 kmod-usb-ohci kmod-sdhci-mt7620
 endef
 TARGET_DEVICES += mikrotik_rbm33g
 
@@ -419,6 +468,7 @@ define Device/mikrotik_rbm11g
   $(Device/MikroTik)
   DTS := RBM11G
   DEVICE_TITLE := MikroTik RouterBOARD M11G
+  DEVICE_PACKAGES := kmod-usb3 kmod-usb2 kmod-usb-ohci kmod-sdhci-mt7620
 endef
 TARGET_DEVICES += mikrotik_rbm11g
 
@@ -506,6 +556,28 @@ define Device/ubnt-erx-sfp
   SUPPORTED_DEVICES += ubiquiti,edgerouterx-sfp
 endef
 TARGET_DEVICES += ubnt-erx-sfp
+
+define Device/dualq_h721
+  DTS := H721
+  IMAGE_SIZE := 16064k
+  DEVICE_TITLE := DualQ H721
+  DEVICE_PACKAGES := kmod-ata-core kmod-ata-ahci kmod-sdhci-mt7620 kmod-usb3 \
+		kmod-ath10k-ct kmod-ath9k \
+	 	ath10k-firmware-qca988x-ct ath10k-firmware-qca9984-ct \
+	 	ath10k-firmware-qca99x0-ct ath10k-firmware-qca9888-ct
+  SUPPORTED_DEVICES += h721
+endef
+TARGET_DEVICES += dualq_h721
+
+define Device/mofi5500
+  DTS := Mofi5500
+  IMAGE_SIZE := 16064k
+  DEVICE_TITLE := Mofi5500
+  DEVICE_PACKAGES := kmod-ata-core kmod-ata-ahci kmod-sdhci-mt7620 kmod-usb3 \
+			kmod-mt7603 kmod-mt7615e 
+  SUPPORTED_DEVICES += mofi5500
+endef
+TARGET_DEVICES += mofi5500
 
 define Device/unielec_u7621-06-256m-16m
   DTS := U7621-06-256M-16M
@@ -640,6 +712,14 @@ define Device/zbt-we1326
 	kmod-mt7603 kmod-mt76x2 kmod-usb3 kmod-sdhci-mt7620 wpad-basic
 endef
 TARGET_DEVICES += zbt-we1326
+
+define Device/zbt-we1326v5
+  DTS := ZBT-WE1326v5
+  IMAGE_SIZE := $(ralink_default_fw_size_16M)
+  DEVICE_TITLE := ZBT WE1326v5
+  DEVICE_PACKAGES := kmod-mt7603 kmod-mt76x2 kmod-usb3 kmod-sdhci-mt7620 wpad-basic
+endef
+TARGET_DEVICES += zbt-we1326v5
 
 define Device/zbtlink_zbt-we3526
   DTS := ZBT-WE3526

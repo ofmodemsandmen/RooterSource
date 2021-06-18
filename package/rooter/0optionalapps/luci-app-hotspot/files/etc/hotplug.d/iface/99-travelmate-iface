@@ -1,0 +1,26 @@
+#!/bin/sh
+
+if [ "$ACTION" = ifup -a "$INTERFACE" = "wwan" ]; then
+	exit 1
+fi
+
+if [ "$ACTION" = ifdown -a "$INTERFACE" = "wwan" ]; then
+	uci -q set wireless.wwan.ssid="Disconnected"
+	uci -q set wireless.wwan.encryption="none"
+	uci -q set wireless.wwan.key=
+	uci -q set wireless.wwan.disabled=1
+	uci -q commit wireless
+	logger -t TRAVELMATE-DEBUG "Network Reload"
+	ubus call network reload
+	debug="$(uci -q get travelmate.global.trm_debug)"
+	if [ $debug = "1" ]; then
+		logger -t TRAVELMATE-DEBUG "hotplug (iface): action='$ACTION' interface='$INTERFACE'"
+	fi
+	result=`ps | grep -i "travelmate.sh" | grep -v "grep" | wc -l`
+	if [ $result -ge 1 ]
+   	then
+		logger -t TRAVELMATE-DEBUG "Travelmate already running"
+	else
+		/usr/lib/hotspot/travelmate.sh &
+	fi
+fi

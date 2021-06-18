@@ -53,12 +53,20 @@ ap121f)
 	ucidef_set_led_wlan "wlan" "WLAN" "$board:green:wlan" "phy0tpt"
 	;;
 ap147-010)
-	ucidef_set_led_netdev "wan" "WAN" "ap147:green:wan" "eth1"
+	ucidef_set_led_netdev "wan" "WAN" "ap147:green:wan" "wwan0" "link tx rx"
 	ucidef_set_led_switch "lan1" "LAN1" "ap147:green:lan1" "switch0" "0x10"
 	ucidef_set_led_switch "lan2" "LAN2" "ap147:green:lan2" "switch0" "0x08"
 	ucidef_set_led_switch "lan3" "LAN3" "ap147:green:lan3" "switch0" "0x04"
 	ucidef_set_led_switch "lan4" "LAN4" "ap147:green:lan4" "switch0" "0x02"
 	ucidef_set_led_wlan "wlan2g" "WLAN 2.4 GHz" "ap147:green:wlan-2g" "phy0tpt"
+	;;
+oolite-v5.2)
+	ucidef_set_led_netdev "wan" "WAN" "oolite-v5.2-dev:green:wan" "wwan0" "link tx rx"
+	ucidef_set_led_switch "lan1" "LAN1" "oolite-v5.2-dev:green:lan1" "switch0" "0x10"
+	ucidef_set_led_switch "lan2" "LAN2" "oolite-v5.2-dev:green:lan2" "switch0" "0x08"
+	ucidef_set_led_switch "lan3" "LAN3" "oolite-v5.2-dev:green:lan3" "switch0" "0x04"
+	ucidef_set_led_switch "lan4" "LAN4" "oolite-v5.2-dev:green:lan4" "switch0" "0x02"
+	ucidef_set_led_wlan "wlan2g" "WLAN 2.4 GHz" "oolite-v5.2-dev:green:wlan-2g" "phy0tpt"
 	;;
 ap90q|\
 cpe505n|\

@@ -15,6 +15,7 @@
 #include <asm/mach-ath79/ar71xx_regs.h>
 
 #include "common.h"
+#include "dev-ap9x-pci.h"
 #include "dev-eth.h"
 #include "dev-gpio-buttons.h"
 #include "dev-leds-gpio.h"
@@ -26,6 +27,12 @@
 
 #define GS_OOLITE_V5_2_DEV_GPIO_BTN_RESET	17
 #define GS_OOLITE_V5_2_DEV_GPIO_LED_SYSTEM	13
+#define GS_OOLITE_V5_2_DEV_GPIO_LED_WAN		4
+#define GS_OOLITE_V5_2_DEV_GPIO_LED_LAN1	16
+#define GS_OOLITE_V5_2_DEV_GPIO_LED_LAN2	15
+#define GS_OOLITE_V5_2_DEV_GPIO_LED_LAN3	14
+#define GS_OOLITE_V5_2_DEV_GPIO_LED_LAN4	11
+#define GS_OOLITE_V5_2_DEV_GPIO_LED_WLAN_2G	12
 
 #define GS_KEYS_POLL_INTERVAL		20 /* msec */
 #define GS_KEYS_DEBOUNCE_INTERVAL	(3 * GS_KEYS_POLL_INTERVAL)
@@ -45,7 +52,31 @@ static struct gpio_led gs_oolite_v5_2_dev_gpio_leds[] __initdata = {
 	{
 		.name		= "oolite-v5.2-dev:blue:system",
 		.gpio		= GS_OOLITE_V5_2_DEV_GPIO_LED_SYSTEM,
-		.active_low	= 0,
+		.active_low	= 1,
+	}, {
+		.name		= "oolite-v5.2-dev:green:wlan-2g",
+		.gpio		= GS_OOLITE_V5_2_DEV_GPIO_LED_WLAN_2G,
+		.active_low	= 1,
+	}, {
+		.name		= "oolite-v5.2-dev:green:lan1",
+		.gpio		= GS_OOLITE_V5_2_DEV_GPIO_LED_LAN1,
+		.active_low	= 1,
+	}, {
+		.name		= "oolite-v5.2-dev:green:lan2",
+		.gpio		= GS_OOLITE_V5_2_DEV_GPIO_LED_LAN2,
+		.active_low	= 1,
+	}, {
+		.name		= "oolite-v5.2-dev:green:lan3",
+		.gpio		= GS_OOLITE_V5_2_DEV_GPIO_LED_LAN3,
+		.active_low	= 1,
+	}, {
+		.name		= "oolite-v5.2-dev:green:lan4",
+		.gpio		= GS_OOLITE_V5_2_DEV_GPIO_LED_LAN4,
+		.active_low	= 1,
+	}, {
+		.name		= "oolite-v5.2-dev:green:wan",
+		.gpio		= GS_OOLITE_V5_2_DEV_GPIO_LED_WAN,
+		.active_low	= 1,
 	},
 };
 
@@ -90,12 +121,7 @@ static void __init gs_oolite_v5_2_setup(void)
 	ath79_register_pci();
 	ath79_register_usb();
 	ath79_register_wmac(art + GS_OOLITE_V5_2_WMAC_CALDATA_OFFSET, NULL);
-}
-
-static void __init gs_oolite_v5_2_dev_setup(void)
-{
-	gs_oolite_v5_2_setup();
-
+	
 	ath79_register_leds_gpio(-1, ARRAY_SIZE(gs_oolite_v5_2_dev_gpio_leds),
 				 gs_oolite_v5_2_dev_gpio_leds);
 
@@ -107,5 +133,3 @@ static void __init gs_oolite_v5_2_dev_setup(void)
 MIPS_MACHINE(ATH79_MACH_GS_OOLITE_V5_2, "OOLITE-V5-2",
 	     "GainStrong Oolite V5.2", gs_oolite_v5_2_setup);
 
-MIPS_MACHINE(ATH79_MACH_GS_OOLITE_V5_2_DEV, "OOLITE-V5-2-DEV",
-	     "GainStrong Oolite V5.2-Dev", gs_oolite_v5_2_dev_setup);

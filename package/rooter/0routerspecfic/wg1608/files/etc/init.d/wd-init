@@ -1,0 +1,15 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2013 OpenWrt.org
+
+START=80
+USE_PROCD=1
+
+log() {
+	logger -t "WATCHDOG" "$@"
+}
+
+start_service()
+{
+	/usr/lib/custom/watchdog.sh &
+	log "Start watchdog"
+}

@@ -1,0 +1,135 @@
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -995,6 +995,7 @@
+ 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0125)},	/* Quectel EC25, EC20 R2.0  Mini PCIe */
+ 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0306)},	/* Quectel EP06/EG06/EM06 */
+ 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0512)},	/* Quectel EG12/EM12 */
++	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0620)},	/* Quectel EM20 */
+ 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0620)},	/* Quectel EM160R-GL */
+ 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0800)},	/* Quectel RM500Q-GL */
+ 
+@@ -1031,6 +1032,13 @@
+ 	{QMI_FIXED_INTF(0x05c6, 0x9021, 1)},
+ 	{QMI_FIXED_INTF(0x05c6, 0x9022, 2)},
+ 	{QMI_QUIRK_SET_DTR(0x05c6, 0x9025, 4)},	/* Alcatel-sbell ASB TL131 TDD LTE (China Mobile) */
++	{QMI_QUIRK_SET_DTR(0x03f0, 0x0857, 1)},
++	{QMI_QUIRK_SET_DTR(0x05c6, 0xf601, 5)},
++	{QMI_FIXED_INTF(0x413c, 0x81d8, 0)},	/* Foxconn T77W968 LTE */
++	{QMI_FIXED_INTF(0x1bc7, 0x1910, 0)},	/* LN960 */
++	{QMI_FIXED_INTF(0x19d2, 0x1432, 3)},	/* ME3620-Z*/
++	{QMI_FIXED_INTF(0x05c6, 0x90db, 2)},
++	{QMI_QUIRK_SET_DTR(0x1199, 0x90b1, 8)}, /* Sierra Wireless EM7511 */
+ 	{QMI_FIXED_INTF(0x05c6, 0x9026, 3)},
+ 	{QMI_FIXED_INTF(0x05c6, 0x902e, 5)},
+ 	{QMI_FIXED_INTF(0x05c6, 0x9031, 5)},
+
+--- a/drivers/usb/serial/option.c
++++ b/drivers/usb/serial/option.c
+@@ -51,6 +51,9 @@
+ static void option_instat_callback(struct urb *urb);
+ 
+ /* Vendor and product IDs */
++#define MEIG_VENDOR_ID				0x05c6
++#define MEIG_PRODUCT_f601			0xf601
++#define MEIG_PRODUCT_9025			0x9025
+ #define OPTION_VENDOR_ID			0x0AF0
+ #define OPTION_PRODUCT_COLT			0x5000
+ #define OPTION_PRODUCT_RICOLA			0x6000
+@@ -162,6 +165,7 @@
+ #define NOVATELWIRELESS_PRODUCT_E362		0x9010
+ #define NOVATELWIRELESS_PRODUCT_E371		0x9011
+ #define NOVATELWIRELESS_PRODUCT_U620L		0x9022
++#define NOVATELWIRELESS_PRODUCT_U730L		0x9032
+ #define NOVATELWIRELESS_PRODUCT_G2		0xA010
+ #define NOVATELWIRELESS_PRODUCT_MC551		0xB001
+ 
+@@ -252,6 +256,7 @@
+ #define QUECTEL_PRODUCT_BG96			0x0296
+ #define QUECTEL_PRODUCT_EP06			0x0306
+ #define QUECTEL_PRODUCT_EM12			0x0512
++#define QUECTEL_PRODUCT_EM20			0x0620
+ #define QUECTEL_PRODUCT_RM500Q			0x0800
+ #define QUECTEL_PRODUCT_EC200T			0x6026
+ 
+@@ -583,6 +588,9 @@
+ 
+ 
+ static const struct usb_device_id option_ids[] = {
++	{ USB_DEVICE(MEIG_VENDOR_ID, MEIG_PRODUCT_f601) },
++	{ USB_DEVICE(MEIG_VENDOR_ID, MEIG_PRODUCT_9025) },
++	{ USB_DEVICE(0x03f0, 0x0e57)},
+ 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_COLT) },
+ 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_RICOLA) },
+ 	{ USB_DEVICE(OPTION_VENDOR_ID, OPTION_PRODUCT_RICOLA_LIGHT) },
+@@ -1032,6 +1040,7 @@
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(NOVATELWIRELESS_VENDOR_ID, NOVATELWIRELESS_PRODUCT_E362, 0xff, 0xff, 0xff) },
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(NOVATELWIRELESS_VENDOR_ID, NOVATELWIRELESS_PRODUCT_E371, 0xff, 0xff, 0xff) },
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(NOVATELWIRELESS_VENDOR_ID, NOVATELWIRELESS_PRODUCT_U620L, 0xff, 0x00, 0x00) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(NOVATELWIRELESS_VENDOR_ID, NOVATELWIRELESS_PRODUCT_U730L, 0xff, 0x00, 0x00) },
+ 
+ 	{ USB_DEVICE(AMOI_VENDOR_ID, AMOI_PRODUCT_H01) },
+ 	{ USB_DEVICE(AMOI_VENDOR_ID, AMOI_PRODUCT_H01A) },
+@@ -1085,6 +1094,8 @@
+ 	{ USB_DEVICE_INTERFACE_CLASS(BANDRICH_VENDOR_ID, BANDRICH_PRODUCT_1012, 0xff) },
+ 	{ USB_DEVICE(KYOCERA_VENDOR_ID, KYOCERA_PRODUCT_KPC650) },
+ 	{ USB_DEVICE(KYOCERA_VENDOR_ID, KYOCERA_PRODUCT_KPC680) },
++	{ USB_DEVICE(QUALCOMM_VENDOR_ID, 0x5042),
++	  .driver_info = RSVD(3) },
+ 	{ USB_DEVICE(QUALCOMM_VENDOR_ID, 0x6000)}, /* ZTE AC8700 */
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(QUALCOMM_VENDOR_ID, 0x6001, 0xff, 0xff, 0xff), /* 4G LTE usb-modem U901 */
+ 	  .driver_info = RSVD(3) },
+@@ -1120,6 +1131,10 @@
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EM12, 0xff, 0xff, 0xff),
+ 	  .driver_info = RSVD(1) | RSVD(2) | RSVD(3) | RSVD(4) | NUMEP2 },
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EM12, 0xff, 0, 0) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EM20, 0xff, 0xff, 0x30) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EM20, 0xff, 0, 0) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EM20, 0xff, 0xff, 0xff),
++	  .driver_info = RSVD(1) | RSVD(2) | RSVD(3) | RSVD(4) | NUMEP2 },
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, 0x0620, 0xff, 0xff, 0x30) },	/* EM160R-GL */
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, 0x0620, 0xff, 0, 0) },
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_RM500Q, 0xff, 0xff, 0x30) },
+@@ -1127,6 +1142,8 @@
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_RM500Q, 0xff, 0xff, 0x10),
+ 	  .driver_info = ZLP },
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EC200T, 0xff, 0, 0) },
++	{ USB_DEVICE(QUALCOMM_VENDOR_ID, 0x90db), /* SIMCom SIM8200 */
++	  .driver_info = RSVD(2) },
+ 
+ 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_6001) },
+ 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_CMU_300) },
+@@ -2055,6 +2072,22 @@
+ 	  .driver_info = RSVD(0) | RSVD(1) | RSVD(6) },
+ 	{ USB_DEVICE(0x0489, 0xe0b5),						/* Foxconn T77W968 ESIM */
+ 	  .driver_info = RSVD(0) | RSVD(1) | RSVD(6) },
++	{ USB_DEVICE(0x413c, 0x81d8),						/* Foxconn T77W968 */
++	.driver_info = RSVD(0) | RSVD(1) | RSVD(6) },
++	{ USB_DEVICE(0x1bc7, 0x1910),						/* Ln960 */
++	.driver_info = RSVD(0) | RSVD(1) | RSVD(6) },
++	{ USB_DEVICE(TELIT_VENDOR_ID, 0x1911),				/* Ln960 */
++	.driver_info = RSVD(4) | RSVD(5) },
++	{ USB_DEVICE(0x03f0, 0x0857),				/* Telit LN940 (QMI) */
++	  .driver_info = NCTRL(0) | RSVD(1) },
++	{ USB_DEVICE_INTERFACE_CLASS(0x03f0, 0x0a57, 0xff),	/* Telit LN940 (MBIM) */
++	  .driver_info = NCTRL(0) },
++	{ USB_DEVICE(0x2cb7, 0x0111),				/* FM150 MBIM */
++	  .driver_info = RSVD(1) | RSVD(2) | RSVD(3) },
++	{ USB_DEVICE(0x2cb7, 0x0110),				/* FM150 MBIM */
++	  .driver_info = RSVD(1) | RSVD(2) | RSVD(3) },
++	{ USB_DEVICE(0x05c6, 0x9025),						/* Android T77W968 */
++	  .driver_info = RSVD(0) | RSVD(1) | RSVD(6) },
+ 	{ USB_DEVICE(0x1508, 0x1001),						/* Fibocom NL668 (IOT version) */
+ 	  .driver_info = RSVD(4) | RSVD(5) | RSVD(6) },
+ 	{ USB_DEVICE(0x2cb7, 0x0104),						/* Fibocom NL678 series */
+@@ -2152,6 +2177,11 @@
+ 	if (device_flags & NUMEP2 && iface_desc->bNumEndpoints != 2)
+ 		return -ENODEV;
+ 
++	if (dev_desc->idVendor == cpu_to_le16(MEIG_VENDOR_ID) &&
++	    (dev_desc->idProduct == cpu_to_le16(MEIG_PRODUCT_9025) ||
++	    dev_desc->idProduct == cpu_to_le16(MEIG_PRODUCT_f601)) &&
++		iface_desc->bInterfaceNumber >= 4)
++			return -ENODEV;
+ 	/* Store the device flags so we can use them during attach. */
+ 	usb_set_serial_data(serial, (void *)device_flags);
+ 

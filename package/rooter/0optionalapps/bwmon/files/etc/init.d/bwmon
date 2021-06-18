@@ -1,0 +1,15 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006 OpenWrt.org
+
+START=99
+
+start() {
+	ENB=$(uci get bwmon.bwmon.enabled)
+	if [ $ENB = "1" ]; then
+		/opt/WRTbmon/wrtbwmon.sh &
+	fi
+}
+
+stop() {
+	rmdir -f /tmp/WRTbmon
+}

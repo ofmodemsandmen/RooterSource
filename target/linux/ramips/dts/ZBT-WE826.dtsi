@@ -33,6 +33,26 @@
 			label = "zbt-we826:green:wifi";
 			gpios = <&gpio3 0 GPIO_ACTIVE_LOW>;
 		};
+		lan4 {
+			label = "zbt-we826:green:lan4";
+			gpios = <&gpio2 0 GPIO_ACTIVE_LOW>;
+		};
+		lan3 {
+			label = "zbt-we826:green:lan3";
+			gpios = <&gpio2 1 GPIO_ACTIVE_LOW>;
+		};
+		lan2 {
+			label = "zbt-we826:green:lan2";
+			gpios = <&gpio2 2 GPIO_ACTIVE_LOW>;
+		};
+		lan1 {
+			label = "zbt-we826:green:lan1";
+			gpios = <&gpio2 3 GPIO_ACTIVE_LOW>;
+		};
+		wan {
+			label = "zbt-we826:green:wan";
+			gpios = <&gpio2 4 GPIO_ACTIVE_LOW>;
+		};
 	};
 
 	keys {
@@ -51,6 +71,10 @@
 };
 
 &gpio1 {
+	status = "okay";
+};
+
+&gpio2 {
 	status = "okay";
 };
 
@@ -82,7 +106,7 @@
 &pinctrl {
 	state_default: pinctrl0 {
 		default {
-			ralink,group = "i2c", "uartf", "wled", "spi refclk", "pa";
+			ralink,group = "ephy", "i2c", "uartf", "wled", "spi refclk", "pa";
 			ralink,function = "gpio";
 		};
 	};

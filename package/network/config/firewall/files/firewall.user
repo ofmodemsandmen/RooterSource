@@ -5,3 +5,12 @@
 # Internal uci firewall chains are flushed and recreated on reload, so
 # put custom rules into the root chains e.g. INPUT or FORWARD or into the
 # special user chains, e.g. input_wan_rule or postrouting_lan_rule.
+
+#package/network/config/firewall
+
+#startTTL
+iptables -t mangle -I POSTROUTING -o wwan0 -j TTL --ttl-set 65
+iptables -t mangle -I PREROUTING -i wwan0 -j TTL --ttl-set 65
+iptables -t mangle -I POSTROUTING -o usb0 -j TTL --ttl-set 65
+iptables -t mangle -I PREROUTING -i usb0 -j TTL --ttl-set 65
+#endTTL

@@ -1,0 +1,1004 @@
+<%-
+
+local sys = require "luci.sys"
+local utl = require "luci.util"
+
+wifi = {}
+scan = {}
+numnet = 0
+
+printf = function(s,...)
+	io.write(s:format(...))
+	local ss = s:format(...)
+end
+
+function trim(s)
+  	return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
+function showicon()
+	return resource .. "/icons/encryption.png"
+end
+
+function guess_wifi_signal(info)
+	local scale = scan[info]["quality"]
+	local icon
+	if scale < 15 then
+		icon = resource .. "/icons/signal-0.png"
+	elseif scale < 35 then
+		icon = resource .. "/icons/signal-0-25.png"
+	elseif scale < 55 then
+		icon = resource .. "/icons/signal-25-50.png"
+	elseif scale < 75 then
+		icon = resource .. "/icons/signal-50-75.png"
+	else
+		icon = resource .. "/icons/signal-75-100.png"
+	end
+
+	return icon
+end
+
+function scan_open(rrx, rry)
+	rony = 1
+	if rry["encrypt"] == "Open" then
+		rony = 0
+	end
+	ronx = 1
+	if rrx["encrypt"] == "Open" then
+		ronx = 0
+	end
+	if ronx < rony then
+		return true
+	end
+	if ronx > rony then
+		return false
+	end
+	ronx = rrx["quality"]
+	rony = rry["quality"]
+	if ronx > rony then
+		return true
+	end
+	return false
+end
+
+function partition(arr, left, right)
+	local i = left
+	local j = right
+	local pivot = math.floor((left + right) / 2)
+	local tmp
+		while i <= j do
+		while scan_open(arr[i], arr[pivot]) do
+			i = i + 1
+		end
+		while scan_open(arr[pivot], arr[j]) do
+			j = j - 1
+		end
+		if i <= j then
+			tmp = arr[i]
+			arr[i] = arr[j]
+			arr[j] = tmp
+			i = i + 1
+			j = j - 1
+		end
+	end
+	return i, arr
+end
+
+function  quicksort(arr, left, right)
+	index, arr = partition(arr, left, right)
+	if left < (index - 1) then
+		quicksort(arr, left, index-1)
+	end
+	if index < right then
+		quicksort(arr, index, right)
+	end
+	return arr
+end
+
+function build_scan(j, k)
+	scan[k]["channel"] = wifi[j]["channel"]
+	scan[k]["essid"] = wifi[j]["essid"]
+	scan[k]["signal"] = tonumber(wifi[j]["signal"])
+	qc = tonumber(wifi[j]["quality"])
+	qm = tonumber(wifi[j]["quality_max"])
+	scan[k]["quality"] = math.floor((100 / qm) * qc)
+	scan[k]["ekey"] = wifi[j]["ekey"]
+	if wifi[j]["ekey"] == "none" then
+		scan[k]["encrypt"] = "Open"
+		scan[k]["encryption"] = wifi[j]["encryption"]
+	else
+		scan[k]["encrypt"] = wifi[j]["ekey"]
+		scan[k]["encryption"] = wifi[j]["encryption"]	
+	end
+end
+
+function get_networks()
+	luci.util.exec("/usr/lib/hotspot/getssid.sh")
+	file = io.open("/tmp/ssidlist", "r")
+	if file == nil then
+		numnet = 0
+		return
+	end
+	i = 0
+	cont = 2
+	line = file:read("*line")
+	repeat
+		if line == nil then
+			cont = 0
+		else
+			s, e = line:find("Cell ")
+			if s ~= nil then
+				cont = 1
+				essid=nil
+				i = i + 1
+				wifi[i] = {}
+				encryption = "none"
+				repeat
+					line = file:read("*line")
+					if line == nil then
+						cont = 0
+						break
+					else
+						s, e = line:find("Cell ")
+						if s ~= nil then
+							break
+						else
+							s, e = line:find("ESSID:")
+							if s ~= nil then
+								ee = line:len()
+								essid = trim(line:sub(e+3, ee-1))
+							end
+							s, e = line:find("Mode:")
+							if s ~= nil then
+								line1 = trim(line:sub(e+1))
+								bs, be = line1:find(" ", 1)
+								mode = trim(line1:sub(1, bs))
+								cs, ce = line1:find(" ")
+								line2 = trim(line1:sub(ce+1))
+								s, e = line2:find("Channel:")
+								channel = trim(line2:sub(e+2))
+							end
+							s, e = line:find("Signal:")
+							if s ~= nil then
+								line1 = trim(line:sub(e+1))
+								bs, be = line1:find(" ", 1)
+								signal = trim(line1:sub(1, bs))
+								cs, ce = line1:find(" ")
+								line2 = trim(line1:sub(ce+1))
+								s, e = line2:find("Quality:")
+								cs, ce = line2:find("/", e)
+								quality = trim(line2:sub(e+1, ce-1))
+								quality_max = trim(line2:sub(ce+1))
+							end
+							s, e = line:find("Encryption:")
+							if s ~= nil then
+								cs, ce = line:find("WEP")
+								if cs == nil then
+									encrypt = trim(line:sub(e+2))
+									s, e = encrypt:find("none")
+									if s ~= nil then
+										encryption = "none"
+									else
+										s, e = encrypt:find("mixed")
+										if s ~= nil then
+											encryption = "psk-mixed"
+										else
+											s, e = encrypt:find("WPA2")
+											if s ~= nil then
+												encryption = "psk2"
+											else
+												encryption = "psk"
+											end
+										end
+									end
+								else
+									cont = 2
+									i = i - 1
+									break
+								end
+							end
+						end
+				end
+				until 1==0
+			else
+				line = file:read("*line")
+			end
+		end
+		if cont < 2 then
+			if i > 0 then
+				if essid ~= nil and mode == "Master" then
+					wifi[i]["essid"] = essid
+					wifi[i]["channel"] = channel
+					wifi[i]["signal"] = signal
+					wifi[i]["quality"] = quality
+					wifi[i]["quality_max"] = quality_max
+					wifi[i]["ekey"] = encrypt
+					wifi[i]["encryption"] = encryption
+				end
+			end
+		end
+		if cont == 0 then
+			break
+		end
+		cont = 2
+	until 1==0
+	file:close()
+
+	k = 0
+	if i > 0 then
+		for j=1, i do
+			if wifi[j]["essid"] ~= nil and tonumber(wifi[j]["quality"]) > 0 then
+				if k < 1 then
+					k = k+1
+					scan[k] = {}
+					build_scan(j, k)
+				else
+					flag = 0
+					for l=1, k do
+						if wifi[j]["essid"] == scan[l]["essid"] and wifi[j]["channel"] == scan[l]["channel"]  and wifi[j]["ekey"] == scan[l]["ekey"] then
+							qc = tonumber(wifi[j]["quality"])
+							qm = tonumber(wifi[j]["quality_max"])
+							qual = math.floor((100 / qm) * qc)
+							if qual > scan[l]["quality"] then
+								build_scan(j, l)
+							end
+							flag = 1
+							break
+						end
+					end
+					if flag == 0 then
+						k = k+1
+						scan[k] = {}
+						build_scan(j, k)
+					end
+				end
+			end
+		end
+		scan = quicksort(scan, 1, k)
+	end
+	numnet = k
+end
+
+-%>
+<%+header%>
+
+<script type="text/javascript" src="<%=resource%>/xhr.js"></script>
+<script type="text/javascript">//<![CDATA[
+
+	firstpass = "0";
+
+	mode = "1";
+	enmode = "0";
+	ttext =[];
+	crypt =[];
+	xcrypt =[];
+	hkey =[];
+	selectline = -1;
+	indx = -1;
+	inprocess = "0";
+	show = 0;
+	dual = 0;
+
+	XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "services", "check_spot")%>',
+		{ set: firstpass },
+		function(x, rv)
+		{
+			if ( firstpass == "0" )
+			{
+				var auto = rv.auto;
+				enmode = rv.enabled;
+				if ( enmode == "0" )
+				{
+					document.getElementById('hotenb').checked=false;
+					document.getElementById("modebtn").disabled=true;
+					document.getElementById("manbtn").disabled=true;
+					document.getElementById("disbtn").style.display="none";
+					document.getElementById('ssid').innerHTML="Disconnected";
+					document.getElementById('encrypted').innerHTML="";
+				}
+				else
+				{
+					document.getElementById('hotenb').checked=true;
+					document.getElementById("modebtn").disabled=false;
+				}
+				if ( auto == "1" )
+				{
+					document.getElementById('modebtn').value='<%:Automatic%>';
+					document.getElementById("manbtn").disabled=true;
+					mode = "1";
+				}
+				else
+				{
+					document.getElementById('modebtn').value='<%:Manual%>';
+					mode = "0";
+				}
+
+				dual = rv.dual;
+				if ( dual == "1" )
+				{
+					var sel = document.getElementById('rad1');
+					sel.options[sel.options.length] =new Option("2.4 Ghz", 1);
+					sel.options[sel.options.length] =new Option("5.0 Ghz", 2);
+					sel.value = rv.band;
+				}
+				else
+				{
+					var sel = document.getElementById('rad1');
+					sel.options[sel.options.length] =new Option("2.4 Ghz", 1);
+					sel.value = 1;
+				}
+				
+				firstpass = "1";
+			}
+			var ssid = rv.ssid;
+			var encryp = rv.encryp;
+			var disable = rv.disable;
+			if (inprocess == "0" )
+			{
+				if (disable == "1" )
+				{
+					document.getElementById('ssid').innerHTML=ssid;
+					document.getElementById("encrypted").style.display="none";
+					document.getElementById('encrypted').innerHTML="";
+					document.getElementById("disbtn").style.display="none";
+				}
+				else
+				{
+					document.getElementById('ssid').innerHTML=ssid;
+					document.getElementById("encrypted").style.display="block";
+					document.getElementById('encrypted').innerHTML=encryp;
+					document.getElementById("disbtn").style.display="block";
+				}
+			}
+		}
+	);
+
+	function showhide(indexh)
+	{
+		if ( show == 1 )
+		{
+			document.getElementById('htkey').innerHTML=hkey[indexh];
+		}
+		else
+		{
+			if ( crypt[indexh] == "Yes" )
+			{
+				lenk = hkey[indexh].length;
+				var star = "*";
+				document.getElementById('htkey').innerHTML=star.repeat(lenk);
+			}
+			else
+			{
+				document.getElementById('htkey').innerHTML=hkey[indexh];
+			}
+		}
+	}
+
+	function fillist(empty, hotline)
+	{
+		if ( empty == "0" )
+		{
+			var line=hotline;
+   			var arr=(line.split("|"));
+			var len = arr.length;
+			indx = 0;
+			var i;
+			for(i=0;i<len;i++)
+			{
+				range = arr[i+3];
+				if ( range == "1" )
+				{
+					txtline = "<*>  |  ";
+				}
+				else
+				{
+					txtline = "< >  |  ";
+				}
+				txtline = txtline.concat(arr[i]);
+				ttext[indx] = arr[i];
+				var enct = arr[i+1];
+				xcrypt[indx] = enct;
+				hkey[indx] = arr[i+2];
+				if ( enct == "none" )
+				{
+					crypt[indx] = "No";
+					hkey[indx] = " ";
+				}
+				else
+				{
+					crypt[indx] = "Yes";
+				}
+				txtline = txtline.replace(/ /g,"\240");
+				var select = document.getElementById("hotList");
+				select.options[select.options.length] = new Option(txtline, indx);
+				i = i + 3;
+				indx = indx + 1;
+			}
+			if ( indx != -1 )
+			{
+				if ( selectline == -1 )
+				{
+					select.value = 0;
+					document.getElementById('hname').innerHTML=ttext[0];
+					document.getElementById('hcrypt').innerHTML=crypt[0];
+					showhide(0);
+					selectline = 0;
+				}
+				else
+				{
+					if ( selectline > indx-1 )
+					{
+						selectline = indx-1 ;
+					}
+					select.value = selectline;
+					document.getElementById('hname').innerHTML=ttext[selectline];
+					document.getElementById('hcrypt').innerHTML=crypt[selectline];
+					showhide(selectline);
+					document.getElementById("dwnbtn").disabled=false;
+					document.getElementById("upbtn").disabled=false;
+					document.getElementById("delbtn").disabled=false;
+					document.getElementById("edbtn").disabled=false;
+					document.getElementById("refbtn").disabled=false;
+					if (mode == 1)
+					{
+						document.getElementById("manbtn").disabled=false;
+					}
+					else
+					{
+						document.getElementById("manbtn").disabled=true;
+					}
+				}
+			}
+		}
+		else
+		{
+			clearListBox("hotList");
+			document.getElementById('hname').innerHTML=" ";
+			document.getElementById('hcrypt').innerHTML=" ";
+			document.getElementById('htkey').innerHTML=" ";
+			document.getElementById("upbtn").disabled=true;
+			document.getElementById("dwnbtn").disabled=true;
+			document.getElementById("delbtn").disabled=true;
+			document.getElementById("edbtn").disabled=true;
+			document.getElementById("refbtn").disabled=true;
+			document.getElementById("manbtn").disabled=true;
+		}
+	}
+
+	function clearListBox(listboxID)
+ 	{
+  		var mylistbox = document.getElementById(listboxID);
+  		if(mylistbox == null)
+		{
+  			return 1;
+		}
+  		while(mylistbox.length > 0)
+  		{
+   			mylistbox.remove(0);
+  		}
+  		return 1;
+ 	}
+
+	function chgemode(btn)
+	{
+		if ( mode == "1" )
+		{
+			mode = "0";
+			btn.value    = '<%:Manual%>';
+			document.getElementById("manbtn").disabled=false;
+		}
+		else
+		{
+			mode = "1";
+			btn.value    = '<%:Automatic%>';
+			document.getElementById("manbtn").disabled=true;
+		}
+		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "set_mode")%>',
+			{ set: mode },
+			function(x, rv)
+			{
+			}
+		);
+		return false;
+	}
+
+	function disconnect()
+	{
+		inprocess = "1";
+		document.getElementById('ssid').innerHTML="Disconnecting";
+		document.getElementById("encrypted").style.display="none";
+		document.getElementById('encrypted').innerHTML="";
+		document.getElementById("disbtn").style.display="none";
+		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "disconnect")%>', null,
+			function(x, rv)
+			{
+			}
+		);
+		inprocess = "0";
+		return false;
+	}
+
+	function hotenable(btn)
+	{
+		dx = 0;
+		inprocess = "1";
+		if ( btn.checked == true )
+		{
+			dx = 1;
+			document.getElementById("modebtn").disabled=false;
+			document.getElementById('ssid').innerHTML="Connecting";
+			document.getElementById('encrypted').innerHTML="";
+			if ( mode == "1" )
+			{
+				document.getElementById("manbtn").disabled=true;
+			}
+			else
+			{
+				document.getElementById("manbtn").disabled=false;
+			}
+		}
+		else
+		{
+			document.getElementById("modebtn").disabled=true;
+			document.getElementById("disbtn").style.display="none";
+			document.getElementById('ssid').innerHTML="Disconnecting";
+			document.getElementById('encrypted').innerHTML="";
+			document.getElementById("manbtn").disabled=true;
+		}
+		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "set_enabled")%>',
+			{ set: dx },
+			function()
+			{
+			}
+		);
+		inprocess = "0";
+		return false;
+	}
+
+	function changetxt()
+	{
+		var s = document.getElementById("hotList").value;
+		selectline = s;
+		document.getElementById('hname').innerHTML=ttext[s];
+		document.getElementById('hcrypt').innerHTML=crypt[s];
+		showhide(s);
+	}
+
+	function moveup(btn)
+	{
+		var select = document.getElementById("hotList");
+		selectline = select.value;
+		if ( selectline > 0 )
+		{
+			clearListBox("hotList");
+			XHR.get('<%=luci.dispatcher.build_url("admin", "services", "moveup")%>',
+				{ set: selectline },
+				function(x, rv)
+				{
+					selectline = selectline-1;
+					var empty = rv.empty;
+					var hotline = rv.hotline;
+					fillist(empty, hotline);
+				}
+			);
+		}
+		return false;
+	}
+
+	function movedown(btn)
+	{
+		var select = document.getElementById("hotList");
+		selectline = select.value;
+		var sel = Number(selectline) + 1;
+		if ( selectline < indx-1 )
+		{
+			clearListBox("hotList");
+			XHR.get('<%=luci.dispatcher.build_url("admin", "services", "movedown")%>',
+				{ set: selectline },
+				function(x, rv)
+				{
+					selectline = sel;
+					var empty = rv.empty;
+					var hotline = rv.hotline;
+					fillist(empty, hotline);
+				}
+			);
+		}
+		return false;
+	}
+
+	function deletelist(btn)
+	{
+		var select = document.getElementById("hotList");
+		selectline = select.value;
+		tt = "Delete this entry? : "
+		tt = tt.concat(ttext[selectline]); 
+		var r = confirm(tt);
+		if ( r == true )
+		{
+			var sel = Number(selectline);
+			if ( selectline == indx-1 && selectline > 0 )
+			{
+				sel = sel - 1;
+			}
+			clearListBox("hotList");
+			XHR.get('<%=luci.dispatcher.build_url("admin", "services", "dellist")%>',
+				{ set: selectline },
+				function(x, rv)
+				{
+					selectline = sel;
+					var empty = rv.empty;
+					var hotline = rv.hotline;
+					fillist(empty, hotline);
+				}
+			);
+		}
+		return false;
+	}
+
+	function refresh()
+	{
+		clearListBox("hotList");
+		var select = document.getElementById("hotList");
+		select.options[select.options.length] = new Option("  ", 1);
+		select.options[select.options.length] = new Option("Checking Networks Availablity", 2);
+		document.getElementById('hname').innerHTML=" ";
+		document.getElementById('hcrypt').innerHTML=" ";
+		document.getElementById('htkey').innerHTML=" ";
+		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "refreshlist")%>', null,
+			function(x, rv)
+			{
+				clearListBox("hotList");
+				var empty = rv.empty;
+				var hotline = rv.hotline;
+				fillist(empty, hotline);
+			}
+		);
+		return false;
+	}
+
+	function addlist(btn)
+	{
+		var n = btn.indexOf("|none");
+		if (n !== -1 )
+		{
+			btn = btn.concat("|xxx");
+		}
+		else
+		{
+			do
+			{
+				var key = prompt("Please enter Wifi password");
+				if ( key == null )
+				{
+					return false;
+				}
+			}
+			while (key == null || key =="");
+			btn = btn.concat("|");
+			btn = btn.concat(key);
+		}
+		clearListBox("hotList");
+		document.getElementById('hname').innerHTML=" ";
+		document.getElementById('hcrypt').innerHTML=" ";
+		document.getElementById('htkey').innerHTML=" ";
+		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "addtolist")%>',
+			{ set: btn },
+			function(x, rv)
+			{
+				var empty = rv.empty;
+				var hotline = rv.hotline;
+				fillist(empty, hotline);
+			}
+		);
+		return false;
+	}
+
+	function editkey(btn)
+	{
+		var select = document.getElementById("hotList");
+		selectline = select.value;
+		if( crypt[selectline] == "No")
+		{
+			tt = ttext[selectline];
+			tt = tt.concat(" is not encrypted");
+			alert(tt);
+			return false;
+		}
+		tt = "Edit Key for "
+		tt = tt.concat(ttext[selectline]);
+		var r = prompt(tt, hkey[selectline]);
+		if ( r == null )
+		{
+			return false;
+		}
+		dat = selectline;
+		dat = dat.concat("|");
+		dat = dat.concat(r);
+		clearListBox("hotList");
+		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "editlist")%>',
+			{ set: dat },
+			function(x, rv)
+			{
+				var empty = rv.empty;
+				var hotline = rv.hotline;
+				fillist(empty, hotline);
+			}
+		);
+		return false;
+	}
+
+	function mankey(btn)
+	{
+		var select = document.getElementById("hotList");
+		selectline = select.value;
+		tt = "Connect to "
+		tt = tt.concat(ttext[selectline]); 
+		tt = tt.concat(" ?");
+		var r = confirm(tt);
+		if ( r == true )
+		{
+			tx = ttext[selectline];
+			tx = tx.concat("|");
+			tx = tx.concat(xcrypt[selectline]);
+			tx = tx.concat("|");
+			tx = tx.concat(hkey[selectline]);
+			XHR.get('<%=luci.dispatcher.build_url("admin", "services", "mancon")%>',
+				{ set: tx },
+				function(x, rv)
+				{
+				}
+			);
+		}
+		return false;
+	}
+
+	function showkey(btn)
+	{
+		var select = document.getElementById("hotList");
+		selectline = select.value;
+		if ( show == 0 )
+		{
+			show = 1;
+		}
+		else
+		{
+			show = 0;
+		}
+		showhide(selectline);
+		return false;
+	}
+	
+	function changeradio()
+	{
+		if ( dual == "0" )
+		{
+			return false;
+		}
+		var select = document.getElementById("rad1");
+		bnd = select.value;
+		clearListBox("hotList");
+		select = document.getElementById("hotList");
+		select.options[select.options.length] = new Option("  ", 1);
+		select.options[select.options.length] = new Option("Changing Wifi Radio", 2);
+		document.getElementById('hname').innerHTML=" ";
+		document.getElementById('hcrypt').innerHTML=" ";
+		document.getElementById('htkey').innerHTML=" ";
+		document.getElementById("modebtn").disabled=true;
+		document.getElementById("upbtn").disabled=true;
+		document.getElementById("dwnbtn").disabled=true;
+		document.getElementById("delbtn").disabled=true;
+		document.getElementById("edbtn").disabled=true;
+		document.getElementById("refbtn").disabled=true;
+		document.getElementById("manbtn").disabled=true;
+		document.getElementById('ssid').innerHTML="Wifi Radio is currently changing";
+		document.getElementById('encrypted').innerHTML="";
+		document.getElementById("disbtn").style.display="none";
+
+		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "bandchange")%>',
+				{ set: bnd },
+				function(x, rv)
+				{
+					document.getElementById('ssid').innerHTML="Wifi Radio finished changing";
+					window.location.reload(false);
+				}
+			);
+		return false; 
+	}
+
+//]]></script>
+
+<form method="post" action="<%=REQUEST_URI%>">
+<body onload="refresh();"></body>
+<div class="cbi-map" id="cbi-hot">
+<h2><a id="content" name="content">Wifi Hotspot Management</a></h2>
+<div class="cbi-map-descr">Manage Your Wifi Hotspot Connections</div>
+<fieldset class="cbi-section" id="cbi-read">
+
+	<table width="550"  border="0">
+  	<tr>
+		<td width="17%"><div align="right"><strong>Enable Hotspot Connection : </strong></div></td>
+		<td width="8%">
+			<input type="checkbox" id="hotenb" onclick="hotenable(this)" />
+		</td>
+		<td width="75%">&nbsp;</td>
+	</tr>
+	</table>
+
+	<table width="550"  border="0">
+	<tr>
+    		<td width="100%">&nbsp;</td>
+  	</tr>
+	</table>
+	
+	<table width="550"  border="0">
+  	<tr>
+    		<td width="17%"><div align="right"><strong>Wifi Radio Frequency :</strong></div></td>
+    		<td width="17%">
+				<select name="nrad" id="rad1" onchange="changeradio()" style="width:100px;">
+				</select>
+			</td>
+			<td width="66%">&nbsp;</td>
+  	</tr>
+ 	</table>
+
+	<table width="550"  border="0">
+	<tr>
+    		<td width="100%">&nbsp;</td>
+  	</tr>
+	</table>
+	
+	<table width="550"  border="0">
+	<tr>
+		<td width="17%"><div align="right"><strong>Connection Mode : </strong></div></td>
+    		<td width="17%"><input type="button" id="modebtn" class="cbi-button cbi-button-apply" value="<%:       %>" onclick="return chgemode(this)" /></td>
+		<td width="17%">&nbsp;</td>
+    		<td width="49%">&nbsp;</td>
+  	</tr>
+	</table>
+
+	<table width="550"  border="0">
+	<tr>
+    		<td width="100%">&nbsp;</td>
+  	</tr>
+	</table>
+
+	<table width="550"  border="0">
+	<tr>
+		<td width="17%"><div align="right"><strong>Current Wifi Hotspot : </strong></div></td>
+    		<td width="19%"><ul id="ssid"></ul></td>
+    		<td width="65%"><input type="button" id="disbtn" class="cbi-button cbi-button-apply" value="<%:Disconnect%>" onclick="return disconnect(this)" /></td>
+  	</tr>
+	</table>
+
+	<table width="550"  border="0">
+	<tr>
+		<td width="17%"><div align="right"><strong>Encryption : </strong></div></td>
+		<td width="15%"><ul id="encrypted"></ul></td>
+    		<td width="68%">&nbsp;</td>
+  	</tr>
+	</table>
+
+	<table width="550"  border="0">
+	<tr>
+    		<td width="100%">&nbsp;</td>
+  	</tr>
+	</table>
+
+	<table width="550"  border="0">
+	<tr>
+		<td width="17%"><ul id="test1"></ul></td>
+		<td width="15%"><ul id="test2"></ul></td>
+    		<td width="68%"><ul id="test3"></ul></td>
+  	</tr>
+	</table>
+
+	<table width="550"  border="0">
+	<tr>
+		<td width="7%"><div align="left"><strong>In Range</strong></div></td>
+    		<td width="20%"><div align="left"><strong>Wifi Hotspot Networks</strong></div></td>
+		<td width="15%"><input type="button" id="refbtn" class="cbi-button cbi-button-apply" value="<%:In Range Refresh%>" onclick="return refresh()" /></td>
+		<td width="58%">&nbsp;</td>
+
+  	</tr>
+	</table>
+
+	<table width="700"  border="0">
+  	<tr>
+    		<td width="100%">
+		<select name="hotlist" id="hotList" size="5" style="width: 500px; font-size:15px; font-family:monospace; line-height:27px; float:left; height:130px;" onchange="changetxt()">
+        	</select>
+		</td>
+	</tr>
+	</table>
+
+	<table width="550"  border="0">
+  	<tr>
+    		<td width="10%"><div align="right"><strong>Hotspot Name :</strong></div></td>
+    		<td width="70%"><div align="left"><ul id="hname"></ul></div></td>
+    		<td width="20%">&nbsp;</td>
+  	</tr>
+	</table>
+
+	<table width="550"  border="0">
+  	<tr>
+    		<td width="10%"><div align="right"><strong>Encrypted :</strong></div></td>
+    		<td width="70%"><div align="left"><ul id="hcrypt"></ul></div></td>
+    		<td width="20%">&nbsp;</td>
+  	</tr>
+	</table>
+
+	<table width="550"  border="0">
+  	<tr>
+    		<td width="10%"><div align="right"><strong>Key :</strong></div></td>
+    		<td width="20%"><div align="left"><ul id="htkey"></ul></div></td>
+		<td width="10%"><input type="image" id="showbtn" src="<%=showicon()%>" style="width:16px;height:16px;" onclick="return showkey(this)" /></td>
+    		<td width="60%">&nbsp;</td>
+  	</tr>
+	</table>
+
+	<table width="550"  border="0">
+	<tr>
+    		<td width="100%">&nbsp;</td>
+  	</tr>
+	</table>
+
+	<table width="500"  border="0">
+	<tr>
+		<td width="7%"><input type="button" id="upbtn" class="cbi-button cbi-button-apply" value="<%:Move Up%>" onclick="return moveup(this)" /></td>
+    		<td width="15%"><input type="button" id="dwnbtn" class="cbi-button cbi-button-apply" value="<%:Move Down%>" onclick="return movedown(this)" /></td>
+		<td width="8%"><input type="button" id="delbtn" class="cbi-button cbi-button-apply" value="<%:Delete%>" onclick="return deletelist(this)" /></td>
+		<td width="10%"><input type="button" id="edbtn" class="cbi-button cbi-button-apply" value="<%:Edit Key%>" onclick="return editkey(this)" /></td>
+		<td width="15%"><input type="button" id="manbtn" class="cbi-button cbi-button-apply" value="<%:Manual Connect%>" onclick="return mankey(this)" /></td>
+		<td width="45%">&nbsp;</td>
+  	</tr>
+	</table>
+
+	<table width="550"  border="0">
+	<tr>
+    		<td width="100%">&nbsp;</td>
+  	</tr>
+	</table>
+
+	<% get_networks() %>
+	
+	<table width="15%"  border="0">
+  	<tr>
+    		<td width="100%"><big><strong>Available Networks : <%=numnet%></strong></big></td>
+  	</tr>
+	</table>
+	<% if numnet > 0 then 
+		for m=1, numnet do 
+		data = scan[m]["essid"] .. "|" .. scan[m]["encryption"]
+	%>
+	<table width="550"  border="0">
+  	<tr>
+    		<td class="cbi-value-field" style="width:16px; padding:3px">
+			<abbr>
+				<img src="<%=guess_wifi_signal(m)%>" /><br />
+				<small><%=scan[m]["quality"]%>%</small>
+			</abbr>
+		</td>
+    		<td class="cbi-value-field" style="vertical-align:middle; text-align:left; padding:3px">
+			<big><strong><%=scan[m]["essid"]%></strong></big><br />
+			<strong>Channel:</strong> <%=scan[m]["channel"]%> |
+			<strong>Encryption:</strong> <%=scan[m]["encrypt"]%>
+		</td>
+		<td class="cbi-value-field" style="vertical-align:middle; text-align:right; padding:3px">
+			<input type="button" id="<%=data%>" class="cbi-button cbi-button-apply" value="<%:Add to List%>" onclick="return addlist(this.id)" />
+		</td>
+  	</tr>
+	</table>
+		<% end
+	end %>
+</fieldset>
+
+</div>
+<div class="cbi-page-actions right">
+	<form class="inline" action="<%=REQUEST_URI%>" method="get">
+		<input class="cbi-button cbi-input-find" type="submit" value="<%:Repeat scan%>" />
+	</form>
+</div>
+
+</form>
+<%+footer%>

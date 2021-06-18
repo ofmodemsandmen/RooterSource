@@ -15,9 +15,12 @@ html {
 
 body {
 	color: #ffffff;
-	background-color: #4a6b7c;
-	background-position: bottom center;
-	background-repeat: repeat-x;
+	background: url('./background/main_bg.jpg');
+	background-repeat:no-repeat;
+    background-attachment:fixed;
+    background-position:center;
+	background-color:#07223e;
+	background-size: 100% 100%;
 	font-family: Arial, Verdana, sans-serif;
 	font-size: 13px;
 	padding-bottom: 1.5em;

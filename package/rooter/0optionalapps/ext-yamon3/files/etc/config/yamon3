@@ -1,0 +1,8 @@
+config yamon3 'yamon3'
+	option enabled '0'
+
+config tmpyamon3 'tmpyamon3'
+
+config curryamon3 'curryamon3'
+	option enabled '0'
+	

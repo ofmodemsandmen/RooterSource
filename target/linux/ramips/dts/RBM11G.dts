@@ -69,16 +69,13 @@
 		};
 	};
 
-	pcie0_vcc_reg {
-		compatible = "regulator-fixed";
-		regulator-name = "pcie0_vcc";
-
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&gpio0 9 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-boot-on;
-		regulator-always-on;
+	gpio-export {
+		compatible = "gpio-export";
+ 
+		gpio_pcie0_power {
+			gpio-export,output = <1>;
+			gpios = <&gpio0 9 GPIO_ACTIVE_HIGH>;
+		};
 	};
 };
 

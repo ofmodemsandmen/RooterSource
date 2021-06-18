@@ -151,7 +151,9 @@ endef
 
 ralink_default_fw_size_4M=3866624
 ralink_default_fw_size_8M=8060928
-ralink_default_fw_size_16M=16121856
+ralink_default_fw_size_16M=16449536
+BuildFirmware/Default16M/squashfs=$(call BuildFirmware/OF,$(1),$(2),$(3),$(ralink_default_fw_size_16M),$(4))
+BuildFirmware/Default16M/initramfs=$(call BuildFirmware/OF/initramfs,$(1),$(2),$(3),$(4))
 ralink_default_fw_size_32M=33226752
 
 ifeq ($(SUBTARGET),rt288x)

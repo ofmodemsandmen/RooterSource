@@ -55,7 +55,7 @@ define Device/alfa-network_r36m-e4g
   DTS := R36M-E4G
   IMAGE_SIZE := 16064k
   DEVICE_TITLE := ALFA Network R36M-E4G
-  DEVICE_PACKAGES := kmod-i2c-ralink kmod-usb2 kmod-usb-ohci uboot-envtools uqmi
+  DEVICE_PACKAGES := kmod-i2c-ralink kmod-usb2 kmod-usb-ohci uboot-envtools
 endef
 TARGET_DEVICES += alfa-network_r36m-e4g
 
@@ -63,7 +63,7 @@ define Device/alfa-network_tube-e4g
   DTS := TUBE-E4G
   IMAGE_SIZE := 16064k
   DEVICE_TITLE := ALFA Network Tube-E4G
-  DEVICE_PACKAGES := kmod-usb2 kmod-usb-ohci uboot-envtools uqmi \
+  DEVICE_PACKAGES := kmod-usb2 kmod-usb-ohci uboot-envtools \
 	-iwinfo -kmod-rt2800-soc -wpad-basic
 endef
 TARGET_DEVICES += alfa-network_tube-e4g
@@ -749,6 +749,18 @@ define Device/wt3020-8M
   DEVICE_PACKAGES := kmod-usb2 kmod-usb-ohci
 endef
 TARGET_DEVICES += wt3020-8M
+
+define Device/wt3020-16M
+  DTS := WT3020-16M
+  IMAGE_SIZE := $(ralink_default_fw_size_16M)
+  IMAGES += factory.bin
+  SUPPORTED_DEVICES += wt3020
+  IMAGE/factory.bin := $$(sysupgrade_bin) | check-size $$$$(IMAGE_SIZE) | \
+	poray-header -B WT3020 -F 16M
+  DEVICE_TITLE := Nexx WT3020 (16MB)
+  DEVICE_PACKAGES := kmod-usb2 kmod-usb-ohci
+endef
+TARGET_DEVICES += wt3020-16M
 
 define Device/y1
   DTS := Y1

@@ -1,0 +1,5 @@
+config bwmon 'bwmon'
+	option enabled '0'
+	option unlimited_usage '0'
+	option unlimited_start '2:00'
+	option unlimited_end '8:00'

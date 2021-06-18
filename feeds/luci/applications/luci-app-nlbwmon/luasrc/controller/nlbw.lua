@@ -4,10 +4,10 @@
 module("luci.controller.nlbw", package.seeall)
 
 function index()
-	entry({"admin", "nlbw"}, firstchild(), _("Bandwidth Monitor"), 80)
-	entry({"admin", "nlbw", "display"}, template("nlbw/display"), _("Display"), 1)
-	entry({"admin", "nlbw", "config"}, cbi("nlbw/config"), _("Configuration"), 2)
-	entry({"admin", "nlbw", "backup"}, template("nlbw/backup"), _("Backup"), 3)
+	entry({"admin", "nlbw"}, firstchild(), _("Bandwidth Monitors"), 80)
+	entry({"admin", "nlbw", "display"}, template("nlbw/display"), _("NetLink Bandwidth Monitor"), 1)
+	entry({"admin", "nlbw", "config"}, cbi("nlbw/config"), _("--NetLink Configuration"), 2)
+	entry({"admin", "nlbw", "backup"}, template("nlbw/backup"), _("--NetLink Backup"), 3)
 	entry({"admin", "nlbw", "data"}, call("action_data"), nil, 4)
 	entry({"admin", "nlbw", "list"}, call("action_list"), nil, 5)
 	entry({"admin", "nlbw", "ptr"}, call("action_ptr"), nil, 6).leaf = true

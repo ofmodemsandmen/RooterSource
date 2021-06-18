@@ -24,7 +24,40 @@
 	local http = require "luci.http"
 	local disp = require "luci.dispatcher"
 
+	function file_exists(name)
+		local f=io.open(name,"r")
+		if f~=nil then io.close(f) return true else return false end
+	end
+
 	local boardinfo = util.ubus("system", "board")
+	if boardinfo.model == nil then
+		boardinfo.model = " "
+	end
+	if file_exists("/etc/custom") then
+		file = io.open("/etc/custom", "r")
+		board = file:read("*line")
+		model = file:read("*line")
+		hostname = file:read("*line")
+		file:close()
+	else
+		board = boardinfo.model
+		model = boardinfo.model
+	end
+	local headername = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+	local file = io.open("/etc/header_msg", "r")
+	if file ~= nil then
+		line = file:read("*line")
+		line = line:gsub("<model>", model)
+		line = line:gsub(" ", "&nbsp;")
+		headername = headername .. line
+		line = file:read("*line")
+		if line ~= nil then
+			img_name = resource .. line
+		else
+			img_name = resource .. "/img/header.png"
+		end
+		file:close()
+	end
 
 	local node = disp.context.dispatched
 
@@ -189,14 +222,8 @@
 	<div class="fill">
 		<div class="container">
 			<span class="showSide"></span>
-			<a id="logo" href="<% if luci.dispatcher.context.authsession then %><%=url('admin/status/overview')%><% else %>#<% end %>"><img src="<%=media%>/brand.png" alt="OpenWrt"></a>
-			<a class="brand" href="#"><%=boardinfo.hostname or "?"%></a>
-			<div class="status" id="indicators">
-				<span id="xhr_poll_status" style="display:none" onclick="XHR.running() ? XHR.halt() : XHR.run()">
-					<span class="label success" id="xhr_poll_status_on"><span class="mobile-hide"><%:Auto Refresh%></span> <%:on%></span>
-					<span class="label" id="xhr_poll_status_off" style="display:none"><span class="mobile-hide"><%:Auto Refresh%></span> <%:off%></span>
-				</span>
-			</div>
+			
+			<a class="brand" href="#"> <img src="<%=img_name%>" align="top"><font size ="6"><%=headername or "?"%></font></a>
 		</div>
 	</div>
 </header>
@@ -210,7 +237,7 @@
 				<%- if luci.sys.process.info("uid") == 0 and luci.sys.user.getuser("root") and not luci.sys.user.getpasswd("root") then -%>
 					<div class="alert-message warning">
 						<h4><%:No password set!%></h4>
-						<p><%:There is no password set on this router. Please configure a root password to protect the web interface.%></p>
+						<p><%:There is no password set on this router. Go to System->Administration to create password.%></p>
 						<% if disp.lookup("admin/system/admin") then %>
 							<div class="right"><a class="btn" href="<%=url("admin/system/admin")%>"><%:Go to password configuration...%></a></div>
 						<% end %>
