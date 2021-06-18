@@ -1,0 +1,603 @@
+Source-Makefile: feeds/luci/applications/luci-app-mwan3/Makefile
+Build-Depends: lua/host luci-base/host LUCI_CSSTIDY:csstidy/host 
+
+Package: luci-app-mwan3
+Submenu: 3. Applications
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +luci-compat +mwan3 +libuci-lua +luci-mod-admin-full +luci-lib-nixio
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: LuCI support for the MWAN3 multiwan hotplug script
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Description: LuCI support for the MWAN3 multiwan hotplug script
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-bg
+Default: LUCI_LANG_bg||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - bg translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - български (Bulgarian)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-ca
+Default: LUCI_LANG_ca||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - ca translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Català (Catalan)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-cs
+Default: LUCI_LANG_cs||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - cs translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Čeština (Czech)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-de
+Default: LUCI_LANG_de||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - de translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Deutsch (German)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-el
+Default: LUCI_LANG_el||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - el translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Ελληνικά (Greek)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-en
+Default: LUCI_LANG_en||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - en translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - English
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-es
+Default: LUCI_LANG_es||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - es translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Español (Spanish)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-fr
+Default: LUCI_LANG_fr||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - fr translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Français (French)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-he
+Default: LUCI_LANG_he||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - he translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - עִבְרִית (Hebrew)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-hi
+Default: LUCI_LANG_hi||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - hi translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - हिंदी (Hindi)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-hu
+Default: LUCI_LANG_hu||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - hu translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Magyar (Hungarian)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-it
+Default: LUCI_LANG_it||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - it translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Italiano (Italian)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-ja
+Default: LUCI_LANG_ja||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - ja translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - 日本語 (Japanese)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-ko
+Default: LUCI_LANG_ko||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - ko translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - 한국어 (Korean)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-mr
+Default: LUCI_LANG_mr||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - mr translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - मराठी (Marathi)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-ms
+Default: LUCI_LANG_ms||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - ms translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Bahasa Melayu (Malay)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-no
+Default: LUCI_LANG_nb_NO||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - no translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Norsk (Norwegian)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-pl
+Default: LUCI_LANG_pl||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - pl translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Polski (Polish)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-pt
+Default: LUCI_LANG_pt||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - pt translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Português (Portuguese)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-pt-br
+Default: LUCI_LANG_pt_BR||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - pt-br translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Português do Brasil (Brazilian Portuguese)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-ro
+Default: LUCI_LANG_ro||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - ro translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Română (Romanian)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-ru
+Default: LUCI_LANG_ru||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - ru translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Русский (Russian)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-sk
+Default: LUCI_LANG_sk||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - sk translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Slovenčina (Slovak)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-sv
+Default: LUCI_LANG_sv||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - sv translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Svenska (Swedish)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-tr
+Default: LUCI_LANG_tr||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - tr translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Türkçe (Turkish)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-uk
+Default: LUCI_LANG_uk||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - uk translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Українська (Ukrainian)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-vi
+Default: LUCI_LANG_vi||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - vi translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - Tiếng Việt (Vietnamese)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-zh-cn
+Default: LUCI_LANG_zh_Hans||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - zh-cn translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - 中文 (Chinese)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+Package: luci-i18n-mwan3-zh-tw
+Default: LUCI_LANG_zh_Hant||(ALL&&m)
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread luci-app-mwan3
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: luci-app-mwan3 - zh-tw translation
+Maintainer: Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+Source: 
+License: GPLv2
+Type: ipkg
+Hidden: 1
+Description:     Translation for luci-app-mwan3 - 臺灣華語 (Taiwanese)
+Aedan Renner <chipdankly@gmail.com> Florian Eckert <fe@dev.tdt.de>
+@@
+
+

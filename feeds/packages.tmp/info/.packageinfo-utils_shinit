@@ -1,0 +1,26 @@
+Source-Makefile: feeds/packages/utils/shinit/Makefile
+
+Package: shinit
+Version: 0.1.0-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread 
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: utils
+Category: Utilities
+Repository: base
+Title: Initialization for all interactive shells (login or not)
+Maintainer: Jeffery To <jeffery.to@gmail.com>
+Source: 
+License: GPL-2.0-only
+Type: ipkg
+Description:   This package adds support for /etc/shinit and ~/.shinit files, which
+  contain commands to be run at the start of all interactive shells.
+  (/etc/profile and ~/.profile are read for login shells only.)
+
+  This is useful for those who regularly open non-login, interactive
+  shells, for example users of GNU Screen or tmux.
+Jeffery To <jeffery.to@gmail.com>
+@@
+
+

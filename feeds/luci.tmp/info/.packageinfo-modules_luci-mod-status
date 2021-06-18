@@ -1,0 +1,23 @@
+Source-Makefile: feeds/luci/modules/luci-mod-status/Makefile
+Build-Depends: iwinfo lua/host luci-base/host LUCI_CSSTIDY:csstidy/host 
+
+Package: luci-mod-status
+Submenu: 2. Modules
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +luci-base +libiwinfo +libiwinfo-lua
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: LuCI Status Pages
+Maintainer: 
+Source: 
+License: Apache-2.0
+Type: ipkg
+Description: LuCI Status Pages
+
+@@
+
+

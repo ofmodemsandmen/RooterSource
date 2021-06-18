@@ -1,0 +1,25 @@
+Source-Makefile: feeds/packages/multimedia/gerbera/Makefile
+Build-Depends: libmatroska taglib !BUILD_NLS:libiconv !BUILD_NLS:gettext
+
+Package: gerbera
+Version: 1.4.0-4
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +file +libupnp +libsqlite3 +libexif +libexpat +libuuid +BUILD_PATENTED:libffmpeg +libstdcpp +BUILD_NLS:libiconv-full
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: multimedia
+Category: Multimedia
+Repository: base
+Title: A free media server
+Maintainer: 
+Require-User: gerbera:gerbera
+Source: gerbera-1.4.0.tar.gz
+License: GPL-2.0-or-later
+LicenseFiles: LICENSE.md
+Type: ipkg
+Description:   Gerbera - UPnP Media Server based on Mediatomb.
+https://gerbera.io
+
+@@
+
+

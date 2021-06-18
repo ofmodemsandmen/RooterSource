@@ -1,0 +1,24 @@
+Source-Makefile: feeds/packages/net/miniupnpd/Makefile
+
+Package: miniupnpd
+Submenu: Firewall
+Version: 2.2.0-4
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +iptables +libip4tc +IPV6:libip6tc +IPV6:ip6tables +libuuid +libcap
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: net
+Category: Network
+Repository: base
+Title: Lightweight UPnP IGD, NAT-PMP & PCP daemon
+Maintainer: 
+Source: miniupnpd-2.2.0.tar.gz
+License: BSD-3-Clause
+LicenseFiles: LICENSE
+Type: ipkg
+Description: Lightweight UPnP IGD, NAT-PMP & PCP daemon
+https://miniupnp.tuxfamily.org/
+
+@@
+
+

@@ -1,0 +1,23 @@
+Source-Makefile: feeds/luci/contrib/package/csstidy/Makefile
+Build-Types: host
+
+Package: csstidy
+Version: 2018-12-20-1d5620149ae35c0d49fb2014d4e63a23ecfb6f69-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +libstdcpp
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: utils
+Category: Utilities
+Repository: base
+Title: CSSTidy parser and optimiser
+Maintainer: Jo-Philipp Wich <jo@mein.io>
+Source: csstidy-2018-12-20-1d5620149ae35c0d49fb2014d4e63a23ecfb6f69.tar.xz
+License: LGPL-2.1
+LicenseFiles: COPYING
+Type: ipkg
+Description: CSSTidy parser and optimiser
+Jo-Philipp Wich <jo@mein.io>
+@@
+
+

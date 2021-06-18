@@ -1,0 +1,87 @@
+Source-Makefile: feeds/packages/libs/libuhttpd/Makefile
+
+Package: libuhttpd-nossl
+Submenu: Networking
+Version: 2.2.2-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +libubox +liblua
+Conflicts: libuhttpd-openssl libuhttpd-wolfssl libuhttpd-mbedtls
+Menu-Depends: 
+Provides: 
+Build-Variant: nossl
+Section: libs
+Category: Libraries
+Repository: base
+Title: libuhttpd (NO SSL)
+Maintainer: Jianhui Zhao <jianhuizhao329@gmail.com>
+Source: libuhttpd-2.2.2.tar.xz
+License: LGPL-2.1
+LicenseFiles: LICENSE
+Type: ipkg
+Description: libuhttpd (NO SSL)
+Jianhui Zhao <jianhuizhao329@gmail.com>
+@@
+
+Package: libuhttpd-mbedtls
+Submenu: Networking
+Version: 2.2.2-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +libubox +liblua +libustream-mbedtls
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Build-Variant: mbedtls
+Section: libs
+Category: Libraries
+Repository: base
+Title: libuhttpd (mbedtls)
+Maintainer: Jianhui Zhao <jianhuizhao329@gmail.com>
+Source: libuhttpd-2.2.2.tar.xz
+License: LGPL-2.1
+LicenseFiles: LICENSE
+Type: ipkg
+Description: libuhttpd (mbedtls)
+Jianhui Zhao <jianhuizhao329@gmail.com>
+@@
+
+Package: libuhttpd-wolfssl
+Submenu: Networking
+Version: 2.2.2-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +libubox +liblua +libustream-wolfssl
+Conflicts: libuhttpd-mbedtls
+Menu-Depends: 
+Provides: 
+Build-Variant: wolfssl
+Section: libs
+Category: Libraries
+Repository: base
+Title: libuhttpd (wolfssl)
+Maintainer: Jianhui Zhao <jianhuizhao329@gmail.com>
+Source: libuhttpd-2.2.2.tar.xz
+License: LGPL-2.1
+LicenseFiles: LICENSE
+Type: ipkg
+Description: libuhttpd (wolfssl)
+Jianhui Zhao <jianhuizhao329@gmail.com>
+@@
+
+Package: libuhttpd-openssl
+Submenu: Networking
+Version: 2.2.2-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +libubox +liblua +libustream-openssl
+Conflicts: libuhttpd-wolfssl libuhttpd-mbedtls
+Menu-Depends: 
+Provides: 
+Build-Variant: openssl
+Section: libs
+Category: Libraries
+Repository: base
+Title: libuhttpd (openssl)
+Maintainer: Jianhui Zhao <jianhuizhao329@gmail.com>
+Source: libuhttpd-2.2.2.tar.xz
+License: LGPL-2.1
+LicenseFiles: LICENSE
+Type: ipkg
+Description: libuhttpd (openssl)
+Jianhui Zhao <jianhuizhao329@gmail.com>
+@@
+
+

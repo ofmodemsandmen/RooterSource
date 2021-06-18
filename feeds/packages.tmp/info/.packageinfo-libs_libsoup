@@ -1,0 +1,24 @@
+Source-Makefile: feeds/packages/libs/libsoup/Makefile
+Build-Depends: intltool/host !BUILD_NLS:libiconv !BUILD_NLS:gettext
+
+Package: libsoup
+Version: 2.65.1-3
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +glib2 +libxml2 +libgnutls +libsqlite3 +libpsl +BUILD_NLS:libiconv-full +BUILD_NLS:libintl-full
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: libs
+Category: Libraries
+Repository: base
+Title: libsoup
+Maintainer: W. Michael Petullo <mike@flyn.org>
+Source: libsoup-2.65.1.tar.xz
+License: GPL-2.0
+LicenseFiles: COPYING
+Type: ipkg
+Description: libsoup
+https://wiki.gnome.org/Projects/libsoup
+W. Michael Petullo <mike@flyn.org>
+@@
+
+

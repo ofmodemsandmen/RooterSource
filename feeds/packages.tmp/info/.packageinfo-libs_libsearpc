@@ -1,0 +1,26 @@
+Source-Makefile: feeds/packages/libs/libsearpc/Makefile
+Build-Depends: !BUILD_NLS:libiconv !BUILD_NLS:gettext
+
+Package: libsearpc
+Version: 3.1.0-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +glib2 +jansson +python +BUILD_NLS:libiconv-full
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: libs
+Category: Libraries
+Repository: base
+Title: Seafile RPC Library
+Maintainer: Alexandru Ardelean <ardeleanalex@gmail.com>
+Source: libsearpc-3.1.0.tar.gz
+License: GPL-3.0
+LicenseFiles: LICENSE.txt
+Type: ipkg
+Description:     Searpc is a simple C language RPC framework based on GObject system.
+    Searpc handles the serialization/deserialization part of RPC,
+    the transport part is left to users.
+https://seafile.com
+Alexandru Ardelean <ardeleanalex@gmail.com>
+@@
+
+

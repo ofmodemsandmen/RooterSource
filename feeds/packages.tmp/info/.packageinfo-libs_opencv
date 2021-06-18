@@ -1,0 +1,23 @@
+Source-Makefile: feeds/packages/libs/opencv/Makefile
+
+Package: opencv
+Version: 4.1.1-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +libpthread +librt +libatomic +libstdcpp +zlib +libjpeg
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: libs
+Category: Libraries
+Repository: base
+Title: OpenCV
+Maintainer: 
+Source: opencv-4.1.1.tar.xz
+License: BSD-3-Clause
+LicenseFiles: LICENSE
+Type: ipkg
+Description: OpenCV
+https://opencv.org/
+
+@@
+
+

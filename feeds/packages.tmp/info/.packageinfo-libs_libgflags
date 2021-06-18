@@ -1,0 +1,26 @@
+Source-Makefile: feeds/packages/libs/libgflags/Makefile
+Build-Types: host
+
+Package: gflags
+Version: 2.2.2-3
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +libstdcpp +libpthread
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: libs
+Category: Libraries
+Repository: base
+Title: C++ library that implements commandline flags processing
+Maintainer: Amol Bhave <ambhave@fb.com>
+Source: gflags-2.2.2.tar.gz
+License: BSD-3-Clause
+LicenseFiles: COPYING.txt
+Type: ipkg
+Description: 	The gflags package contains a C++ library that implements commandline flags
+	processing. It includes built-in support for standard types such as string and
+	the ability to define flags in the source file in which they are used.
+https://github.com/gflags/gflags
+Amol Bhave <ambhave@fb.com>
+@@
+
+

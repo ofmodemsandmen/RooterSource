@@ -1,0 +1,23 @@
+Source-Makefile: feeds/packages/multimedia/motion/Makefile
+
+Package: motion
+Version: 4.2.2-2
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +libjpeg +libpthread +libmicrohttpd-ssl
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: multimedia
+Category: Multimedia
+Repository: base
+Title: webcam motion sensing and logging
+Maintainer: Roger D <rogerdammit@gmail.com>
+Source: motion-release-4.2.2.tar.gz
+License: GPLv2
+LicenseFiles: COPYING
+Type: ipkg
+Description: webcam motion sensing and logging
+https://motion-project.github.io/
+Roger D <rogerdammit@gmail.com>
+@@
+
+

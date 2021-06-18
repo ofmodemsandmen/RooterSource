@@ -1,0 +1,25 @@
+Source-Makefile: feeds/telephony/libs/signalwire-client-c/Makefile
+
+Package: signalwire-client-c
+Submenu: Telephony
+Version: 2019-09-20-4729b1552e5f3d8a414f5769f5ca85b4e7572305-1
+ABIVersion: 1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +libatomic +libks +libopenssl
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: libs
+Category: Libraries
+Repository: base
+Title: SignalWire C client library
+Maintainer: Sebastian Kemper <sebastian_ml@gmx.net>
+Source: signalwire-client-c-2019-09-20-4729b1552e5f3d8a414f5769f5ca85b4e7572305.tar.xz
+License: MIT
+LicenseFiles: copyright
+Type: ipkg
+Description: SignalWire C client library
+https://github.com/signalwire/signalwire-c
+Sebastian Kemper <sebastian_ml@gmx.net>
+@@
+
+

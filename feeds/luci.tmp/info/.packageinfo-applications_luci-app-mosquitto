@@ -1,0 +1,23 @@
+Source-Makefile: feeds/luci/applications/luci-app-mosquitto/Makefile
+Build-Depends: lua/host luci-base/host LUCI_CSSTIDY:csstidy/host 
+
+Package: luci-app-mosquitto
+Submenu: 3. Applications
+Version: x-1
+Depends: +libc +GCC_LIBSSP:libssp +USE_GLIBC:librt +USE_GLIBC:libpthread +luci-compat +luci-mod-admin-full mosquitto
+Conflicts: 
+Menu-Depends: 
+Provides: 
+Section: luci
+Category: LuCI
+Repository: base
+Title: Mosquitto LuCI interface
+Maintainer: Karl Palsson <karlp@etactica.com>
+Source: 
+License: Apache-2.0
+Type: ipkg
+Description:    Provides a webadmin for most basic mosquitto parameters.
+Karl Palsson <karlp@etactica.com>
+@@
+
+
