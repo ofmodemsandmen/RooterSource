@@ -1,10 +1,21 @@
 <%+header%>
 <%
+local sys = require "luci.sys"
+local utl = require "luci.util"
 local fs = require "nixio.fs"
 nosms = 1
 if not fs.stat("/etc/noat") then
 	nosms = 0
 end
+
+function showicon(lck)
+	if lck == 0 then
+		return resource .. "/icons/unlock1.png"
+	else
+		return resource .. "/icons/lock1.png"
+	end
+end
+
 -%>
 <script type="text/javascript" src="<%=resource%>/xhr.js"></script>
 <script type="text/javascript">//<![CDATA[
@@ -36,6 +47,7 @@ end
 	var caindx ;
 	var indx3 ;
 	var caindx3 ;
+	var lockb = 0;
 	
 	XHR.poll(2, '<%=luci.dispatcher.build_url("admin", "modem", "check_misc")%>', null,
 		function(x, rv)
@@ -77,6 +89,9 @@ end
 				document.getElementById("tab13").style.display = "none";
 				document.getElementById("tab14").style.display = "none";
 				document.getElementById("bndtxt").value=" ";
+				document.getElementById("senddropat").disabled=true;
+				document.getElementById("atcmdlck").disabled=true;
+				document.getElementById("sendfullat").disabled=true;
 			
 				if ( gpio == "0" )
 				{
@@ -96,6 +111,36 @@ end
 					document.getElementById("pwrtoggle").disabled=true;
 					document.getElementById("pwrtoggle1").disabled=true;
 				}
+				
+				plock = rv.plock;
+				if ( plock == "0" )
+				{
+					document.getElementById("droptxt").style.display="none";
+					document.getElementById("linetxt").style.display="block";
+					document.getElementById("atcmd").disabled=true;
+					document.getElementById("sendatcmd").disabled=true;
+				}
+				else
+				{
+					document.getElementById("droptxt").style.display="block";
+					document.getElementById("linetxt").style.display="none";
+					document.getElementById("drop1").disabled=true;
+					document.getElementById("atcmdlck").disabled=true;
+					document.getElementById("sendfullat").disabled=true;
+					
+					document.getElementById("drop1").options.length=0;
+					atlen = document.getElementById("drop1").length;
+					if ( atlen == 0 )
+					{
+						x = document.getElementById("drop1");
+						option = document.createElement("option");
+						option.text = "Wait for Modem";
+						x.add(option);
+					}
+					
+					atlock = rv["atlock"];
+					document.getElementById("password").value=atlock;
+				}
 			}
 			if ( stat == "1" )
 			{
@@ -104,6 +149,52 @@ end
 				document.getElementById("disconn").disabled=true;
 				document.getElementById("sendcmdat").disabled=false;
 				document.getElementById("apply1").disabled=false;
+				document.getElementById("senddropat").disabled=false;
+				document.getElementById("atcmd").disabled=false;
+				document.getElementById("drop1").disabled=false;
+				
+				plock = rv.plock;
+				if ( plock == "0" )
+				{
+					document.getElementById("droptxt").style.display="none";
+					document.getElementById("linetxt").style.display="block";
+					document.getElementById("atcmd").disabled=true;
+					document.getElementById("sendatcmd").disabled=true;
+				}
+				else
+				{
+					document.getElementById("droptxt").style.display="block";
+					document.getElementById("linetxt").style.display="none";
+					document.getElementById("drop1").disabled=false;
+					document.getElementById("senddropat").disabled=false;
+					document.getElementById("atcmdlck").disabled=false;
+					document.getElementById("sendfullat").disabled=false;
+				}
+				
+				atlen = document.getElementById("drop1").options.length;
+				if (atlen <= 1 )
+				{
+					document.getElementById("drop1").options.length=0;
+				}
+				atlen = document.getElementById("drop1").options.length;
+				if ( atlen == 0 )
+				{
+					at1 = rv.at1 ;
+					at2 = rv.at2 ;
+					aindx = rv.aindx ;
+					
+					if ( aindx != 0 )
+					{
+						x = document.getElementById("drop1");
+						for (i = 0; i < aindx; i++) {
+							option = document.createElement("option");
+							option.text = at2[i];
+							x.add(option);
+						}
+					}
+				}
+				atlock = rv["atlock"];
+				document.getElementById("password").value=atlock;
 
 				if ( gpio == "0" )
 				{
@@ -157,8 +248,47 @@ end
 				document.getElementById("active").innerHTML="Modem Connected";
 				document.getElementById("conn").disabled=true;
 				document.getElementById("disconn").disabled=false;
-				document.getElementById("sendcmdat").disabled=false;
 				document.getElementById("apply1").disabled=false;
+				plock = rv.plock;
+				if ( plock == "0" )
+				{
+					document.getElementById("droptxt").style.display="none";
+					document.getElementById("linetxt").style.display="block";
+					document.getElementById("atcmd").disabled=true;
+					document.getElementById("sendatcmd").disabled=true;
+				}
+				else
+				{
+					document.getElementById("droptxt").style.display="block";
+					document.getElementById("linetxt").style.display="none";
+					document.getElementById("drop1").disabled=false;
+					document.getElementById("senddropat").disabled=false;
+					document.getElementById("atcmdlck").disabled=false;
+				}
+				atlen = document.getElementById("drop1").options.length;
+				if (atlen <= 1 )
+				{
+					document.getElementById("drop1").options.length=0;
+				}
+				atlen = document.getElementById("drop1").options.length;
+				if ( atlen == 0 )
+				{
+					at1 = rv.at1 ;
+					at2 = rv.at2 ;
+					aindx = rv.aindx ;
+					
+					if ( aindx != 0 )
+					{
+						x = document.getElementById("drop1");
+						for (i = 0; i < aindx; i++) {
+							option = document.createElement("option");
+							option.text = at2[i];
+							x.add(option);
+						}
+					}
+				}
+				atlock = rv["atlock"];
+				document.getElementById("password").value=atlock;
 				if ( gpio == "0" )
 				{
 					if ( usb == "0" )
@@ -314,6 +444,9 @@ end
 				document.getElementById("apply1").style.display="block";
 				document.getElementById("apply1").style.visibility="visible";
 			}
+	
+			
+			// Start of Band locking
 			
 			uVid = rv.uVid ;
 			uPid = rv.uPid ;
@@ -829,8 +962,8 @@ end
 		var x = event.key;
     		if (x == "Enter")
 		{
-			document.getElementById("sendcmdat").focus();
-			var s = document.getElementById("atcmd").value;
+			document.getElementById("sendfullat").focus();
+			var s = document.getElementById("atcmdlck").value;
 			if ( s.length == 0 )
 			{
 				alert("You must enter an AT-Command!!");
@@ -1128,6 +1261,108 @@ end
 		}
 		return false;
 	}
+	
+	function senddropcmd()
+	{
+		var s = document.getElementById("drop1").selectedIndex;
+		index = at1[s];
+		document.getElementById("attxt").value=index;
+		
+		atsend=1;
+		document.getElementById("attxt").value="Waiting for a Response";
+		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "send_atcmd")%>',
+			{ set: index },
+			function(x, rv)
+			{
+				atres=rv.result;
+				atres1 = atres.toLowerCase();
+				crin = atres1.indexOf("+crsm:");
+				if ( crin == -1 )
+				{
+					document.getElementById("attxt").value=rv.result;
+					
+				}
+				else
+				{
+					subs = atres1.substring(crin);
+					crin = subs.indexOf(",");
+					subs1 = subs.substring(crin+1);
+					crin = subs1.indexOf(",");
+					subs = "xxxxxxxxxxxxxx" + subs1.substring(crin+15);
+					subs1 = "ICCID = " + subs.replace(/['"]+/g, '');
+					document.getElementById("attxt").value=subs1; 
+				}
+				atsend=0;
+			}
+		);
+		return false; 
+	}
+	
+	function done() { 
+		document.getElementById("popup").style.display = "none";
+		passw = document.getElementById("password").value;
+		var r = document.getElementById("pass").value;
+		if ( r == null )
+
+		{
+			return false;
+		}
+		if ( r == passw )
+		{
+			document.getElementById("lockbtn").src="<%=showicon(0)%>";
+			document.getElementById("atcmdlck").style.visibility="visible";
+			document.getElementById("sendfullat").style.visibility="visible";
+			document.getElementById("pass").value="";
+			lockb = 1;
+		}
+		else
+		{
+			alert("Incorrect Password!!!");
+		}
+		document.getElementById("lockbtn").disabled=false;
+		return false;
+	};
+
+	function unlock(btn)
+	{
+		
+		if ( lockb == 0 )
+		{
+			document.getElementById("popup").style.display = "block";
+			document.getElementById("lockbtn").disabled=true;
+		}
+		else
+		{
+			document.getElementById("lockbtn").src="<%=showicon(1)%>";
+			document.getElementById("atcmdlck").style.visibility="hidden";
+			document.getElementById("sendfullat").style.visibility="hidden";
+			lockb = 0;
+		}
+		return false;
+	}
+	
+	function sendfullcmd()
+	{
+		var s = document.getElementById("atcmdlck").value;
+		if ( s.length == 0 )
+		{
+			alert("You must enter an AT-Command!!");
+			return false;
+		}
+		atsend=1;
+		document.getElementById("attxt").value="Waiting for a Response";
+		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "send_atcmd")%>',
+			{ set: s },
+			function(x, rv)
+			{
+				document.getElementById("attxt").value=rv.result;
+				atsend=0;
+			}
+		);
+
+		return false;
+	}
+
 
 //]]></script>
 
@@ -1140,6 +1375,22 @@ end
       input {
         vertical-align: bottom;
       }
+	  
+	  #popup {
+		width:560px;
+		height:190px;
+		padding:20px;
+		background-color:gainsboro;  
+		border-style : solid;	
+		position:fixed;
+		top : 40%;
+		margin-left: auto;
+		margin-right: auto;
+		left: 0;
+		right: 0;
+		text-align: center;
+		display:none;
+	}
     </style>
 </head>
 <fieldset class="cbi-section" id="cbi-modi">
@@ -1180,15 +1431,59 @@ end
 <% if nosms == 0 then %>
 <fieldset class="cbi-section" id="cbi-term">
 	<legend>AT-Command Terminal</legend>
-	<table width="700" border="0">
+	
+	<div id="popup">
+		<table width="500" border="0">
+			<tr>
+				<td width="50px"><div>Enter Password to Unlock Full Terminal</div></td>
+			</tr>
+			<tr>
+				<td width="200px"><input id="pass" type="password"/></td>
+			</tr>
+			<tr>
+				<td><input type="image" src="<%=showicon(0)%>" style="width:48px;height:48px;" onclick="return done()" /></td>
+			</tr>
+		</table>
+	</div>
+	
+	<table width="700" border="0" id="droptxt">
+	<tr>
+		<td width="10%"><div align="right">AT-Command : </div></td>
+		<td width="15%">
+			<select style="width:200px" name="atdrop" id="drop1">
+			</select>
+		</td>
+		<td width="3%">
+			<input type="image" id="lockbtn" name="lockbtn" src="<%=showicon(1)%>" style="width:48px;height:48px;" onclick="return unlock(this)" />
+		</td>
+		<td width="15%" ><input style="visibility:hidden;width: 500px;maxlength="200" type="text" name="atcmdlck" id="atcmdlck" class="cbi-input-text"  onkeydown="sndcmd(event)" ></input>
+		</td>
+		<td width="10%"><input style="visibility:hidden" type="submit" id="sendfullat" class="cbi-button cbi-button-apply" value="<%:Send Command%>" onclick="return sendfullcmd()" />
+		</td>
+		<td width="47%">&nbsp;</td>
+	</tr>
+	<tr>
+		<td><input type="submit" id="senddropat" class="cbi-button cbi-button-apply" value="<%:Send Command%>" onclick="return senddropcmd()" />
+		</td>
+	</tr>
+	</table>
+	
+	<table style="visibility:hidden" width="700" border="0" id="atpass">
+	<tr>
+		<td width="10%"><div id="password" align="right"></div></td>
+	</tr>
+	</table>
+	
+	<table width="700" border="0" id="linetxt">
 	<tr>
 		<td width="5%"><div align="right">AT-Command : </div></td>
-		<td width="95%"><input type="text" name="atcmd" id="atcmd" class="cbi-input-text" style="width: 350px;" maxlength="500" onkeydown="sndcmd(event)" ></input></td>
+		<td width="20%"><input type="text" name="atcmd" id="atcmd" class="cbi-input-text" style="width: 350px;" maxlength="500" ></input></td>
+		<td width="75%">&nbsp;</td>
 	</tr>
 	<tr>
 		<td><input type="submit" id="sendcmdat" class="cbi-button cbi-button-apply" value="<%:Send Command%>" onclick="return sendcmd()" /></td>
 		<td> </td>
-		</tr>
+	</tr>
 	</table>
 
 	<table id="cmdtxt" width="700"  border="0" style="display:table;">

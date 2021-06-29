@@ -2,7 +2,7 @@ module("luci.controller.hotspot", package.seeall)
 
 function index()
 	local page
-	page = entry({"admin", "services", "hotspot"}, template("hotspot/hotspot"), _("Wifi Hotspot Manager"))
+	page = entry({"admin", "services", "hotspot"}, template("hotspot/hotspot"), _("Wifi Hotspot Manager"), 34)
 	page.dependent = true
 
 	entry({"admin", "services", "check_spot"}, call("action_check_spot"))

@@ -60,6 +60,11 @@ make_connect() {
 
 make_signal() {
 	{
+		if [ -e $ROOTER/provchk.sh ]; then
+			$ROOTER/provchk.sh $COPS $CURRMODEM
+			source /tmp/cops$CURRMODEM.file
+			rm -f /tmp/cops$CURRMODEM.file
+		fi
 		echo "$COMMPORT"
 		echo "$CSQ"
 		echo "$CSQ_PER"

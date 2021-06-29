@@ -100,11 +100,14 @@ gpio[29] = 7
 model[30] = "mt300n-v2"
 gpio[30] = 11
 gpioname[30] = "usb"
-model[31] = "giga"
+model[31] = "gigamod"
 gpio[31] = 16
 gpioname[31] = "power_usb"
+model[32] = "turbomod"
+gpio[32] = 17
+gpioname[32] = "power_usb"
 
-numodel = 31
+numodel = 32
 
 local file = io.open(mfile, "r")
 if file == nil then

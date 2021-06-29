@@ -1,5 +1,5 @@
 #
-# MT7621 Profiles
+# MT7621 Profiles 
 #
 
 KERNEL_DTB += -d21

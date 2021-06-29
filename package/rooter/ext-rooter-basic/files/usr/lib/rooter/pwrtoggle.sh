@@ -17,6 +17,7 @@ waitfor() {
 			break
 		fi
 	done
+	sleep 4
 }
 
 rebind() {

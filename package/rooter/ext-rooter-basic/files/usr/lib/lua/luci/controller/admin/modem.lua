@@ -120,7 +120,10 @@ function action_check_misc()
 	local bnd31 = {}
 	local bnd32 = {}
 	local bnd33 = {}
+	local at1 = {}
+	local at2 = {}
 	local file
+	local file1
 	local active
 	local connect
 
@@ -222,6 +225,46 @@ function action_check_misc()
 		end
 		netmode = luci.model.uci.cursor():get("modem", "modem" .. miscnum, "netmode")
 		rv["netmode"] = netmode
+	end
+	file = io.open("/etc/passlock", "r")
+	if file == nil then
+		rv["plock"] = "0"
+	else
+		line = file:read("*line")
+		rv["atlock"] = line
+		file:close()
+		rv["plock"] = "1"
+		aindx = 0
+		if active == "0" then
+			file = io.open("/etc/atlist", "r")
+		else
+			os.execute("/usr/lib/custom/locktype.sh " .. miscnum )
+			file1 = io.open("/tmp/modemlock", "r")
+			if file1 ~= nil then
+				linex = file1:read("*line")
+				file1:close()
+				file = io.open(linex, "r")
+			else
+				file = io.open("/etc/atlist", "r")
+			end
+		end
+		if file ~= nil then
+			line = file:read("*line")
+			repeat
+				at1[aindx] = line
+				line = file:read("*line")
+				at2[aindx] = line
+				aindx = aindx +1
+				line = file:read("*line")
+			until line == nil
+			file:close()
+			--at1[aindx] = linex
+			--at2[aindx] = linex
+			--aindx = aindx +1
+			rv['at1'] = at1
+			rv['at2'] = at2
+			rv['aindx'] = tostring(aindx)
+		end
 	end
 	rv["active"] = active
 	file = io.open("/tmp/gpiopin", "r")

@@ -58,6 +58,17 @@
 			linux,code = <KEY_RESTART>;
 		};
 	};
+	
+	gpio_export {
+		compatible = "gpio-export";
+		#size-cells = <0>;
+
+		power_usb {
+			gpio-export,name = "power_usb";
+			gpio-export,output = <1>;
+			gpios = <&gpio0 17 GPIO_ACTIVE_HIGH>;
+		};
+	};
 };
 
 &nand {

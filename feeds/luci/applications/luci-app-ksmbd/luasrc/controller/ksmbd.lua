@@ -7,5 +7,5 @@ function index()
 		return
 	end
 
-	entry({"admin", "services", "ksmbd"}, view("ksmbd"), _("KSMBD Network Shares")).dependent = true
+	entry({"admin", "services", "ksmbd"}, view("ksmbd"), _("KSMBD Network Shares"), 34).dependent = true
 end 
