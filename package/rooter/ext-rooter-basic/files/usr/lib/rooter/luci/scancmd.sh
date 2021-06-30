@@ -191,24 +191,32 @@ case $uVid in
 			"68c0"|"9041"|"901f" ) # MC7354 EM/MC7355
 				M3="101101A"
 				M3X="0"
+				M4='AT!BAND=11,"Test",0,'$M3,$M3X
 			;;
 			"9070"|"9071"|"9078"|"9079"|"907a"|"907b" ) # EM/MC7455
 				M3="100030818DF"
 				M3X="0"
+				M4='AT!BAND=11,"Test",0,'$M3,$M3X
+				if [ -e /etc/fake ]; then
+					M4='AT!BAND=11,"Test",0,A300BA0E38DF,0,2,0,0'
+				fi
 			;;
 			"9090"|"9091"|"90b1" ) # EM7565
 				EM7565=$(echo "$model" | grep "7565")
 				if [ ! -z $EM7565 ]; then
-					M3="2100BA0E19DF"
+					M3="A300BA0E38DF"
 					M3X="2"
+					M4='AT!BAND=11,"Test",0,'$M3",0,"$M3X",0,0"
 				else
 					EM7511=$(echo "$model" | grep "7511")
 					if [ ! -z $EM7511 ]; then # EM7511
 						M3="A300BA0E38DF"
 						M3X="2"
+						M4='AT!BAND=11,"Test",0,'$M3",0,"$M3X",0,0"
 					else
 						M3="87000300385A"
 						M3X="42"
+						M4='AT!BAND=11,"Test",0,'$M3",0,"$M3X",0,0"
 					fi
 				fi
 
@@ -217,6 +225,10 @@ case $uVid in
 				M3="AT"
 			;;
 		esac
+		log "Set full : $M4"
+		if [ -e /etc/fake ]; then
+			M4='AT!BAND=11,"Test",0,'$M3,$M3X
+		fi
 		M1='AT!ENTERCND="A710"'
 		M4='AT!BAND=11,"Test",0,'$M3,$M3X
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M1")
@@ -366,12 +378,30 @@ case $uVid in
 	;;
 	"1199" )
 		M1='AT!ENTERCND="A710"'
-		M4='AT!BAND=1F,"Test",0,'$L1X,$L2
+		case $uPid in
+
+			"68c0"|"9041"|"901f" ) # MC7354 EM/MC7355
+				M4='AT!BAND=11,"Test",0,'$L1X,0
+			;;
+			"9070"|"9071"|"9078"|"9079"|"907a"|"907b" ) # EM/MC7455
+				M4='AT!BAND=11,"Test",0,'$L1X,0
+				if [ -e /etc/fake ]; then
+					M4='AT!BAND=11,"Test",0,'$L1X',0,'$L2',0,0'
+				fi
+			;;
+			"9090"|"9091"|"90b1" )
+				M4='AT!BAND=11,"Test",0,'$L1X',0,'$L2',0,0'
+			;;
+		esac
+		log "Set back : $M4"
+		if [ -e /etc/fake ]; then
+			M4='AT!BAND=11,"Test",0,00000100030818DF,0'
+		fi
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M1")
 		log "$OX"
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M4")
 		log "$OX"
-		M4='AT!BAND=00;!BAND=1F'
+		M4='AT!BAND=00;!BAND=11'
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M4")
 		log "$OX"
 	;;

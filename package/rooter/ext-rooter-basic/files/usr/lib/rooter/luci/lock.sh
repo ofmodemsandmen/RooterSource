@@ -213,8 +213,25 @@ case $uVid in
 	;;
 	"1199" )
 		M1='AT!ENTERCND="A710"'
-		M2='AT!BAND=11,"Test",0,'$mask64,$maskl2
+		case $uPid in
+
+			"68c0"|"9041"|"901f" ) # MC7354 EM/MC7355
+				M2='AT!BAND=11,"Test",0,'$mask64,0
+			;;
+			"9070"|"9071"|"9078"|"9079"|"907a"|"907b" ) # EM/MC7455
+				M2='AT!BAND=11,"Test",0,'$mask64,0
+				if [ -e /etc/fake ]; then
+					M2='AT!BAND=11,"Test",0,'$mask64',0,'$maskl2',0,0'
+				fi
+			;;
+			"9090"|"9091"|"90b1" )
+				M2='AT!BAND=11,"Test",0,'$mask64',0,'$maskl2',0,0'
+			;;
+		esac
 		log "$M2"
+		if [ -e /etc/fake ]; then
+			exit 0
+		fi
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M1")
 		log "$OX"
 		ATCMDD="AT+CFUN=1,1"

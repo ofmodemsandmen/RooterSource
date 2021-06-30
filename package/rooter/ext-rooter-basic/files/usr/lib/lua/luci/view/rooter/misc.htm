@@ -1305,6 +1305,7 @@ end
 		if ( r == null )
 
 		{
+			document.getElementById("pass").value="";
 			return false;
 		}
 		if ( r == passw )
@@ -1318,6 +1319,7 @@ end
 		else
 		{
 			alert("Incorrect Password!!!");
+			document.getElementById("pass").value="";
 		}
 		document.getElementById("lockbtn").disabled=false;
 		return false;
@@ -1330,6 +1332,7 @@ end
 		{
 			document.getElementById("popup").style.display = "block";
 			document.getElementById("lockbtn").disabled=true;
+			document.getElementById("pass").focus();
 		}
 		else
 		{

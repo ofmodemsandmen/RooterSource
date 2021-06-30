@@ -18,28 +18,40 @@ fi
 sierrabandmask() {
 	ATCMDD='AT!ENTERCND="A710";!BAND?'
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	if [ -e /etc/fake ]; then
+		OX=' AT!ENTERCND="A710";!BAND?
+
+Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band Mask    L Band Mask 2    L Band Mask 3    L Band Mask 4
+
+00, All bands                     100600000FC00000 0000A700B20E39DF 0000000000000000 0000000000000002 0000000000000000 0000000000000000
+
+OK'
+	fi
 	log " "
 	log "Sierra Response : $OX"
 	log " "
-	echo "$OX" > /tmp/scanx
-	while IFS= read -r line
-	do
-		read -r line
-		Unk=$(echo $line | grep "Unknown")
-		read -r line
-		if [ -z $Unk ]; then
-			BND=$(echo $line | cut -d, -f3 | tr " " ",")
-			L1=$(echo $BND | cut -d, -f3)
-			GW=$(echo $BND | cut -d, -f2) 
-			L2=$(echo $BND | cut -d, -f4)
-		else
-			BND=$(echo $line | cut -d, -f3 | tr " " ",")
-			L1=$(echo $BND | cut -d, -f2)
-			GW=$(echo $BND | cut -d, -f1)
-			L2=$(echo $BND | cut -d, -f3)
-		fi
-		break
-	done < /tmp/scanx
+	OX=$(echo $OX | tr " " '\x0a')
+	line=$OX
+	Unk=$(echo $line | grep "All bands")
+	if [ "$Unk" ]; then
+		BND=$(echo $line | cut -d, -f4 | tr " " ",")
+		echo "$BND"
+		L1=$(echo $BND | cut -d, -f5)
+		GW=$(echo $BND | cut -d, -f4) 
+		L2=$(echo $BND | cut -d, -f7)
+	else
+		BND=$(echo $line | cut -d, -f5 | tr " " ",")
+		log "$BND"
+		L1=$(echo $BND | cut -d, -f3)
+		GW=$(echo $BND | cut -d, -f2) 
+		L2=$(echo $BND | cut -d, -f5)
+	fi
+	if [ ! $L2 ]; then
+		L2="0000000000000000"
+	fi
+	if [ $L2 = "OK" ]; then
+		L2="0000000000000000"
+	fi
 	log " "
 	log "LTE Band Mask : $L2$L1"
 	log " "
