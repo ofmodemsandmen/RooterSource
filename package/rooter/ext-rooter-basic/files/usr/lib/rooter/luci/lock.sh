@@ -128,6 +128,9 @@ if [ -z $maskz ]; then
 else
 	maskl2=$maskz
 fi
+if [ -z $mask64 ]; then
+	mask64="0"
+fi
 
 CURRMODEM=$(uci get modem.general.miscnum)
 COMMPORT="/dev/ttyUSB"$(uci get modem.modem$CURRMODEM.commport)
@@ -152,7 +155,7 @@ case $uVid in
 				fi
 				M2='AT+QNWPREFCFG="lte_band",'$lst
 			else # Fake EM160 RM500
-				if [ -e /etc/fake ]; then
+				if [ -e /etc/qfake ]; then
 					if [ ! -z $mask ]; then
 						fibdecode $mask 1 1
 					else
@@ -213,6 +216,9 @@ case $uVid in
 	;;
 	"1199" )
 		M1='AT!ENTERCND="A710"'
+		if [ -z $mask64 ]; then
+			mask64="0"
+		fi
 		case $uPid in
 
 			"68c0"|"9041"|"901f" ) # MC7354 EM/MC7355
@@ -221,11 +227,11 @@ case $uVid in
 			"9070"|"9071"|"9078"|"9079"|"907a"|"907b" ) # EM/MC7455
 				M2='AT!BAND=11,"Test",0,'$mask64,0
 				if [ -e /etc/fake ]; then
-					M2='AT!BAND=11,"Test",0,'$mask64',0,'$maskl2',0,0'
+					M2='AT!BAND=11,"Test",0,'$mask64','$maskl2',0,0,0'
 				fi
 			;;
 			"9090"|"9091"|"90b1" )
-				M2='AT!BAND=11,"Test",0,'$mask64',0,'$maskl2',0,0'
+				M2='AT!BAND=11,"Test",0,'$mask64','$maskl2',0,0,0'
 			;;
 		esac
 		log "$M2"

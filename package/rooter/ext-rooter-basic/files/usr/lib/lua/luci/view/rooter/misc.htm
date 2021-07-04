@@ -1,7 +1,7 @@
 <%+header%>
 <%
 local sys = require "luci.sys"
-local utl = require "luci.util"
+local utl = require "luci.util" 
 local fs = require "nixio.fs"
 nosms = 1
 if not fs.stat("/etc/noat") then
@@ -86,7 +86,7 @@ end
 				document.getElementById("dym2").style.display = "none";
 				document.getElementById("dym3").style.display = "none";
 				document.getElementById("tab10").style.display = "none";
-				document.getElementById("tab13").style.display = "none";
+				document.getElementById("tab13").style.display = "";
 				document.getElementById("tab14").style.display = "none";
 				document.getElementById("bndtxt").value=" ";
 				document.getElementById("senddropat").disabled=true;
@@ -118,7 +118,7 @@ end
 					document.getElementById("droptxt").style.display="none";
 					document.getElementById("linetxt").style.display="block";
 					document.getElementById("atcmd").disabled=true;
-					document.getElementById("sendatcmd").disabled=true;
+					document.getElementById("sendcmdat").disabled=true;
 				}
 				else
 				{
@@ -158,8 +158,8 @@ end
 				{
 					document.getElementById("droptxt").style.display="none";
 					document.getElementById("linetxt").style.display="block";
-					document.getElementById("atcmd").disabled=true;
-					document.getElementById("sendatcmd").disabled=true;
+					document.getElementById("atcmd").disabled=false;
+					document.getElementById("sendcmdat").disabled=false;
 				}
 				else
 				{
@@ -169,33 +169,31 @@ end
 					document.getElementById("senddropat").disabled=false;
 					document.getElementById("atcmdlck").disabled=false;
 					document.getElementById("sendfullat").disabled=false;
-				}
-				
-				atlen = document.getElementById("drop1").options.length;
-				if (atlen <= 1 )
-				{
-					document.getElementById("drop1").options.length=0;
-				}
-				atlen = document.getElementById("drop1").options.length;
-				if ( atlen == 0 )
-				{
-					at1 = rv.at1 ;
-					at2 = rv.at2 ;
-					aindx = rv.aindx ;
-					
-					if ( aindx != 0 )
+					atlen = document.getElementById("drop1").options.length;
+					if (atlen <= 1 )
 					{
-						x = document.getElementById("drop1");
-						for (i = 0; i < aindx; i++) {
-							option = document.createElement("option");
-							option.text = at2[i];
-							x.add(option);
+						document.getElementById("drop1").options.length=0;
+					}
+					atlen = document.getElementById("drop1").options.length;
+					if ( atlen == 0 )
+					{
+						at1 = rv.at1 ;
+						at2 = rv.at2 ;
+						aindx = rv.aindx ;
+						
+						if ( aindx != 0 )
+						{
+							x = document.getElementById("drop1");
+							for (i = 0; i < aindx; i++) {
+								option = document.createElement("option");
+								option.text = at2[i];
+								x.add(option);
+							}
 						}
 					}
+					atlock = rv["atlock"];
+					document.getElementById("password").value=atlock;
 				}
-				atlock = rv["atlock"];
-				document.getElementById("password").value=atlock;
-
 				if ( gpio == "0" )
 				{
 					if ( usb == "0" )
@@ -254,8 +252,8 @@ end
 				{
 					document.getElementById("droptxt").style.display="none";
 					document.getElementById("linetxt").style.display="block";
-					document.getElementById("atcmd").disabled=true;
-					document.getElementById("sendatcmd").disabled=true;
+					document.getElementById("atcmd").disabled=false;
+					document.getElementById("sendcmdat").disabled=false;
 				}
 				else
 				{
@@ -264,31 +262,31 @@ end
 					document.getElementById("drop1").disabled=false;
 					document.getElementById("senddropat").disabled=false;
 					document.getElementById("atcmdlck").disabled=false;
-				}
-				atlen = document.getElementById("drop1").options.length;
-				if (atlen <= 1 )
-				{
-					document.getElementById("drop1").options.length=0;
-				}
-				atlen = document.getElementById("drop1").options.length;
-				if ( atlen == 0 )
-				{
-					at1 = rv.at1 ;
-					at2 = rv.at2 ;
-					aindx = rv.aindx ;
-					
-					if ( aindx != 0 )
+					atlen = document.getElementById("drop1").options.length;
+					if (atlen <= 1 )
 					{
-						x = document.getElementById("drop1");
-						for (i = 0; i < aindx; i++) {
-							option = document.createElement("option");
-							option.text = at2[i];
-							x.add(option);
+						document.getElementById("drop1").options.length=0;
+					}
+					atlen = document.getElementById("drop1").options.length;
+					if ( atlen == 0 )
+					{
+						at1 = rv.at1 ;
+						at2 = rv.at2 ;
+						aindx = rv.aindx ;
+						
+						if ( aindx != 0 )
+						{
+							x = document.getElementById("drop1");
+							for (i = 0; i < aindx; i++) {
+								option = document.createElement("option");
+								option.text = at2[i];
+								x.add(option);
+							}
 						}
 					}
-				}
-				atlock = rv["atlock"];
-				document.getElementById("password").value=atlock;
+					atlock = rv["atlock"];
+					document.getElementById("password").value=atlock;
+				} 
 				if ( gpio == "0" )
 				{
 					if ( usb == "0" )
@@ -1332,7 +1330,6 @@ end
 		{
 			document.getElementById("popup").style.display = "block";
 			document.getElementById("lockbtn").disabled=true;
-			document.getElementById("pass").focus();
 		}
 		else
 		{

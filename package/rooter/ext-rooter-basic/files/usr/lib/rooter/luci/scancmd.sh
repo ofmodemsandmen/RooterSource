@@ -94,6 +94,9 @@ L1="${L1:2:length-2}"
 L1=$(echo $L1 | sed 's/^0*//')
 L2=$(uci get modem.modem$CURRMODEM.L2)
 L1X=$(uci get modem.modem$CURRMODEM.L1X)
+if [ -z $L1X ]; then
+	L1X="0"
+fi
 
 case $uVid in
 	"2c7c" )
@@ -129,7 +132,7 @@ case $uVid in
 				if [ ! -z $EM20 ]; then # EM20
 					M3="20000A7E03B0F38DF"
 					M4='AT+QCFG="band",0,'$M3',0'
-					if [ -e /etc/fake ]; then
+					if [ -e /etc/qfake ]; then
 						mask="42000087E2BB0F38DF"
 						fibdecode $mask 1 1
 						M4F='AT+QNWPREFCFG="lte_band",'$lst
@@ -198,7 +201,7 @@ case $uVid in
 				M3X="0"
 				M4='AT!BAND=11,"Test",0,'$M3,$M3X
 				if [ -e /etc/fake ]; then
-					M4='AT!BAND=11,"Test",0,A300BA0E38DF,0,2,0,0'
+					M4='AT!BAND=11,"Test",0,A300BA0E38DF,2,0,0,0'
 				fi
 			;;
 			"9090"|"9091"|"90b1" ) # EM7565
@@ -206,17 +209,17 @@ case $uVid in
 				if [ ! -z $EM7565 ]; then
 					M3="A300BA0E38DF"
 					M3X="2"
-					M4='AT!BAND=11,"Test",0,'$M3",0,"$M3X",0,0"
+					M4='AT!BAND=11,"Test",0,'$M3","$M3X",0,0,0"
 				else
 					EM7511=$(echo "$model" | grep "7511")
 					if [ ! -z $EM7511 ]; then # EM7511
 						M3="A300BA0E38DF"
 						M3X="2"
-						M4='AT!BAND=11,"Test",0,'$M3",0,"$M3X",0,0"
+						M4='AT!BAND=11,"Test",0,'$M3","$M3X",0,0,0"
 					else
 						M3="87000300385A"
 						M3X="42"
-						M4='AT!BAND=11,"Test",0,'$M3",0,"$M3X",0,0"
+						M4='AT!BAND=11,"Test",0,'$M3","$M3X",0,0,0"
 					fi
 				fi
 
@@ -230,7 +233,6 @@ case $uVid in
 			M4='AT!BAND=11,"Test",0,'$M3,$M3X
 		fi
 		M1='AT!ENTERCND="A710"'
-		M4='AT!BAND=11,"Test",0,'$M3,$M3X
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M1")
 		log "$OX"
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M4")
@@ -386,11 +388,11 @@ case $uVid in
 			"9070"|"9071"|"9078"|"9079"|"907a"|"907b" ) # EM/MC7455
 				M4='AT!BAND=11,"Test",0,'$L1X,0
 				if [ -e /etc/fake ]; then
-					M4='AT!BAND=11,"Test",0,'$L1X',0,'$L2',0,0'
+					M4='AT!BAND=11,"Test",0,'$L1X','$L2',0,0,0'
 				fi
 			;;
 			"9090"|"9091"|"90b1" )
-				M4='AT!BAND=11,"Test",0,'$L1X',0,'$L2',0,0'
+				M4='AT!BAND=11,"Test",0,'$L1X','$L2',0,0,0'
 			;;
 		esac
 		log "Set back : $M4"

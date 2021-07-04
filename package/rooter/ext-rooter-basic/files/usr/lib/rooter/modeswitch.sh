@@ -136,7 +136,9 @@ check_all_empty() {
 change_bconf() {
 	local devname=$1
 	local conf=$2
+	local mode=$3
 	local unconf=0
+	log "Switching Modem at $DEVICENAME to $mode by selecting Cfg# $bestcfg"
 	echo $unconf >/sys/bus/usb/devices/$devname/bConfigurationValue
 	sleep 1
 	echo $conf >/sys/bus/usb/devices/$devname/bConfigurationValue	
@@ -315,8 +317,7 @@ if [ "$ACTION" = add ]; then
 	if echo $FORCEQMI | grep -q -i "$FILEN"; then
 		bestcfg=1
 		if [ $bConfig -ne $bestcfg ]; then
-			display_top; display "Switching Modem at $DEVICENAME to QMI by selecting Cfg# $bestcfg"; display_bottom
-			change_bconf $DEVICENAME $bestcfg
+			change_bconf $DEVICENAME $bestcfg QMI
 		fi
 	else
 		if [ $retval -ne 0 ]; then
@@ -324,19 +325,24 @@ if [ "$ACTION" = add ]; then
 			if [ $FILEN = "12d1:15c1" ]; then
 				bestcfg=2
 				if [ $bConfig -ne $bestcfg ]; then
-					log "Switching Modem at $DEVICENAME to ECM by selecting Cfg# $bestcfg"
-					change_bconf $DEVICENAME $bestcfg
+					change_bconf $DEVICENAME $bestcfg ECM
 				fi
-			elif [ $FILEN = "413c:81d7" -a $bNumConfs = 3 ]; then
-					bestcfg=1
-					if [ $bConfig -ne $bestcfg ]; then
-						log "Switching Modem at $DEVICENAME to QMI by selecting Cfg# $bestcfg"
-						change_bconf $DEVICENAME $bestcfg
+			elif [ $FILEN = "413c:81d7" ]; then
+				bestcfg=1
+				case $bNumConfs in
+				"3" )
+					change_bconf $DEVICENAME $bestcfg QMI
+					;;
+				"2" )
+					bNumIfs=$(cat /sys/bus/usb/devices/$DEVICENAME/bNumInterfaces)
+					if [ $bNumIfs -lt 4 ]; then
+						change_bconf $DEVICENAME $bestcfg QMI
 					fi
+					;;
+				esac
 			else
 				if [ $bConfig -ne $retval ]; then
-					log "Switching Modem at $DEVICENAME to MBIM by selecting Cfg# $retval"
-					change_bconf $DEVICENAME $retval
+					change_bconf $DEVICENAME $retval MBIM
 				fi
 			fi
 		else

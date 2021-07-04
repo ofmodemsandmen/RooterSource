@@ -19,32 +19,44 @@ sierrabandmask() {
 	ATCMDD='AT!ENTERCND="A710";!BAND?'
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	if [ -e /etc/fake ]; then
-		OX=' AT!ENTERCND="A710";!BAND?
+		OY=' AT!ENTERCND="A710";!BAND?
 
 Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band Mask    L Band Mask 2    L Band Mask 3    L Band Mask 4
 
-00, All bands                     100600000FC00000 0000A700B20E39DF 0000000000000000 0000000000000002 0000000000000000 0000000000000000
+00, All bands                     100600000FC00000 A300BA0E38DF 0000000000000000 0000000000000000 0000000000000000 0000000000000000
 
 OK'
+		OX='AT!ENTERCND="A710";!BAND?
+Unknown band mask. Use AT!BAND to set band.
+0000000000000000 0000A300BA0E38DF 0000000000000000 0000000000000002 0000000000000000 0000000000000000 OK'
 	fi
 	log " "
 	log "Sierra Response : $OX"
 	log " "
 	OX=$(echo $OX | tr " " '\x0a')
 	line=$OX
-	Unk=$(echo $line | grep "All bands")
+	Unk=$(echo $line | grep "Unknown")
 	if [ "$Unk" ]; then
-		BND=$(echo $line | cut -d, -f4 | tr " " ",")
+		BND=$(echo $line | cut -d, -f6 | tr " " ",")
 		echo "$BND"
-		L1=$(echo $BND | cut -d, -f5)
-		GW=$(echo $BND | cut -d, -f4) 
-		L2=$(echo $BND | cut -d, -f7)
+		L1=$(echo $BND | cut -d, -f11)
+		GW=$(echo $BND | cut -d, -f10) 
+		L2=$(echo $BND | cut -d, -f13)
 	else
-		BND=$(echo $line | cut -d, -f5 | tr " " ",")
-		log "$BND"
-		L1=$(echo $BND | cut -d, -f3)
-		GW=$(echo $BND | cut -d, -f2) 
-		L2=$(echo $BND | cut -d, -f5)
+		all=$(echo $line | grep "All bands")
+		if [ "$all" ]; then
+			BND=$(echo $line | cut -d, -f4 | tr " " ",")
+			echo "$BND"
+			L1=$(echo $BND | cut -d, -f5)
+			GW=$(echo $BND | cut -d, -f4) 
+			L2=$(echo $BND | cut -d, -f7)
+		else
+			BND=$(echo $line | cut -d, -f5 | tr " " ",")
+			log "$BND"
+			L1=$(echo $BND | cut -d, -f3)
+			GW=$(echo $BND | cut -d, -f2) 
+			L2=$(echo $BND | cut -d, -f5)
+		fi
 	fi
 	if [ ! $L2 ]; then
 		L2="0000000000000000"
@@ -87,7 +99,7 @@ quebandmask() {
 	log " "
 	L5=""
 	L6=""
-	if [ -e /etc/fake ]; then
+	if [ -e /etc/qfake ]; then
 		EMT=1
 	else
 		EMT=0
@@ -100,7 +112,7 @@ quebandmask() {
 		GW=$(echo $qm | cut -d, -f4)
 		L2="0"
 	else
-		if [ -e /etc/fake ]; then
+		if [ -e /etc/qfake ]; then
 			#OX='AT+QNWPREFCFG="lte_band",+QNWPREFCFG:  "lte_band",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:43:48:66:71 OK'
 			OX='AT+QNWPREFCFG="lte_band" +QNWPREFCFG: "lte_band",0  OK'
 		fi
@@ -122,7 +134,7 @@ quebandmask() {
 		fi
 		L2="0"
 		GW="0"
-		if [ -e /etc/fake ]; then
+		if [ -e /etc/qfake ]; then
 			EMT=0620
 		else
 			EMT=0800
@@ -154,7 +166,7 @@ quebandmask() {
 			fi
 
 			ATCMDD='AT+QNWPREFCFG="nr5g_band"'
-			if [ -e /etc/fake ]; then
+			if [ -e /etc/qfake ]; then
 				#OX='AT+QNWPREFCFG="nr5g_band" +QNWPREFCFG: "nr5g_band",1:2:3:5:7:8:12:20:25:28:38:40:41:48:66:71:77:78:79 OK'
 				OX='AT+QNWPREFCFG="nr5g_band" +QNWPREFCFG: "nr5g_band",0 OK'
 			else
@@ -180,7 +192,7 @@ quebandmask() {
 			$ROOTER/luci/celltype.sh $CURRMODEM
 			netmode=$(uci -q get modem.modem$CURRMODEM.netmode)
 			NET="0"
-			if [ -e /etc/fake ]; then
+			if [ -e /etc/qfake ]; then
 				if [ $netmode = "7" ]; then
 					NET=8
 				fi
