@@ -5,9 +5,18 @@ ROOTER=/usr/lib/rooter
 CURRMODEM=$1
 COMMPORT=$2
 
-OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "cellinfo.gcom" "$CURRMODEM")
+if [ -e /etc/nocops ]; then
+	echo "0" > /tmp/block
+	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "cellinfo0.gcom" "$CURRMODEM")
+	rm -f /tmp/block
+else
+	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "cellinfo0.gcom" "$CURRMODEM")
+fi
+OY=$($ROOTER/gcom/gcom-locked "$COMMPORT" "cellinfo.gcom" "$CURRMODEM")
 
 OX=$(echo $OX | tr 'a-z' 'A-Z')
+OY=$(echo $OY | tr 'a-z' 'A-Z')
+OX=$OX" "$OY
 
 COPS="-"
 COPS_MCC="-"

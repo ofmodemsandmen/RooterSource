@@ -8,19 +8,14 @@ let $g=$env("TIMEOUT")
 if $g = "" let f=25
 else let f = val($g)
 
-send "AT+CREG=2;+CREG?;+CREG=0^m"
+send "AT+COPS=3,0;+COPS?^m"
 let t=time()+f
 gosub getresult
 if $s="^mTIMEOUT ERROR" print $s
 
-send "AT+CEREG=2;+CEREG?;+CEREG=0^m"
+send "AT+COPS=3,2;+COPS?^m"
 let t=time()+f
 gosub getresult
-if $s="^mTIMEOUT ERROR" print $s
-
-send "AT+C5GREG=2;+C5GREG?;+C5GREG=0^m"
-let t=time()+f
-gosub noerror
 if $s="^mTIMEOUT ERROR" print $s
 
  exit 0

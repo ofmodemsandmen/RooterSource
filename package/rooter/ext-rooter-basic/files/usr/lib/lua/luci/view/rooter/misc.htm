@@ -960,8 +960,8 @@ end
 		var x = event.key;
     		if (x == "Enter")
 		{
-			document.getElementById("sendfullat").focus();
-			var s = document.getElementById("atcmdlck").value;
+			document.getElementById("sendcmdat").focus();
+			var s = document.getElementById("atcmd").value;
 			if ( s.length == 0 )
 			{
 				alert("You must enter an AT-Command!!");
@@ -1341,6 +1341,33 @@ end
 		return false;
 	}
 	
+	function sndfullcmd(event)
+	{
+		var x = event.key;
+    		if (x == "Enter")
+		{
+			document.getElementById("sendfullat").focus();
+			var s = document.getElementById("atcmdlck").value;
+			if ( s.length == 0 )
+			{
+				alert("You must enter an AT-Command!!");
+				return false;
+			}
+			atsend=1;
+			document.getElementById("attxt").value="Waiting for a Response";
+			XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "send_atcmd")%>',
+				{ set: s },
+				function(x, rv)
+				{
+					document.getElementById("atcmd").focus();
+					document.getElementById("attxt").value=rv.result;
+					atsend=0;
+				}
+			);
+		}
+		return false;
+	}
+	
 	function sendfullcmd()
 	{
 		var s = document.getElementById("atcmdlck").value;
@@ -1456,7 +1483,7 @@ end
 		<td width="3%">
 			<input type="image" id="lockbtn" name="lockbtn" src="<%=showicon(1)%>" style="width:48px;height:48px;" onclick="return unlock(this)" />
 		</td>
-		<td width="15%" ><input style="visibility:hidden;width: 500px;maxlength="200" type="text" name="atcmdlck" id="atcmdlck" class="cbi-input-text"  onkeydown="sndcmd(event)" ></input>
+		<td width="15%" ><input style="visibility:hidden;width: 500px;maxlength="200" type="text" name="atcmdlck" id="atcmdlck" class="cbi-input-text"  onkeydown="sndfullcmd(event)" ></input>
 		</td>
 		<td width="10%"><input style="visibility:hidden" type="submit" id="sendfullat" class="cbi-button cbi-button-apply" value="<%:Send Command%>" onclick="return sendfullcmd()" />
 		</td>
@@ -1477,7 +1504,7 @@ end
 	<table width="700" border="0" id="linetxt">
 	<tr>
 		<td width="5%"><div align="right">AT-Command : </div></td>
-		<td width="20%"><input type="text" name="atcmd" id="atcmd" class="cbi-input-text" style="width: 350px;" maxlength="500" ></input></td>
+		<td width="20%"><input type="text" name="atcmd" id="atcmd" class="cbi-input-text" style="width: 350px;" maxlength="500"  onkeydown="sndcmd(event)" ></input></td>
 		<td width="75%">&nbsp;</td>
 	</tr>
 	<tr>

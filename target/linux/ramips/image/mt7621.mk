@@ -1,5 +1,5 @@
 #
-# MT7621 Profiles 
+# MT7621 Profiles
 #
 
 KERNEL_DTB += -d21
@@ -751,6 +751,28 @@ define Device/zbt-wg3526-16M
 	kmod-usb3 kmod-usb-ledtrig-usbport wpad-basic
 endef
 TARGET_DEVICES += zbt-wg3526-16M
+
+define Device/zbt-wg209-16M
+  DTS := ZBT-WG209-16M
+  IMAGE_SIZE := $(ralink_default_fw_size_16M)
+  SUPPORTED_DEVICES += zbt-wg209
+  DEVICE_TITLE := ZBT WG209 (16MB flash)
+  DEVICE_PACKAGES := \
+	kmod-ata-core kmod-ata-ahci kmod-sdhci-mt7620 kmod-mt7603 kmod-mt76x2 \
+	kmod-usb3 kmod-usb-ledtrig-usbport wpad-basic
+endef
+TARGET_DEVICES += zbt-wg209-16M
+
+define Device/zbt-wg1602-16M
+  DTS := ZBT-WG1602-16M
+  IMAGE_SIZE := $(ralink_default_fw_size_16M)
+  SUPPORTED_DEVICES += zbt-wg1602
+  DEVICE_TITLE := ZBT WG1602 (16MB flash)
+  DEVICE_PACKAGES := \
+	kmod-ata-core kmod-ata-ahci kmod-sdhci-mt7620 kmod-mt7603 kmod-mt76x2 \
+	kmod-usb3 kmod-usb-ledtrig-usbport wpad-basic
+endef
+TARGET_DEVICES += zbt-wg1602-16M
 
 define Device/zbt-wg3526-32M
   DTS := ZBT-WG3526-32M

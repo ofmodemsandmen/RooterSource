@@ -19,16 +19,24 @@ sierrabandmask() {
 	ATCMDD='AT!ENTERCND="A710";!BAND?'
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	if [ -e /etc/fake ]; then
-		OY=' AT!ENTERCND="A710";!BAND?
+		# all bands set using index 0
+		OX1=' AT!ENTERCND="A710";!BAND?
 
 Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band Mask    L Band Mask 2    L Band Mask 3    L Band Mask 4
 
 00, All bands                     100600000FC00000 A300BA0E38DF 0000000000000000 0000000000000000 0000000000000000 0000000000000000
 
 OK'
-		OX='AT!ENTERCND="A710";!BAND?
+		# all bands set usin index 11
+		OX3=' AT!ENTERCND="A710";!BAND?
+Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band Mask    L Band Mask 2    L Band Mask 3    L Band Mask 4 11, Test                          0000000000000000 000021002204284A 0000000000000000 0000000000000002 0000000000000000 0000000000000000 OK'
+		# all bands Unknown band
+		OX2='AT!ENTERCND="A710";!BAND?
 Unknown band mask. Use AT!BAND to set band.
 0000000000000000 0000A300BA0E38DF 0000000000000000 0000000000000002 0000000000000000 0000000000000000 OK'
+		# B42 using index 0
+		OX=' AT!ENTERCND="A710";!BAND?
+Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band Mask    L Band Mask 2    L Band Mask 3    L Band Mask 4 00, All bands                     100600000EC00000 000000000000000A 0000000000000000 0000000000000002 0000000000000000 0000000000000000 OK'
 	fi
 	log " "
 	log "Sierra Response : $OX"
@@ -38,18 +46,28 @@ Unknown band mask. Use AT!BAND to set band.
 	Unk=$(echo $line | grep "Unknown")
 	if [ "$Unk" ]; then
 		BND=$(echo $line | cut -d, -f6 | tr " " ",")
-		echo "$BND"
+		log "Unknw : $BND"
 		L1=$(echo $BND | cut -d, -f11)
 		GW=$(echo $BND | cut -d, -f10) 
 		L2=$(echo $BND | cut -d, -f13)
 	else
-		all=$(echo $line | grep "All bands")
+		all=$(echo $line | grep "L Band Mask 2")
 		if [ "$all" ]; then
 			BND=$(echo $line | cut -d, -f4 | tr " " ",")
-			echo "$BND"
-			L1=$(echo $BND | cut -d, -f5)
-			GW=$(echo $BND | cut -d, -f4) 
-			L2=$(echo $BND | cut -d, -f7)
+			log "EM7511 : $BND"
+			OK=8
+			EOK=$(echo $BND | cut -d, -f$OK)
+			while [ $EOK != "OK" ]; do
+				OK=$(( OK + 1 ))
+				EOK=$(echo $BND | cut -d, -f$OK)
+			done
+			log "$OK"
+			ex1=$(( OK - 5 ))
+			ex2=$(( OK - 6 ))
+			ex3=$(( OK - 3 ))
+			L1=$(echo $BND | cut -d, -f$ex1)
+			GW=$(echo $BND | cut -d, -f$ex2) 
+			L2=$(echo $BND | cut -d, -f$ex3)
 		else
 			BND=$(echo $line | cut -d, -f5 | tr " " ",")
 			log "$BND"

@@ -123,6 +123,9 @@ set_dns2() {
 check_apn() {
 	local IPVAR="IP"
 	local COMMPORT="/dev/ttyUSB"$CPORT
+	if [ -e /etc/nocops ]; then
+		echo "0" > /tmp/block
+	fi
 	ATCMDD="AT+CGDCONT=?"
 	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	if [ -n "$(echo $OX | grep -o "IPV4V6")" ]; then
@@ -140,6 +143,9 @@ check_apn() {
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")
 		sleep 5
+	fi
+	if [ -e /etc/nocops ]; then
+		rm -f /tmp/block
 	fi
 }
 

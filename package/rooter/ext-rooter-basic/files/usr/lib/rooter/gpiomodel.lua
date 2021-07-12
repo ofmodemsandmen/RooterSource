@@ -106,8 +106,10 @@ gpioname[31] = "power_usb"
 model[32] = "turbomod"
 gpio[32] = 17
 gpioname[32] = "power_usb"
+model[33] = "mk01"
+gpio[33] = 6
 
-numodel = 32
+numodel = 33
 
 local file = io.open(mfile, "r")
 if file == nil then
