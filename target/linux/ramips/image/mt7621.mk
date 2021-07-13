@@ -557,18 +557,6 @@ define Device/ubnt-erx-sfp
 endef
 TARGET_DEVICES += ubnt-erx-sfp
 
-define Device/dualq_h721
-  DTS := H721
-  IMAGE_SIZE := 16064k
-  DEVICE_TITLE := DualQ H721
-  DEVICE_PACKAGES := kmod-ata-core kmod-ata-ahci kmod-sdhci-mt7620 kmod-usb3 \
-		kmod-ath10k-ct kmod-ath9k \
-	 	ath10k-firmware-qca988x-ct ath10k-firmware-qca9984-ct \
-	 	ath10k-firmware-qca99x0-ct ath10k-firmware-qca9888-ct
-  SUPPORTED_DEVICES += h721
-endef
-TARGET_DEVICES += dualq_h721
-
 define Device/mofi5500
   DTS := Mofi5500
   IMAGE_SIZE := 16064k
