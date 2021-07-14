@@ -544,7 +544,20 @@ else
 			echo "$LIST"
 			echo "$LIST" > alllist.txt
 		else
-			buldimage $1 $2 $3
+			if [ $cmd = "DETAILS" ]; then
+				LIST=$(jshon -k < $routersjson)
+				echo "$LIST" > alllist.txt
+				while read L1
+				do
+					temp1=$(jshon -e "$L1" -e details  < $routersjson)
+					temp="${temp1%\"}"
+					details="${temp#\"}"
+					echo $L1
+					echo "$details"
+				done < alllist.txt
+			else
+				buldimage $1 $2 $3
+			fi
 		fi
 	fi
 fi
