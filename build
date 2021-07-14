@@ -1,0 +1,545 @@
+#!/bin/sh
+
+routersjson="./routers.json"
+templatefolder="template/"
+customfolder="custom/"
+	
+buldimage() {
+	image=$1
+	flag=$2
+	cconfig=$3
+
+	image_up=$(echo "$image" | tr [a-z] [A-Z])
+	LIST=$(jshon -k < $routersjson)
+	echo "$LIST" > modellist.txt
+
+	found=0
+	while read  model 
+	do
+		model_up=$( echo "$model" | tr [a-z] [A-Z])
+		if [ "$image_up" = "$model_up" ]; then
+			found=1
+			model_list=$(jshon -e "$model_up" -k < $routersjson)
+			fnd=$(echo "$model_list" | grep "type")
+			if [ ! -z "$fnd" ]; then
+				model_type=$(jshon -e "$model_up" -e type  < $routersjson)
+				temp="${model_type%\"}"
+				model_type="${temp#\"}"
+				case $model_type in
+					"1" )
+						temp1=$(jshon -e "$model_up" -e image  < $routersjson)
+						temp="${temp1%\"}"
+						model_image="${temp#\"}"
+						
+						temp1=$(jshon -e "$model_up" -e ext  < $routersjson)
+						temp="${temp1%\"}"
+						model_ext="${temp#\"}"
+					;;
+					"2" )
+						temp1=$(jshon -e "$model_up" -e image1  < $routersjson)
+						temp="${temp1%\"}"
+						model_image1="${temp#\"}"
+						temp1=$(jshon -e "$model_up" -e image2  < $routersjson)
+						temp="${temp1%\"}"
+						model_image2="${temp#\"}"
+						
+						temp1=$(jshon -e "$model_up" -e ext1  < $routersjson)
+						temp="${temp1%\"}"
+						model_ext1="${temp#\"}"
+						temp1=$(jshon -e "$model_up" -e ext2  < $routersjson)
+						temp="${temp1%\"}"
+						model_ext2="${temp#\"}"
+					;;
+					"3" )
+					temp1=$(jshon -e "$model_up" -e image1  < $routersjson)
+						temp="${temp1%\"}"
+						model_image1="${temp#\"}"
+						temp1=$(jshon -e "$model_up" -e image2  < $routersjson)
+						temp="${temp1%\"}"
+						model_image2="${temp#\"}"
+						temp1=$(jshon -e "$model_up" -e image3  < $routersjson)
+						temp="${temp1%\"}"
+						model_image3="${temp#\"}"
+						temp1=$(jshon -e "$model_up" -e image4  < $routersjson)
+						temp="${temp1%\"}"
+						model_image4="${temp#\"}"
+						
+						temp1=$(jshon -e "$model_up" -e ext1  < $routersjson)
+						temp="${temp1%\"}"
+						model_ext1="${temp#\"}"
+						temp1=$(jshon -e "$model_up" -e ext2  < $routersjson)
+						temp="${temp1%\"}"
+						model_ext2="${temp#\"}"
+					;;
+					"4" )
+						temp1=$(jshon -e "$model_up" -e image1  < $routersjson)
+						temp="${temp1%\"}"
+						model_image1="${temp#\"}"
+						temp1=$(jshon -e "$model_up" -e image2  < $routersjson)
+						temp="${temp1%\"}"
+						model_image2="${temp#\"}"
+					;;
+				esac
+				
+				temp1=$(jshon -e "$model_up" -e config  < $routersjson)
+				temp="${temp1%\"}"
+				model_config="${temp#\"}"
+				
+				temp1=$(jshon -e "$model_up" -e imagepath  < $routersjson)
+				temp="${temp1%\"}"
+				model_imagepath="${temp#\"}"
+				model_imagepath=$(echo $model_imagepath | sed 's!\\!!g')
+				
+				temp1=$(jshon -e "$model_up" -e mod  < $routersjson)
+				temp="${temp1%\"}"
+				model_mod="${temp#\"}"
+				
+				model_addons=""
+				fnd=$(echo "$model_list" | grep "addons")
+				if [ ! -z "$fnd" ]; then
+					cntr=0
+					item_len=$(jshon -e "$model_up" -e addons -l  < $routersjson)
+					if [ $item_len -gt 0 ]; then
+						while [ $cntr -lt $item_len ]; do
+							temp1=$(jshon -e "$model_up" -e addons -e $cntr  < $routersjson)
+							temp="${temp1%\"}"
+							temp1="${temp#\"}"
+							temp1=$(echo $temp1 | sed 's!\\!!g')
+							if [ $cntr -eq 0 ]; then
+								model_addons=$temp1
+							else
+								model_addons=$model_addons"|"$temp1
+							fi
+							cntr=$((cntr+1))
+						done
+					fi
+				fi
+				zippassword=""
+				fnd=$(echo "$model_list" | grep "zippassword")
+				if [ ! -z "$fnd" ]; then
+					temp1=$(jshon -e "$model_up" -e zippassword  < $routersjson)
+					temp="${temp1%\"}"
+					temp1="${temp#\"}"
+					zippassword="-P "$(echo $temp1 | sed 's!\\!!g')" "
+				fi
+
+				model_name=""
+				model_hostname=""
+				model_ssid2g=""
+				model_ssid5g=""
+				model_password=""
+				model_material=""
+				model_argon=""
+				model_tomato=""
+				fnd=$(echo "$model_list" | grep "custom")
+				if [ ! -z "$fnd" ]; then
+					cust_list=$(jshon -e "$model_up" -e custom -k < $routersjson)
+					fnd=$(echo "$cust_list" | grep "name")
+					if [ ! -z "$fnd" ]; then
+						x_list=$(jshon -e "$model_up" -e custom -e name -k < $routersjson)
+						fnd=$(echo "$x_list" | grep "model")
+						if [ ! -z "$fnd" ]; then
+							temp1=$(jshon -e "$model_up" -e custom -e name -e model < $routersjson)
+							temp="${temp1%\"}"
+							model_name="${temp#\"}"
+						fi
+						fnd=$(echo "$x_list" | grep "hostname")
+						if [ ! -z "$fnd" ]; then
+							temp1=$(jshon -e "$model_up" -e custom -e name -e hostname < $routersjson)
+							temp="${temp1%\"}"
+							model_hostname="${temp#\"}"
+						fi
+					fi
+					
+					fnd=$(echo "$cust_list" | grep "wifi")
+					if [ ! -z "$fnd" ]; then
+						x_list=$(jshon -e "$model_up" -e custom -e wifi -k < $routersjson)
+						fnd=$(echo "$x_list" | grep "SSID2G")
+						if [ ! -z "$fnd" ]; then
+							temp1=$(jshon -e "$model_up" -e custom -e wifi -e SSID2G < $routersjson)
+							temp="${temp1%\"}"
+							model_ssid2g="${temp#\"}"
+						fi
+						fnd=$(echo "$x_list" | grep "SSID5G")
+						if [ ! -z "$fnd" ]; then
+							temp1=$(jshon -e "$model_up" -e custom -e wifi -e SSID5G < $routersjson)
+							temp="${temp1%\"}"
+							model_ssid5g="${temp#\"}"
+						fi
+						fnd=$(echo "$x_list" | grep "Password")
+						if [ ! -z "$fnd" ]; then
+							temp1=$(jshon -e "$model_up" -e custom -e wifi -e Password < $routersjson)
+							temp="${temp1%\"}"
+							model_password="${temp#\"}"
+						fi
+					fi
+					
+					fnd=$(echo "$cust_list" | grep "image")
+					if [ ! -z "$fnd" ]; then
+						x_list=$(jshon -e "$model_up" -e custom -e image -k < $routersjson)
+						fnd=$(echo "$x_list" | grep "Material")
+						if [ ! -z "$fnd" ]; then
+							temp1=$(jshon -e "$model_up" -e custom -e images -e Material < $routersjson)
+							temp="${temp1%\"}"
+							model_material="${temp#\"}"
+						fi
+						fnd=$(echo "$x_list" | grep "Argon")
+						if [ ! -z "$fnd" ]; then
+							temp1=$(jshon -e "$model_up" -e custom -e images -e Argon < $routersjson)
+							temp="${temp1%\"}"
+							model_argon="${temp#\"}"
+						fi
+						fnd=$(echo "$x_list" | grep "Tomato")
+						if [ ! -z "$fnd" ]; then
+							temp1=$(jshon -e "$model_up" -e custom -e images -e Tomato < $routersjson)
+							temp="${temp1%\"}"
+							model_tomato="${temp#\"}"
+						fi
+					fi
+					file_list=""
+					fnd=$(echo "$cust_list" | grep "files")
+					if [ ! -z "$fnd" ]; then
+						temp1=$(jshon -e "$model_up" -e custom -e files  < $routersjson)
+						temp="${temp1%\"}"
+						temp1="${temp#\"}"
+						file_list="./configfiles"$(echo $temp1 | sed 's!\\!!g')
+					fi
+				fi
+			fi
+			break
+		fi
+	done < ./modellist.txt
+
+	if [ $found -eq 0 ];then
+		if [ ! -z $image ]; then
+			echo "Model $image is not supported"
+			echo " "
+		fi
+		echo "Usage : <router name> [flag config name]"
+		echo " "
+		echo "<router name> is one of the names in the following list"
+		echo "[flag config name] are optional for working with custom config file for this router"
+		echo "[flag] : -e  create or edit a custom config file"
+		echo "         -eb create or edit a custom config file and then build the image"
+		echo "         -b  build an image using the custom config file"
+		echo "[config name] : name given to a custom config file for this router"
+		echo "                if this config file does not exist then the template"
+		echo "                config file will be used to create it"
+		echo " "
+		echo "Supported Models are :"
+		echo " "
+		ln=0
+		while read L1
+		do
+			if [ $ln -gt 2 ]; then
+				ln=0
+				printf "%-15s\n" $L1
+			else
+				ln=$((ln+1))
+				printf "%-15s" $L1
+			fi
+		done < modellist.txt
+		printf "\n"
+		rm -f ./modellist.txt
+		exit 0
+	fi
+	rm -f ./modellist.txt
+
+	configfix() {
+		DNS=$(cat "./.config" | grep "CONFIG_PACKAGE_dnsmasq-full=y")
+		if [ ! -z $DNS ]; then
+			sed -i -e 's/CONFIG_PACKAGE_dnsmasq=y/# CONFIG_PACKAGE_dnsmasq is not set/g' ./.config
+		fi
+		WPAD=$(cat "./.config" | grep "CONFIG_PACKAGE_wpad-basic=y")
+		if [ ! -z $WPAD ]; then
+			sed -i -e 's/CONFIG_PACKAGE_wpad-basic=y/# CONFIG_PACKAGE_wpad-basic is not set/g' ./.config
+		fi
+		WPAD=$(cat "./.config" | grep "CONFIG_PACKAGE_wpad=y")
+		if [ ! -z $WPAD ]; then
+			sed -i -e 's/CONFIG_PACKAGE_wpad-mini=y/# CONFIG_PACKAGE_wpad-mini is not set/g' ./.config
+		fi
+
+	}
+
+	DATE=$(date +%Y-%m-%d)
+
+	NAME="GoldenOrb_"
+	CODE=$NAME$DATE
+	rm -rf ./bin
+	rm -rf ./files
+	mkdir -p ./files/etc
+
+	echo 'CODENAME="'"$CODE"'"' > ./files/etc/codename
+
+	testim="$model_material""$model_argon""$model_tomato"
+	if [ ! -z "$testim" ]; then
+		echo "                        <model>" > ./files/etc/header_msg
+		if [ ! -z $model_material ]; then
+			echo "/img/"$model_material >> ./files/etc/header_msg
+		else
+			echo "/img/header.png" >> ./files/etc/header_msg
+		fi
+		if [ ! -z $model_argon ]; then
+			echo "/img/"$model_argon >> ./files/etc/header_msg
+		else
+			echo "/img/rosy.png" >> ./files/etc/header_msg
+		fi
+		if [ ! -z $model_tomato ]; then
+			echo "/img/"$model_tomato >> ./files/etc/header_msg
+		else
+			echo "/img/tomato.png" >> ./files/etc/header_msg
+		fi
+	fi
+
+	if [ ! -z "$model_name" ]; then
+		if [ ! -z "$model_name" ]; then
+			echo "$model_name" > ./files/etc/custom
+			echo "$model_name" >> ./files/etc/custom
+		fi
+		if [ ! -z "$model_hostname" ]; then
+			echo "$model_hostname" >> ./files/etc/custom
+		else
+			echo "ROOter" >> ./files/etc/custom
+		fi
+	fi
+
+	testim="$model_ssid2g""$model_ssid5g""$model_password"
+	if [ ! -z "$testim" ]; then
+		if [ ! -z "$model_ssid2g" ]; then
+			echo "$model_ssid2g" >> ./files/etc/customwifi
+		else
+			echo "ROOter 2G" >> ./files/etc/customwifi
+		fi
+		if [ ! -z "$model_ssid5g" ]; then
+			echo "$model_ssid5g" >> ./files/etc/customwifi
+		else
+			echo "ROOter 5G" >> ./files/etc/customwifi
+		fi
+		if [ ! -z "$model_password" ]; then
+			echo "$model_password" >> ./files/etc/customwifi
+		else
+			echo "rooter2017" >> ./files/etc/customwifi
+		fi
+	fi
+
+	addon_list=""
+
+	copy_addons() {
+		if [ ! -z "$model_addons" ]; then
+			addon_list=$(echo "$model_addons" | sed -r 's![|]+!,!g')","
+			bd=1
+			L1=$(echo "$addon_list" | cut -d, -f$bd)
+			while [ ! -z "$L1" ]
+			do
+				cp "./configfiles/addons/"$L1 ./images/$L1
+				bd=$((bd+1))
+				L1=$(echo "$addon_list" | cut -d, -f$bd)
+			done
+			addon_list=$(echo "$model_addons" | sed -r 's![|]+! !g')
+		fi
+	}
+
+	del_addons() {
+		if [ ! -z "$model_addons" ]; then
+			addon_list=$(echo "$model_addons" | sed -r 's![|]+!,!g')","
+			bd=1
+			L1=$(echo "$addon_list" | cut -d, -f$bd)
+			while [ ! -z "$L1" ]
+			do
+				rm -f $L1
+				bd=$((bd+1))
+				L1=$(echo "$addon_list" | cut -d, -f$bd)
+			done
+			addon_list=$(echo "$model_addons" | sed -r 's![|]+! !g')
+		fi
+	}
+
+	m_config=$templatefolder$model_config
+	if [ ! -z $cconfig ]; then
+		if [ $flag = "-e" ]; then
+			m_config=$customfolder".config_"$cconfig
+			if [ ! -e ./configfiles/$m_config ]; then
+				cp ./configfiles/$templatefolder$model_config  ./configfiles/$m_config
+			fi
+			cp ./configfiles/$m_config ./.config
+			# edit and exit
+			make menuconfig
+			if [ -e ./.config ]; then
+				cp ./.config ./configfiles/$m_config 
+			fi
+			exit 0
+		else
+			if [ $flag = "-eb" ]; then
+				m_config=$customfolder".config_"$cconfig
+				if [ ! -e ./configfiles/$m_config ]; then
+					cp ./configfiles/$templatefolder$model_config  ./configfiles/$m_config
+				fi
+				cp ./configfiles/$m_config ./.config
+				# edit
+				make menuconfig
+				if [ -e ./.config ]; then
+					cp ./.config ./configfiles/$m_config 
+				else
+					exit 0
+				fi 
+			else
+				if [ $flag = "-b" ]; then
+					m_config=$customfolder".config_"$cconfig
+					if [ ! -e ./configfiles/$m_config ]; then
+						cp ./configfiles/$templatefolder$model_config  ./configfiles/$m_config
+					fi
+				else
+					echo "Mangled Parameters"
+					exit 0
+				fi
+			fi
+		fi
+	fi
+
+	TYP="-GO"
+	END=$TYP$DATE
+
+	if [ ! -z "$file_list" ]; then
+		cp -r $file_list* ./files
+	fi
+
+	case $model_type in
+		"1" )
+			cp ./configfiles/$m_config ./.config
+			make defconfig
+			configfix
+			make V=s
+			cp ./bin/targets$model_imagepath$model_image ./images/$model_mod$END$model_ext
+			copy_addons
+			cd ./images
+			zip $zippassword $model_mod$END.zip $model_mod$END$model_ext $addon_list
+			rm -f $model_mod$END$model_ext
+			del_addons
+			cd ..
+			if [ -e ./configfiles/$m_config"-full" ]; then
+				cp ./configfiles/$m_config"-full" ./.config
+				make defconfig
+				configfix
+				make V=s
+				cp ./bin/targets$model_imagepath$model_image ./images/$model_mod"-full"$END$model_ext
+				cd ./images
+				zip $zippassword $model_mod$END.zip $model_mod"-full"$END$model_ext
+				rm -f $model_mod"-full"$END$model_ext
+				cd ..
+			fi
+		;;
+		"2" )
+			cp ./configfiles/$m_config ./.config
+			make defconfig
+			configfix
+			make V=s
+			cp ./bin/targets$model_imagepath$model_image1 ./images/$model_mod$END$model_ext1
+			cp ./bin/targets$model_imagepath$model_image2 ./images/$model_mod$END$model_ext2
+			copy_addons
+			cd ./images
+			zip $zippassword$model_mod$END.zip $model_mod$END$model_ext1 $model_mod$END$model_ext2 $addon_list
+			rm -f $model_mod$END$model_ext1
+			rm -f $model_mod$END$model_ext2
+			del_addons
+			cd ..
+			if [ -e ./configfiles/$m_config"-full" ]; then
+				cp ./configfiles/$m_config"-full" ./.config
+				make defconfig
+				configfix
+				make V=s
+				cp ./bin/targets$model_imagepath$model_image1 ./images/$model_mod"-full"$END$model_ext1
+				cp ./bin/targets$model_imagepath$model_image2 ./images/$model_mod"-full"$END$model_ext2
+				cd ./images
+				zip $zippassword$model_mod$END.zip $model_mod$"-full"END$model_ext1 $model_mod"-full"$END$model_ext2 
+				rm -f $model_mod"-full"$END$model_ext1
+				rm -f $model_mod"-full"$END$model_ext2
+				cd ..
+			fi
+		;;
+		"3" )
+			cp ./configfiles/$m_config ./.config
+			make defconfig
+			configfix
+			make V=s
+			cp ./bin/targets$model_imagepath$model_image1 ./images/$model_image1
+			cp ./bin/targets$model_imagepath$model_image3 ./images/$model_image3
+			copy_addons
+			cd ./images
+			gunzip $model_image1
+			mv $model_image2 $model_mod$END$model_ext1
+			gunzip $model_image3
+			mv $model_image4 $model_mod$END$model_ext2
+			zip -r $zippassword $model_mod$END.zip $model_mod$END$model_ext1 $model_mod$END$model_ext2 $addon_list
+			rm -f $model_mod$END$model_ext1
+			rm -f $model_mod$END$model_ext2
+			del_addons
+			cd ..
+			if [ -e ./configfiles/$m_config"-full" ]; then
+				cp ./configfiles/$m_config"-full" ./.config
+				make defconfig
+				configfix
+				make V=s
+				cp ./bin/targets$model_imagepath$model_image1 ./images/$model_image1
+				cp ./bin/targets$model_imagepath$model_image3 ./images/$model_image3
+				cd ./images
+				gunzip $model_image1
+				mv $model_image2 $model_mod"-full"$END$model_ext1
+				gunzip $model_image3
+				mv $model_image4 $model_mod"-full"$END$model_ext2
+				zip -r $zippassword $model_mod$END.zip $model_mod"-full"$END$model_ext1 $model_mod"-full"$END$model_ext2 
+				rm -f $model_mod"-full"$END$model_ext1
+				rm -f $model_mod"-full"$END$model_ext2
+				cd ..
+			fi
+		;;
+		"4" )
+			cp ./configfiles/$m_config ./.config
+			make defconfig
+			configfix
+			make V=s
+			cp ./bin/targets$model_imagepath$model_image1 ./images/$model_image1
+			copy_addons
+			cd ./images
+			gunzip $model_image1
+			mv $model_image2 $model_mod$END"-ext4.img"
+			zip -r $zippassword $model_mod$END.zip $model_mod$END"-ext4.img"  $addon_list
+			rm -f $model_mod$END"-ext4.img"
+			rm -f $model_imagepath$model_image1
+			del_addons
+			cd ..
+			if [ -e ./configfiles/$m_config"-full" ]; then
+				cp ./configfiles/$m_config"-full" ./.config
+				make defconfig
+				configfix
+				make V=s
+				cp ./bin/targets$model_imagepath$model_image1 ./images/$model_image1
+				cd ./images
+				gunzip $model_image1
+				mv $model_image2 $model_mod"-full"$END"-ext4.img"
+				zip -r $zippassword $model_mod$END.zip $model_mod"-full"$END"-ext4.img" 
+				rm -f $model_mod"-full"$END"-ext4.img"
+				rm -f $model_imagepath$model_image1
+				cd ..
+			fi
+		;;
+	esac
+}
+
+cmd=$1
+
+if [ -z $cmd ]; then
+	buldimage $1 $2 $3
+else
+	if [ $cmd = "ALL" ]; then
+		LIST=$(jshon -k < $routersjson)
+		echo "$LIST" > alllist.txt
+		while read L1
+		do
+		  buldimage "$L1"
+		done < alllist.txt
+		rm -f ./alllist.txt
+	else
+		buldimage $1 $2 $3
+	fi
+fi
+

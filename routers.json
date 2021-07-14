@@ -1,0 +1,472 @@
+{
+	"ALIX-2D13": {
+		"type": "4",
+		"config": ".config_alix-2d13",
+		"image1": "openwrt-x86-geode-combined-ext4.img.gz",
+		"image2": "openwrt-x86-geode-combined-ext4.img",
+		"imagepath": "/x86/geode/",
+		"mod": "ALIX-2D13",
+		"addons": ["readme.txt"]
+	},
+	"APU2C4": {
+		"type": "4",
+		"config": ".config_apu2c4",
+		"image1": "openwrt-x86-64-combined-squashfs.img.gz",
+		"image2": "openwrt-x86-64-combined-squashfs.img",
+		"imagepath": "/x86/64/",
+		"mod": "APU2C4",
+		"addons": ["readme.txt"]
+	},
+	"ARCHERA7V5": {
+		"type": "2",
+		"config": ".config_archera7v5",
+		"image1": "openwrt-ath79-generic-tplink_archer-a7-v5-squashfs-factory.bin",
+		"image2": "openwrt-ath79-generic-tplink_archer-a7-v5-squashfs-sysupgrade.bin",
+		"imagepath": "/ath79/generic/",
+		"mod": "Archer-A7-V5",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["readme.txt"]
+	},
+	"ARCHERC7V2": {
+		"type": "2",
+		"config": ".config_archerc7v2",
+		"image1": "openwrt-ath79-generic-tplink_archer-c7-v2-squashfs-factory.bin",
+		"image2": "openwrt-ath79-generic-tplink_archer-c7-v2-squashfs-sysupgrade.bin",
+		"imagepath": "/ath79/generic/",
+		"mod": "Archer-C7-V2",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["readme.txt"]
+	},
+	"ARCHERC7V4": {
+		"type": "2",
+		"config": ".config_archerc7v4",
+		"image1": "openwrt-ath79-generic-tplink_archer-c7-v4-squashfs-factory.bin",
+		"image2": "openwrt-ath79-generic-tplink_archer-c7-v4-squashfs-sysupgrade.bin",
+		"imagepath": "/ath79/generic/",
+		"mod": "Archer-C7-V4",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["readme.txt"]
+	},
+	"ARCHERC7V5": {
+		"type": "2",
+		"config": ".config_archerc7v5",
+		"image1": "openwrt-ath79-generic-tplink_archer-c7-v5-squashfs-factory.bin",
+		"image2": "openwrt-ath79-generic-tplink_archer-c7-v5-squashfs-sysupgrade.bin",
+		"imagepath": "/ath79/generic/",
+		"mod": "Archer-C7-V5",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["readme.txt"]
+	},
+	"ARCHERC20V1": {
+		"type": "2",
+		"config": ".config_archerc20v1",
+		"image1": "openwrt-ramips-mt7620-tplink_c20-v1-squashfs-sysupgrade.bin",
+		"image2": "openwrt-ramips-mt7620-tplink_c20-v1-squashfs-factory.bin",
+		"imagepath": "/ramips/mt7620/",
+		"mod": "Archer-C20-V1",
+		"ext1": "-upgrade.bin",
+		"ext2": "-factory.bin",
+		"addons": ["readme.txt"]
+	},
+	"AR150": {
+		"type": "1",
+		"config": ".config_ar150",
+		"image": "openwrt-ar71xx-generic-gl-ar150-squashfs-sysupgrade.bin",
+		"imagepath": "/ar71xx/generic/",
+		"mod": "GL-AR150",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"AR300LITE": {
+		"type": "1",
+		"config": ".config_ar300lite",
+		"image": "openwrt-ath7-generic-gl-ar300m-squashfs-sysupgrade.bin",
+		"imagepath": "/ath79/generic/",
+		"mod": "GL-AR300M-Lite",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"AR750": {
+		"type": "1",
+		"config": ".config_ar750",
+		"image": "openwrt-ar71xx-generic-gl-ar750-squashfs-sysupgrade.bin",
+		"imagepath": "/ar71xx/generic/",
+		"mod": "GL-AR750",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"AR750S": {
+		"type": "1",
+		"config": ".config_ar750s",
+		"image": "openwrt-ar71xx-generic-gl-ar750s-squashfs-sysupgrade.bin",
+		"imagepath": "/ar71xx/generic/",
+		"mod": "GL-AR750S",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"B1300": {
+		"type": "1",
+		"config": ".config_b1300",
+		"image": "openwrt-ipq40xx-generic-glinet_gl-b1300-squashfs-sysupgrade.bin",	
+		"imagepath": "/ipq40xx/generic/",
+		"mod": "GL-B1300",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"C2600": {
+		"type": "2",
+		"config": ".config_c2600",
+		"image1": "openwrt-ipq806x-tplink_c2600-squashfs-factory.bin",
+		"image2": "openwrt-ipq806x-tplink_c2600-squashfs-sysupgrade.bin",
+		"imagepath": "/ipq806x/generic/",
+		"mod": "C2600",
+		"ext1": "-factory.bin",
+		"ext2": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"GLMIFI": {
+		"type": "1",
+		"config": ".config_glmifi",
+		"image": "openwrt-ar71xx-generic-gl-mifi-squashfs-sysupgrade.bin",
+		"imagepath": "/ar71xx/generic/",
+		"mod": "GL-MIFI",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"MR3020V3": {
+		"type": "2",
+		"config": ".config_mr3020v3",
+		"image1": "openwrt-ramips-mt76x8-tplink_tl-mr3020-v3-squashfs-tftp-recovery.bin",
+		"image2": "openwrt-ramips-mt76x8-tplink_tl-mr3020-v3-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt76x8/",
+		"mod": "MR3020v3",
+		"ext1": "-tftp-recovery.bin",
+		"ext2": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"MT300NV2": {
+		"type": "1",
+		"config": ".config_mt300nv2",
+		"image": "openwrt-ramips-mt76x8-gl-mt300n-v2-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt76x8/",
+		"mod": "MT300N-V2",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"MYNET-N600": {
+		"type": "2",
+		"config": ".config_mynet-n600",
+		"image1": "openwrt-ar71xx-generic-mynet-n600-squashfs-factory.bin",
+		"image2": "openwrt-ar71xx-generic-mynet-n600-squashfs-sysupgrade.bin",
+		"imagepath": "/ar71xx/generic/",
+		"mod": "MYNET-N600",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["Flashing_a_WD_Mynet_Router.pdf", "readme.txt"]
+	},
+	"MYNET-N750": {
+		"type": "2",
+		"config": ".config_mynet-n750",
+		"image1": "openwrt-ath79-generic-mynet-n750-squashfs-factory.bin",
+		"image2": "openwrt-ath79-generic-mynet-n750-squashfs-sysupgrade.bin",
+		"imagepath": "/ath79/generic/",
+		"mod": "MYNET-N750",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["Flashing_a_WD_Mynet_Router.pdf", "readme.txt"]
+	},
+	"R6220": {
+		"type": "2",
+		"config": ".config_r6220",
+		"image1": "openwrt-ramips-mt7621-r6220-squashfs-factory.img",
+		"image2": "openwrt-ramips-mt7621-r6220-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "Netgear-R6220",
+		"ext1": "-factory.img",
+		"ext2": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"R7800": {
+		"type": "2",
+		"config": ".config_r7800",
+		"image1": "openwrt-ipq806x-generic-netgear_r7800-squashfs-factory.img",
+		"image2": "openwrt-ipq806x-generic-netgear_r7800-squashfs-sysupgrade.bin",
+		"imagepath": "/ipq806x/generic/",
+		"mod": "Netgear-R7800",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["readme.txt"]
+	},
+	"RASPPI": {
+		"type": "3",
+		"config": ".config_rasppi",
+		"image1": "openwrt-brcm2708-bcm2708-rpi-ext4-factory.img.gz",
+		"image2": "openwrt-brcm2708-bcm2708-rpi-ext4-factory.img",
+		"image3": "openwrt-brcm2708-bcm2708-rpi-squashfs-sysupgrade.img.gz",
+		"image4": "openwrt-brcm2708-bcm2708-rpi-squashfs-sysupgrade.img",
+		"imagepath": "/brcm2708/bcm2708/",
+		"mod": "RaspberryPi",
+		"ext1": "-ext4.img",
+		"ext2": "-squashfs.img",
+		"addons": ["readme.txt"]
+	},
+	"RASPPI2": {
+		"type": "3",
+		"config": ".config_rasppi3",
+		"image1": "openwrt-brcm2708-bcm2709-rpi-2-ext4-factory.img.gz",
+		"image2": "openwrt-brcm2708-bcm2709-rpi-2-ext4-factory.img",
+		"image3": "openwrt-brcm2708-bcm2709-rpi-2-squashfs-sysupgrade.img.gz",
+		"image4": "openwrt-brcm2708-bcm2709-rpi-2-squashfs-sysupgrade.img",
+		"imagepath": "/brcm2708/bcm2709/",
+		"mod": "RaspberryPi-2",
+		"ext1": "-ext4.img",
+		"ext2": "-squashfs.img",
+		"addons": ["readme.txt"]
+	},
+	"RASPPI3": {
+		"type": "3",
+		"config": ".config_rasppi3",
+		"image1": "openwrt-brcm2708-bcm2710-rpi-3-ext4-factory.img.gz",
+		"image2": "openwrt-brcm2708-bcm2710-rpi-3-ext4-factory.img",
+		"image3": "openwrt-brcm2708-bcm2710-rpi-3-squashfs-sysupgrade.img.gz",
+		"image4": "openwrt-brcm2708-bcm2710-rpi-3-squashfs-sysupgrade.img",
+		"imagepath": "/brcm2708/bcm2710/",
+		"mod": "RaspberryPi-3",
+		"ext1": "-ext4.img",
+		"ext2": "-squashfs.img",
+		"addons": ["readme.txt"]
+	},
+	"RBM11G": {
+		"type": "2",
+		"config": ".config_rbm11g",
+		"image1": "openwrt-ramips-mt7621-mikrotik_rbm11g-initramfs-kernel.bin",
+		"image2": "openwrt-ramips-mt7621-mikrotik_rbm11g-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "RBM11G",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.txt"]
+	},
+	"RBM33G": {
+		"type": "2",
+		"config": ".config_rbm33g",
+		"image1": "openwrt-ramips-mt7621-mikrotik_rbm33g-initramfs-kernel.bin",
+		"image2": "openwrt-ramips-mt7621-mikrotik_rbm33g-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "RBM33G",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.txt"]
+	},
+	"RBM750GR3": {
+		"type": "2",
+		"config": ".config_rbm750gr3",
+		"image1": "openwrt-ramips-mt7621-mikrotik_routerboard-750gr3-initramfs-kernel.bin",
+		"image2": "openwrt-ramips-mt7621-mikrotik_routerboard-750gr3-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "RBM750GR3",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.txt"]
+	},
+	"RT-AC58U": {
+		"type": "2",
+		"config": ".config_rt-ac58u",
+		"image1": "openwrt-ipq40xx-generic-asus_rt-ac58u-initramfs-fit-uImage.itb",
+		"image2": "openwrt-ipq40xx-generic-asus_rt-ac58u-squashfs-sysupgrade.bin",
+		"imagepath": "/ipq40xx/generic/",
+		"mod": "RT-AC58U",
+		"ext1": "-factory.itb",
+		"ext2": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"SMARTBOXPRO": {
+		"type": "2",
+		"config": ".config_smartboxpro",
+		"image1": "openwrt-ramips-mt7621-beeline_smartbox-pro-squashfs-sysupgrade.bin",
+		"image2": "openwrt-ramips-mt7621-beeline_smartbox-pro-squashfs-breed.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "SmartBox_Pro",
+		"ext1": "-upgrade.bin",
+		"ext2": "-for-breed.bin",
+		"addons": ["readme.txt"],
+		"custom": {
+			"name": {
+				"model": "SmartBox Pro"
+			}
+		}
+	},
+	"TURBOPLUS": {
+		"type": "2",
+		"config": ".config_turboplus",
+		"image1": "openwrt-ramips-mt7621-beeline_smartbox-turbo-plus-squashfs-sysupgrade.bin",
+		"image2": "openwrt-ramips-mt7621-beeline_smartbox-turbo-plus-squashfs-breed.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "SmartBox_TurboPlus",
+		"ext1": "-upgrade.bin",
+		"ext2": "-for-breed.bin",
+		"addons": ["readme.txt"],
+		"custom": {
+			"name": {
+				"model": "SmartBox Turbo Plus"
+			}
+		}
+	},
+	"TURBOMODPLUS": {
+		"type": "2",
+		"config": ".config_turbomodplus",
+		"image1": "openwrt-ramips-mt7621-beeline_smartbox-turbo-plus-squashfs-sysupgrade.bin",
+		"image2": "openwrt-ramips-mt7621-beeline_smartbox-turbo-plus-squashfs-breed.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "SmartBox_TurboModPlus",
+		"ext1": "-upgrade.bin",
+		"ext2": "-for-breed.bin",
+		"addons": ["readme.txt"],
+		"custom": {
+			"name": {
+				"model": "SmartBox Turbo Mod Plus"
+			}
+		}
+	},
+	"WE826Q": {
+		"type": "1",
+		"config": ".config_we826q",
+		"image": "openwrt-ar71xx-generic-oolite-v5.2-squashfs-sysupgrade.bin",
+		"imagepath": "/ar71xx/generic/",
+		"mod": "ZBT-WE826-Q",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"],
+		"custom": {
+			"name": {
+				"model": "ZBT WE826-Q"
+			}
+		}
+	},
+	"WE826T": {
+		"type": "1",
+		"config": ".config_we826t",
+		"image": "openwrt-ramips-mt7620-zbt-we826-16M-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7620/",
+		"mod": "ZBT-WE826T",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"WE826WD": {
+		"type": "1",
+		"config": ".config_we826wd",
+		"image": "openwrt-ramips-mt7620-zbt-we826-16M-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7620/",
+		"mod": "ZBT-WE826WD",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"],
+		"custom": {
+			"name": {
+				"model": "ZBT WE826-WD"
+			}
+		}
+	},
+	"WG1602": {
+		"type": "1",
+		"config": ".config_wg1602",
+		"image": "openwrt-ramips-mt7621-zbt-wg1602-16M-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "ZBT-WG1602",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"WG209": {
+		"type": "1",
+		"config": ".config_wg209",
+		"image": "openwrt-ramips-mt7621-zbt-wg209-16M-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "ZBT-WG209",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"WG3526": {
+		"type": "1",
+		"config": ".config_wg3526",
+		"image": "openwrt-ramips-mt7621-zbt-wg3526-16M-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "ZBT-WG3526",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"WRT1900AC": {
+		"type": "2",
+		"config": ".config_wrt1900ac",
+		"image1": "openwrt-mvebu-cortexa9-linksys_wrt1900ac-squashfs-factory.img",
+		"image2": "openwrt-mvebu-cortexa9-linksys_wrt1900ac-squashfs-sysupgrade.bin",
+		"imagepath": "/mvebu/cortexa9/",
+		"mod": "WRT1900AC-V1",
+		"ext1": "-factory.img",
+		"ext2": "-update.bin",
+		"addons": ["readme.txt"]
+	},
+	"WRT1900ACS": {
+		"type": "2",
+		"config": ".config_wrt1900acs",
+		"image1": "openwrt-mvebu-cortexa9-linksys_wrt1900acs-squashfs-factory.img",
+		"image2": "openwrt-mvebu-cortexa9-linksys_wrt1900acs-squashfs-sysupgrade.bin",
+		"imagepath": "/mvebu/cortexa9/",
+		"mod": "WRT1900ACS",
+		"ext1": "-factory.img",
+		"ext2": "-update.bin",
+		"addons": ["readme.txt"]
+	},
+	"WRT3200ACM": {
+		"type": "2",
+		"config": ".config_wrt3200acm",
+		"image1": "openwrt-mvebu-cortexa9-linksys-wrt3200acm-squashfs-factory.img",
+		"image2": "openwrt-mvebu-cortexa9-linksys_wrt3200acm-squashfs-sysupgrade.bin",
+		"imagepath": "/mvebu/cortexa9/",
+		"mod": "WRT3200ACM",
+		"ext1": "-factory.img",
+		"ext2": "-update.bin",
+		"addons": ["readme.txt"]
+	},
+	"WRT32X": {
+		"type": "2",
+		"config": ".config_wrt32x",
+		"image1": "openwrt-mvebu-cortexa9-linksys-wrt32x-squashfs-factory.img",
+		"image2": "openwrt-mvebu-cortexa9-linksys_wrt32x-squashfs-sysupgrade.bin",
+		"imagepath": "/mvebu/cortexa9/",
+		"mod": "WRT32x",
+		"ext1": "-factory.img",
+		"ext2": "-update.bin",
+		"addons": ["readme.txt"]
+	},
+	"X750": {
+		"type": "1",
+		"config": ".config_x750",
+		"image": "openwrt-ath79-generic-gl-x750-squashfs-sysupgrade.bin",
+		"imagepath": "/ath79/generic/",
+		"mod": "GL-X750",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"X86-64": {
+		"type": "4",
+		"config": ".config_x86-64",
+		"image1": "openwrt-x86-64-combined-ext4.img.gz",
+		"image2": "openwrt-x86-64-combined-ext4.img",
+		"imagepath": "/x86/64/",
+		"mod": "x86-64",
+		"addons": ["readme.txt"]
+	},
+	"XMIFI3PRO": {
+		"type": "2",
+		"config": ".config_xmifi3pro",
+		"image1": "openwrt-ramips-mt7621-xiaomi_mir3p-squashfs-factory.bin",
+		"image2": "openwrt-ramips-mt7621-xiaomi_mir3p-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "Xiaomi-Mifi3Pro",
+		"ext1": "-factory.bin",
+		"ext2": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	}
+}
