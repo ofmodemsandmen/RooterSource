@@ -539,7 +539,13 @@ else
 		done < alllist.txt
 		rm -f ./alllist.txt
 	else
-		buldimage $1 $2 $3
+		if [ $cmd = "LIST" ]; then
+			LIST=$(jshon -k < $routersjson)
+			echo "$LIST"
+			echo "$LIST" > alllist.txt
+		else
+			buldimage $1 $2 $3
+		fi
 	fi
 fi
 

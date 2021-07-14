@@ -128,6 +128,17 @@
 		"ext2": "-upgrade.bin",
 		"addons": ["readme.txt"]
 	},
+	"EA8500": {
+		"type": "2",
+		"config": ".config_ea8500",
+		"image1": "openwrt-ipq806x-generic-linksys_ea8500-squashfs-factory.img",
+		"image2": "openwrt-ipq806x-generic-linksys_ea8500-squashfs-sysupgrade.bin",
+		"imagepath": "/ipq806x/generic/",
+		"mod": "Linksys-EA8500",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["readme.txt"]
+	},
 	"GLMIFI": {
 		"type": "1",
 		"config": ".config_glmifi",
