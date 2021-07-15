@@ -90,13 +90,15 @@
 		"addons": ["readme.txt"]
 	},
 	"AR300LITE": {
-		"details": "Gl.iNet AR300M 16meg Flash",
-		"type": "1",
+		"details": "Gl.iNet AR300M 16meg Nand Flash",
+		"type": "2",
 		"config": ".config_ar300lite",
-		"image": "openwrt-ath79-generic-gl-ar300m-squashfs-sysupgrade.bin",
-		"imagepath": "/ath79/generic/",
+		"image1": "openwrt-ath79-nand-glinet_gl-ar300m-nand-squashfs-factory.img",
+		"image2": "openwrt-ath79-nand-glinet_gl-ar300m-nand-squashfs-sysupgrade.bin",
+		"imagepath": "/ath79/nand/",
 		"mod": "GL-AR300M-Lite",
-		"ext": "-upgrade.bin",
+		"ext1": "-factory.img",
+		"ext2": "-upgrade.bin",
 		"addons": ["readme.txt"]
 	},
 	"AR750": {
