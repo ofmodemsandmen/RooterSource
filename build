@@ -450,7 +450,7 @@ buldimage() {
 				cp ./bin/targets$model_imagepath$model_image1 ./images/$model_mod"-full"$END$model_ext1
 				cp ./bin/targets$model_imagepath$model_image2 ./images/$model_mod"-full"$END$model_ext2
 				cd ./images
-				zip $zippassword$model_mod$END.zip $model_mod$"-full"END$model_ext1 $model_mod"-full"$END$model_ext2 
+				zip $zippassword$model_mod$END.zip $model_mod$"-full"$END$model_ext1 $model_mod"-full"$END$model_ext2 
 				rm -f $model_mod"-full"$END$model_ext1
 				rm -f $model_mod"-full"$END$model_ext2
 				cd ..

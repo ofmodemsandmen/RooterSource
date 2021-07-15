@@ -93,7 +93,7 @@
 		"details": "Gl.iNet AR300M 16meg Flash",
 		"type": "1",
 		"config": ".config_ar300lite",
-		"image": "openwrt-ath7-generic-gl-ar300m-squashfs-sysupgrade.bin",
+		"image": "openwrt-ath79-generic-gl-ar300m-squashfs-sysupgrade.bin",
 		"imagepath": "/ath79/generic/",
 		"mod": "GL-AR300M-Lite",
 		"ext": "-upgrade.bin",
