@@ -90,15 +90,13 @@
 		"addons": ["readme.txt"]
 	},
 	"AR300LITE": {
-		"details": "Gl.iNet AR300M 16meg Nand Flash",
-		"type": "2",
+		"details": "Gl.iNet AR300M Lite",
+		"type": "1",
 		"config": ".config_ar300lite",
-		"image1": "openwrt-ath79-nand-glinet_gl-ar300m-nand-squashfs-factory.img",
-		"image2": "openwrt-ath79-nand-glinet_gl-ar300m-nand-squashfs-sysupgrade.bin",
-		"imagepath": "/ath79/nand/",
+		"image1": "openwrt-ath79-generic-glinet_gl-ar300m-lite-squashfs-sysupgrade.bin",
+		"imagepath": "/ath79/generic/",
 		"mod": "GL-AR300M-Lite",
-		"ext1": "-factory.img",
-		"ext2": "-upgrade.bin",
+		"ext": "-upgrade.bin",
 		"addons": ["readme.txt"]
 	},
 	"AR750": {
@@ -135,10 +133,22 @@
 		"details": "Archer C2600",
 		"type": "2",
 		"config": ".config_c2600",
-		"image1": "openwrt-ipq806x-tplink_c2600-squashfs-factory.bin",
-		"image2": "openwrt-ipq806x-tplink_c2600-squashfs-sysupgrade.bin",
+		"image1": "openwrt-ipq806x-generic-tplink_c2600-squashfs-factory.bin",
+		"image2": "openwrt-ipq806x-generic-tplink_c2600-squashfs-sysupgrade.bin",
 		"imagepath": "/ipq806x/generic/",
 		"mod": "C2600",
+		"ext1": "-factory.bin",
+		"ext2": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"DIR505A1": {
+		"details": "D-Link DIR505a1",
+		"type": "2",
+		"config": ".config_dir505a1",
+		"image1": "openwrt-ar71xx-generic-dir-505-a1-squashfs-factory.bin",
+		"image2": "openwrt-ar71xx-generic-dir-505-a1-squashfs-sysupgrade.bin",
+		"imagepath": "/ar71xx/generic/",
+		"mod": "DIR505A1",
 		"ext1": "-factory.bin",
 		"ext2": "-upgrade.bin",
 		"addons": ["readme.txt"]

@@ -410,6 +410,11 @@ buldimage() {
 			configfix
 			make V=s
 			cp ./bin/targets$model_imagepath$model_image ./images/$model_mod$END$model_ext
+			EX=$?
+			if [ $EX -ne 0 ]; then
+				echo "$EX $model_imagepath$model_image"
+				exit $EX
+			fi
 			copy_addons
 			cd ./images
 			zip $zippassword $model_mod$END.zip $model_mod$END$model_ext $addon_list
@@ -422,6 +427,11 @@ buldimage() {
 				configfix
 				make V=s
 				cp ./bin/targets$model_imagepath$model_image ./images/$model_mod"-full"$END$model_ext
+				EX=$?
+				if [ $EX -ne 0 ]; then
+					echo "$EX $model_imagepath$model_image"
+					exit $EX
+				fi
 				cd ./images
 				zip $zippassword $model_mod$END.zip $model_mod"-full"$END$model_ext
 				rm -f $model_mod"-full"$END$model_ext
@@ -434,7 +444,17 @@ buldimage() {
 			configfix
 			make V=s
 			cp ./bin/targets$model_imagepath$model_image1 ./images/$model_mod$END$model_ext1
+			EX=$?
+			if [ $EX -ne 0 ]; then
+				echo "$EX $model_imagepath$model_image"
+				exit $EX
+			fi
 			cp ./bin/targets$model_imagepath$model_image2 ./images/$model_mod$END$model_ext2
+			EX=$?
+			if [ $EX -ne 0 ]; then
+				echo "$EX $model_imagepath$model_image"
+				exit $EX
+			fi
 			copy_addons
 			cd ./images
 			zip $zippassword$model_mod$END.zip $model_mod$END$model_ext1 $model_mod$END$model_ext2 $addon_list
@@ -448,9 +468,19 @@ buldimage() {
 				configfix
 				make V=s
 				cp ./bin/targets$model_imagepath$model_image1 ./images/$model_mod"-full"$END$model_ext1
+				EX=$?
+				if [ $EX -ne 0 ]; then
+					echo "$EX $model_imagepath$model_image"
+					exit $EX
+				fi
 				cp ./bin/targets$model_imagepath$model_image2 ./images/$model_mod"-full"$END$model_ext2
+				EX=$?
+				if [ $EX -ne 0 ]; then
+					echo "$EX $model_imagepath$model_image"
+					exit $EX
+				fi
 				cd ./images
-				zip $zippassword$model_mod$END.zip $model_mod$"-full"$END$model_ext1 $model_mod"-full"$END$model_ext2 
+				zip $zippassword$model_mod$END.zip $model_mod"-full"$END$model_ext1 $model_mod"-full"$END$model_ext2 
 				rm -f $model_mod"-full"$END$model_ext1
 				rm -f $model_mod"-full"$END$model_ext2
 				cd ..
@@ -462,7 +492,17 @@ buldimage() {
 			configfix
 			make V=s
 			cp ./bin/targets$model_imagepath$model_image1 ./images/$model_image1
+			EX=$?
+			if [ $EX -ne 0 ]; then
+				echo "$EX $model_imagepath$model_image"
+				exit $EX
+			fi
 			cp ./bin/targets$model_imagepath$model_image3 ./images/$model_image3
+			EX=$?
+			if [ $EX -ne 0 ]; then
+				echo "$EX $model_imagepath$model_image"
+				exit $EX
+			fi
 			copy_addons
 			cd ./images
 			gunzip $model_image1
@@ -480,7 +520,17 @@ buldimage() {
 				configfix
 				make V=s
 				cp ./bin/targets$model_imagepath$model_image1 ./images/$model_image1
+				EX=$?
+				if [ $EX -ne 0 ]; then
+					echo "$EX $model_imagepath$model_image"
+					exit $EX
+				fi
 				cp ./bin/targets$model_imagepath$model_image3 ./images/$model_image3
+				EX=$?
+				if [ $EX -ne 0 ]; then
+					echo "$EX $model_imagepath$model_image"
+					exit $EX
+				fi
 				cd ./images
 				gunzip $model_image1
 				mv $model_image2 $model_mod"-full"$END$model_ext1
@@ -498,6 +548,11 @@ buldimage() {
 			configfix
 			make V=s
 			cp ./bin/targets$model_imagepath$model_image1 ./images/$model_image1
+			EX=$?
+			if [ $EX -ne 0 ]; then
+				echo "$EX $model_imagepath$model_image"
+				exit $EX
+			fi
 			copy_addons
 			cd ./images
 			gunzip $model_image1
@@ -513,6 +568,11 @@ buldimage() {
 				configfix
 				make V=s
 				cp ./bin/targets$model_imagepath$model_image1 ./images/$model_image1
+				EX=$?
+				if [ $EX -ne 0 ]; then
+					echo "$EX $model_imagepath$model_image"
+					exit $EX
+				fi
 				cd ./images
 				gunzip $model_image1
 				mv $model_image2 $model_mod"-full"$END"-ext4.img"
