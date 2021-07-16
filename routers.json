@@ -187,6 +187,58 @@
 		"ext2": "-update.bin",
 		"addons": ["Flashing_a_WD_Mynet_Router.pdf", "readme.txt"]
 	},
+	"NEXR5GO": {
+		"details": "WiFiX NEXR5GO",
+		"type": "1",
+		"config": ".config_nexr5go",
+		"image": "openwrt-ar71xx-generic-oolite-v5.2-squashfs-sysupgrade.bin",
+		"imagepath": "/ar71xx/generic/",
+		"mod": "WiFiX NEXR5GO",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"],
+		"custom": {
+			"wifi": {
+				"SSID2G": "WiFiX",
+				"SSID5G": "WiFiX 5G",
+				"Password": "12345678"
+			},
+			"image": {
+				"Material": "wifix.png",
+				"Argon": "wifix.png",
+				"Tomato": "wifix.png"
+			},
+			"name": {
+				"model": "WiFiX NEXR5GO",
+				"hostname": "WiFiX"
+			}
+		}
+	},
+	"NEXQ6GO": {
+		"details": "WiFiX NEXQ6GO",
+		"type": "1",
+		"config": ".config_nexq6go",
+		"image": "openwrt-ar71xx-generic-oolite-v5.2-squashfs-sysupgrade.bin",
+		"imagepath": "/ar71xx/generic/",
+		"mod": "WiFiX NEXQ6GO",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"],
+		"custom": {
+			"wifi": {
+				"SSID2G": "WiFiX",
+				"SSID5G": "WiFiX 5G",
+				"Password": "12345678"
+			},
+			"image": {
+				"Material": "wifix.png",
+				"Argon": "wifix.png",
+				"Tomato": "wifix.png"
+			},
+			"name": {
+				"model": "WiFiX NEXQ6GO",
+				"hostname": "WiFiX"
+			}
+		}
+	},
 	"MYNET-N750": {
 		"details": "MyNet N750",
 		"type": "2",
