@@ -124,6 +124,7 @@ buldimage() {
 				fi
 
 				model_name=""
+				model_flash="16"
 				model_hostname=""
 				model_ssid2g=""
 				model_ssid5g=""
@@ -131,6 +132,15 @@ buldimage() {
 				model_material=""
 				model_argon=""
 				model_tomato=""
+				
+				fnd=$(echo "$model_list" | grep "flash")
+				if [ ! -z "$fnd" ]; then
+					temp1=$(jshon -e "$model_up" -e flash  < $routersjson)
+					temp="${temp1%\"}"
+					temp1="${temp#\"}"
+					model_flash=$(echo $temp1 | sed 's!\\!!g')
+				fi
+				
 				fnd=$(echo "$model_list" | grep "custom")
 				if [ ! -z "$fnd" ]; then
 					cust_list=$(jshon -e "$model_up" -e custom -k < $routersjson)
@@ -179,19 +189,19 @@ buldimage() {
 						x_list=$(jshon -e "$model_up" -e custom -e image -k < $routersjson)
 						fnd=$(echo "$x_list" | grep "Material")
 						if [ ! -z "$fnd" ]; then
-							temp1=$(jshon -e "$model_up" -e custom -e images -e Material < $routersjson)
+							temp1=$(jshon -e "$model_up" -e custom -e image -e Material < $routersjson)
 							temp="${temp1%\"}"
 							model_material="${temp#\"}"
 						fi
 						fnd=$(echo "$x_list" | grep "Argon")
 						if [ ! -z "$fnd" ]; then
-							temp1=$(jshon -e "$model_up" -e custom -e images -e Argon < $routersjson)
+							temp1=$(jshon -e "$model_up" -e custom -e image -e Argon < $routersjson)
 							temp="${temp1%\"}"
 							model_argon="${temp#\"}"
 						fi
 						fnd=$(echo "$x_list" | grep "Tomato")
 						if [ ! -z "$fnd" ]; then
-							temp1=$(jshon -e "$model_up" -e custom -e images -e Tomato < $routersjson)
+							temp1=$(jshon -e "$model_up" -e custom -e image -e Tomato < $routersjson)
 							temp="${temp1%\"}"
 							model_tomato="${temp#\"}"
 						fi
@@ -421,21 +431,23 @@ buldimage() {
 			rm -f $model_mod$END$model_ext
 			del_addons
 			cd ..
-			if [ -e ./configfiles/$m_config"-full" ]; then
-				cp ./configfiles/$m_config"-full" ./.config
-				make defconfig
-				configfix
-				make V=s
-				cp ./bin/targets$model_imagepath$model_image ./images/$model_mod"-full"$END$model_ext
-				EX=$?
-				if [ $EX -ne 0 ]; then
-					echo "$EX $model_imagepath$model_image"
-					exit $EX
+			if [ $model_flash != "8" ]; then
+				if [ -e ./configfiles/$m_config"-full" ]; then
+					cp ./configfiles/$m_config"-full" ./.config
+					make defconfig
+					configfix
+					make V=s
+					cp ./bin/targets$model_imagepath$model_image ./images/$model_mod"-full"$END$model_ext
+					EX=$?
+					if [ $EX -ne 0 ]; then
+						echo "$EX $model_imagepath$model_image"
+						exit $EX
+					fi
+					cd ./images
+					zip $zippassword $model_mod$END.zip $model_mod"-full"$END$model_ext
+					rm -f $model_mod"-full"$END$model_ext
+					cd ..
 				fi
-				cd ./images
-				zip $zippassword $model_mod$END.zip $model_mod"-full"$END$model_ext
-				rm -f $model_mod"-full"$END$model_ext
-				cd ..
 			fi
 		;;
 		"2" )
@@ -462,28 +474,30 @@ buldimage() {
 			rm -f $model_mod$END$model_ext2
 			del_addons
 			cd ..
-			if [ -e ./configfiles/$m_config"-full" ]; then
-				cp ./configfiles/$m_config"-full" ./.config
-				make defconfig
-				configfix
-				make V=s
-				cp ./bin/targets$model_imagepath$model_image1 ./images/$model_mod"-full"$END$model_ext1
-				EX=$?
-				if [ $EX -ne 0 ]; then
-					echo "$EX $model_imagepath$model_image"
-					exit $EX
+			if [ $model_flash != "8" ]; then
+				if [ -e ./configfiles/$m_config"-full" ]; then
+					cp ./configfiles/$m_config"-full" ./.config
+					make defconfig
+					configfix
+					make V=s
+					cp ./bin/targets$model_imagepath$model_image1 ./images/$model_mod"-full"$END$model_ext1
+					EX=$?
+					if [ $EX -ne 0 ]; then
+						echo "$EX $model_imagepath$model_image"
+						exit $EX
+					fi
+					cp ./bin/targets$model_imagepath$model_image2 ./images/$model_mod"-full"$END$model_ext2
+					EX=$?
+					if [ $EX -ne 0 ]; then
+						echo "$EX $model_imagepath$model_image"
+						exit $EX
+					fi
+					cd ./images
+					zip $zippassword$model_mod$END.zip $model_mod"-full"$END$model_ext1 $model_mod"-full"$END$model_ext2 
+					rm -f $model_mod"-full"$END$model_ext1
+					rm -f $model_mod"-full"$END$model_ext2
+					cd ..
 				fi
-				cp ./bin/targets$model_imagepath$model_image2 ./images/$model_mod"-full"$END$model_ext2
-				EX=$?
-				if [ $EX -ne 0 ]; then
-					echo "$EX $model_imagepath$model_image"
-					exit $EX
-				fi
-				cd ./images
-				zip $zippassword$model_mod$END.zip $model_mod"-full"$END$model_ext1 $model_mod"-full"$END$model_ext2 
-				rm -f $model_mod"-full"$END$model_ext1
-				rm -f $model_mod"-full"$END$model_ext2
-				cd ..
 			fi
 		;;
 		"3" )
@@ -514,32 +528,34 @@ buldimage() {
 			rm -f $model_mod$END$model_ext2
 			del_addons
 			cd ..
-			if [ -e ./configfiles/$m_config"-full" ]; then
-				cp ./configfiles/$m_config"-full" ./.config
-				make defconfig
-				configfix
-				make V=s
-				cp ./bin/targets$model_imagepath$model_image1 ./images/$model_image1
-				EX=$?
-				if [ $EX -ne 0 ]; then
-					echo "$EX $model_imagepath$model_image"
-					exit $EX
+			if [ $model_flash != "8" ]; then
+				if [ -e ./configfiles/$m_config"-full" ]; then
+					cp ./configfiles/$m_config"-full" ./.config
+					make defconfig
+					configfix
+					make V=s
+					cp ./bin/targets$model_imagepath$model_image1 ./images/$model_image1
+					EX=$?
+					if [ $EX -ne 0 ]; then
+						echo "$EX $model_imagepath$model_image"
+						exit $EX
+					fi
+					cp ./bin/targets$model_imagepath$model_image3 ./images/$model_image3
+					EX=$?
+					if [ $EX -ne 0 ]; then
+						echo "$EX $model_imagepath$model_image"
+						exit $EX
+					fi
+					cd ./images
+					gunzip $model_image1
+					mv $model_image2 $model_mod"-full"$END$model_ext1
+					gunzip $model_image3
+					mv $model_image4 $model_mod"-full"$END$model_ext2
+					zip -r $zippassword $model_mod$END.zip $model_mod"-full"$END$model_ext1 $model_mod"-full"$END$model_ext2 
+					rm -f $model_mod"-full"$END$model_ext1
+					rm -f $model_mod"-full"$END$model_ext2
+					cd ..
 				fi
-				cp ./bin/targets$model_imagepath$model_image3 ./images/$model_image3
-				EX=$?
-				if [ $EX -ne 0 ]; then
-					echo "$EX $model_imagepath$model_image"
-					exit $EX
-				fi
-				cd ./images
-				gunzip $model_image1
-				mv $model_image2 $model_mod"-full"$END$model_ext1
-				gunzip $model_image3
-				mv $model_image4 $model_mod"-full"$END$model_ext2
-				zip -r $zippassword $model_mod$END.zip $model_mod"-full"$END$model_ext1 $model_mod"-full"$END$model_ext2 
-				rm -f $model_mod"-full"$END$model_ext1
-				rm -f $model_mod"-full"$END$model_ext2
-				cd ..
 			fi
 		;;
 		"4" )
@@ -562,24 +578,26 @@ buldimage() {
 			rm -f $model_imagepath$model_image1
 			del_addons
 			cd ..
-			if [ -e ./configfiles/$m_config"-full" ]; then
-				cp ./configfiles/$m_config"-full" ./.config
-				make defconfig
-				configfix
-				make V=s
-				cp ./bin/targets$model_imagepath$model_image1 ./images/$model_image1
-				EX=$?
-				if [ $EX -ne 0 ]; then
-					echo "$EX $model_imagepath$model_image"
-					exit $EX
+			if [ $model_flash != "8" ]; then
+				if [ -e ./configfiles/$m_config"-full" ]; then
+					cp ./configfiles/$m_config"-full" ./.config
+					make defconfig
+					configfix
+					make V=s
+					cp ./bin/targets$model_imagepath$model_image1 ./images/$model_image1
+					EX=$?
+					if [ $EX -ne 0 ]; then
+						echo "$EX $model_imagepath$model_image"
+						exit $EX
+					fi
+					cd ./images
+					gunzip $model_image1
+					mv $model_image2 $model_mod"-full"$END"-ext4.img"
+					zip -r $zippassword $model_mod$END.zip $model_mod"-full"$END"-ext4.img" 
+					rm -f $model_mod"-full"$END"-ext4.img"
+					rm -f $model_imagepath$model_image1
+					cd ..
 				fi
-				cd ./images
-				gunzip $model_image1
-				mv $model_image2 $model_mod"-full"$END"-ext4.img"
-				zip -r $zippassword $model_mod$END.zip $model_mod"-full"$END"-ext4.img" 
-				rm -f $model_mod"-full"$END"-ext4.img"
-				rm -f $model_imagepath$model_image1
-				cd ..
 			fi
 		;;
 	esac

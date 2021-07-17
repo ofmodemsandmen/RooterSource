@@ -70,6 +70,7 @@
 	"ARCHERC20V1": {
 		"details": "Archer C20v1",
 		"type": "2",
+		"flash": "8",
 		"config": ".config_archerc20v1",
 		"image1": "openwrt-ramips-mt7620-tplink_c20-v1-squashfs-sysupgrade.bin",
 		"image2": "openwrt-ramips-mt7620-tplink_c20-v1-squashfs-factory.bin",
@@ -93,7 +94,7 @@
 		"details": "Gl.iNet AR300M Lite",
 		"type": "1",
 		"config": ".config_ar300lite",
-		"image1": "openwrt-ath79-generic-glinet_gl-ar300m-lite-squashfs-sysupgrade.bin",
+		"image": "openwrt-ath79-generic-glinet_gl-ar300m-lite-squashfs-sysupgrade.bin",
 		"imagepath": "/ath79/generic/",
 		"mod": "GL-AR300M-Lite",
 		"ext": "-upgrade.bin",
@@ -144,6 +145,7 @@
 	"DIR505A1": {
 		"details": "D-Link DIR505a1",
 		"type": "2",
+		"flash": "8",
 		"config": ".config_dir505a1",
 		"image1": "openwrt-ar71xx-generic-dir-505-a1-squashfs-factory.bin",
 		"image2": "openwrt-ar71xx-generic-dir-505-a1-squashfs-sysupgrade.bin",
@@ -166,6 +168,7 @@
 	"MR3020V3": {
 		"details": "MR3020v3",
 		"type": "2",
+		"flash": "8",
 		"config": ".config_mr3020v3",
 		"image1": "openwrt-ramips-mt76x8-tplink_tl-mr3020-v3-squashfs-tftp-recovery.bin",
 		"image2": "openwrt-ramips-mt76x8-tplink_tl-mr3020-v3-squashfs-sysupgrade.bin",
@@ -197,32 +200,6 @@
 		"ext2": "-update.bin",
 		"addons": ["Flashing_a_WD_Mynet_Router.pdf", "readme.txt"]
 	},
-	"NEXR5GO": {
-		"details": "WiFiX NEXR5GO",
-		"type": "1",
-		"config": ".config_nexr5go",
-		"image": "openwrt-ar71xx-generic-oolite-v5.2-squashfs-sysupgrade.bin",
-		"imagepath": "/ar71xx/generic/",
-		"mod": "WiFiX NEXR5GO",
-		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"],
-		"custom": {
-			"wifi": {
-				"SSID2G": "WiFiX",
-				"SSID5G": "WiFiX 5G",
-				"Password": "12345678"
-			},
-			"image": {
-				"Material": "wifix.png",
-				"Argon": "wifix.png",
-				"Tomato": "wifix.png"
-			},
-			"name": {
-				"model": "WiFiX NEXR5GO",
-				"hostname": "WiFiX"
-			}
-		}
-	},
 	"NEXQ6GO": {
 		"details": "WiFiX NEXQ6GO",
 		"type": "1",
@@ -253,8 +230,8 @@
 		"details": "MyNet N750",
 		"type": "2",
 		"config": ".config_mynet-n750",
-		"image1": "openwrt-ath79-generic-mynet-n750-squashfs-factory.bin",
-		"image2": "openwrt-ath79-generic-mynet-n750-squashfs-sysupgrade.bin",
+		"image1": "openwrt-ath79-generic-wd_mynet-n750-squashfs-factory.bin",
+		"image2": "openwrt-ath79-generic-wd_mynet-n750-squashfs-sysupgrade.bin",
 		"imagepath": "/ath79/generic/",
 		"mod": "MYNET-N750",
 		"ext1": "-factory.bin",
