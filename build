@@ -140,7 +140,7 @@ buldimage() {
 					temp1="${temp#\"}"
 					model_flash=$(echo $temp1 | sed 's!\\!!g')
 				fi
-				
+
 				fnd=$(echo "$model_list" | grep "custom")
 				if [ ! -z "$fnd" ]; then
 					cust_list=$(jshon -e "$model_up" -e custom -k < $routersjson)
@@ -243,10 +243,10 @@ buldimage() {
 		do
 			if [ $ln -gt 2 ]; then
 				ln=0
-				printf "%-15s\n" $L1
+				printf "%-17s\n" $L1
 			else
 				ln=$((ln+1))
-				printf "%-15s" $L1
+				printf "%-17s" $L1
 			fi
 		done < modellist.txt
 		printf "\n"
@@ -416,6 +416,13 @@ buldimage() {
 	case $model_type in
 		"1" )
 			cp ./configfiles/$m_config ./.config
+			if [ $m_config = $templatefolder$model_config ]; then
+				if [ $model_flash = "8" ]; then
+					sed -i -e 's/# CONFIG_PACKAGE_ext-rooter8-vpn is not set/CONFIG_PACKAGE_ext-rooter8-vpn=y/g' ./.config
+				else
+					sed -i -e 's/# CONFIG_PACKAGE_ext-rooter-lite is not set/CONFIG_PACKAGE_ext-rooter-lite=y/g' ./.config
+				fi
+			fi
 			make defconfig
 			configfix
 			make V=s
@@ -432,8 +439,9 @@ buldimage() {
 			del_addons
 			cd ..
 			if [ $model_flash != "8" ]; then
-				if [ -e ./configfiles/$m_config"-full" ]; then
-					cp ./configfiles/$m_config"-full" ./.config
+				if [ $m_config = $templatefolder$model_config ]; then
+					cp ./configfiles/$m_config ./.config
+					sed -i -e 's/# CONFIG_PACKAGE_ext-rooter16 is not set/CONFIG_PACKAGE_ext-rooter16=y/g' ./.config
 					make defconfig
 					configfix
 					make V=s
@@ -452,6 +460,13 @@ buldimage() {
 		;;
 		"2" )
 			cp ./configfiles/$m_config ./.config
+			if [ $m_config = $templatefolder$model_config ]; then
+				if [ $model_flash = "8" ]; then
+					sed -i -e 's/# CONFIG_PACKAGE_ext-rooter8-vpn is not set/CONFIG_PACKAGE_ext-rooter8-vpn=y/g' ./.config
+				else
+					sed -i -e 's/# CONFIG_PACKAGE_ext-rooter-lite is not set/CONFIG_PACKAGE_ext-rooter-lite=y/g' ./.config
+				fi
+			fi
 			make defconfig
 			configfix
 			make V=s
@@ -475,8 +490,9 @@ buldimage() {
 			del_addons
 			cd ..
 			if [ $model_flash != "8" ]; then
-				if [ -e ./configfiles/$m_config"-full" ]; then
-					cp ./configfiles/$m_config"-full" ./.config
+				if [ $m_config = $templatefolder$model_config ]; then
+					cp ./configfiles/$m_config ./.config
+					sed -i -e 's/# CONFIG_PACKAGE_ext-rooter16 is not set/CONFIG_PACKAGE_ext-rooter16=y/g' ./.config
 					make defconfig
 					configfix
 					make V=s
@@ -502,6 +518,13 @@ buldimage() {
 		;;
 		"3" )
 			cp ./configfiles/$m_config ./.config
+			if [ $m_config = $templatefolder$model_config ]; then
+				if [ $model_flash = "8" ]; then
+					sed -i -e 's/# CONFIG_PACKAGE_ext-rooter8-vpn is not set/CONFIG_PACKAGE_ext-rooter8-vpn=y/g' ./.config
+				else
+					sed -i -e 's/# CONFIG_PACKAGE_ext-rooter-lite is not set/CONFIG_PACKAGE_ext-rooter-lite=y/g' ./.config
+				fi
+			fi
 			make defconfig
 			configfix
 			make V=s
@@ -529,8 +552,9 @@ buldimage() {
 			del_addons
 			cd ..
 			if [ $model_flash != "8" ]; then
-				if [ -e ./configfiles/$m_config"-full" ]; then
-					cp ./configfiles/$m_config"-full" ./.config
+				if [ $m_config = $templatefolder$model_config ]; then
+					cp ./configfiles/$m_config ./.config
+					sed -i -e 's/# CONFIG_PACKAGE_ext-rooter16 is not set/CONFIG_PACKAGE_ext-rooter16=y/g' ./.config
 					make defconfig
 					configfix
 					make V=s
@@ -560,6 +584,13 @@ buldimage() {
 		;;
 		"4" )
 			cp ./configfiles/$m_config ./.config
+			if [ $m_config = $templatefolder$model_config ]; then
+				if [ $model_flash = "8" ]; then
+					sed -i -e 's/# CONFIG_PACKAGE_ext-rooter8-vpn is not set/CONFIG_PACKAGE_ext-rooter8-vpn=y/g' ./.config
+				else
+					sed -i -e 's/# CONFIG_PACKAGE_ext-rooter-lite is not set/CONFIG_PACKAGE_ext-rooter-lite=y/g' ./.config
+				fi
+			fi
 			make defconfig
 			configfix
 			make V=s
@@ -579,8 +610,9 @@ buldimage() {
 			del_addons
 			cd ..
 			if [ $model_flash != "8" ]; then
-				if [ -e ./configfiles/$m_config"-full" ]; then
-					cp ./configfiles/$m_config"-full" ./.config
+				if [ $m_config = $templatefolder$model_config ]; then
+					cp ./configfiles/$m_config ./.config
+					sed -i -e 's/# CONFIG_PACKAGE_ext-rooter16 is not set/CONFIG_PACKAGE_ext-rooter16=y/g' ./.config
 					make defconfig
 					configfix
 					make V=s
@@ -630,7 +662,10 @@ else
 					temp1=$(jshon -e "$L1" -e details  < $routersjson)
 					temp="${temp1%\"}"
 					details="${temp#\"}"
-					echo $L1
+					temp1=$(jshon -e "$L1" -e mod  < $routersjson)
+					temp="${temp1%\"}"
+					mod="${temp#\"}"$END".zip"
+					echo $mod
 					echo "$details"
 				done < alllist.txt
 			else

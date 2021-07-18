@@ -142,6 +142,22 @@
 		"ext2": "-upgrade.bin",
 		"addons": ["readme.txt"]
 	},
+	"CFE3": {
+		"details": "Comfast CF-E3",
+		"type": "1",
+		"flash":"8",
+		"config": ".config_cfe3",
+		"image": "openwrt-ath79-generic-comfast_cf-e5-squashfs-sysupgrade.bin",
+		"imagepath": "/ath79/generic/",
+		"mod": "Comfast-CF-E3",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"],
+		"custom": {
+			"name": {
+				"model": "Comfast CF-E3"
+			}
+		}
+	},
 	"DIR505A1": {
 		"details": "D-Link DIR505a1",
 		"type": "2",
@@ -206,7 +222,7 @@
 		"config": ".config_nexq6go",
 		"image": "openwrt-ar71xx-generic-oolite-v5.2-squashfs-sysupgrade.bin",
 		"imagepath": "/ar71xx/generic/",
-		"mod": "WiFiX NEXQ6GO",
+		"mod": "WiFiX-NEXQ6GO",
 		"ext": "-upgrade.bin",
 		"addons": ["readme.txt"],
 		"custom": {
@@ -474,13 +490,25 @@
 		"addons": ["readme.txt"]
 	},
 	"WRT1900AC": {
-		"details": "Linksys WRT1900ac",
+		"details": "Linksys WRT1900ac v1",
 		"type": "2",
 		"config": ".config_wrt1900ac",
 		"image1": "openwrt-mvebu-cortexa9-linksys_wrt1900ac-squashfs-factory.img",
 		"image2": "openwrt-mvebu-cortexa9-linksys_wrt1900ac-squashfs-sysupgrade.bin",
 		"imagepath": "/mvebu/cortexa9/",
 		"mod": "WRT1900AC-V1",
+		"ext1": "-factory.img",
+		"ext2": "-update.bin",
+		"addons": ["readme.txt"]
+	},
+	"WRT1900ACV2": {
+		"details": "Linksys WRT1900ac v2",
+		"type": "2",
+		"config": ".config_wrt1900acv2",
+		"image1": "openwrt-mvebu-cortexa9-linksys_wrt1900acv2-squashfs-factory.img",
+		"image2": "openwrt-mvebu-cortexa9-linksys_wrt1900acv2-squashfs-sysupgrade.bin",
+		"imagepath": "/mvebu/cortexa9/",
+		"mod": "WRT1900AC-V2",
 		"ext1": "-factory.img",
 		"ext2": "-update.bin",
 		"addons": ["readme.txt"]
@@ -501,7 +529,7 @@
 		"details": "Linksys WRT3200acm",
 		"type": "2",
 		"config": ".config_wrt3200acm",
-		"image1": "openwrt-mvebu-cortexa9-linksys-wrt3200acm-squashfs-factory.img",
+		"image1": "openwrt-mvebu-cortexa9-linksys_wrt3200acm-squashfs-factory.img",
 		"image2": "openwrt-mvebu-cortexa9-linksys_wrt3200acm-squashfs-sysupgrade.bin",
 		"imagepath": "/mvebu/cortexa9/",
 		"mod": "WRT3200ACM",
@@ -513,7 +541,7 @@
 		"details": "Linksys WRT32x",
 		"type": "2",
 		"config": ".config_wrt32x",
-		"image1": "openwrt-mvebu-cortexa9-linksys-wrt32x-squashfs-factory.img",
+		"image1": "openwrt-mvebu-cortexa9-linksys_wrt32x-squashfs-factory.img",
 		"image2": "openwrt-mvebu-cortexa9-linksys_wrt32x-squashfs-sysupgrade.bin",
 		"imagepath": "/mvebu/cortexa9/",
 		"mod": "WRT32x",
@@ -525,7 +553,7 @@
 		"details": "Gl.iNet X750",
 		"type": "1",
 		"config": ".config_x750",
-		"image": "openwrt-ath79-generic-gl-x750-squashfs-sysupgrade.bin",
+		"image": "openwrt-ath79-generic-glinet_gl-x750-squashfs-sysupgrade.bin",
 		"imagepath": "/ath79/generic/",
 		"mod": "GL-X750",
 		"ext": "-upgrade.bin",
