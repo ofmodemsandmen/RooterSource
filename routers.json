@@ -344,14 +344,14 @@
 		"ext2": "-update.bin",
 		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.txt"]
 	},
-	"RBM750GR3": {
-		"details": "Mikrotek RBM750Gr3",
+	"RB750GR3": {
+		"details": "Mikrotek RB750Gr3",
 		"type": "2",
-		"config": ".config_rbm750gr3",
-		"image1": "openwrt-ramips-mt7621-mikrotik_routerboard-rbm750gr3-initramfs-kernel.bin",
-		"image2": "openwrt-ramips-mt7621-mikrotik_routerboard-rbm750gr3-squashfs-sysupgrade.bin",
+		"config": ".config_rb750gr3",
+		"image1": "openwrt-ramips-mt7621-mikrotik_rb750gr3-initramfs-kernel.bin",
+		"image2": "openwrt-ramips-mt7621-mikrotik_rb750gr3-squashfs-sysupgrade.bin",
 		"imagepath": "/ramips/mt7621/",
-		"mod": "RBM750GR3",
+		"mod": "RB750GR3",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
 		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.txt"]
