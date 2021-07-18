@@ -16,7 +16,7 @@ define Package/ext-rooter-lite
   DEPENDS:=+luci +ext-rooter-basic \
 		+luci-app-ddns +ddns-scripts +ddns-scripts_no-ip_com \
 		+luci-app-rootervpn +ext-wireguard \
-		+luci-app-nlbwmon +bwmon \
+		+webconsole +bwmon \
 		+ext-theme +luci-theme-argon +argon-config +ext-login \
 		+luci-theme-tomato +ext-material \
 		+ca-bundle +ca-certificates +libustream-openssl \
@@ -37,10 +37,6 @@ endef
 
 
 define Build/Compile
-endef
-
-define Package/ext-rooter-lite/install
-	$(CP) ./files/* $(1)/
 endef
 
 $(eval $(call BuildPackage,ext-rooter-lite))

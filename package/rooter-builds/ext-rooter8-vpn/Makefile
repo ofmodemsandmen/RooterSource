@@ -13,7 +13,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/ext-rooter8-vpn
   SECTION:=utils
   CATEGORY:=ROOter
-  DEPENDS:=+luci +ext-rooter4 \
+  DEPENDS:=+luci +ext-rooter4 +bwmon \
 		+luci-app-rootervpn +ext-wireguard 
   TITLE:=basic ROOter support for 8meg routers
   PKGARCH:=all

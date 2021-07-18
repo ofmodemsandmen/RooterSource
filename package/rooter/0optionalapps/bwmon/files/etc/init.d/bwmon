@@ -4,10 +4,8 @@
 START=99
 
 start() {
-	ENB=$(uci get bwmon.bwmon.enabled)
-	if [ $ENB = "1" ]; then
-		/opt/WRTbmon/wrtbwmon.sh &
-	fi
+		/usr/lib/bwmon/wrtbwmon.sh &
+		/usr/lib/bwmon/create.sh &
 }
 
 stop() {

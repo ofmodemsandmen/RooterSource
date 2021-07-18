@@ -17,7 +17,7 @@ define Package/ext-rooter16
 		+luci-app-mwan3 +luci-app-dnsmasq-ipset \
 		+luci-app-ddns +ddns-scripts +ddns-scripts_no-ip_com \
 		+luci-app-rootervpn +ext-wireguard \
-		+luci-app-nlbwmon +bwmon \
+		+webconsole +bwmon \
 		+ext-theme +luci-theme-argon +argon-config \
 		+luci-theme-tomato +ext-material +ext-login \
 		+ca-bundle +ca-certificates +libustream-openssl \
@@ -38,12 +38,6 @@ endef
 
 
 define Build/Compile
-endef
-
-define Package/ext-rooter16/install
-	$(CP) ./files/* $(1)/
-
-
 endef
 
 $(eval $(call BuildPackage,ext-rooter16))

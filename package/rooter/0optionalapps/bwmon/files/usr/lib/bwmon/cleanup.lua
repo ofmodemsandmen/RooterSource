@@ -1,7 +1,7 @@
 #!/usr/bin/lua
 
 filepost = "-mac_data.js"
-dirname = '/opt/WRTbmon/data'
+dirname = '/usr/lib/bwmon/data'
 
 function clean()
 	nummon = 0
