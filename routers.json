@@ -585,7 +585,7 @@
 		"details": "YOUKU YK1",
 		"type": "1",
 		"config": ".config_youkuyk1",
-		"image": "openwrt-ramips-mt7620-youku_yk1-squashfs-sysupgrade.bin",
+		"image": "openwrt-ramips-mt7620-youku-yk1-squashfs-sysupgrade.bin",
 		"imagepath": "/ramips/mt7620/",
 		"mod": "YOUKU-YK1",
 		"ext": "-upgrade.bin",
