@@ -13,9 +13,9 @@
 		"details": "APU 2C4",
 		"type": "4",
 		"config": ".config_apu2c4",
-		"image1": "openwrt-x86-64-combined-squashfs.img.gz",
-		"image2": "openwrt-x86-64-combined-squashfs.img",
-		"imagepath": "/x86/64/",
+		"image1": "openwrt-x86-generic-combined-squashfs.img.gz",
+		"image2": "openwrt-x86-generic-combined-squashfs.img",
+		"imagepath": "/x86/generic/",
 		"mod": "APU2C4",
 		"addons": ["readme.txt"]
 	},
@@ -579,6 +579,16 @@
 		"mod": "Xiaomi-Mifi3Pro",
 		"ext1": "-factory.bin",
 		"ext2": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"YOUKUYK1": {
+		"details": "YOUKU YK1",
+		"type": "1",
+		"config": ".config_youkuyk1",
+		"image": "openwrt-ramips-mt7620-youku_yk1-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7620/",
+		"mod": "YOUKU-YK1",
+		"ext": "-upgrade.bin",
 		"addons": ["readme.txt"]
 	}
 }
