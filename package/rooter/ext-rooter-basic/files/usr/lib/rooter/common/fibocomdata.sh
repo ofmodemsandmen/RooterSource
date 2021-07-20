@@ -117,7 +117,7 @@ if [ -n "$SERVING" ]; then
 	GTCCDATA=$(echo $SERVING | grep -o "$REGXa")
 	LTENEIGH=$(echo $SERVING | grep -o "$REGXg")
 	NRNEIGH=$(echo $SERVING | grep -o "$REGXh")
-	rm -f /tmp/scan$CURRMODEM
+	echo "" > /tmp/scan$CURRMODEM
 	for NVAL in $(echo "$LTENEIGH"); do
 		CHAN=$(echo $NVAL | cut -d, -f7)
 		CHAN=$(printf "%d" 0x$CHAN)
@@ -301,7 +301,7 @@ if [ -n "$XLDATA" ]; then
 	ECIO=$((($ECIO / 2) - 20))
 	SINR=$(echo $XLDATA | cut -d, -f12 | grep -o "[-0-9]\{1,4\}")
 	if [ -n "$SINR" ] && [ "$SINR" != "255" ]; then
-		SINR=$((($SSINR - 47) / 2))" dB"
+		SINR=$(($SINR / 2))" dB"
 	fi
 	CSQ="-"
 	CSQ_PER=$((100 - (($RSCP + 44) * 100/-96)))"%"

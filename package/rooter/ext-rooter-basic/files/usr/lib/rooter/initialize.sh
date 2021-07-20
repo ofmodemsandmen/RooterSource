@@ -66,7 +66,8 @@ firstboot() {
 	config_load firewall
 	config_foreach do_zone zone
 
-
+	source /etc/openwrt_release
+	twone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
 }
 
 if [ -e /tmp/installing ]; then
@@ -281,3 +282,6 @@ chown -R root:root /etc/dropbear/
 chmod 700 /etc/dropbear/
 chmod 644 /etc/dropbear/authorized_keys 2>/dev/null
 
+if [ ! -z $twone ]; then
+	reboot -f
+fi

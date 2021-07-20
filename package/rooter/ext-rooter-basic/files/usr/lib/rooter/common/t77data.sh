@@ -10,9 +10,12 @@ CURRMODEM=$1
 COMMPORT=$2
 
 OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "t77info.gcom" "$CURRMODEM" | tr 'a-z' 'A-Z')
+
 O=$($ROOTER/common/processat.sh "$OX")
 OX=$(echo $OX)
 O=$(echo $O)
+
+REGXca="BAND:[0-9]\{1,3\} BW:[0-9.]\+MHZ EARFCN:[0-9]\+ PCI:[0-9]\+ RSRP:[^R]\+RSRQ:[^R]\+RSSI:[^S]\+SNR[^D]\+"
 
 RSRP=""
 RSRQ=""
@@ -46,19 +49,23 @@ fi
 TEMP=$(echo $OX | grep -o "TSENS_TZ_SENSOR[0-9]:[0-9]\{1,3\}")
 if [ -n "$TEMP" ]; then
 	TEMP=${TEMP:17:3}
-	TEMP=$(echo $TEMP | grep -o "[0-9]\{1,3\}")$(printf "\xc2\xb0")"C"
-else
+fi
+if [ -z "$TEMP" ]; then
 	TEMP=$(echo $OX | grep -o "XO_THERM_BUF:[0-9]\{1,3\}")
 	if [ -n "$TEMP" ]; then
 		TEMP=${TEMP:13:3}
-		TEMP=$(echo $TEMP | grep -o "[0-9]\{1,3\}")$(printf "\xc2\xb0")"C"
-	else
-		TEMP="-"
 	fi
+fi
+if [ -z "$TEMP" ]; then
+	TEMP=$(echo $OX | grep -o "TSENS: [0-9]\{1,3\}C")
+fi
+if [ -n "$TEMP" ]; then
+	TEMP=$(echo $TEMP | grep -o "[0-9]\{1,3\}")$(printf "\xc2\xb0")"C"
+else
+	TEMP="-"
 fi
 TECH=$(echo $O" " | grep -o "+COPS: .,.,[^,]\+,[027]")
 TECH="${TECH: -1}"
-
 if [ -n "$TECH" ]; then
 	SGCELL=$(echo $O" " | grep -o "\$QCSQ .\+ OK " | tr " " "," | tr ",:" ",")
 
@@ -66,14 +73,16 @@ if [ -n "$TECH" ]; then
 		"7")
 			MODE="LTE"
 			RSSI=$(echo $O | grep -o " RSSI: [^D]\+D" | grep -o "[-0-9\.]\+")
-			CSQ_RSSI=$(echo $RSSI)" dBm"
+			if [ "$CSQ_RSSI" == "-" ]; then
+				CSQ_RSSI=$(echo $RSSI)" dBm"
+			fi
 			RSCP=$(echo $O | grep -o "[^G] RSRP: [^D]\+D" | grep -o "[-0-9\.]\+")
 			RSCP=$(echo $RSCP)
 			ECIO=$(echo $O | grep -o " RSRQ: [^D]\+D" | grep -o "[-0-9\.]\+")
 			ECIO=$(echo $ECIO)
-			SINR=$(echo $OX | grep -o "RS-SINR: [^D]\+D")
+			SINR=$(echo $OX | grep -o "RS-S[I]*NR: [^D]\+D")
 			SINR=${SINR:8}
-			SINR=$(echo "$SINR" | grep -o "[-0-9]\{1,3\}")" dB"
+			SINR=$(echo "$SINR" | grep -o "[-0-9.]\{1,3\}")" dB"
 			CHANNEL=$(echo $O | grep -o " EARFCN(DL/UL): [0-9]\+" | grep -o "[0-9]\+")
 			LBAND="B"$(echo $O | grep -o " BAND: [0-9]\+" | grep -o "[0-9]\+")
 			BWD=$(echo $O | grep -o " BW: [0-9\.]\+ MHZ" | grep -o "[0-9\.]\+")
@@ -81,24 +90,46 @@ if [ -n "$TECH" ]; then
 				BWD=${BWD/.*}
 			fi
 			LBAND=$LBAND" (Bandwidth $BWD MHz)"
-			SCC=$(echo $O | grep -o " SCC[1-9][^M]\+MHZ")
+			PCI=$(echo $OX | grep -o " ENB ID(PCI): [^(]\+([0-9]\{1,3\})" | grep -o "([0-9]\+)" | grep -o "[0-9]\+")
+			SCC=$(echo $OX | grep -o " SCELL[1-9]:")
 			if [ -n "$SCC" ]; then
-				printf '%s\n' "$SCC" | while read SCCX; do
-					SCCX=$(echo $SCCX | tr " " ",")
-					SLBV=$(echo $SCCX | cut -d, -f5 | grep -o "B[0-9]\{1,3\}")
-					SBWV=$(echo $SCCX | cut -d, -f9)
-					if [ $SBWV != "1.4" ]; then
-						SBWV=${SBWV/.*}
+				SCCn=$(echo $SCC | grep -o [0-9])
+				for SCCx in $(echo "$SCCn"); do
+					SCCv=$(echo $OX | grep -o "SCELL$SCCx: $REGXca" | tr ' ' ',')
+					if [ -n "$SCCv" ]; then
+						SLBV=B$(echo $SCCv | cut -d, -f2 | grep -o "[0-9]\{1,3\}")
+						SBWV=$(echo $SCCv | cut -d, -f3 | grep -o "[0-9][^M]\+")
+						if [ "$SBWV" != "1.4" ]; then
+							SBWV=${SBWV%.*}
+						fi
+						LBAND=$LBAND"<br />"$SLBV" (CA, Bandwidth "$SBWV" MHz)"
+						CHANNEL=$CHANNEL", "$(echo $SCCv | cut -d, -f4 | grep -o "[0-9]\+")
+						PCI=$PCI", "$(echo $SCCv | cut -d, -f5 | grep -o "[0-9]\+")
+						RSCP=$RSCP" dBm, "$(echo $SCCv | cut -d, -f6 | grep -o "[-0-9.]\+")
+						ECIO=$ECIO" dB, "$(echo $SCCv | cut -d, -f7 | grep -o "[-0-9.]\+")
+						CSQ_RSSI=$CSQ_RSSI", "$(echo $SCCv | cut -d, -f8 | grep -o "[-0-9.]\+")" dBm"
+						SINR=$SINR", "$(echo $SCCv | cut -d, -f9 | grep -o "[-0-9.]\+")" dB"
 					fi
-					LBAND=$LBAND"<br />"$SLBV" (CA, Bandwidth "$SBWV" MHz)"
-					echo "$LBAND" > /tmp/lbandvar$CURRMODEM
 				done
-				if [ -e /tmp/lbandvar$CURRMODEM ]; then
-					read LBAND < /tmp/lbandvar$CURRMODEM
-					rm /tmp/lbandvar$CURRMODEM
+			else
+				SCC=$(echo $O | grep -o " SCC[1-9][^M]\+MHZ")
+				if [ -n "$SCC" ]; then
+					printf '%s\n' "$SCC" | while read SCCX; do
+						SCCX=$(echo $SCCX | tr " " ",")
+						SLBV=$(echo $SCCX | cut -d, -f5 | grep -o "B[0-9]\{1,3\}")
+						SBWV=$(echo $SCCX | cut -d, -f9)
+						if [ "$SBWV" != "1.4" ]; then
+							SBWV=${SBWV/.*}
+						fi
+						LBAND=$LBAND"<br />"$SLBV" (CA, Bandwidth "$SBWV" MHz)"
+						echo "$LBAND" > /tmp/lbandvar$CURRMODEM
+					done
+					if [ -e /tmp/lbandvar$CURRMODEM ]; then
+						read LBAND < /tmp/lbandvar$CURRMODEM
+						rm /tmp/lbandvar$CURRMODEM
+					fi
 				fi
 			fi
-			PCI=$(echo $O | grep -o " ENB ID(PCI): [^(]\+([0-9]\{1,3\})" | grep -o "([0-9]\+)" | grep -o "[0-9]\+")
 			;;
 		*)
 			if [ $TECH = "2" ]; then
