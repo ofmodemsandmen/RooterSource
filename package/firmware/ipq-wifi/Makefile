@@ -33,6 +33,7 @@ ALLWIFIBOARDS:= \
 	engenius_ens620ext \
 	linksys_ea6350v3 \
 	linksys_ea8300 \
+	p2w_r619ac \
 	qxwlan_e2600ac
 
 ALLWIFIPACKAGES:=$(foreach BOARD,$(ALLWIFIBOARDS),ipq-wifi-$(BOARD))
@@ -105,6 +106,7 @@ $(eval $(call generate-ipq-wifi-package,engenius_eap1300,EnGenius EAP1300))
 $(eval $(call generate-ipq-wifi-package,engenius_ens620ext,EnGenius ENS620EXT))
 $(eval $(call generate-ipq-wifi-package,linksys_ea6350v3,Linksys EA6350v3))
 $(eval $(call generate-ipq-wifi-package,linksys_ea8300,Linksys EA8300))
+$(eval $(call generate-ipq-wifi-package,p2w_r619ac,P&W R619AC))
 $(eval $(call generate-ipq-wifi-package,qxwlan_e2600ac,Qxwlan E2600AC))
 
 $(foreach PACKAGE,$(ALLWIFIPACKAGES),$(eval $(call BuildPackage,$(PACKAGE))))

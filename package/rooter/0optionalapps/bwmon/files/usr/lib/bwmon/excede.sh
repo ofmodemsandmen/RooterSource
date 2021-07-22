@@ -9,6 +9,8 @@ total=$1
 
 if [ -e /etc/bwlock ]; then
 	if [ $total -gt $allocate ]; then
-		log "Allocation exceeded $total $allocate"
+		/usr/lib/bwmon/block 1
+	else
+		/usr/lib/bwmon/block 0
 	fi
 fi

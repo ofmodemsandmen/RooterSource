@@ -254,6 +254,18 @@
 		"ext2": "-update.bin",
 		"addons": ["Flashing_a_WD_Mynet_Router.pdf", "readme.txt"]
 	},
+	"R619AC": {
+		"details": "P2W R619AC",
+		"type": "2",
+		"config": ".config_r619ac",
+		"image1": "openwrt-ipq40xx-generic-p2w_r619ac-squashfs-nand-factory.ubi",
+		"image2": "openwrt-ipq40xx-generic-p2w_r619ac-squashfs-nand-sysupgrade.bin",
+		"imagepath": "/ipq40xx/generic/",
+		"mod": "P2W-R619AC",
+		"ext1": "-factory.ubi",
+		"ext2": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
 	"R6220": {
 		"details": "Netgear R6220",
 		"type": "2",

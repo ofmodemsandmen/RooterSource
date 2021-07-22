@@ -177,6 +177,57 @@ newRuleIF()
     fi
 }
 
+accounting(){
+	LAN_IFACE="br-lan"
+	WAN_IFACE=$1
+	LAN_IP=$(uci -q get network.lan.ipaddr)
+	SERVER_IP=$(echo $LAN_IP  | cut -d . -f 1,2,3).0
+	INTERNAL_NETMASK="$SERVER_IP/24"
+
+	# create the ACCOUNTING chains
+	iptables -w -N ACCOUNTING_BLOCK 2> /dev/null
+	iptables -w -N ACCOUNTING_IN 2> /dev/null
+	iptables -w -N ACCOUNTING_OUT 2> /dev/null
+	check=0
+	# check if accounting rule for ethernet wan not exist, add it
+	checks=$(iptables -w -L FORWARD -v -n | grep "ACCOUNTING" | grep "$WAN_IFACE")
+	[ -z "$checks" ] && check=1
+	
+	# check if jumps to the ACCOUNTING chains are still at the start of the FORWARD chain
+	iptables -w -L FORWARD --line-numbers -n | grep "ACCOUNTING" | grep "^1 "
+	if [ $? -ne 0 -o "$check" = "1" ]; then
+		# remove old jump rules
+		iptables -w -D FORWARD $(iptables -w -L FORWARD --line-numbers | grep ACCOUNTING | grep -m 1 -o "[0-9]*")
+		while [ $? -eq 0 ]; do
+			iptables -w -D FORWARD $(iptables -w -L FORWARD --line-numbers | grep ACCOUNTING | grep -m 1 -o "[0-9]*")
+		done
+		# insert new jump rules at start of FORWARD chain
+		if [ -n "$WAN_IFACE" ]
+		then
+			iptables -w -I FORWARD -i ${WAN_IFACE} -j ACCOUNTING_IN
+			iptables -w -I FORWARD -o ${WAN_IFACE} -j ACCOUNTING_OUT
+		fi
+		iptables -w -I FORWARD -j ACCOUNTING_BLOCK
+	fi
+
+	#For each host in the ARP table
+	grep ${LAN_IFACE} /proc/net/arp | while read IP TYPE FLAGS MAC MASK IFACE
+	do
+		#Add iptables rules (if non existing).
+		iptables -w -nL ACCOUNTING_IN | grep "${IP} " > /dev/null
+		if [ $? -ne 0 ]; then
+			iptables -w -I ACCOUNTING_IN -d ${IP} -s ${INTERNAL_NETMASK} -j RETURN
+			iptables -w -I ACCOUNTING_IN -d ${IP} ! -s ${INTERNAL_NETMASK} -j RETURN
+		fi
+
+		iptables -w -nL ACCOUNTING_OUT | grep "${IP} " > /dev/null
+		if [ $? -ne 0 ]; then
+			iptables -w -I ACCOUNTING_OUT -s ${IP} -d ${INTERNAL_NETMASK} -j RETURN
+			iptables -w -I ACCOUNTING_OUT -s ${IP} ! -d ${INTERNAL_NETMASK} -j RETURN
+		fi
+	done
+}
+
 setup()
 {
 	for chain in $chains; do
@@ -199,6 +250,7 @@ setup()
 	for chain in INPUT OUTPUT; do
 	    for interface in $interfaces; do
 		[ -n "$interface" ] && [ -e "/sys/class/net/$interface" ] && newRuleIF $chain $interface
+		accounting $interface
 	    done
 	done
 
