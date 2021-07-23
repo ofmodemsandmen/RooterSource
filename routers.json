@@ -593,6 +593,16 @@
 		"ext2": "-upgrade.bin",
 		"addons": ["readme.txt"]
 	},
+	"XMIFI3G": {
+		"details": "Xiaomi Mifi 3G",
+		"type": "1",
+		"config": ".config_xmifi3g",
+		"image": "openwrt-ramips-mt7621-xiaomi_mir3g-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "Xiaomi-Mifi3G",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
 	"YOUKUYK1": {
 		"details": "YOUKU YK1",
 		"type": "1",
