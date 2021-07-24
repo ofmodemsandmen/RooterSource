@@ -181,6 +181,18 @@
 		"ext": "-upgrade.bin",
 		"addons": ["readme.txt"]
 	},
+	"HLK7621": {
+		"details": "HiLink HLK-7621a",
+		"type": "2",
+		"config": ".config_hlk7621",
+		"image1": "openwrt-ramips-mt7621-hlk-7621a-squashfs-sysupgrade.bin",
+		"image2": "openwrt-ramips-mt7621-hlk-7621a-initramfs-kernel.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "HiLink-HLK-7621a",
+		"ext1": "-upgrade.bin",
+		"ext2": "-initramfs-kernel.bin",
+		"addons": ["readme.txt"]
+	},
 	"MR3020V3": {
 		"details": "MR3020v3",
 		"type": "2",
@@ -512,6 +524,32 @@
 		"imagepath": "/ramips/mt7621/",
 		"mod": "ZBT-WG3526",
 		"ext": "-upgrade.bin",
+		"addons": ["readme.txt"]
+	},
+	"WR842V2": {
+		"details": "TP-Link WR842 V2",
+		"type": "2",
+		"flash": "8",
+		"config": ".config_wr842v2",
+		"image1": "openwrt-ath79-generic-tplink_tl-wr842n-v2-squashfs-factory.bin",
+		"image2": "openwrt-ath79-generic-tplink_tl-wr842n-v2-squashfs-sysupgrade.bin",
+		"imagepath": "/ath79/generic/",
+		"mod": "TP-Link-WR842-V2",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["readme.txt"]
+	},
+	"WR842V3": {
+		"details": "TP-Link WR842 V3",
+		"type": "2",
+		"flash": "8",
+		"config": ".config_wr842v3",
+		"image1": "openwrt-ath79-generic-tplink_tl-wr842n-v3-squashfs-factory.bin",
+		"image2": "openwrt-ath79-generic-tplink_tl-wr842n-v3-squashfs-sysupgrade.bin",
+		"imagepath": "/ath79/generic/",
+		"mod": "TP-Link-WR842-V3",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
 		"addons": ["readme.txt"]
 	},
 	"WRT1900AC": {
