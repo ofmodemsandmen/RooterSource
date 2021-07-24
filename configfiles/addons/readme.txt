@@ -10,3 +10,9 @@ in its name only.
 
 Images with "full" in their name will have Load Balancing included.
 Those without do not have Load Balancing.
+
+When you first flash the router and go to log in to the GUI your browser
+may give you a warning saying it was dangerous, certificate warning etc.
+This is due to the router having a self signed certificate and you have to
+accept this. There is no danger in doing this as it is something that
+browsers do when the device uses http and the browser wants https.
