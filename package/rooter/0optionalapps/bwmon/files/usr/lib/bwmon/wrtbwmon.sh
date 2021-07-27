@@ -4,6 +4,14 @@ LAN_TYPE=$(uci get network.lan.ipaddr | awk -F. ' { print $1"."$2 }')
 LEASES_FILE=/tmp/dhcp.leases
 lockDir=/tmp/WRTbmon
 
+ifname="ifname"
+source /etc/openwrt_release
+twone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
+if [ ! -z "$twone" ]; then
+	ifname="device"
+fi
+	
+
 [ ! -d "$lockDir" ] && mkdir "$lockDir"
 basePath="/tmp/bwmon/"
 mkdir -p $basePath"data"
@@ -50,7 +58,7 @@ createDbIfMissing()
 
 checkWAN()
 {
-    [ -z "$wan" ] && log "Warning: failed to detect WAN interface."
+    [ -z "$wan" ] && return
 }
 
 lookup()
@@ -89,12 +97,12 @@ detectIF()
     fi
 
     if [ -n "$uci" -a -x "$uci" ]; then
-	IF=`$uci get network.${1}.ifname 2>/dev/null`
+	IF=`$uci get network.${1}.$ifname 2>/dev/null`
 	[ $? -eq 0 -a -n "$IF" ] && echo $IF && return
     fi
 
     if [ -n "$nvram" -a -x "$nvram" ]; then
-	IF=`$nvram get ${1}_ifname 2>/dev/null`
+	IF=`$nvram get ${1}_$ifname 2>/dev/null`
 	[ $? -eq 0 -a -n "$IF" ] && echo $IF && return
     fi
 }

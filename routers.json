@@ -526,19 +526,6 @@
 		"ext": "-upgrade.bin",
 		"addons": ["readme.txt"]
 	},
-	"WR842V2": {
-		"details": "TP-Link WR842 V2",
-		"type": "2",
-		"flash": "8",
-		"config": ".config_wr842v2",
-		"image1": "openwrt-ath79-generic-tplink_tl-wr842n-v2-squashfs-factory.bin",
-		"image2": "openwrt-ath79-generic-tplink_tl-wr842n-v2-squashfs-sysupgrade.bin",
-		"imagepath": "/ath79/generic/",
-		"mod": "TP-Link-WR842-V2",
-		"ext1": "-factory.bin",
-		"ext2": "-update.bin",
-		"addons": ["readme.txt"]
-	},
 	"WR842V3": {
 		"details": "TP-Link WR842 V3",
 		"type": "2",

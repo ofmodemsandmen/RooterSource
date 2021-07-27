@@ -18,7 +18,6 @@ define Package/ext-rooter4
 		+luci-app-sqm +kmod-sched-cake \
 		+luci-app-ddns +ddns-scripts +ddns-scripts_no-ip_com \
 		+ext-command +ext-p910nd +luci-app-guestwifi \
-		+luci-app-mwan3 +luci-app-dnsmasq-ipset \
 		+luci-app-hotspot +ext-extra \
 		+picocom +wpad-mini +wget +nano
   TITLE:=install basic ROOter routers
