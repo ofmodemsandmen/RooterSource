@@ -83,6 +83,7 @@
 	"AR150": {
 		"details": "Gl.iNet AR150",
 		"type": "1",
+		"ram": "64",
 		"config": ".config_ar150",
 		"image": "openwrt-ar71xx-generic-gl-ar150-squashfs-sysupgrade.bin",
 		"imagepath": "/ar71xx/generic/",
@@ -174,6 +175,7 @@
 	"GLMIFI": {
 		"details": "Gl.iNet Mifi",
 		"type": "1",
+		"ram": "64",
 		"config": ".config_glmifi",
 		"image": "openwrt-ar71xx-generic-gl-mifi-squashfs-sysupgrade.bin",
 		"imagepath": "/ar71xx/generic/",
