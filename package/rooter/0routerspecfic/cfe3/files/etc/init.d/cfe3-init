@@ -1,0 +1,22 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2013 OpenWrt.org
+
+START=99
+USE_PROCD=1
+
+log() {
+	logger -t "CFE3 " "$@"
+}
+
+start_service()
+{
+	echo 12 > /sys/class/gpio/export
+	echo out > /sys/class/gpio/gpio12/direction
+	echo 0 >/sys/class/gpio/gpio12/value
+	echo 13 > /sys/class/gpio/export
+	echo out > /sys/class/gpio/gpio13/direction
+	echo 1 >/sys/class/gpio/gpio13/value
+	echo 14 > /sys/class/gpio/export
+	echo out > /sys/class/gpio/gpio14/direction
+	echo 0 >/sys/class/gpio/gpio14/value
+}

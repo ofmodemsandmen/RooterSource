@@ -46,9 +46,6 @@ CONFIG_TARGET_ar71xx_generic=y
 # CONFIG_TARGET_ar71xx_tiny is not set
 # CONFIG_TARGET_ar71xx_nand is not set
 # CONFIG_TARGET_ar71xx_mikrotik is not set
-# CONFIG_TARGET_ath79_generic is not set
-# CONFIG_TARGET_ath79_nand is not set
-# CONFIG_TARGET_ath79_tiny is not set
 # CONFIG_TARGET_MULTI_PROFILE is not set
 # CONFIG_TARGET_ar71xx_generic_Default is not set
 # CONFIG_TARGET_ar71xx_generic_DEVICE_carambola2 is not set
@@ -313,132 +310,6 @@ CONFIG_TARGET_ar71xx_generic_DEVICE_gl-ar750s=y
 # CONFIG_TARGET_ar71xx_generic_DEVICE_JA76PF2 is not set
 # CONFIG_TARGET_ar71xx_generic_DEVICE_JWAP003 is not set
 # CONFIG_TARGET_ar71xx_generic_DEVICE_jwap230 is not set
-# CONFIG_TARGET_ath79_generic_Default is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_8dev_carambola2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_avm_fritz4020 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_avm_fritz300e is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_aruba_ap-105 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_buffalo_bhr-4grv is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_buffalo_bhr-4grv2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_buffalo_wzr-hp-ag300h is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_buffalo_wzr-hp-g302h-a1a0 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_buffalo_wzr-hp-g450h is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_comfast_cf-e110n-v2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_comfast_cf-e120a-v3 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_comfast_cf-e5 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_dlink_dir-825-b1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_dlink_dir-825-c1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_dlink_dir-835-a1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_dlink_dir-859-a1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_elecom_wrc-1750ghbk2-i is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_elecom_wrc-300ghbk2-i is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_embeddedwireless_dorin is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_engenius_ecb1750 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_engenius_epg5000 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_engenius_ews511ap is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_glinet_gl-ar150 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_glinet_gl-ar300m-lite is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_glinet_gl-x750 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_iodata_etg3-r is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_iodata_wn-ac1167dgr is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_iodata_wn-ac1600dgr is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_iodata_wn-ac1600dgr2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_iodata_wn-ag300dgr is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_librerouter_librerouter-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_nec_wg1200cr is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_nec_wg800hp is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_netgear_ex6400 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_netgear_ex7300 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_netgear_wndr3700 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_netgear_wndr3700v2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_netgear_wndr3800 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ocedo_koala is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ocedo_raccoon is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ocedo_ursus is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_openmesh_om5p-ac-v2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_phicomm_k2t is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_pisen_wmm003n is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_pcs_cap324 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_pcs_cr3000 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_pcs_cr5000 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_rosinson_wr818 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-a7-v5 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-c2-v3 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-c25-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-c5-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-c58-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-c59-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-c6-v2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-c60-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-c60-v2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-c60-v3 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-c7-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-c7-v2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-c7-v4 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-c7-v5 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_archer-d50-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_cpe210-v2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_cpe210-v3 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_cpe220-v3 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_re350k-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_re450-v2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wdr3500-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wdr3600-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wdr4300-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wdr4300-v1-il is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wdr4310-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wdr4900-v2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wr1043n-v5 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wr1043nd-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wr1043nd-v2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wr1043nd-v3 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wr1043nd-v4 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wr2543-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wr710n-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wr710n-v2.1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wr810n-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wr810n-v2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wr842n-v3 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wr842n-v1 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_tplink_tl-wr842n-v2 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_airrouter is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_bullet-m is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_bullet-m-xw is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_lap-120 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_nanobeam-ac is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_nanostation-ac is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_nanostation-ac-loco is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_nanostation-loco-m is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_nanostation-loco-m-xw is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_nanostation-m is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_nanostation-m-xw is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_picostation-m is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_rocket-m is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_routerstation is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_routerstation-pro is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_unifi is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_unifiac-lr is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_unifiac-lite is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_unifiac-mesh is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_unifiac-mesh-pro is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_unifiac-pro is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_ubnt_acb-isp is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_wd_mynet-n750 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_wd_mynet-wifi-rangeextender is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_winchannel_wb2000 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_xiaomi_mi-router-4q is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_yuncore_a770 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_yuncore_a782 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_yuncore_xd4200 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_zbtlink_zbt-wd323 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_devolo_dvl1200e is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_devolo_dvl1200i is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_devolo_dvl1750c is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_devolo_dvl1750e is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_devolo_dvl1750i is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_devolo_dvl1750x is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_etactica_eg200 is not set
-# CONFIG_TARGET_ath79_generic_DEVICE_jjplus_ja76pf2 is not set
 CONFIG_HAS_SUBTARGETS=y
 CONFIG_HAS_DEVICES=y
 CONFIG_TARGET_BOARD="ar71xx"
@@ -1804,7 +1675,10 @@ CONFIG_PACKAGE_procd=y
 # CONFIG_PROCD_ZRAM_TMPFS is not set
 # CONFIG_PACKAGE_qos-scripts is not set
 # CONFIG_PACKAGE_resolveip is not set
-# CONFIG_PACKAGE_rpcd is not set
+CONFIG_PACKAGE_rpcd=y
+CONFIG_PACKAGE_rpcd-mod-file=y
+CONFIG_PACKAGE_rpcd-mod-iwinfo=y
+# CONFIG_PACKAGE_rpcd-mod-rpcsys is not set
 # CONFIG_PACKAGE_snapshot-tool is not set
 # CONFIG_PACKAGE_sqm-scripts is not set
 # CONFIG_PACKAGE_sqm-scripts-extra is not set
@@ -2786,15 +2660,16 @@ CONFIG_PACKAGE_MAC80211_MESH=y
 # CONFIG_PACKAGE_dkjson is not set
 # CONFIG_PACKAGE_json4lua is not set
 # CONFIG_PACKAGE_ldbus is not set
-# CONFIG_PACKAGE_libiwinfo-lua is not set
+CONFIG_PACKAGE_libiwinfo-lua=y
 # CONFIG_PACKAGE_lpeg is not set
 # CONFIG_PACKAGE_lsqlite3 is not set
-# CONFIG_PACKAGE_lua is not set
+CONFIG_PACKAGE_lua=y
 # CONFIG_PACKAGE_lua-bencode is not set
 # CONFIG_PACKAGE_lua-cjson is not set
 # CONFIG_PACKAGE_lua-copas is not set
 # CONFIG_PACKAGE_lua-coxpcall is not set
 # CONFIG_PACKAGE_lua-ev is not set
+# CONFIG_PACKAGE_lua-examples is not set
 # CONFIG_PACKAGE_lua-libmodbus is not set
 # CONFIG_PACKAGE_lua-lzlib is not set
 # CONFIG_PACKAGE_lua-md5 is not set
@@ -4300,9 +4175,9 @@ CONFIG_PACKAGE_libjson-c=y
 # CONFIG_PACKAGE_libldns is not set
 # CONFIG_PACKAGE_libloragw is not set
 # CONFIG_PACKAGE_libltdl is not set
-# CONFIG_PACKAGE_liblua is not set
-# CONFIG_PACKAGE_liblucihttp is not set
-# CONFIG_PACKAGE_liblucihttp-lua is not set
+CONFIG_PACKAGE_liblua=y
+CONFIG_PACKAGE_liblucihttp=y
+CONFIG_PACKAGE_liblucihttp-lua=y
 # CONFIG_PACKAGE_liblzo is not set
 # CONFIG_PACKAGE_libmad is not set
 # CONFIG_PACKAGE_libmagic is not set
@@ -4452,7 +4327,7 @@ CONFIG_PACKAGE_libnl-tiny=y
 CONFIG_PACKAGE_libubox=y
 # CONFIG_PACKAGE_libubox-lua is not set
 CONFIG_PACKAGE_libubus=y
-# CONFIG_PACKAGE_libubus-lua is not set
+CONFIG_PACKAGE_libubus-lua=y
 CONFIG_PACKAGE_libuci=y
 # CONFIG_PACKAGE_libuci-lua is not set
 CONFIG_PACKAGE_libuclient=y
@@ -4517,9 +4392,9 @@ CONFIG_PACKAGE_libuclient=y
 # CONFIG_PACKAGE_re2 is not set
 CONFIG_RE2_SHARED=y
 # CONFIG_RE2_STATIC is not set
-# CONFIG_PACKAGE_rpcd-mod-luci is not set
+CONFIG_PACKAGE_rpcd-mod-luci=y
 # CONFIG_PACKAGE_rpcd-mod-rad2-enc is not set
-# CONFIG_PACKAGE_rpcd-mod-rrdns is not set
+CONFIG_PACKAGE_rpcd-mod-rrdns=y
 # CONFIG_PACKAGE_rxtx is not set
 # CONFIG_PACKAGE_sbc is not set
 # CONFIG_PACKAGE_terminfo is not set
@@ -4540,7 +4415,7 @@ CONFIG_RE2_SHARED=y
 #
 # 1. Collections
 #
-# CONFIG_PACKAGE_luci is not set
+CONFIG_PACKAGE_luci=y
 # CONFIG_PACKAGE_luci-nginx is not set
 # CONFIG_PACKAGE_luci-ssl is not set
 # CONFIG_PACKAGE_luci-ssl-nginx is not set
@@ -4549,7 +4424,7 @@ CONFIG_RE2_SHARED=y
 #
 # 2. Modules
 #
-# CONFIG_PACKAGE_luci-base is not set
+CONFIG_PACKAGE_luci-base=y
 # CONFIG_LUCI_SRCDIET is not set
 CONFIG_LUCI_JSMIN=y
 CONFIG_LUCI_CSSTIDY=y
@@ -4587,14 +4462,14 @@ CONFIG_LUCI_CSSTIDY=y
 # CONFIG_LUCI_LANG_zh_Hans is not set
 # CONFIG_LUCI_LANG_zh_Hant is not set
 # CONFIG_PACKAGE_luci-compat is not set
-# CONFIG_PACKAGE_luci-mod-admin-full is not set
+CONFIG_PACKAGE_luci-mod-admin-full=y
 # CONFIG_PACKAGE_luci-mod-failsafe is not set
 # CONFIG_PACKAGE_luci-mod-freifunk is not set
 # CONFIG_PACKAGE_luci-mod-freifunk-community is not set
-# CONFIG_PACKAGE_luci-mod-network is not set
+CONFIG_PACKAGE_luci-mod-network=y
 # CONFIG_PACKAGE_luci-mod-rpc is not set
-# CONFIG_PACKAGE_luci-mod-status is not set
-# CONFIG_PACKAGE_luci-mod-system is not set
+CONFIG_PACKAGE_luci-mod-status=y
+CONFIG_PACKAGE_luci-mod-system=y
 
 #
 # 3. Applications
@@ -4603,6 +4478,7 @@ CONFIG_LUCI_CSSTIDY=y
 # CONFIG_PACKAGE_luci-app-advanced-reboot is not set
 # CONFIG_PACKAGE_luci-app-ahcp is not set
 # CONFIG_PACKAGE_luci-app-aria2 is not set
+# CONFIG_PACKAGE_luci-app-attendedsysupgrade is not set
 # CONFIG_PACKAGE_luci-app-banip is not set
 # CONFIG_PACKAGE_luci-app-bcp38 is not set
 # CONFIG_PACKAGE_luci-app-bird1-ipv4 is not set
@@ -4621,7 +4497,7 @@ CONFIG_LUCI_CSSTIDY=y
 # CONFIG_PACKAGE_luci-app-dump1090 is not set
 # CONFIG_PACKAGE_luci-app-dynapoint is not set
 # CONFIG_PACKAGE_luci-app-e2guardian is not set
-# CONFIG_PACKAGE_luci-app-firewall is not set
+CONFIG_PACKAGE_luci-app-firewall=y
 # CONFIG_PACKAGE_luci-app-freifunk-diagnostics is not set
 # CONFIG_PACKAGE_luci-app-freifunk-policyrouting is not set
 # CONFIG_PACKAGE_luci-app-freifunk-widgets is not set
@@ -4647,7 +4523,7 @@ CONFIG_LUCI_CSSTIDY=y
 # CONFIG_PACKAGE_luci-app-olsr-services is not set
 # CONFIG_PACKAGE_luci-app-olsr-viz is not set
 # CONFIG_PACKAGE_luci-app-openvpn is not set
-# CONFIG_PACKAGE_luci-app-opkg is not set
+CONFIG_PACKAGE_luci-app-opkg=y
 # CONFIG_PACKAGE_luci-app-p910nd is not set
 # CONFIG_PACKAGE_luci-app-pagekitec is not set
 # CONFIG_PACKAGE_luci-app-polipo is not set
@@ -4691,7 +4567,7 @@ CONFIG_LUCI_CSSTIDY=y
 # CONFIG_PACKAGE_luci-theme-argon is not set
 # CONFIG_PACKAGE_luci-theme-bootstrap is not set
 # CONFIG_PACKAGE_luci-theme-freifunk-generic is not set
-# CONFIG_PACKAGE_luci-theme-material is not set
+CONFIG_PACKAGE_luci-theme-material=y
 # CONFIG_PACKAGE_luci-theme-openwrt is not set
 
 #
@@ -4700,9 +4576,9 @@ CONFIG_LUCI_CSSTIDY=y
 # CONFIG_PACKAGE_luci-proto-3g is not set
 # CONFIG_PACKAGE_luci-proto-hnet is not set
 # CONFIG_PACKAGE_luci-proto-ipip is not set
-# CONFIG_PACKAGE_luci-proto-ipv6 is not set
+CONFIG_PACKAGE_luci-proto-ipv6=y
 # CONFIG_PACKAGE_luci-proto-openconnect is not set
-# CONFIG_PACKAGE_luci-proto-ppp is not set
+CONFIG_PACKAGE_luci-proto-ppp=y
 # CONFIG_PACKAGE_luci-proto-pppossh is not set
 # CONFIG_PACKAGE_luci-proto-qmi is not set
 # CONFIG_PACKAGE_luci-proto-relay is not set
@@ -4715,13 +4591,13 @@ CONFIG_LUCI_CSSTIDY=y
 # CONFIG_PACKAGE_luci-lib-dracula is not set
 # CONFIG_PACKAGE_luci-lib-httpclient is not set
 # CONFIG_PACKAGE_luci-lib-httpprotoutils is not set
-# CONFIG_PACKAGE_luci-lib-ip is not set
+CONFIG_PACKAGE_luci-lib-ip=y
 # CONFIG_PACKAGE_luci-lib-ipkg is not set
 # CONFIG_PACKAGE_luci-lib-iptparser is not set
 # CONFIG_PACKAGE_luci-lib-jquery-1-4 is not set
 # CONFIG_PACKAGE_luci-lib-json is not set
-# CONFIG_PACKAGE_luci-lib-jsonc is not set
-# CONFIG_PACKAGE_luci-lib-nixio is not set
+CONFIG_PACKAGE_luci-lib-jsonc=y
+CONFIG_PACKAGE_luci-lib-nixio=y
 CONFIG_PACKAGE_luci-lib-nixio_notls=y
 # CONFIG_PACKAGE_luci-lib-nixio_axtls is not set
 # CONFIG_PACKAGE_luci-lib-nixio_cyassl is not set
@@ -4736,6 +4612,93 @@ CONFIG_PACKAGE_luci-lib-nixio_notls=y
 # CONFIG_PACKAGE_freifunk-policyrouting is not set
 # CONFIG_PACKAGE_freifunk-watchdog is not set
 # CONFIG_PACKAGE_meshwizard is not set
+# CONFIG_PACKAGE_luci-i18n-base-bg is not set
+# CONFIG_PACKAGE_luci-i18n-base-ca is not set
+# CONFIG_PACKAGE_luci-i18n-base-cs is not set
+# CONFIG_PACKAGE_luci-i18n-base-de is not set
+# CONFIG_PACKAGE_luci-i18n-base-el is not set
+# CONFIG_PACKAGE_luci-i18n-base-en is not set
+# CONFIG_PACKAGE_luci-i18n-base-es is not set
+# CONFIG_PACKAGE_luci-i18n-base-fr is not set
+# CONFIG_PACKAGE_luci-i18n-base-he is not set
+# CONFIG_PACKAGE_luci-i18n-base-hi is not set
+# CONFIG_PACKAGE_luci-i18n-base-hu is not set
+# CONFIG_PACKAGE_luci-i18n-base-it is not set
+# CONFIG_PACKAGE_luci-i18n-base-ja is not set
+# CONFIG_PACKAGE_luci-i18n-base-ko is not set
+# CONFIG_PACKAGE_luci-i18n-base-mr is not set
+# CONFIG_PACKAGE_luci-i18n-base-ms is not set
+# CONFIG_PACKAGE_luci-i18n-base-no is not set
+# CONFIG_PACKAGE_luci-i18n-base-pl is not set
+# CONFIG_PACKAGE_luci-i18n-base-pt is not set
+# CONFIG_PACKAGE_luci-i18n-base-pt-br is not set
+# CONFIG_PACKAGE_luci-i18n-base-ro is not set
+# CONFIG_PACKAGE_luci-i18n-base-ru is not set
+# CONFIG_PACKAGE_luci-i18n-base-sk is not set
+# CONFIG_PACKAGE_luci-i18n-base-sv is not set
+# CONFIG_PACKAGE_luci-i18n-base-tr is not set
+# CONFIG_PACKAGE_luci-i18n-base-uk is not set
+# CONFIG_PACKAGE_luci-i18n-base-vi is not set
+# CONFIG_PACKAGE_luci-i18n-base-zh-cn is not set
+# CONFIG_PACKAGE_luci-i18n-base-zh-tw is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-bg is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-ca is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-cs is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-de is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-el is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-en is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-es is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-fr is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-he is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-hi is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-hu is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-it is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-ja is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-ko is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-mr is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-ms is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-no is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-pl is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-pt is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-pt-br is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-ro is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-ru is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-sk is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-sv is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-tr is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-uk is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-vi is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-zh-cn is not set
+# CONFIG_PACKAGE_luci-i18n-firewall-zh-tw is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-bg is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-ca is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-cs is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-de is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-el is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-en is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-es is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-fr is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-he is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-hi is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-hu is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-it is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-ja is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-ko is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-mr is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-ms is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-no is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-pl is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-pt is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-pt-br is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-ro is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-ru is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-sk is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-sv is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-tr is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-uk is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-vi is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-zh-cn is not set
+# CONFIG_PACKAGE_luci-i18n-opkg-zh-tw is not set
 
 #
 # Mail
@@ -5360,7 +5323,7 @@ CONFIG_OPENLDAP_DEBUG=y
 # Web Servers/Proxies
 #
 # CONFIG_PACKAGE_apache is not set
-# CONFIG_PACKAGE_cgi-io is not set
+CONFIG_PACKAGE_cgi-io=y
 # CONFIG_PACKAGE_clamav is not set
 # CONFIG_PACKAGE_e2guardian is not set
 # CONFIG_PACKAGE_freshclam is not set
@@ -5392,7 +5355,9 @@ CONFIG_OPENLDAP_DEBUG=y
 # CONFIG_PACKAGE_spawn-fcgi is not set
 # CONFIG_PACKAGE_squid is not set
 # CONFIG_PACKAGE_tinyproxy is not set
-# CONFIG_PACKAGE_uhttpd is not set
+CONFIG_PACKAGE_uhttpd=y
+# CONFIG_PACKAGE_uhttpd-mod-lua is not set
+# CONFIG_PACKAGE_uhttpd-mod-ubus is not set
 # CONFIG_PACKAGE_uwsgi is not set
 
 #
@@ -5759,6 +5724,7 @@ CONFIG_PACKAGE_wpad-basic=y
 #
 # CONFIG_PACKAGE_alix2d13 is not set
 # CONFIG_PACKAGE_b1300 is not set
+# CONFIG_PACKAGE_cfe3 is not set
 # CONFIG_PACKAGE_d240 is not set
 # CONFIG_PACKAGE_dir860l is not set
 # CONFIG_PACKAGE_ext-ssh is not set

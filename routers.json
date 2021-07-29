@@ -539,6 +539,18 @@
 		"ext2": "-update.bin",
 		"addons": ["readme.txt"]
 	},
+	"WR942V1": {
+		"details": "TP-Link WR942 V1",
+		"type": "2",
+		"config": ".config_wr942v1",
+		"image1": "openwrt-ar71xx-generic-tl-wr942n-v1-squashfs-factory.bin",
+		"image2": "openwrt-ar71xx-generic-tl-wr942n-v1-squashfs-sysupgrade.bin",
+		"imagepath": "/ar71xx/generic/",
+		"mod": "TP-Link-WR942-V1",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["readme.txt"]
+	},
 	"WRT1900AC": {
 		"details": "Linksys WRT1900ac v1",
 		"type": "2",
