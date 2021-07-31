@@ -7,7 +7,7 @@
 		"image2": "openwrt-x86-geode-combined-ext4.img",
 		"imagepath": "/x86/geode/",
 		"mod": "ALIX-2D13",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "readmeSD.txt"]
 	},
 	"APU2C4": {
 		"details": "APU 2C4",
@@ -17,7 +17,7 @@
 		"image2": "openwrt-x86-generic-combined-squashfs.img",
 		"imagepath": "/x86/generic/",
 		"mod": "APU2C4",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "readmeSD.txt"]
 	},
 	"ARCHERA7V5": {
 		"details": "Archer A7v5",
@@ -29,7 +29,7 @@
 		"mod": "Archer-A7-V5",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "archer.txt"]
 	},
 	"ARCHERC7V2": {
 		"details": "Archer C7v2",
@@ -41,7 +41,7 @@
 		"mod": "Archer-C7-V2",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "archer.txt"]
 	},
 	"ARCHERC7V4": {
 		"details": "Archer C7v4",
@@ -53,7 +53,7 @@
 		"mod": "Archer-C7-V4",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "archer.txt"]
 	},
 	"ARCHERC7V5": {
 		"details": "Archer C7v5",
@@ -65,7 +65,7 @@
 		"mod": "Archer-C7-V5",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "archer.txt"]
 	},
 	"ARCHERC20V1": {
 		"details": "Archer C20v1",
@@ -78,7 +78,7 @@
 		"mod": "Archer-C20-V1",
 		"ext1": "-upgrade.bin",
 		"ext2": "-factory.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf"]
 	},
 	"AR150": {
 		"details": "Gl.iNet AR150",
@@ -89,7 +89,7 @@
 		"imagepath": "/ar71xx/generic/",
 		"mod": "GL-AR150",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "GL-AR150-flash.bin", "glinet.txt"]
 	},
 	"AR300LITE": {
 		"details": "Gl.iNet AR300M Lite",
@@ -99,7 +99,7 @@
 		"imagepath": "/ath79/generic/",
 		"mod": "GL-AR300M-Lite",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf"]
 	},
 	"AR750": {
 		"details": "Gl.iNet AR750",
@@ -109,7 +109,7 @@
 		"imagepath": "/ar71xx/generic/",
 		"mod": "GL-AR750",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "glinet.txt"]
 	},
 	"AR750S": {
 		"details": "Gl.iNet AR750s",
@@ -119,7 +119,7 @@
 		"imagepath": "/ar71xx/generic/",
 		"mod": "GL-AR750S",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "glinet.txt"]
 	},
 	"B1300": {
 		"details": "Gl.iNet B1300",
@@ -129,7 +129,7 @@
 		"imagepath": "/ipq40xx/generic/",
 		"mod": "GL-B1300",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "glinet.txt"]
 	},
 	"C2600": {
 		"details": "Archer C2600",
@@ -141,7 +141,7 @@
 		"mod": "C2600",
 		"ext1": "-factory.bin",
 		"ext2": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "archer.txt"]
 	},
 	"CFE3": {
 		"details": "Comfast CF-E3",
@@ -152,7 +152,7 @@
 		"imagepath": "/ath79/generic/",
 		"mod": "Comfast-CF-E3",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"],
+		"addons": ["readme.pdf", "readmerecovery.txt"],
 		"custom": {
 			"name": {
 				"model": "Comfast CF-E3"
@@ -170,7 +170,7 @@
 		"mod": "DIR505A1",
 		"ext1": "-factory.bin",
 		"ext2": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "factory.txt"]
 	},
 	"GLMIFI": {
 		"details": "Gl.iNet Mifi",
@@ -181,7 +181,7 @@
 		"imagepath": "/ar71xx/generic/",
 		"mod": "GL-MIFI",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "GL-MIFI-flash.bin", "glinet.txt"]
 	},
 	"HLK7621": {
 		"details": "HiLink HLK-7621a",
@@ -193,7 +193,7 @@
 		"mod": "HiLink-HLK-7621a",
 		"ext1": "-upgrade.bin",
 		"ext2": "-initramfs-kernel.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "readmerecovery.txt"]
 	},
 	"MR3020V3": {
 		"details": "MR3020v3",
@@ -206,7 +206,7 @@
 		"mod": "MR3020v3",
 		"ext1": "-tftp-recovery.bin",
 		"ext2": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "archer.txt"]
 	},
 	"MT300NV2": {
 		"details": "Gl.iNet MT300Nv2",
@@ -216,7 +216,7 @@
 		"imagepath": "/ramips/mt76x8/",
 		"mod": "MT300N-V2",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "glinet.txt"]
 	},
 	"MYNET-N600": {
 		"details": "MyNet N600",
@@ -228,7 +228,7 @@
 		"mod": "MYNET-N600",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
-		"addons": ["Flashing_a_WD_Mynet_Router.pdf", "readme.txt"]
+		"addons": ["Flashing_a_WD_Mynet_Router.pdf", "readme.pdf"]
 	},
 	"NEXQ6GO": {
 		"details": "WiFiX NEXQ6GO",
@@ -238,7 +238,7 @@
 		"imagepath": "/ar71xx/generic/",
 		"mod": "WiFiX-NEXQ6GO",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"],
+		"addons": ["readme.pdf"],
 		"custom": {
 			"wifi": {
 				"SSID2G": "WiFiX",
@@ -266,7 +266,7 @@
 		"mod": "MYNET-N750",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
-		"addons": ["Flashing_a_WD_Mynet_Router.pdf", "readme.txt"]
+		"addons": ["Flashing_a_WD_Mynet_Router.pdf", "readme.pdf"]
 	},
 	"R619AC": {
 		"details": "P2W R619AC",
@@ -278,7 +278,7 @@
 		"mod": "P2W-R619AC",
 		"ext1": "-factory.ubi",
 		"ext2": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "readmerecovery.txt"]
 	},
 	"R6220": {
 		"details": "Netgear R6220",
@@ -290,7 +290,7 @@
 		"mod": "Netgear-R6220",
 		"ext1": "-factory.img",
 		"ext2": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", factory.txt"]
 	},
 	"R7800": {
 		"details": "Netgear R7800",
@@ -302,7 +302,7 @@
 		"mod": "Netgear-R7800",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "tftp.txt"]
 	},
 	"RASPPI": {
 		"details": "Raspberry Pi",
@@ -316,7 +316,7 @@
 		"mod": "RaspberryPi",
 		"ext1": "-ext4.img",
 		"ext2": "-squashfs.img",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "readmeSD.txt"]
 	},
 	"RASPPI2": {
 		"details": "Raspberry Pi 2",
@@ -330,7 +330,7 @@
 		"mod": "RaspberryPi-2",
 		"ext1": "-ext4.img",
 		"ext2": "-squashfs.img",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "readmeSD.txt"]
 	},
 	"RASPPI3": {
 		"details": "Raspberry Pi 3",
@@ -344,7 +344,7 @@
 		"mod": "RaspberryPi-3",
 		"ext1": "-ext4.img",
 		"ext2": "-squashfs.img",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "readmeSD.txt"]
 	},
 	"RBM11G": {
 		"details": "Mikrotek RBM11G",
@@ -356,7 +356,7 @@
 		"mod": "RBM11G",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
-		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.txt"]
+		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.pdf", "readme.pdf"]
 	},
 	"RBM33G": {
 		"details": "Mikrotek RBM33G",
@@ -368,7 +368,7 @@
 		"mod": "RBM33G",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
-		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.txt"]
+		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.pdf", "readme.pdf"]
 	},
 	"RB750GR3": {
 		"details": "Mikrotek RB750Gr3",
@@ -380,7 +380,7 @@
 		"mod": "RB750GR3",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
-		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.txt"]
+		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.pdf", "readme.pdf"]
 	},
 	"RT-AC58U": {
 		"details": "Asus RT-AC58U",
@@ -392,7 +392,7 @@
 		"mod": "RT-AC58U",
 		"ext1": "-factory.itb",
 		"ext2": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf"]
 	},
 	"SMARTBOXPRO": {
 		"details": "Beeline SmartBox Pro",
@@ -404,7 +404,7 @@
 		"mod": "SmartBox_Pro",
 		"ext1": "-upgrade.bin",
 		"ext2": "-for-breed.bin",
-		"addons": ["readme.txt"],
+		"addons": ["readme.pdf"],
 		"custom": {
 			"name": {
 				"model": "SmartBox Pro"
@@ -421,7 +421,7 @@
 		"mod": "SmartBox_TurboPlus",
 		"ext1": "-upgrade.bin",
 		"ext2": "-for-breed.bin",
-		"addons": ["readme.txt"],
+		"addons": ["readme.pdf"],
 		"custom": {
 			"name": {
 				"model": "SmartBox Turbo Plus"
@@ -438,7 +438,7 @@
 		"mod": "SmartBox_TurboModPlus",
 		"ext1": "-upgrade.bin",
 		"ext2": "-for-breed.bin",
-		"addons": ["readme.txt"],
+		"addons": ["readme.pdf"],
 		"custom": {
 			"name": {
 				"model": "SmartBox Turbo Mod Plus"
@@ -456,7 +456,17 @@
 		"mod": "TP-Link-WDR4300",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "factory.txt"]
+	},
+	"WE1326": {
+		"details": "ZBT WE1326",
+		"type": "1",
+		"config": ".config_we1326",
+		"image": "openwrt-ramips-mt7621-zbt-we1326-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "ZBT-WE1326",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf", "readmerecovery.txt"]
 	},
 	"WE826Q": {
 		"details": "ZBT WE826-Q",
@@ -466,7 +476,7 @@
 		"imagepath": "/ar71xx/generic/",
 		"mod": "ZBT-WE826-Q",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"],
+		"addons": ["readme.pdf", "readmerecovery.txt"],
 		"custom": {
 			"name": {
 				"model": "ZBT WE826-Q"
@@ -481,7 +491,7 @@
 		"imagepath": "/ramips/mt7620/",
 		"mod": "ZBT-WE826T",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "readmerecovery.txt"]
 	},
 	"WE826WD": {
 		"details": "ZBT WE826-WD",
@@ -491,7 +501,7 @@
 		"imagepath": "/ramips/mt7620/",
 		"mod": "ZBT-WE826WD",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"],
+		"addons": ["readme.pdf", "readmerecovery.txt"],
 		"custom": {
 			"name": {
 				"model": "ZBT WE826-WD"
@@ -506,7 +516,7 @@
 		"imagepath": "/ramips/mt7621/",
 		"mod": "ZBT-WG1602",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "readmerecovery.txt"]
 	},
 	"WG209": {
 		"details": "ZBT WG209",
@@ -516,7 +526,7 @@
 		"imagepath": "/ramips/mt7621/",
 		"mod": "ZBT-WG209",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "readmerecovery.txt"]
 	},
 	"WG3526": {
 		"details": "ZBT WG3526",
@@ -526,7 +536,7 @@
 		"imagepath": "/ramips/mt7621/",
 		"mod": "ZBT-WG3526",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "readmerecovery.txt"]
 	},
 	"WR842V3": {
 		"details": "TP-Link WR842 V3",
@@ -539,7 +549,7 @@
 		"mod": "TP-Link-WR842-V3",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "archer.txt"]
 	},
 	"WR942V1": {
 		"details": "TP-Link WR942 V1",
@@ -551,7 +561,7 @@
 		"mod": "TP-Link-WR942-V1",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "archer.txt"]
 	},
 	"WRT1900AC": {
 		"details": "Linksys WRT1900ac v1",
@@ -563,7 +573,7 @@
 		"mod": "WRT1900AC-V1",
 		"ext1": "-factory.img",
 		"ext2": "-update.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "factory.txt"]
 	},
 	"WRT1900ACV2": {
 		"details": "Linksys WRT1900ac v2",
@@ -575,7 +585,7 @@
 		"mod": "WRT1900AC-V2",
 		"ext1": "-factory.img",
 		"ext2": "-update.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "factory.txt"]
 	},
 	"WRT1900ACS": {
 		"details": "Linksys WRT1900acs",
@@ -587,7 +597,7 @@
 		"mod": "WRT1900ACS",
 		"ext1": "-factory.img",
 		"ext2": "-update.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "factory.txt"]
 	},
 	"WRT3200ACM": {
 		"details": "Linksys WRT3200acm",
@@ -599,7 +609,7 @@
 		"mod": "WRT3200ACM",
 		"ext1": "-factory.img",
 		"ext2": "-update.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "factory.txt"]
 	},
 	"WRT32X": {
 		"details": "Linksys WRT32x",
@@ -611,7 +621,7 @@
 		"mod": "WRT32x",
 		"ext1": "-factory.img",
 		"ext2": "-update.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "factory.txt"]
 	},
 	"X750": {
 		"details": "Gl.iNet X750",
@@ -621,7 +631,7 @@
 		"imagepath": "/ath79/generic/",
 		"mod": "GL-X750",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "glinet.txt"]
 	},
 	"X86-64": {
 		"details": "Generic x86 64 bit",
@@ -631,7 +641,7 @@
 		"image2": "openwrt-x86-64-combined-ext4.img",
 		"imagepath": "/x86/64/",
 		"mod": "x86-64",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf"]
 	},
 	"XMIFI3PRO": {
 		"details": "Xiaomi Mifi 3 Pro",
@@ -643,7 +653,7 @@
 		"mod": "Xiaomi-Mifi3Pro",
 		"ext1": "-factory.bin",
 		"ext2": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf""xiaomi.txt"]
 	},
 	"XMIFI3G": {
 		"details": "Xiaomi Mifi 3G",
@@ -653,7 +663,7 @@
 		"imagepath": "/ramips/mt7621/",
 		"mod": "Xiaomi-Mifi3G",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "xiaomi.txt"]
 	},
 	"YOUKUYK1": {
 		"details": "YOUKU YK1",
@@ -663,6 +673,6 @@
 		"imagepath": "/ramips/mt7620/",
 		"mod": "YOUKU-YK1",
 		"ext": "-upgrade.bin",
-		"addons": ["readme.txt"]
+		"addons": ["readme.pdf", "factory.txt"]
 	}
 }

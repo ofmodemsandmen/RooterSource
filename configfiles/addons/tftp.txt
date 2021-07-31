@@ -1,0 +1,6 @@
+Netgear R7800
+	Use TFTP method with ROOter factory image
+
+	Router IP Address   - 192.168.1.1
+	Computer IP Address - 192.168.1.10
+	White Led should flash about 10 times before releasing reset.

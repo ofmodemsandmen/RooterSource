@@ -1,0 +1,5 @@
+Xiaomi Mifi 3G
+	see https://openwrt.org/toh/xiaomi/mir3g#installation_via_software_exploit
+	
+Xiaomi Mifi 3 Pro
+	see https://openwrt.org/toh/xiaomi/mi_router_3_pro#unlocking_installing_openwrt

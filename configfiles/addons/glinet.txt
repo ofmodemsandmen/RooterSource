@@ -1,0 +1,27 @@
+AR150
+	Use web page at
+	http://192.168.8.1/Upgrade.asp
+	
+AR750
+	Use web page at
+	http://192.168.1.1/index.html?index
+	
+AR300-Lite
+	Factory GUI in Advanced section, use System->Bachup/Flash Firmware menu.
+	
+AR750S
+	Factory GUI in Advanced section, use System->Bachup/Flash Firmware menu.
+
+B1300
+	Use Recovery GUI
+	Firmware rename 	- lede-gl-b1300.bin
+	Release reset after Leds blink 3 times
+	
+Mifi
+	Factory GUI in Advanced section, use System->Bachup/Flash Firmware menu.
+	
+MT300Nv2
+	Factory GUI in Advanced section, use System->Bachup/Flash Firmware menu.
+
+X750
+	Factory GUI in Advanced section, use System->Bachup/Flash Firmware menu.

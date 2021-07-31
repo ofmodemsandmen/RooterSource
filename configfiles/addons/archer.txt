@@ -1,0 +1,49 @@
+
+Archer A7v5
+	Use TFTP method with ROOter factory image
+
+	Router IP Address   - 192.168.0.66
+	Computer IP Address - 192.168.0.86
+	Firmware name 		- ArcherC7v5_tp_recovery.bin
+	
+Archer C7v2
+	Factory Gui with ROOter factory image
+	
+	Firmware name		- c7v2.bin
+	
+Archer C7v4
+	Use TFTP method with ROOter factory image
+
+	Router IP Address   - 192.168.0.66
+	Computer IP Address - 192.168.0.86
+	Firmware name 		- ArcherC7v4_tp_recovery.bin
+	
+Archer C7v5
+	Use TFTP method with ROOter factory image
+
+	Router IP Address   - 192.168.0.66
+	Computer IP Address - 192.168.0.86
+	Firmware name 		- ArcherC7v5_tp_recovery.bin
+
+MR3020v3
+	Use TFTP method with ROOter factory image
+
+	Router IP Address   - 192.168.0.66
+	Computer IP Address - 192.168.0.225
+	Firmware name 		- tp_recovery.bin
+	
+WR942v1
+	Use TFTP method with ROOter factory image
+
+	Router IP Address   - 192.168.0.86
+	Computer IP Address - 192.168.0.66
+	Firmware name 		- WR942v1_recovery.bin
+
+WR842v3
+	Use TFTP method with ROOter factory image
+
+	Router IP Address   - 192.168.0.86
+	Computer IP Address - 192.168.0.66
+	Firmware name 		- wr842nv3_tp_recovery.bin
+
+
