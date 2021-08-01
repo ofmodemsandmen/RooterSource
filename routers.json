@@ -290,7 +290,7 @@
 		"mod": "Netgear-R6220",
 		"ext1": "-factory.img",
 		"ext2": "-upgrade.bin",
-		"addons": ["readme.pdf", factory.txt"]
+		"addons": ["readme.pdf", "factory.txt"]
 	},
 	"R7800": {
 		"details": "Netgear R7800",
@@ -653,7 +653,7 @@
 		"mod": "Xiaomi-Mifi3Pro",
 		"ext1": "-factory.bin",
 		"ext2": "-upgrade.bin",
-		"addons": ["readme.pdf""xiaomi.txt"]
+		"addons": ["readme.pdf","xiaomi.txt"]
 	},
 	"XMIFI3G": {
 		"details": "Xiaomi Mifi 3G",
