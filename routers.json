@@ -347,37 +347,37 @@
 		"addons": ["readme.pdf", "readmeSD.txt"]
 	},
 	"RBM11G": {
-		"details": "Mikrotek RBM11G",
+		"details": "Mikrotik RBM11G",
 		"type": "2",
 		"config": ".config_rbm11g",
 		"image1": "openwrt-ramips-mt7621-mikrotik_rbm11g-initramfs-kernel.bin",
 		"image2": "openwrt-ramips-mt7621-mikrotik_rbm11g-squashfs-sysupgrade.bin",
 		"imagepath": "/ramips/mt7621/",
-		"mod": "RBM11G",
+		"mod": "Mikrotik-RBM11G",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
 		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.pdf", "readme.pdf"]
 	},
 	"RBM33G": {
-		"details": "Mikrotek RBM33G",
+		"details": "Mikrotik RBM33G",
 		"type": "2",
 		"config": ".config_rbm33g",
 		"image1": "openwrt-ramips-mt7621-mikrotik_rbm33g-initramfs-kernel.bin",
 		"image2": "openwrt-ramips-mt7621-mikrotik_rbm33g-squashfs-sysupgrade.bin",
 		"imagepath": "/ramips/mt7621/",
-		"mod": "RBM33G",
+		"mod": "Mikrotik-RBM33G",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
 		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.pdf", "readme.pdf"]
 	},
 	"RB750GR3": {
-		"details": "Mikrotek RB750Gr3",
+		"details": "Mikrotik RB750Gr3",
 		"type": "2",
 		"config": ".config_rb750gr3",
 		"image1": "openwrt-ramips-mt7621-mikrotik_rb750gr3-initramfs-kernel.bin",
 		"image2": "openwrt-ramips-mt7621-mikrotik_rb750gr3-squashfs-sysupgrade.bin",
 		"imagepath": "/ramips/mt7621/",
-		"mod": "RB750GR3",
+		"mod": "Mikrotik-RB750GR3",
 		"ext1": "-factory.bin",
 		"ext2": "-update.bin",
 		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.pdf", "readme.pdf"]
@@ -389,7 +389,7 @@
 		"image1": "openwrt-ipq40xx-generic-asus_rt-ac58u-initramfs-fit-uImage.itb",
 		"image2": "openwrt-ipq40xx-generic-asus_rt-ac58u-squashfs-sysupgrade.bin",
 		"imagepath": "/ipq40xx/generic/",
-		"mod": "RT-AC58U",
+		"mod": "Asus-RT-AC58U",
 		"ext1": "-factory.itb",
 		"ext2": "-upgrade.bin",
 		"addons": ["readme.pdf"]
@@ -401,7 +401,7 @@
 		"image1": "openwrt-ramips-mt7621-beeline_smartbox-pro-squashfs-sysupgrade.bin",
 		"image2": "openwrt-ramips-mt7621-beeline_smartbox-pro-squashfs-breed.bin",
 		"imagepath": "/ramips/mt7621/",
-		"mod": "SmartBox_Pro",
+		"mod": "Beeline-SmartBox_Pro",
 		"ext1": "-upgrade.bin",
 		"ext2": "-for-breed.bin",
 		"addons": ["readme.pdf"],
@@ -418,7 +418,7 @@
 		"image1": "openwrt-ramips-mt7621-beeline_smartbox-turbo-plus-squashfs-sysupgrade.bin",
 		"image2": "openwrt-ramips-mt7621-beeline_smartbox-turbo-plus-squashfs-breed.bin",
 		"imagepath": "/ramips/mt7621/",
-		"mod": "SmartBox_TurboPlus",
+		"mod": "Beeline-SmartBox_TurboPlus",
 		"ext1": "-upgrade.bin",
 		"ext2": "-for-breed.bin",
 		"addons": ["readme.pdf"],
@@ -435,7 +435,7 @@
 		"image1": "openwrt-ramips-mt7621-beeline_smartbox-turbo-plus-squashfs-sysupgrade.bin",
 		"image2": "openwrt-ramips-mt7621-beeline_smartbox-turbo-plus-squashfs-breed.bin",
 		"imagepath": "/ramips/mt7621/",
-		"mod": "SmartBox_TurboModPlus",
+		"mod": "Beeline-SmartBox_TurboModPlus",
 		"ext1": "-upgrade.bin",
 		"ext2": "-for-breed.bin",
 		"addons": ["readme.pdf"],
@@ -570,7 +570,7 @@
 		"image1": "openwrt-mvebu-cortexa9-linksys_wrt1900ac-squashfs-factory.img",
 		"image2": "openwrt-mvebu-cortexa9-linksys_wrt1900ac-squashfs-sysupgrade.bin",
 		"imagepath": "/mvebu/cortexa9/",
-		"mod": "WRT1900AC-V1",
+		"mod": "Linksys-WRT1900AC-V1",
 		"ext1": "-factory.img",
 		"ext2": "-update.bin",
 		"addons": ["readme.pdf", "factory.txt"]
@@ -582,7 +582,7 @@
 		"image1": "openwrt-mvebu-cortexa9-linksys_wrt1900acv2-squashfs-factory.img",
 		"image2": "openwrt-mvebu-cortexa9-linksys_wrt1900acv2-squashfs-sysupgrade.bin",
 		"imagepath": "/mvebu/cortexa9/",
-		"mod": "WRT1900AC-V2",
+		"mod": "Linksys-WRT1900AC-V2",
 		"ext1": "-factory.img",
 		"ext2": "-update.bin",
 		"addons": ["readme.pdf", "factory.txt"]
@@ -594,7 +594,7 @@
 		"image1": "openwrt-mvebu-cortexa9-linksys_wrt1900acs-squashfs-factory.img",
 		"image2": "openwrt-mvebu-cortexa9-linksys_wrt1900acs-squashfs-sysupgrade.bin",
 		"imagepath": "/mvebu/cortexa9/",
-		"mod": "WRT1900ACS",
+		"mod": "Linksys-WRT1900ACS",
 		"ext1": "-factory.img",
 		"ext2": "-update.bin",
 		"addons": ["readme.pdf", "factory.txt"]
@@ -606,7 +606,7 @@
 		"image1": "openwrt-mvebu-cortexa9-linksys_wrt3200acm-squashfs-factory.img",
 		"image2": "openwrt-mvebu-cortexa9-linksys_wrt3200acm-squashfs-sysupgrade.bin",
 		"imagepath": "/mvebu/cortexa9/",
-		"mod": "WRT3200ACM",
+		"mod": "Linksys-WRT3200ACM",
 		"ext1": "-factory.img",
 		"ext2": "-update.bin",
 		"addons": ["readme.pdf", "factory.txt"]
@@ -618,7 +618,7 @@
 		"image1": "openwrt-mvebu-cortexa9-linksys_wrt32x-squashfs-factory.img",
 		"image2": "openwrt-mvebu-cortexa9-linksys_wrt32x-squashfs-sysupgrade.bin",
 		"imagepath": "/mvebu/cortexa9/",
-		"mod": "WRT32x",
+		"mod": "Linksys-WRT32x",
 		"ext1": "-factory.img",
 		"ext2": "-update.bin",
 		"addons": ["readme.pdf", "factory.txt"]
@@ -674,5 +674,16 @@
 		"mod": "YOUKU-YK1",
 		"ext": "-upgrade.bin",
 		"addons": ["readme.pdf", "factory.txt"]
+	},
+	"C2V1": {
+		"details": "Archer C2v1",
+		"type": "1",
+		"flash": "8",
+		"config": ".config_c2v1",
+		"image": "openwrt-ramips-mt7620-tplink_c2-v1-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7620/",
+		"mod": "Archer-C2-V1",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf"]
 	}
 }

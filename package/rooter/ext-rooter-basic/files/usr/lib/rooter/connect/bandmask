@@ -244,6 +244,9 @@ quebandmask() {
 fibomask() {
 	idV=$(uci get modem.modem$CURRMODEM.idV)
 	idP=$(uci get modem.modem$CURRMODEM.idP)
+	if [ $idP = "0001" ]; then
+		return
+	fi
 	CPORT=$(uci get modem.modem$CURRMODEM.commport)
 	ATCMDD="AT+CGMM"
     model=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")

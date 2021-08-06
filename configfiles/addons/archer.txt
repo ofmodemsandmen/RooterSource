@@ -5,10 +5,13 @@ Archer A7v5
 	Router IP Address   - 192.168.0.66
 	Computer IP Address - 192.168.0.86
 	Firmware name 		- ArcherC7v5_tp_recovery.bin
-	
+
+Archer C7v1
+	Factory Gui with ROOter factory image
+	Firmware name		- c7v1.bin
+		
 Archer C7v2
 	Factory Gui with ROOter factory image
-	
 	Firmware name		- c7v2.bin
 	
 Archer C7v4
@@ -32,6 +35,13 @@ MR3020v3
 	Computer IP Address - 192.168.0.225
 	Firmware name 		- tp_recovery.bin
 	
+MR3420v5
+	Use TFTP method with ROOter factory image
+
+	Router IP Address   - 192.168.0.66
+	Computer IP Address - 192.168.0.225
+	Firmware name 		- tp_recovery.bin
+	
 WR942v1
 	Use TFTP method with ROOter factory image
 
@@ -46,4 +56,48 @@ WR842v3
 	Computer IP Address - 192.168.0.66
 	Firmware name 		- wr842nv3_tp_recovery.bin
 
+WDR3500
+	Factory Gui with ROOter factory image
+	Firmware name		- wdr3500v1_tp_recovery.bin
+	
+WDR3600
+	Factory Gui with ROOter factory image
+	Firmware name		- wdr3600v1_tp_recovery.bin
 
+WDR4300
+	Factory Gui with ROOter factory image
+	Firmware name		- wdr4300v1_en_3_14_3_up_boot(150518).bin	
+
+WDR4310
+	Factory Gui with ROOter factory image
+	
+WR902ACv1
+	Factory Gui with ROOter factory image
+	Firmware name		- update.bin	
+
+WR903ACv3
+	Use TFTP method with ROOter factory image
+
+	Router IP Address   - 192.168.0.86
+	Computer IP Address - 192.168.0.66
+	Firmware name 		- tp_recovery.bin
+
+WR1043NDv2
+	Factory Gui with ROOter factory image
+	Firmware name		- firmware.bin	
+	
+WR1043NDv3
+	Factory Gui with ROOter factory image
+	Firmware name		- firmware.bin	
+		
+C20v1
+	Factory Gui with ROOter factory image
+	Details - https://openwrt.org/toh/tp-link/archer_c20i
+
+C2v1
+	Details - https://openwrt.org/toh/tp-link/archer_c2_ac750
+
+C6Uv1
+	Factory Gui with ROOter factory image
+
+	

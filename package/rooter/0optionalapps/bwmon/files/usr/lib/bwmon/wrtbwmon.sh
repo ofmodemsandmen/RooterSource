@@ -366,7 +366,6 @@ shutDown()
 	echo "end day $cDay" >> $monthlyUsageDB".bk"
 	cp -f $monthlyUsageDB".bk" $monthlyUsageBack
 	rm -f $monthlyUsageDB".bk"
-	log "Cleanup backup"
 	lua /usr/lib/bwmon/cleanup.lua
 	rm -f /tmp/lockbw
 }

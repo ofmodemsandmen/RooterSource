@@ -6,7 +6,10 @@ AR750
 	Use web page at
 	http://192.168.1.1/index.html?index
 	
-AR300-Lite
+AR300M-Lite
+	Factory GUI in Advanced section, use System->Bachup/Flash Firmware menu.
+
+AR300M
 	Factory GUI in Advanced section, use System->Bachup/Flash Firmware menu.
 	
 AR750S
@@ -25,3 +28,11 @@ MT300Nv2
 
 X750
 	Factory GUI in Advanced section, use System->Bachup/Flash Firmware menu.
+
+XE300
+	Factory GUI in Advanced section, use System->Bachup/Flash Firmware menu.
+
+MT1300
+	Factory GUI in Advanced section, use System->Bachup/Flash Firmware menu.
+	
+	
