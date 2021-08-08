@@ -4,3 +4,17 @@ Netgear R7800
 	Router IP Address   - 192.168.1.1
 	Computer IP Address - 192.168.1.10
 	White Led should flash about 10 times before releasing reset.
+	
+Asus RT-AC51U
+Asus RT-AC56U
+Asus RT-AC68U
+Asus RT-AC87U
+Asus RT-N66U
+	Use TFTP method with ROOter factory image
+
+	Router IP Address   - 192.168.1.1
+	Computer IP Address - 192.168.1.10
+	
+Asus RT-AC56U
+	Details - https://openwrt.org/toh/asus/rt-ac58u#installation
+	

@@ -1,15 +1,5 @@
 Use Factory GUI
+	flash ROOter factory firmware
 
-	Dir-505A1
-	Netgear R6220	- may need to flash twice
-	YOUKU YK1
-	WRT3200ACM 		- Connectivity → Manual Update
-	WRT1900ACS 		- Connectivity → Manual Update
-	WRT1900ACv1&v2	- Connectivity → Manual Update
-	WRT32X	 		- Connectivity → Manual Update
-	WDR4300
-	WR703N-16meg
-	MW4530R
-	Nexx WT3020
-	
+
 	

@@ -1,16 +1,5 @@
 Use the Recovery GUI at 192.168.1.1
 
-	Comfast CF-E3
-	HiLink HLK-7621a
-	P2W R619AC
-	WG3526
-	WG209
-	WG259
-	WG1602
-	WG1608
-	WE826-WD
-	WE826-T
-	WE826-Q
-	WE1326
-	RT-N56U
-	
+Use the Recovery GUI at 192.168.0.1	
+
+	D-Link DIR-860L-B1
