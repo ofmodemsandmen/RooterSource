@@ -499,7 +499,7 @@
 		"config": ".config_ar750s",
 		"image": "openwrt-ar71xx-generic-gl-ar750s-squashfs-sysupgrade.bin",
 		"imagepath": "/ar71xx/generic/",
-		"mod": "GL-AR750S",
+		"mod": "GLi-AR750S",
 		"ext": "-upgrade.bin",
 		"addons": ["readme.pdf", "glinet.txt"]
 	},
@@ -555,7 +555,7 @@
 		"config": ".config_mt300n",
 		"image": "openwrt-ramips-mt7620-gl-mt300n-squashfs-sysupgrade.bin",
 		"imagepath": "/ramips/mt7620/",
-		"mod": "GL-MT300N",
+		"mod": "GL-MT300N-V1",
 		"ext": "-upgrade.bin",
 		"addons": ["readme.pdf", "glinet.txt"]
 	},
@@ -623,7 +623,7 @@
 		"config": ".config_y1",
 		"image": "openwrt-ramips-mt7620-y1-squashfs-sysupgrade.bin",
 		"imagepath": "/ramips/mt7620/",
-		"mod": "Lenovo-Y1",
+		"mod": "Lenovo-Y1-V1",
 		"ext": "-upgrade.bin",
 		"addons": ["readme.pdf", "readmerecovery.txt"]
 	},
@@ -634,7 +634,7 @@
 		"config": ".config_y1s",
 		"image": "openwrt-ramips-mt7620-y1s-squashfs-sysupgrade.bin",
 		"imagepath": "/ramips/mt7620/",
-		"mod": "Lenovo-Y1S",
+		"mod": "Lenovo-Y1S-V1",
 		"ext": "-upgrade.bin",
 		"addons": ["readme.pdf", "readmerecovery.txt"]
 	},
@@ -985,7 +985,7 @@
 		"image3": "openwrt-brcm2708-bcm2708-rpi-squashfs-sysupgrade.img.gz",
 		"image4": "openwrt-brcm2708-bcm2708-rpi-squashfs-sysupgrade.img",
 		"imagepath": "/brcm2708/bcm2708/",
-		"mod": "RaspberryPi",
+		"mod": "RaspberryPi-1",
 		"ext1": "-ext4.img",
 		"ext2": "-squashfs.img",
 		"addons": ["readme.pdf", "readmeSD.txt"]
@@ -1343,5 +1343,16 @@
 		"mod": "ZBT-WE1026-5G",
 		"ext": "-upgrade.bin",
 		"addons": ["readme.pdf", "readmerecovery.txt"]
+	},
+	"RTN16": {
+		"details": "Asus RT-N16",
+		"type": "1",
+		"build": "1907",
+		"config": ".config_rtn16",
+		"image": "openwrt-brcm47xx-mips74k-asus-rt-n16-squashfs.trx",
+		"imagepath": "/brcm47xx/mips74k/",
+		"mod": "Asus-RT-N16",
+		"ext": "-upgrade.trx",
+		"addons": ["readme.pdf", "tftp.txt"]
 	}
 }

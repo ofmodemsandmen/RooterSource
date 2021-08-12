@@ -1,5 +1,7 @@
 #!/bin/sh
 
+DATE=$(date +%Y-%m-%d)
+#DATE="2021-08-15"
 routersjson="./routers.json"
 templatefolder="template/"
 customfolder="custom/"
@@ -268,10 +270,12 @@ buldimage() {
 		if [ ! -z $WPAD ]; then
 			sed -i -e 's/CONFIG_PACKAGE_wpad-mini=y/# CONFIG_PACKAGE_wpad-mini is not set/g' ./.config
 		fi
+		WPAD=$(cat "./.config" | grep "CONFIG_PACKAGE_wpad-mesh-openssl=y")
+		if [ ! -z $WPAD ]; then
+			sed -i -e 's/CONFIG_PACKAGE_wpad=y/# CONFIG_PACKAGE_wpad is not set/g' ./.config
+		fi
 
 	}
-
-	DATE=$(date +%Y-%m-%d)
 
 	NAME="GoldenOrb_"
 	CODE=$NAME$DATE
@@ -641,13 +645,26 @@ if [ -z $cmd ]; then
 	buldimage $1 $2 $3
 else
 	if [ $cmd = "ALL" ]; then
+		start=$2
+		flg=0
 		LIST=$(jshon -k < $routersjson)
 		echo "$LIST" > alllist.txt
 		while read L1
-		do
-		  buldimage "$L1"
+		do	
+			if [ -z $start ]; then
+		  		buldimage "$L1"
+			else
+				if [ $flg -eq 0 ]; then
+					if [ $start = $L1 ]; then
+						flg=1
+						buldimage "$L1"
+					fi
+				else
+					buldimage "$L1"
+				fi
+			fi
 		done < alllist.txt
-		rm -f ./alllist.txt
+				rm -f ./alllist.txt
 	else
 		if [ $cmd = "LIST" ]; then
 			LIST=$(jshon -k < $routersjson)
