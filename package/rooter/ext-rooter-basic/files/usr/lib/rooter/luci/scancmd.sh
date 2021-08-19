@@ -240,6 +240,8 @@ case $uVid in
 		M4='AT!BAND=00;!BAND=11'
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M4")
 		log "$OX"
+		ATCMDD='AT!ENTERCND="AWRONG"'
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	;;
 	"8087"|"2cb7" )
 		rm -f /tmp/scan
@@ -406,6 +408,8 @@ case $uVid in
 		M4='AT!BAND=00;!BAND=11'
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M4")
 		log "$OX"
+		ATCMDD='AT!ENTERCND="AWRONG"'
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	;;
 esac
 uci set modem.pinginfo$CURRMODEM.alive=$ACTIVE

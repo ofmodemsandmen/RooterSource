@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/sh
 CHAN=$1
 CHAN=$(echo "$CHAN" | grep -o "[0-9]*")
 
@@ -151,99 +151,135 @@ decode_lte() {
 }
 
 decode_nr5g() {
-	if [ $CHAN -le 123400 ]; then
+	if [ $CHAN -lt 123400 ]; then
 		BAND="-"
 	elif [ $CHAN -le 130400 ]; then
 		BAND="n71"
-	elif [ $CHAN -le 143400 ]; then
+	elif [ $CHAN -lt 143400 ]; then
 		BAND="-"
-	elif [ $CHAN -le 145600 ]; then
+	elif [ $CHAN -lt 145600 ]; then
 		BAND="n29"
-	elif [ $CHAN -le 145800 ]; then
-		BAND="-"
-	elif [ $CHAN -le 149200 ]; then
-		BAND="n12"
-	elif [ $CHAN -le 151600 ]; then
-		BAND="-"
+	elif [ $CHAN -eq 145600 ]; then
+		BAND="n29|n85"
+	elif [ $CHAN -lt 145800 ]; then
+		BAND="n85"
+	elif [ $CHAN -eq 145800 ]; then
+		BAND="n12|n85"
+	elif [ $CHAN -lt 147600 ]; then
+		BAND="n12|n85"
+	elif [ $CHAN -lt 149200 ]; then
+		BAND="n12|n67|n85"
+	elif [ $CHAN -eq 149200 ]; then
+		BAND="n12|n13|n67|n85"
+	elif [ $CHAN -le 151200 ]; then
+		BAND="n13|n67"
+	elif [ $CHAN -lt 151600 ]; then
+		BAND="n67"
+	elif [ $CHAN -eq 151600 ]; then
+		BAND="n14|n28|n67"
 	elif [ $CHAN -le 153600 ]; then
 		BAND="n14|n28"
-	elif [ $CHAN -le 158200 ]; then
+	elif [ $CHAN -lt 158200 ]; then
 		BAND="n28"
+	elif [ $CHAN -eq 158200 ]; then
+		BAND="n14|n20|n28"
 	elif [ $CHAN -le 160600 ]; then
 		BAND="n20|n28"
 	elif [ $CHAN -le 164200 ]; then
 		BAND="n20"
-	elif [ $CHAN -le 171800 ]; then
+	elif [ $CHAN -lt 171800 ]; then
 		BAND="-"
-	elif [ $CHAN -le 172000 ]; then
+	elif [ $CHAN -lt 172000 ]; then
 		BAND="n26"
-	elif [ $CHAN -le 173800 ]; then
+	elif [ $CHAN -lt 173800 ]; then
 		BAND="n18|n26"
 	elif [ $CHAN -le 175000 ]; then
 		BAND="n5|n18|n26"
 	elif [ $CHAN -le 178800 ]; then
 		BAND="n5|n26"
-	elif [ $CHAN -le 185000 ]; then
+	elif [ $CHAN -lt 185000 ]; then
 		BAND="-"
 	elif [ $CHAN -le 192000 ]; then
 		BAND="n8"
-	elif [ $CHAN -le 285400 ]; then
+	elif [ $CHAN -lt 285400 ]; then
 		BAND="-"
-	elif [ $CHAN -le 286400 ]; then
+	elif [ $CHAN -lt 286400 ]; then
 		BAND="n51|n76|n91|n93"
-	elif [ $CHAN -le 295000 ]; then
+	elif [ $CHAN -eq 286400 ]; then
+		BAND="n50|n51|n75|n76|n91|92|n93|94"
+	elif [ $CHAN -lt 295000 ]; then
 		BAND="n50|n75|n92|n94"
+	elif [ $CHAN -eq 295000 ]; then
+		BAND="n50|n74|n75|n92|n94"
 	elif [ $CHAN -le 303400 ]; then
 		BAND="n50|n74|n75|n92|n94"
 	elif [ $CHAN -le 303600 ]; then
 		BAND="n74"
-	elif [ $CHAN -le 361000 ]; then
+	elif [ $CHAN -lt 305000 ]; then
 		BAND="-"
-	elif [ $CHAN -le 376000 ]; then
+	elif [ $CHAN -le 311800 ]; then
+		BAND="n24"
+	elif [ $CHAN -lt 361000 ]; then
+		BAND="-"
+	elif [ $CHAN -lt 376000 ]; then
 		BAND="n3"
+	elif [ $CHAN -eq 376000 ]; then
+		BAND="n3|n39"
 	elif [ $CHAN -le 384000 ]; then
 		BAND="n39"
-	elif [ $CHAN -le 386000 ]; then
+	elif [ $CHAN -lt 386000 ]; then
 		BAND="-"
 	elif [ $CHAN -le 398000 ]; then
 		BAND="n2|n25"
-	elif [ $CHAN -le 399000 ]; then
+	elif [ $CHAN -lt 399000 ]; then
 		BAND="n25"
-	elif [ $CHAN -le 402000 ]; then
+	elif [ $CHAN -eq 399000 ]; then
+		BAND="n25|n70"
+	elif [ $CHAN -lt 402000 ]; then
 		BAND="n70"
+	elif [ $CHAN -eq 402000 ]; then
+		BAND="n34|n70"
 	elif [ $CHAN -le 404000 ]; then
 		BAND="n34|n70"
 	elif [ $CHAN -le 405000 ]; then
 		BAND="n34"
-	elif [ $CHAN -le 422000 ]; then
+	elif [ $CHAN -lt 422000 ]; then
 		BAND="-"
 	elif [ $CHAN -le 434000 ]; then
 		BAND="n1|n65|n66"
 	elif [ $CHAN -le 440000 ]; then
 		BAND="n65|n66"
-	elif [ $CHAN -le 460000 ]; then
+	elif [ $CHAN -lt 460000 ]; then
 		BAND="-"
-	elif [ $CHAN -le 470000 ]; then
+	elif [ $CHAN -lt 470000 ]; then
 		BAND="n40"
+	elif [ $CHAN -eq 470000 ]; then
+		BAND="n30|n40"
 	elif [ $CHAN -le 472000 ]; then
 		BAND="n30|n40"
 	elif [ $CHAN -le 480000 ]; then
 		BAND="n40"
-	elif [ $CHAN -le 496700 ]; then
+	elif [ $CHAN -lt 496700 ]; then
 		BAND="-"
 	elif [ $CHAN -le 499000 ]; then
 		BAND="n53"
-	elif [ $CHAN -le 499200 ]; then
+	elif [ $CHAN -lt 499200 ]; then
 		BAND="-"
-	elif [ $CHAN -le 514000 ]; then
+	elif [ $CHAN -lt 514000 ]; then
 		BAND="n41|n90"
-	elif [ $CHAN -le 524000 ]; then
+	elif [ $CHAN -eq 514000 ]; then
 		BAND="n38|n41|n90"
-	elif [ $CHAN -le 538000 ]; then
+	elif [ $CHAN -lt 524000 ]; then
+		BAND="n38|n41|n90"
+	elif [ $CHAN -eq 524000 ]; then
+		BAND="n7|n38|n41|n90"
+	elif [ $CHAN -lt 538000 ]; then
+		BAND="n7|n41|n90"
+	elif [ $CHAN -eq 538000 ]; then
 		BAND="n7|n90"
-	elif [ $CHAN -le 620000 ]; then
+	elif [ $CHAN -lt 620000 ]; then
 		BAND="-"
-	elif [ $CHAN -le 636667 ]; then
+	elif [ $CHAN -lt 636667 ]; then
 		BAND="n77|n78"
 	elif [ $CHAN -le 646666 ]; then
 		BAND="n48|n77|n78"
@@ -251,10 +287,18 @@ decode_nr5g() {
 		BAND="n77|n78"
 	elif [ $CHAN -le 680000 ]; then
 		BAND="n77"
-	elif [ $CHAN -le 693334 ]; then
+	elif [ $CHAN -lt 693334 ]; then
 		BAND="-"
 	elif [ $CHAN -le 733333 ]; then
 		BAND="n79"
+	elif [ $CHAN -lt 743333 ]; then
+		BAND="-"
+	elif [ $CHAN -lt 795000 ]; then
+		BAND="n46"
+	elif [ $CHAN -eq 795000 ]; then
+		BAND="n46|n96"
+	elif [ $CHAN -le 875000 ]; then
+		BAND="n96"
 	else
 		BAND="-"
 	fi
@@ -264,7 +308,7 @@ if [ -z "$CHAN" ]; then
 	BAND="-"
 elif [ "$CHAN" -lt 123400 ]; then
 	decode_lte
-elif [ "$CHAN" -lt 733333 ]; then
+elif [ "$CHAN" -le 875000 ]; then
 	decode_nr5g
 else
 	BAND="-"

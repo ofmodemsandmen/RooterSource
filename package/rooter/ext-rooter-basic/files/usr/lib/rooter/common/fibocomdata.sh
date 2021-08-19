@@ -78,6 +78,7 @@ REGXf="SCC[0-9]: 1,0,[0-9]\{1,3\},1[0-9]\{2\},[0-9]\{1,6\},[0-9]\{1,3\}"
 
 REGXg="2,4,,,,,[0-9A-F]\{1,5\},[0-9A-F]\{1,3\},,[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\}"
 REGXh="2,9,,,,,[0-9A-F]\{5\},[0-9A-F]\{1,3\},,[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\}"
+REGXy="1,4,[0-9]\{3\},[0-9]\{2,3\},[0-9A-F]\{0,5\},[0-9A-F]\{0,10\},[0-9]\{1,8\}, ,[0-9]\{1,2\},[0-5], ,"
 
 CHANNEL="-"
 ECIO="-"
@@ -115,6 +116,7 @@ if [ -n "$SERVING" ]; then
 		MODE="-"
 	fi
 	GTCCDATA=$(echo $SERVING | grep -o "$REGXa")
+	GTCCDATAy=$(echo $SERVING | grep -o "$REGXy")
 	LTENEIGH=$(echo $SERVING | grep -o "$REGXg")
 	NRNEIGH=$(echo $SERVING | grep -o "$REGXh")
 	echo "" > /tmp/scan$CURRMODEM
@@ -255,6 +257,15 @@ if [ -n "$GTCCDATA" ]; then
 		fi
 	done
 fi
+
+if [ -n "$GTCCDATAy" ]; then
+	CHANNEL=$(echo $GTCCDATAy | cut -d, -f7)
+	BW=$(echo $GTCCDATAy | cut -d, -f10)
+	decode_bw
+	LBAND="B"$(echo $GTCCDATAy | cut -d, -f9)" (Bandwidth: "$BW" MHz)"
+	XUDATA=""
+fi
+
 if [ -n "$XLDATA" ]; then
 	XLDATA=$(echo "${XLDATA//[\" ]/}")
 	XLEC=$(echo $OX | grep -o "+XLEC: [01],[0-9]\+,[0-5],.*BAND_LTE_[0-9]\{1,2\},[^ ]\+")
