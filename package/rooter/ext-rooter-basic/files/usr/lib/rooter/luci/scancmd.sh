@@ -296,7 +296,7 @@ do
 			INT=$(echo $qm | cut -d, -f3)
 			BND=$(echo $qm | cut -d, -f5)
 			RSSI=$(echo $qm | cut -d, -f9)
-			BAND=$(/usr/lib/rooter/chan2band.sh $BND)
+			BAND=$(/usr/bin/chan2band.sh $BND)
 			if [ "$INT" = "intra" ]; then
 				echo "Band : $BAND    Signal : $RSSI (dBm) (current connected band)" >> /tmp/scan
 			else
@@ -311,7 +311,7 @@ do
 			read -r line
 			qm=$(echo $line" " | tr -d '"' | tr " " ",")
 			BND=$(echo $qm | cut -d, -f1)
-			BAND=$(/usr/lib/rooter/chan2band.sh $BND)
+			BAND=$(/usr/bin/chan2band.sh $BND)
 			RSSI=$(echo $qm | cut -d, -f13)
 			echo "Band : $BAND    Signal : $RSSI (dBm) (current connected band)" >> /tmp/scan
 			flg=1
@@ -337,7 +337,7 @@ do
 						break
 					fi
 					BND=$(echo $qm | cut -d, -f1)
-					BAND=$(/usr/lib/rooter/chan2band.sh $BND)
+					BAND=$(/usr/bin/chan2band.sh $BND)
 					RSSI=$(echo $qm | cut -d, -f8)
 					echo "Band : $BAND    Signal : $RSSI (dBm)" >> /tmp/scan
 					flg=1

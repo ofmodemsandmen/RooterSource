@@ -7,6 +7,10 @@ nosms = 1
 if not fs.stat("/etc/noat") then
 	nosms = 0
 end
+block = 0
+if not fs.stat("/etc/bandlock") then
+	block = 1
+end
 
 function showicon(lck)
 	if lck == 0 then
@@ -1524,7 +1528,8 @@ end
 </fieldset>
 <% end %>
 
-<fieldset class="cbi-section" id="cbi-mode">
+<% if block == 0 then %>
+<fieldset class="cbi-section" id="cbi-mode-cb">
 	<legend>Cellular Bands</legend>
 	<table width="500" border="0" id ="tab10">
 		<tr>
@@ -1633,6 +1638,7 @@ end
 	</tr>
 	</table>
 </fieldset>
+<% end %>
 	
 <fieldset class="cbi-section" id="cbi-mode">
 	<legend>Cellular Mode</legend>

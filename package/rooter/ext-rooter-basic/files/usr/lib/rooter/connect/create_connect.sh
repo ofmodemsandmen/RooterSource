@@ -781,7 +781,13 @@ if [ -n "$CHKPORT" ]; then
 		uci delete network.wan$INTER
 		uci set network.wan$INTER=interface
 		uci set network.wan$INTER.proto=dhcp
-		uci set network.wan$INTER.ifname=wwan$WWANZ
+		source /etc/openwrt_release
+		tone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
+		ifname="ifname"
+		if [ ! -z $tone ]; then
+			ifname="device"
+		fi
+		uci set network.wan$INTER.$ifname=wwan$WWANZ
 		uci set network.wan$INTER._orig_bridge=false
 		uci set network.wan$INTER.metric=$INTER"0"
 		set_dns
@@ -1074,7 +1080,13 @@ while [ 1 -lt 6 ]; do
 			uci delete network.wan$INTER
 			uci set network.wan$INTER=interface
 			uci set network.wan$INTER.proto=static
-			uci set network.wan$INTER.ifname=$ifname
+			source /etc/openwrt_release
+			tone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
+			ifname1="ifname"
+			if [ ! -z $tone ]; then
+				ifname1="device"
+			fi
+			uci set network.wan$INTER.$ifname1=$ifname
 			uci set network.wan$INTER.metric=$INTER"0"
 			uci set network.wan$INTER.ipaddr=$ip/32
 			uci set network.wan$INTER.gateway='0.0.0.0'

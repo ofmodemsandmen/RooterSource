@@ -55,7 +55,13 @@ set_network() {
 	uci delete network.wan$INTER
 	uci set network.wan$INTER=interface
 	uci set network.wan$INTER.proto=dhcp
-	uci set network.wan$INTER.ifname=$1
+	source /etc/openwrt_release
+	tone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
+	ifname="ifname"
+	if [ ! -z $tone ]; then
+		ifname="device"
+	fi
+	uci set network.wan$INTER.$ifname=$1
 	uci set network.wan$INTER.metric=$INTER"0"
 	set_dns
 	uci commit network

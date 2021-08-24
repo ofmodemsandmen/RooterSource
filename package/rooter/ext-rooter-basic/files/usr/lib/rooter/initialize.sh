@@ -163,12 +163,19 @@ while [ $COUNTER -le $MODCNT ]; do
 	rm -f $ROOTER_LINK/reconnect$COUNTER
 	rm -f $ROOTER_LINK/create_proto$COUNTER
 	$ROOTER/signal/status.sh $COUNTER "No Modem Present"
+	
+	source /etc/openwrt_release
+	tone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
+	ifname="ifname"
+	if [ ! -z $tone ]; then
+		ifname="device"
+	fi
 
 	uci -q delete network.wan$COUNTER       
 	uci set network.wan$COUNTER=interface
 	uci set network.wan$COUNTER.proto=dhcp 
 	uci set network.wan$COUNTER.metric=$COUNTER"0"
-	uci set network.wan$COUNTER.ifname="wan"$COUNTER
+	uci set network.wan$COUNTER.$ifname="wan"$COUNTER
 
 	if [ -e /etc/config/mwan3 ]; then
 		ENB=$(uci get mwan3.wan$COUNTER.enabled)

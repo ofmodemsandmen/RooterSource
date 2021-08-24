@@ -55,7 +55,13 @@ set_network() {
 	uci delete network.wan$INTER
 	uci set network.wan$INTER=interface
 	uci set network.wan$INTER.proto=dhcp
-	uci set network.wan$INTER.ifname=$1
+	source /etc/openwrt_release
+	tone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
+	ifname="ifname"
+	if [ ! -z $tone ]; then
+		ifname="device"
+	fi
+	uci set network.wan$INTER.$ifname=$1
 	uci set network.wan$INTER.metric=$INTER"0"
 	set_dns
 	uci commit network
@@ -217,9 +223,6 @@ if
 then
 	log "Using usb$USBN as network interface"
 	uci set modem.modem$CURRMODEM.interface=usb$USBN
-	if [ -e $ROOTER/changedevice.sh ]; then
-		$ROOTER/changedevice.sh usb$USBN
-	fi
 	USBN=`expr 1 + $USBN`
 else
 	set_network eth$ETHN
@@ -228,9 +231,6 @@ else
 	then
 		log "Using eth$ETHN as network interface"
 		uci set modem.modem$CURRMODEM.interface=eth$ETHN
-		if [ -e $ROOTER/changedevice.sh ]; then
-			$ROOTER/changedevice.sh eth$ETHN
-		fi
 		ETHN=`expr 1 + $ETHN`
 	fi
 fi
