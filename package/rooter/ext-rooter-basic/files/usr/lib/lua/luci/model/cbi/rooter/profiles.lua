@@ -25,6 +25,13 @@ ma = di:taboption(this_tab, Value, "apn", "APN :");
 ma.rmempty = true;
 ma.default = "broadband"
 
+pt = di:taboption(this_tab, ListValue, "pdptype", "Protocol Type :")
+pt:value("IP", "IPv4")
+pt:value("IPv6", "IPv6")
+pt:value("IPV4V6", "IPv4+IPv6")
+pt:value("0", "Default")
+pt.default = "0"
+
 mu = di:taboption(this_tab, Value, "user", "Connection User Name :"); 
 mu.optional=false; 
 mu.rmempty = true;
@@ -356,6 +363,13 @@ iccid1.default="1234567"
 
 cma = s:taboption(this_ctab, Value, "apn", "APN :"); 
 cma.rmempty = true;
+
+pt = s:taboption(this_ctab, ListValue, "pdptype", "Protocol Type :")
+pt:value("IP", "IPv4")
+pt:value("IPv6", "IPv6")
+pt:value("IPV4V6", "IPv4+IPv6")
+pt:value("0", "Default")
+pt.default = "0"
 
 cmu = s:taboption(this_ctab, Value, "user", "Connection User Name :"); 
 cmu.optional=false; 

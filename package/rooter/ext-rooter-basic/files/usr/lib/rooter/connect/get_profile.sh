@@ -17,7 +17,8 @@ idV=$(uci get modem.modem$CURRMODEM.idV)
 idP=$(uci get modem.modem$CURRMODEM.idP)
 IMEI=$(uci get modem.modem$CURRMODEM.imei)
 IMSI=$(uci -q get modem.modem$CURRMODEM.imsi)
-ICCID=$(uci -q get modem.modem$CURRMODEM.iccid)
+TEMPICCID=$(uci get modem.modem$CURRMODEM.iccid)
+ICCID=${TEMPICCID:0:5}
 
 log "Modem $CURRMODEM is $MANUF $MODEL"
 
@@ -183,6 +184,11 @@ do_custom() {
 					uci set modem.modeminfo$CURRMODEM.tzone=$tzone
 					config_get nodhcp $1 nodhcp
 					uci set modem.modeminfo$CURRMODEM.nodhcp=$nodhcp
+					config_get pdptype $1 pdptype
+					if [ $pdptype = "0" ]; then
+						pdptype=""
+					fi
+					uci set modem.modeminfo$CURRMODEM.pdptype=$pdptype
 
 					[ -n "$apn" ] || log "This profile has no APN configured !!!"
 
@@ -251,6 +257,11 @@ if [ $MATCH = 0 ]; then
 	uci set modem.modeminfo$CURRMODEM.atc=$(uci -q get profile.default.atc)
 	uci set modem.modeminfo$CURRMODEM.tzone=$(uci -q get profile.default.tzone)
 	uci set modem.modeminfo$CURRMODEM.nodhcp=$(uci -q get profile.default.nodhcp)
+	pdp=$(uci -q get profile.default.pdptype)
+	if [ $pdp = "0" ]; then
+		pdp=""
+	fi
+	uci set modem.modeminfo$CURRMODEM.pdptype=$pdp
 
 	alive=$(uci get profile.default.alive)
 	uci delete modem.pinginfo$CURRMODEM

@@ -19,7 +19,7 @@ define Package/ext-rooter4
 		+luci-app-ddns +ddns-scripts +ddns-scripts_no-ip_com \
 		+ext-command +ext-p910nd +luci-app-guestwifi \
 		+luci-app-hotspot +ext-extra \
-		+picocom +wpad-mini +wget +nano
+		+picocom +wpad-mini +wget +nano +464xlat 
   TITLE:=install basic ROOter routers
   PKGARCH:=all
 endef

@@ -11,4 +11,5 @@ config default 'default'
 	option apn 'internet'
 	option tzone '0'
 	option nodhcp '0'
+	option pdptype '0'
 

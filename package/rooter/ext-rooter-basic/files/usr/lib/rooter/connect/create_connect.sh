@@ -297,14 +297,18 @@ chkreg() {
 addv6() {
 	. /lib/functions.sh
 	. /lib/netifd/netifd-proto.sh
-	log "Adding IPv6 dynamic interface"
 	local interface=wan$INTER
+	local zone="$(fw3 -q network "$interface" 2>/dev/null)"
+	
+	log "Adding IPv6 dynamic interface"
 	json_init
 	json_add_string name "${interface}_6"
 	json_add_string ifname "@$interface"
 	json_add_string proto "dhcpv6"
 	json_add_string extendprefix 1
+	[ -n "$zone" ] && json_add_string zone "$zone"
 	[ "$pdns" = 1 ] && json_add_boolean peerdns 0
+	[ "$nat46" = 1 ] || json_add_string iface_464xlat 0
 	proto_add_dynamic_defaults
 	json_close_object
 	ubus call network add_dynamic "$(json_dump)"
@@ -1072,6 +1076,11 @@ while [ 1 -lt 6 ]; do
 				v6cap=0
 			fi
 			
+			if [ -n "ip6" -a -z "$ip" ]; then
+				log "Running IPv6-only mode"
+				nat46=1
+			fi
+			
 			ATCMDD="AT+XDATACHANNEL=1,1,\"/USBCDC/0\",\"/USBHS/NCM/0\",2,1"
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			RDNS=$(uci -q get network.wan$INTER.dns)
@@ -1088,8 +1097,10 @@ while [ 1 -lt 6 ]; do
 			fi
 			uci set network.wan$INTER.$ifname1=$ifname
 			uci set network.wan$INTER.metric=$INTER"0"
-			uci set network.wan$INTER.ipaddr=$ip/32
-			uci set network.wan$INTER.gateway='0.0.0.0'
+			if [ -n "$ip" ]; then
+				uci set network.wan$INTER.ipaddr=$ip/32
+				uci set network.wan$INTER.gateway='0.0.0.0'
+			fi
 			if [ "$v6cap" -gt 0 ]; then
 				uci set network.wan$INTER.ip6addr=$ip6/128
 			fi

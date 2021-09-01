@@ -16,7 +16,7 @@ define Package/ext-rooterbcm16
   DEPENDS:=+luci +ext-rooter-basic \
 		+luci-app-ddns +ddns-scripts +ddns-scripts_no-ip_com \
 		+luci-app-rootervpn +ext-wireguard \
-		+webconsole +bwmon \
+		+webconsole +bwmon +464xlat \
 		+ext-theme +luci-theme-argon +argon-config \
 		+luci-theme-tomato +ext-material +ext-login \
 		+ca-bundle +ca-certificates +libustream-openssl \

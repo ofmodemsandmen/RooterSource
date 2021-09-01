@@ -1397,5 +1397,19 @@
 				"model": "Comfast CF-E5"
 			}
 		}
+	},
+	"WNDR4300": {
+		"details": "Netgear WNDR4300v1",
+		"type": "2",
+		"build": "1907",
+		"flash": "8",
+		"config": ".config_wndr4300",
+		"image1": "openwrt-ar71xx-nand-wndr4300-ubi-factory.img",
+		"image2": "openwrt-ar71xx-nand-wndr4300-squashfs-sysupgrade.tar",
+		"imagepath": "/ar71xx/nand/",
+		"mod": "Netgear-WNDR4300v1",
+		"ext1": "-upgrade.bin",
+		"ext2": "-factory.img",
+		"addons": ["readme.pdf", "readmerecovery.txt"]
 	}
 }
