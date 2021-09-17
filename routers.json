@@ -1411,5 +1411,18 @@
 		"ext1": "-upgrade.bin",
 		"ext2": "-factory.img",
 		"addons": ["readme.pdf", "readmerecovery.txt"]
+	},
+	"EA8300": {
+		"details": "Linksys EA8300",
+		"type": "2",
+		"build": "1907",
+		"config": ".config_ea8300",
+		"image1": "openwrt-ipq40xx-generic-linksys_ea8300-squashfs-factory.bin",
+		"image2": "openwrt-ipq40xx-generic-linksys_ea8300-squashfs-sysupgrade.bin",
+		"imagepath": "/ipq40xx/generic/",
+		"mod": "Linksys-EA8300",
+		"ext1": "-factory.bin",
+		"ext2": "-upgrade.bin",
+		"addons": ["readme.pdf", "factory.txt"]
 	}
 }

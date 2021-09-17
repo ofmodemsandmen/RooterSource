@@ -13,6 +13,7 @@ else
 	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "cellinfo0.gcom" "$CURRMODEM")
 fi
 OY=$($ROOTER/gcom/gcom-locked "$COMMPORT" "cellinfo.gcom" "$CURRMODEM")
+OXx=$OX
 
 OX=$(echo $OX | tr 'a-z' 'A-Z')
 OY=$(echo $OY | tr 'a-z' 'A-Z')
@@ -21,7 +22,7 @@ OX=$OX" "$OY
 COPS="-"
 COPS_MCC="-"
 COPS_MNC="-"
-COPSX=$(echo $OX | grep -o "+COPS: [01],0,.\+," | cut -d, -f3 | grep -o "[^\"]\+")
+COPSX=$(echo $OXx | grep -o "+COPS: [01],0,.\+," | cut -d, -f3 | grep -o "[^\"]\+")
 
 if [ "x$COPSX" != "x" ]; then
 	COPS=$COPSX

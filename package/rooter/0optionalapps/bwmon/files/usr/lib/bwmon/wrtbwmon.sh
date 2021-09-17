@@ -417,11 +417,13 @@ checkTime()
 		echo "end day $cDay" >> $monthlyUsageDB
 		cp -f $monthlyUsageDB $monthlyUsageBack
 		cDay=$pDay
+		cMonth=$pMonth
+		cYear=$pYear
 		rm -f $dataPath[[:digit:]][[:digit:]][[:digit:]][[:digit:]]"-"[[:digit:]][[:digit:]]"-"[[:digit:]][[:digit:]]-daily_data.js
 		rm -f $backPath[[:digit:]][[:digit:]][[:digit:]][[:digit:]]"-"[[:digit:]][[:digit:]]"-"[[:digit:]][[:digit:]]-daily_data.js
-		if [ "$cMonth" -ne "$pMonth" ]; then
-			cMonth=$pMonth
-			cYear=$pYear
+		roll=$(uci -q get custom.bwallocate.rollover)
+		[ -z $roll ] && roll=1
+		if [ "$roll" -eq "$pDay" ]; then
 			rm -f $monthlyUsageDB
 			rm -f $monthlyUsageBack
 			monthlyUsageDB="$dataPath$cYear-$cMonth-mac_data.js"

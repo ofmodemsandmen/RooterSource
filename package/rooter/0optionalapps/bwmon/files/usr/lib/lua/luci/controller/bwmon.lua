@@ -8,6 +8,7 @@ function index()
 	
 	entry({"admin", "nlbw", "check_bw"}, call("action_check_bw"))
 	entry({"admin", "nlbw", "change_bw"}, call("action_change_bw"))
+	entry({"admin", "nlbw", "change_roll"}, call("action_change_roll"))
 end
 
 function action_check_bw()
@@ -46,8 +47,10 @@ function action_check_bw()
 	if file ~= nil then
 		rv['lock'] = 1
 		file:close()
+		rv['rollover'] = luci.model.uci.cursor():get("custom", "bwallocate", "rollover")
 	else
 		rv['lock'] = 0
+		rv['rollover'] = luci.model.uci.cursor():get("custom", "bwallocate", "rollover")
 	end
 	
 	luci.http.prepare_content("application/json")
@@ -58,4 +61,10 @@ function action_change_bw()
 	local set = luci.http.formvalue("set")
 	os.execute("/usr/lib/bwmon/allocate.sh " .. set)
 	
-	end
+end
+
+function action_change_roll()
+	local set = luci.http.formvalue("set")
+	os.execute("/usr/lib/bwmon/rollover.sh " .. set)
+	
+end

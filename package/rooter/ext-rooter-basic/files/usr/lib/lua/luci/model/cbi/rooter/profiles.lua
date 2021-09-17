@@ -1,6 +1,6 @@
 local utl = require "luci.util"
 
-local maxmodem = luci.model.uci.cursor():get("modem", "general", "max")
+local maxmodem = luci.model.uci.cursor():get("modem", "general", "max") 
 
 m = Map("profile", translate("Modem Connection Profiles"),
 	translate("Create Profiles used to provide information at connection time"))
@@ -27,7 +27,7 @@ ma.default = "broadband"
 
 pt = di:taboption(this_tab, ListValue, "pdptype", "Protocol Type :")
 pt:value("IP", "IPv4")
-pt:value("IPv6", "IPv6")
+pt:value("IPV6", "IPv6")
 pt:value("IPV4V6", "IPv4+IPv6")
 pt:value("0", "Default")
 pt.default = "0"
@@ -56,6 +56,23 @@ mtz:value("0", "No")
 mtz:value("1", "Yes")
 mtz.default=1
 
+ml = di:taboption(this_tab, ListValue, "lock", "Roaming Allowed :");
+ml:value("0", "Yes")
+ml:value("1", "No")
+ml.default=1
+
+mcc = di:taboption(this_tab, Value, "mcc", "Provider Country Code :");
+mcc.optional=false; 
+mcc.rmempty = true;
+mcc.datatype = "and(uinteger,min(1),max(999))"
+mcc:depends("lock", "1")
+
+mnc = di:taboption(this_tab, Value, "mnc", "Provider Network Code :");
+mnc.optional=false; 
+mnc.rmempty = true;
+mnc.datatype = "and(uinteger,min(1),max(999))"
+mnc:depends("lock", "1")
+
 this_taba = "advance"
 
 mf = di:taboption(this_taba, ListValue, "ppp", "Force Modem to PPP Protocol :");
@@ -73,23 +90,6 @@ nl = di:taboption(this_taba, ListValue, "nodhcp", "No DHCP for QMI Modems :");
 nl:value("0", "No")
 nl:value("1", "Yes")
 nl.default=0
-
-ml = di:taboption(this_taba, ListValue, "lock", "Lock Connection to a Provider :");
-ml:value("0", "No")
-ml:value("1", "Yes")
-ml.default=0
-
-mcc = di:taboption(this_taba, Value, "mcc", "Provider Country Code :");
-mcc.optional=false; 
-mcc.rmempty = true;
-mcc.datatype = "and(uinteger,min(1),max(999))"
-mcc:depends("lock", "1")
-
-mnc = di:taboption(this_taba, Value, "mnc", "Provider Network Code :");
-mnc.optional=false; 
-mnc.rmempty = true;
-mnc.datatype = "and(uinteger,min(1),max(999))"
-mnc:depends("lock", "1")
 
 mdns1 = di:taboption(this_taba, Value, "dns1", "Custom DNS Server1 :"); 
 mdns1.rmempty = true;
@@ -395,6 +395,23 @@ cmtz:value("0", "No")
 cmtz:value("1", "Yes")
 cmtz.default=1
 
+cml = s:taboption(this_ctab, ListValue, "lock", "Roaming Allowed :");
+cml:value("0", "Yes")
+cml:value("1", "No")
+cml.default=1
+
+cmcc = s:taboption(this_ctab, Value, "mcc", "Provider Country Code :");
+cmcc.optional=false; 
+cmcc.rmempty = true;
+cmcc.datatype = "and(uinteger,min(1),max(999))"
+cmcc:depends("lock", "1")
+
+cmnc = s:taboption(this_ctab, Value, "mnc", "Provider Network Code :");
+cmnc.optional=false; 
+cmnc.rmempty = true;
+cmnc.datatype = "and(uinteger,min(1),max(999))"
+cmnc:depends("lock", "1")
+
 this_ctaba = "cadvanced"
 
 cmf = s:taboption(this_ctaba, ListValue, "ppp", "Force Modem to PPP Protocol :");
@@ -419,23 +436,6 @@ cnl = s:taboption(this_ctaba, ListValue, "nodhcp", "No DHCP for QMI Modems :");
 cnl:value("0", "No")
 cnl:value("1", "Yes")
 cnl.default=0
-
-cml = s:taboption(this_ctaba, ListValue, "lock", "Lock Connection to a Provider :");
-cml:value("0", "No")
-cml:value("1", "Yes")
-cml.default=0
-
-cmcc = s:taboption(this_ctaba, Value, "mcc", "Provider Country Code :");
-cmcc.optional=false; 
-cmcc.rmempty = true;
-cmcc.datatype = "and(uinteger,min(1),max(999))"
-cmcc:depends("lock", "1")
-
-cmnc = s:taboption(this_ctaba, Value, "mnc", "Provider Network Code :");
-cmnc.optional=false; 
-cmnc.rmempty = true;
-cmnc.datatype = "and(uinteger,min(1),max(999))"
-cmnc:depends("lock", "1")
 
 cmdns1 = s:taboption(this_ctaba, Value, "dns1", "Custom DNS Server1 :"); 
 cmdns1.rmempty = true;

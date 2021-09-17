@@ -121,16 +121,27 @@ set_dns2() {
 
 
 check_apn() {
-	local IPVAR="IP"
+	IPVAR="IP"
 	local COMMPORT="/dev/ttyUSB"$CPORT
 	if [ -e /etc/nocops ]; then
 		echo "0" > /tmp/block
 	fi
 	ATCMDD="AT+CGDCONT=?"
 	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if [ -n "$(echo $OX | grep -o "IPV4V6")" ]; then
-		IPVAR="IPV4V6"
-	fi
+
+	[ "$PDPT" = "0" ] && PDPT=""
+	for PDP in "$PDPT" IPV4V6; do
+		if [[ "$(echo $OX | grep -o "$PDP")" ]]; then
+			IPVAR="$PDP"
+			break
+		fi
+	done
+
+	uci set modem.modem$CURRMODEM.pdptype=$IPVAR
+	uci commit modem
+
+	log "PDP Type selected in the Connection Profile: \"$PDPT\", active: \"$IPVAR\""
+
 	ATCMDD="AT+CGDCONT?;+CFUN?"
 	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	if `echo $OX | grep "+CGDCONT: 1,\"$IPVAR\",\"$NAPN\"," 1>/dev/null 2>&1`
@@ -1085,7 +1096,7 @@ while [ 1 -lt 6 ]; do
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			RDNS=$(uci -q get network.wan$INTER.dns)
 			
-			log Applying IP settings to wan$INTER			
+			log "Applying IP settings to wan$INTER"			
 			uci delete network.wan$INTER
 			uci set network.wan$INTER=interface
 			uci set network.wan$INTER.proto=static

@@ -12,7 +12,8 @@ while true; do
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "ussd.gcom" "$CURRMODEM" "$ATCMDD" | tr "\n" "\v")
 		USSD=$(echo "$OX" | grep -o "+CUSD: .\+\",[0-9]\+" | tr "\v" "\n")
 		USSDL=${#USSD}
-		DCS=$(echo ${USSD:(-2)})
+		USSDLx=$((USSDL - 2))
+		DCS=$(printf "${USSD:$USSDLx:2}")
 		if [ $USSDL -ge 14 ]; then
 			USSDL=$((USSDL - 14))
 			USSD=$(printf "${USSD:10:$USSDL}")
@@ -21,7 +22,7 @@ while true; do
 				USSDL=${#USSD}
 				nV=0
 				until [ $nV -ge $USSDL ]; do
-					UU=$(printf "%d" "0x"${USSD:nV:4})
+					UU=$(printf "%d" "0x"${USSD:$nV:4})
 					if [[ $UU -lt 128 ]]; then
 						USSDx="$USSDx"$(printf "%b" "\\$(printf "0%o" "$UU")")
 					elif [[ $UU -lt 2048 ]]; then
@@ -37,7 +38,7 @@ while true; do
 						UUU=$((($UU & 63) | 128))
 						USSDx="$USSDx"$(printf "%b" "\\$(printf "0%o" "$UUU")")
 					fi
-				nV=$(( $nV + 4 ))
+					nV=$(( $nV + 4 ))
 				done
 				USSD="$USSDx"
 			fi

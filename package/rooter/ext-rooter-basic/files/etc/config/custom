@@ -1,0 +1,4 @@
+config settings bwallocate
+	option rollover '1'
+	option allocate '1000'
+	

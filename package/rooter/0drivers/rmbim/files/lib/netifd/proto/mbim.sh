@@ -5,7 +5,7 @@
 	. ../netifd-proto.sh
 	init_proto "$@"
 }
-#DBG=-v
+# DBG=-v
 
 ROOTER=/usr/lib/rooter
 ROOTER_LINK="/tmp/links"
@@ -20,19 +20,30 @@ get_connect() {
 	NPASS=$(uci -q get modem.modeminfo$CURRMODEM.passw)
 	NAUTH=$(uci -q get modem.modeminfo$CURRMODEM.auth)
 	PINC=$(uci -q get modem.modeminfo$CURRMODEM.pincode)
+	PDPT=$(uci -q get modem.modeminfo$CURRMODEM.pdptype)
 
-	uci set modem.modem$CURRMODEM.apn=$NAPN
-	uci set modem.modem$CURRMODEM.user="$NUSER"
-	uci set modem.modem$CURRMODEM.passw="$NPASS"
-	uci set modem.modem$CURRMODEM.auth=$NAUTH
-	uci set modem.modem$CURRMODEM.pin=$PINC
-	uci commit modem
-	
 	apn=$NAPN
 	username="$NUSER"
 	password="$NPASS"
 	auth=$NAUTH
 	pincode=$PINC
+
+	if [ "$PDPT" = 0 ]; then
+		ipt=""
+	else
+		IPVAR=$(uci -q get modem.modem$CURRMODEM.pdptype)
+		case "$IPVAR" in
+			"IP" )
+				ipt="ipv4:"
+			;;
+			"IPV6" )
+				ipt="ipv6:"
+			;;
+			"IPV4V6" )
+				ipt="ipv4v6:"
+			;;
+		esac
+	fi
 }
 
 get_sub() {
@@ -232,35 +243,9 @@ _proto_mbim_setup() {
 	fi
 	UP=$(echo "$ATTACH" | awk '/uplinkspeed:/ {print $2}')
 	DOWN=$(echo "$ATTACH" | awk '/downlinkspeed:/ {print $2}')
-	MODE=$(echo "$ATTACH" | awk '/highestavailabledataclass:/ {print $2}')
-	if [ "$MODE" == "0001" ]; then
-		CLASS="GPRS"
-	fi
-	if [ "$MODE" == "0002" ]; then
-		CLASS="EDGE"
-	fi
-	if [ "$MODE" == "0004" ]; then
-		CLASS="UMTS"
-	fi
-	if [ "$MODE" == "0008" ]; then
-		CLASS="HSDPA"
-	fi
-	if [ "$MODE" == "0010" ]; then
-		CLASS="HSUPA"
-	fi
-	if [ "$MODE" == "0020" ]; then
-		CLASS="LTE"
-	fi
-	CUS=${MODE:0:1}
-	if [ "$CUS" = "8" ]; then
-		CLASS="CUSTOM"
-	fi
-	if [ -z "$CLASS" ]; then
-		CLASS="UNKNOWN"
-	fi
 
 	log "Connect to network"
-	while ! umbim $DBG -n -t $tid -d $device connect "$apn" "$auth" "$username" "$password"; do
+	while ! umbim $DBG -n -t $tid -d $device connect "$ipt""$apn" "$auth" "$username" "$password"; do
 		tid=$((tid + 1))
 		sleep 1;
 	done
@@ -287,7 +272,12 @@ _proto_mbim_setup() {
 	[ -n "$DNS4" ] && echo "DNS4: $DNS4"
 	
 	log "Connected, setting IP"
-	
+
+	if [ -n "$IP6" -a -z "$IP" ]; then
+		log "Running IPv6-only mode"
+		nat46=1
+	fi	
+
 	if [[ $(echo "$IP6" | grep -o "^[23]") ]]; then
 		# Global unicast IP acquired
 		v6cap=1
@@ -315,8 +305,10 @@ _proto_mbim_setup() {
 
 	proto_init_update "$ifname" 1
 	
-	proto_add_ipv4_address $IP "255.255.255.255"
-	proto_add_ipv4_route "0.0.0.0" 0
+	if [ -n "$IP" ]; then
+		proto_add_ipv4_address $IP "255.255.255.255"
+		proto_add_ipv4_route "0.0.0.0" 0
+	fi
 
 	for DNSV in $(echo "$v4dns"); do
 		proto_add_dns_server "$DNSV"
@@ -334,22 +326,42 @@ _proto_mbim_setup() {
 		fi
 	fi
 
+	proto_add_data
+		json_add_string zone wan
+	proto_close_data
+
 	proto_send_update "$interface"	
 
+	if [ "$v6cap" -gt 0 ]; then
+		local zone="$(fw3 -q network "$interface" 2>/dev/null)"
+	fi
 	if [ "$v6cap" = 2 ]; then
 		log "Adding IPv6 dynamic interface"
 		json_init
 		json_add_string name "${interface}_6"
 		json_add_string ifname "@$interface"
 		json_add_string proto "dhcpv6"
-		proto_add_dynamic_defaults
 		json_add_string extendprefix 1
+		[ -n "$zone" ] && json_add_string zone "$zone"
+		[ "$nat46" = 1 ] || json_add_string iface_464xlat 0
 		json_add_boolean peerdns 0
 		json_add_array dns
 			for DNSV in $(echo "$v6dns"); do
 				json_add_string "" "$DNSV"
 			done
 		json_close_array
+		proto_add_dynamic_defaults
+		json_close_object
+		ubus call network add_dynamic "$(json_dump)"
+	elif
+		[ "$v6cap" = 1 -a "$nat46" = 1 ]; then
+		log "Adding 464XLAT (CLAT) dynamic interface"
+		json_init
+		json_add_string name "CLAT$INTER"
+		json_add_string proto "464xlat"
+		json_add_string tunlink "${interface}"
+		[ -n "$zone" ] && json_add_string zone "$zone"
+		proto_add_dynamic_defaults
 		json_close_object
 		ubus call network add_dynamic "$(json_dump)"
 	fi
@@ -387,7 +399,6 @@ _proto_mbim_setup() {
 	uci set modem.modem$CURRMODEM.mcc=$MCC
 	uci set modem.modem$CURRMODEM.mnc=" "$MNC
 	uci set modem.modem$CURRMODEM.sig="--"
-	uci set modem.modem$CURRMODEM.mode=$CLASS
 	uci set modem.modem$CURRMODEM.sms=0
 	uci commit modem
 

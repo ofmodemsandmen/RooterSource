@@ -123,7 +123,7 @@ if [ -n "$SERVING" ]; then
 	for NVAL in $(echo "$LTENEIGH"); do
 		CHAN=$(echo $NVAL | cut -d, -f7)
 		CHAN=$(printf "%d" 0x$CHAN)
-		BAND=$(/usr/bin/chan2band.sh $CHAN)
+		BAND=$(/usr/lib/rooter/chan2band.sh $CHAN)
 		PCIx=$(echo $NVAL | cut -d, -f8)
 		PCIx=$(printf "%d" 0x$PCIx)
 		RSSI=$(echo $NVAL | cut -d, -f11)
@@ -133,7 +133,7 @@ if [ -n "$SERVING" ]; then
 		for NVAL in $(echo "$NRNEIGH"); do
 		CHAN=$(echo $NVAL | cut -d, -f7)
 		CHAN=$(printf "%d" 0x$CHAN)
-		BAND=$(/usr/bin/chan2band.sh $CHAN)
+		BAND=$(/usr/lib/rooter/chan2band.sh $CHAN)
 		PCIx=$(echo $NVAL | cut -d, -f8)
 		PCIx=$(printf "%d" 0x$PCIx)
 		RSSI=$(echo $NVAL | cut -d, -f11)
@@ -274,7 +274,7 @@ if [ -n "$XLDATA" ]; then
 	PCI=$(printf "%d" $PCI)
 	CHANNEL=$(echo $XLDATA | cut -d, -f7)
 	CHANNEL=$(printf "%d" $CHANNEL)
-	LBAND=$(/usr/bin/chan2band.sh "$CHANNEL")
+	LBAND=$($ROOTER/chan2band.sh "$CHANNEL")
 	if [ -n "$XLEC" ]; then
 		BW=$(echo $XLEC | cut -d, -f3)
 		RAWLIST=$(echo $XLEC | grep -o "BAND_LTE_[0-9]\{1,2\}.\+" | grep -o "[,0-9]*" | tr ',' ' ')
@@ -304,6 +304,13 @@ if [ -n "$XLDATA" ]; then
 					fi
 				fi
 			done
+		fi
+	else
+		XLEC=$(echo $OX | grep -o "+XLEC: 0,[1-9],[0-5]")
+		if [ -n "$XLEC" ]; then
+			BW=$(echo $XLEC | cut -d, -f3)
+			decode_bw
+			LBAND=$LBAND" (Bandwidth $BW MHz)"
 		fi
 	fi
 	RSCP=$(echo $XLDATA | cut -d, -f10)
