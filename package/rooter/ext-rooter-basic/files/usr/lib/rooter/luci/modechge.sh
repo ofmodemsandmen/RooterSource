@@ -52,39 +52,39 @@ if [ $MODEMTYPE -eq 2 ]; then
 	esac
 fi
 
-# Huawei legacy
+# Huawei LTE
 if [ $MODEMTYPE -eq 3 ]; then
 	case $NETMODE in
                 1*)
-                        ATC="AT^SYSCFGEX=\"00\",3FFFFFFF,2,4,7FFFFFFFFFFFFFFF,," ;;
+                        ATC="AT^SYSCFGEX=\"00\",40000000,2,4,40000000,," ;;
                 2*)
-                        ATC="AT^SYSCFGEX=\"010203\",3FFFFFFF,2,4,7FFFFFFFFFFFFFFF,," ;;
+                        ATC="AT^SYSCFGEX=\"010203\",40000000,2,4,40000000,," ;;
                 3*)
-                        ATC="AT^SYSCFGEX=\"01\",3FFFFFFF,2,4,7FFFFFFFFFFFFFFF,," ;;
+                        ATC="AT^SYSCFGEX=\"01\",40000000,2,4,40000000,," ;;
                 4*)
-                        ATC="AT^SYSCFGEX=\"020301\",3FFFFFFF,2,4,7FFFFFFFFFFFFFFF,," ;;
+                        ATC="AT^SYSCFGEX=\"020301\",40000000,2,4,40000000,," ;;
                 5*)
-                        ATC="AT^SYSCFGEX=\"02\",3FFFFFFF,2,4,7FFFFFFFFFFFFFFF,," ;;
+                        ATC="AT^SYSCFGEX=\"02\",40000000,2,4,40000000,," ;;
                 6*)
-                        ATC="AT^SYSCFGEX=\"030201\",3FFFFFFF,2,4,7FFFFFFFFFFFFFFF,," ;;
+                        ATC="AT^SYSCFGEX=\"030201\",40000000,2,4,40000000,," ;;
                 7*)
-                        ATC="AT^SYSCFGEX=\"03\",3FFFFFFF,2,4,7FFFFFFFFFFFFFFF,," ;;
+                        ATC="AT^SYSCFGEX=\"03\",40000000,2,4,40000000,," ;;
         esac
 fi
 
-# Huawei LTE
+# Huawei legacy
 if [ $MODEMTYPE -eq 4 ]; then
 	case $NETMODE in
 		1*)
-			ATC="AT^SYSCFG=2,0,03FFFFFFF,2,4" ;;
+			ATC="AT^SYSCFG=2,0,40000000,2,4" ;;
 		2*)
-			ATC="AT^SYSCFG=2,1,03FFFFFFF,2,4" ;;
+			ATC="AT^SYSCFG=2,1,40000000,2,4" ;;
 		3*)
-			ATC="AT^SYSCFG=13,1,03FFFFFFF,2,4" ;;
+			ATC="AT^SYSCFG=13,1,40000000,2,4" ;;
 		4*)
-			ATC="AT^SYSCFG=2,2,03FFFFFFF,2,4" ;;
+			ATC="AT^SYSCFG=2,2,40000000,2,4" ;;
 		5*)
-			ATC="AT^SYSCFG=14,2,03FFFFFFF,2,4" ;;
+			ATC="AT^SYSCFG=14,2,40000000,2,4" ;;
 	esac
 fi
 

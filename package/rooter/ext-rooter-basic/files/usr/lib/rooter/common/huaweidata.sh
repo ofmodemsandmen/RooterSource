@@ -182,6 +182,11 @@ process_huawei() {
 		fi
 	fi
 
+	NETMODEx=$(uci get modem.modem$CURRMODEM.netmode)
+	if [ "$NETMODE" != "$NETMODEx" ]; then
+		uci set modem.modem$CURRMODEM.netmode="$NETMODE"
+		uci commit modem
+	fi
 
 	MODE="-"
 	TECH=$(echo "$O" | awk -F[,] '/^\^SYSINFOEX:/ {print $9}' | sed 's/"//g')

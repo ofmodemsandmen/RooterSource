@@ -60,21 +60,27 @@ ifname="$( ls "$devpath"/net )"
 
 uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null & sleep 10 ; kill -9 $!
 
-#uqmi -s -d "$device" --set-data-format 802.3
-#uqmi -s -d "$device" --wda-set-data-format 802.3
 if [ $RAW -eq 1 ]; then
 	DATAFORM='"raw-ip"'
-	echo "Y" > /sys/class/net/$ifname/qmi/raw_ip
+elif [ $idV = 1199 -a $idP = 9055 ]; then
+	$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
+	DATAFORM="802.3"
+	uqmi -s -d "$device" --set-data-format 802.3
+	uqmi -s -d "$device" --wda-set-data-format 802.3
 else
 	DATAFORM=$(uqmi -s -d "$device" --wda-get-data-format)
 fi
+
 log "WDA-GET-DATA-FORMAT is $DATAFORM"
+
 if [ "$DATAFORM" = '"raw-ip"' ]; then
 	[ -f /sys/class/net/$ifname/qmi/raw_ip ] || {
 		log "Device only supports raw-ip mode but is missing this required driver attribute: /sys/class/net/$ifname/qmi/raw_ip"
 		ret=1
 	}
+	ip link set dev $ifname down
 	echo "Y" > /sys/class/net/$ifname/qmi/raw_ip
+	ip link set dev $ifname up
 fi
 
 log "Setting FCC Auth: $(uqmi -s -d "$device" --fcc-auth)"
