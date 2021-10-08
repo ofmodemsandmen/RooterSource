@@ -70,7 +70,7 @@
 			document.getElementById("runtest").style.display="none";
 			document.getElementById("pingl").style.display="none";
 			document.getElementById("wait").style.display="";
-			document.getElementById("wait").innerHTML = "Unable to contact SpeedTest.net" ;
+			document.getElementById("wait").innerHTML = "<%:Unable to contact SpeedTest.net%>" ;
 			document.getElementById("noint").style.visibility="visible";
 			document.getElementById("loading").style.display="none";
 		}
@@ -132,8 +132,8 @@ function dotest(btn)
 <form method="post" action="<%=REQUEST_URI%>">
 <body onload="refresh();"></body>
 <div class="cbi-map" id="cbi-misc">
-<h2><a id="content" name="content">Speed Test</a></h2>
-<div class="cbi-map-descr">An Internet speed test using speedtest.net</div>
+<h2><a id="content" name="content"><%:Speed Test%></a></h2>
+<div class="cbi-map-descr"><%:An Internet speed test using speedtest.net%></div>
 <head>
      <style>
       input {
@@ -145,7 +145,7 @@ function dotest(btn)
 	
 	<table width="550"  border="0">
 		<tr>
-    		<td width="43%"><div align="right"  id="wait" style="font-size : 15px; width: 100%; height: 25px;">***Finding Optimal Server***</div></td>
+    		<td width="43%"><div align="right"  id="wait" style="font-size : 15px; width: 100%; height: 25px;"><%:***Finding Optimal Server***%></div></td>
 			<td width="57%">&nbsp;</td>
 		</tr>
  	</table>
@@ -193,7 +193,7 @@ function dotest(btn)
 	
 	<table width="550"  border="0" id="pingl" style="visibility:hidden">
 		<tr>
-				<td width="35%"><div align="right" style="font-size : 15px; width: 100%; height: 25px;">Latency : </div></td>
+				<td width="35%"><div align="right" style="font-size : 15px; width: 100%; height: 25px;"><%:Latency : %></div></td>
 				<td width="20%"><div align="left" id="ping"></div></td>
 				<td width="45%">&nbsp;</td>
 		</tr>
@@ -201,10 +201,10 @@ function dotest(btn)
 	
 	<table width="550"  border="0" id="updwn" style="visibility:hidden">
 		<tr>
-    		<td width="25%"><div align="right" style="font-size : 15px; width: 100%; height: 25px;"><strong>Download : </strong></div></td>
+    		<td width="25%"><div align="right" style="font-size : 15px; width: 100%; height: 25px;"><strong><%:Download : %></strong></div></td>
 			<td width="10%"><div align="left"  id="dwn" style="font-size : 15px; width: 100%; height: 25px;"><strong></strong></div></td>
 			<td width="10%">&nbsp;</td>
-			<td width="6%"><div align="right"  style="font-size : 15px; width: 100%; height: 25px;"><strong>Upload : </strong></div></td>
+			<td width="6%"><div align="right"  style="font-size : 15px; width: 100%; height: 25px;"><strong><%:Upload : %></strong></div></td>
 			<td width="10%"><div align="left"  id="up" style="font-size : 15px; width: 100%; height: 25px;"><strong></strong></div></td>
 			<td width="40%">&nbsp;</td>
 		</tr>

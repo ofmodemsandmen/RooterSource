@@ -1,4 +1,10 @@
-config settings bwallocate
+
+config settings 'bwallocate'
 	option rollover '1'
+	option enabled '0'
 	option allocate '1000'
-	
+
+config menu 'menu'
+	option password '1234'
+	option full '1'
+

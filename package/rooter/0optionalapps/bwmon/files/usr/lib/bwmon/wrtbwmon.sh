@@ -258,9 +258,9 @@ setup()
 	for chain in INPUT OUTPUT; do
 	    for interface in $interfaces; do
 		[ -n "$interface" ] && [ -e "/sys/class/net/$interface" ] && newRuleIF $chain $interface
-		if [ -e /etc/bwlock ]; then
+		#if [ -e /etc/bwlock ]; then
 			accounting $interface
-		fi
+		#fi
 	    done
 	done
 

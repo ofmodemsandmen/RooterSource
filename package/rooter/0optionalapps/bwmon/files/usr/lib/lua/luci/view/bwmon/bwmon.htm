@@ -21,12 +21,14 @@ var maclist = new Array() ;
 var partsArray = new Array;
 var lockb = 0;
 var rollover = 1;
+var enabled = "0";
 
 	function display(rv)
 	{
 		days = rv.days;
 		bwlock = rv.lock;
 		rollover = rv.rollover;
+		enabled = rv.enabled;
 			if ( days !== "0" )
 			{
 				document.getElementById("totalb").style.visibility="visible";
@@ -41,21 +43,30 @@ var rollover = 1;
 					document.getElementById("allocatet").style.display="";
 					document.getElementById("lockbtn").style.visibility="visible";
 					document.getElementById("lockbtn").style.display="";
-					document.getElementById("rollday").style.visibility="visible";
-					document.getElementById("rollover1").style.visibility="visible";
+					//document.getElementById("rollday").style.visibility="visible";
+					//document.getElementById("rollover1").style.visibility="visible";
 					
-					document.getElementById("allocate").innerHTML=rv.catotal;
-					document.getElementById("allocate").style.fontWeight = "bold" ;
-					ntotal = parseInt(rv.total);
-					nallocate = parseInt(rv.atotal);
-					if ( ntotal > nallocate )
+					if ( enabled == "1" )
 					{
-						document.getElementById("total").style.color = "red";
+						document.getElementById("allocate").innerHTML=rv.catotal;
+						document.getElementById("enable").value="<%:Disable Bandwidth Allocation%>";
+						ntotal = parseInt(rv.total);
+						nallocate = parseInt(rv.atotal);
+						if ( ntotal > nallocate )
+						{
+							document.getElementById("total").style.color = "red";
+						}
+						else
+						{
+							document.getElementById("total").style.color = "inherit";
+						}
 					}
 					else
 					{
-						document.getElementById("total").style.color = "inherit";
+						document.getElementById("allocate").innerHTML="<%:Disabled%>";
+						document.getElementById("enable").value="<%:Enable Bandwidth Allocation%>";
 					}
+					document.getElementById("allocate").style.fontWeight = "bold" ;
 				}
 				else
 				{
@@ -71,6 +82,22 @@ var rollover = 1;
 				} 
 				
 				document.getElementById("rollday").selectedIndex = rollover - 1;
+				en =  "th";
+				if ( rv.rollover == "1" )
+				{
+					en = "st";
+				}
+				if ( rv.rollover == "2" )
+				{
+					en = "nd";
+				}
+				if ( rv.rollover == "3" )
+				{
+					en = "rd";
+				}
+				document.getElementById("rolld").innerHTML=rv.rollover + en;
+				document.getElementById("rolld").style.fontWeight = "bold" ;
+
 				document.getElementById("total").innerHTML=rv.ctotal;
 				document.getElementById("total").style.fontWeight = "bold" ;
 				document.getElementById("ptotal").innerHTML=rv.cptotal;
@@ -176,6 +203,7 @@ var rollover = 1;
 			document.getElementById("rollover1").style.visibility="visible";
 			document.getElementById("rollday").style.visibility="visible";
 			document.getElementById("changeroll").style.visibility="visible";
+			document.getElementById("enable").style.visibility="visible";
 			document.getElementById("pass").value="";
 			lockb = 1;
 		}
@@ -202,6 +230,9 @@ var rollover = 1;
 			document.getElementById("alloc1").style.visibility="hidden";
 			document.getElementById("change").style.visibility="hidden";
 			document.getElementById("changeroll").style.visibility="hidden";
+			document.getElementById("rollday").style.visibility="hidden";
+			document.getElementById("rollover1").style.visibility="hidden";
+			document.getElementById("enable").style.visibility="hidden";
 			lockb = 0;
 		}
 		return false;
@@ -244,12 +275,34 @@ var rollover = 1;
 					
 		return false;
 	}
+	
+	function enablealloc()
+	{
+		if (enabled == "0" )
+		{
+			enabled = "1";
+		}
+		else
+		{
+			enabled = "0";
+		}
+		XHR.get('<%=luci.dispatcher.build_url("admin", "nlbw", "change_enable")%>',
+			{ set: enabled },
+			function(x, rv)
+			{
+				
+			}
+		);
+		
+					
+		return false;
+	}
 
 //]]></script>
 
 <form method="post" action="<%=REQUEST_URI%>">
 <div class="cbi-map" id="cbi-modem">
-<h2><a id="content" name="content">Bandwidth Monitor</a></h2>
+<h2><a id="content" name="content"><%:Bandwidth Monitor%></a></h2>
 <div class="cbi-map-descr"> </div>
 <head>
      <style>
@@ -271,7 +324,7 @@ var rollover = 1;
     </style>
 </head>
 <fieldset class="cbi-section" id="cbi-mod">
-	<legend>Total Bandwidth</legend>
+	<legend><%:Total Bandwidth%></legend>
 		
 	<table style="visibility:hidden" width="700" border="0" id="atpass">
 	<tr>
@@ -282,7 +335,7 @@ var rollover = 1;
 	<div id="popup">
 		<table width="500" border="0">
 			<tr>
-				<td width="50px"><div>Enter Password to Unlock Full Terminal</div></td>
+				<td width="50px"><div><%:Enter Password to Unlock Full Terminal%></div></td>
 			</tr>
 			<tr>
 				<td width="200px"><input id="pass" type="password"/></td>
@@ -295,20 +348,37 @@ var rollover = 1;
 	
 	<table border="0" id="totalb">
 		<tr>
-			<td width="343"><div align="right" id="allocatet"><strong>Total Amount of Allocated Bandwidth per Month : </strong></div></td>
+			<td width="343"><div align="right" id="allocatet"><strong><%:Total Amount of Allocated Bandwidth per Month : %></strong></div></td>
 			<td width="112"><div align="center" id="allocate"></div></td>
-			<td width="48"><input type="image" align="center" id="lockbtn" name="lockbtn" src="<%=showicon(1)%>" style="width:48px;height:48px;" onclick="return unlock(this)" /></td>
-			<td width="273"><div align="right" style="visibility:hidden;" id="alloc1"><strong>New Amount of Allocated Bandwidth in Gigabytes : </strong></div></td>
+			<td width="48" ></td>
+			<td width="273"><div align="right" style="visibility:hidden;" id="alloc1"><strong><%:New Amount of Allocated Bandwidth in Gigabytes : %></strong></div></td>
 			<td width="144" ><input type="number" min="1" name="alloc" id="alloc" style="visibility:hidden;" class="cbi-input-text" ></input>
 			</td>
 			<td width="161"><input type="submit" style="visibility:hidden;" id="change" class="cbi-button cbi-button-apply" value="<%:Change Amount%>" onclick="return changealloc()" />
 			</td>
 		</tr>
 		<tr>
-			<td><div align="right"><strong>Total Amount of Bandwidth used this Month : </strong></div></td>
+			<td><div align="right"><strong><%:Total Amount of Bandwidth used this Month : %></strong></div></td>
 			<td><div align="center" id="total"></div></td>
-			<td width="48" ></td>
-			<td width="273" ><div align="right" style="visibility:hidden;" id="rollover1"><strong>Rollover Day : </strong></div></td>
+			<td width="48"><input type="image" align="center" id="lockbtn" name="lockbtn" src="<%=showicon(1)%>" style="width:48px;height:48px;" onclick="return unlock(this)" /></td>
+			<td width="161"><input type="submit" style="visibility:hidden;" id="enable" class="cbi-button cbi-button-apply" value="<%:Bandwidth Allocation%>" onclick="return enablealloc()" />
+			</td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><div align="right"><strong><%:Estimated Bandwidth to be used this Month : %></strong></div></td>
+			<td><div align="center" id="ptotal"></div></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><div align="right"><strong><%:Rollover Day : %></strong></div></td>
+			<td><div align="center" id="rolld"></div></td>
+			<td></td>
+			<td width="273" ><div align="right" style="visibility:hidden;" id="rollover1"><strong><%:Rollover Day : %></strong></div></td>
 			<td width="144" ><select style="visibility:hidden;width:144px" name="rollday" id="rollday" >
 			<option value="1" selected="selected"><%:1st of month%></option>
 			<option value="2"><%:2nd of month%></option>
@@ -341,14 +411,10 @@ var rollover = 1;
 				</select></td>
 			<td width="161" ><input type="submit" style="visibility:hidden;" id="changeroll" class="cbi-button cbi-button-apply" value="<%:Change Rollover Day%>" onclick="return rollchange()"</td>
 		</tr>
-		<tr>
-			<td><div align="right"><strong>Estimated Bandwidth to be used this Month : </strong></div></td>
-			<td><div align="center" id="ptotal"></div></td>
-		</tr>
 	</table>
 	<table border="0" id="nodatab" style="visibility:hidden;">
 		<tr>
-			<td width="343"><div align="left"><strong>No Data Yet</strong></div></td>
+			<td width="343"><div align="left"><strong><%:No Data Yet%></strong></div></td>
 		</tr>
 	</table>
 </fieldset>	
@@ -357,7 +423,7 @@ var rollover = 1;
 	<legend>Report</legend>
 	<table border="0" id="report">
 		<tr>
-			<td width="343" ><div align="right"><strong>Number of Days in Reporting Period : </strong></div></td>
+			<td width="343" ><div align="right"><strong><%:Number of Days in Reporting Period : %></strong></div></td>
 			<td width="112" ><div align="center" id="days"></div></td>
 			<td width="48" ></td>
 			<td width="283" ></td>
@@ -365,17 +431,17 @@ var rollover = 1;
 			<td width="161" ></td>
 		</tr>
 		<tr>
-			<td ><div align="right"><strong>Total Amount of Download Bandwidth : </strong></div></td>
+			<td ><div align="right"><strong><%:Total Amount of Download Bandwidth : %></strong></div></td>
 			<td ><div align="center" id="totaldown"></div></td>
 		</tr>
 		<tr>
-			<td ><div align="right"><strong>Total Amount of Upload Bandwidth : </strong></div></td>
+			<td ><div align="right"><strong><%:Total Amount of Upload Bandwidth : %></strong></div></td>
 			<td ><div align="center" id="totalup"></div></td>
 		</tr>
 	</table>
 	<table border="0" id="nodatar" style="visibility:hidden;">
 		<tr>
-			<td width="343"><div align="left"><strong>No Data Yet</strong></div></td>
+			<td width="343"><div align="left"><strong><%:No Data Yet%></strong></div></td>
 		</tr>
 	</table>
 
@@ -384,12 +450,12 @@ var rollover = 1;
 <fieldset class="cbi-section" id="cbi-mod">
 	<table width="1400" border="1" id="datar1" >
 		<tr>
-			<td width="160px"><div align="center"><strong>IP Address</strong></div></td>
-			<td width="200px"><div align="center"><strong>Name</strong></div></td>
-			<td width="160px"><div align="center"><strong>MAC Address</strong></div></td>
-			<td width="150px"><div align="center"><strong>Bandwidth Down</strong></div></td>
-			<td width="150px"><div align="center"><strong>Bandwidth Up</strong></div></td>
-			<td width="150px"><div align="center"><strong>Bandwidth Total</strong></div></td>
+			<td width="160px"><div align="center"><strong><%:IP Address%></strong></div></td>
+			<td width="200px"><div align="center"><strong><%:Name%></strong></div></td>
+			<td width="160px"><div align="center"><strong><%:MAC Address%></strong></div></td>
+			<td width="150px"><div align="center"><strong><%:Bandwidth Down%></strong></div></td>
+			<td width="150px"><div align="center"><strong><%:Bandwidth Up%></strong></div></td>
+			<td width="150px"><div align="center"><strong><%:Bandwidth Total%></strong></div></td>
 		</tr>
 	</table>
 	<table width="1400" border="0" id="datar" >

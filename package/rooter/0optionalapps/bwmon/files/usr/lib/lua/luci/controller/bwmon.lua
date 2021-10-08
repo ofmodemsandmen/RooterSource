@@ -9,6 +9,7 @@ function index()
 	entry({"admin", "nlbw", "check_bw"}, call("action_check_bw"))
 	entry({"admin", "nlbw", "change_bw"}, call("action_change_bw"))
 	entry({"admin", "nlbw", "change_roll"}, call("action_change_roll"))
+	entry({"admin", "nlbw", "change_enable"}, call("action_change_enable"))
 end
 
 function action_check_bw()
@@ -52,6 +53,7 @@ function action_check_bw()
 		rv['lock'] = 0
 		rv['rollover'] = luci.model.uci.cursor():get("custom", "bwallocate", "rollover")
 	end
+	rv['enabled'] = luci.model.uci.cursor():get("custom", "bwallocate", "enabled")
 	
 	luci.http.prepare_content("application/json")
 	luci.http.write_json(rv)
@@ -66,5 +68,11 @@ end
 function action_change_roll()
 	local set = luci.http.formvalue("set")
 	os.execute("/usr/lib/bwmon/rollover.sh " .. set)
+	
+end
+
+function action_change_enable()
+	local set = luci.http.formvalue("set")
+	os.execute("uci set custom.bwallocate.enabled=" .. set .. "; uci commit custom")
 	
 end

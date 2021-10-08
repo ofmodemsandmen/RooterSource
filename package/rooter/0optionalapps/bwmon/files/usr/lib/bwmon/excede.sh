@@ -5,12 +5,21 @@ log() {
 }
 
 if [ -e /etc/bwlock ]; then
-	allocate=$2
-	total=$1
-	/usr/lib/bwmon/block 0
-	if [ $total -gt $allocate ]; then
-		/usr/lib/bwmon/block 1
-	else
+	enb=$(uci -q get custom.bwallocate.enabled)
+	if [ $enb = '1' ]; then
+		allocate=$2
+		total=$1
 		/usr/lib/bwmon/block 0
+		if [ $total -gt $allocate ]; then
+			if [ -e /etc/nodogsplash/control ]; then
+				/etc/nodogsplash/control block
+			fi
+			/usr/lib/bwmon/block 1
+		else
+			if [ -e /etc/nodogsplash/control ]; then
+				/etc/nodogsplash/control unblock
+			fi
+			/usr/lib/bwmon/block 0
+		fi
 	fi
 fi

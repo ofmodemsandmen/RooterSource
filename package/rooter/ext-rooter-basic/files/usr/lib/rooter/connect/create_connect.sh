@@ -283,6 +283,8 @@ chkraw() {
 		RAW=1
 	elif [ $idV = 413c -a $idP = 81d7 ]; then
 		RAW=1
+	elif [ $idV = 2dee -a $idP = 4d22 ]; then
+		RAW=1
 	fi
 }
 
@@ -497,6 +499,19 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 		devpath="$(readlink -f /sys/class/usbmisc/$devname/device/)"
 		ifname="$( ls "$devpath"/net )"
 		chkraw
+		uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null & sleep 10 ; 
+		if [ $RAW -eq 1 ]; then
+			DATAFORM='"raw-ip"'
+		else
+			if [ $idV = 1199 -a $idP = 9055 ]; then
+				$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
+				DATAFORM="802.3"
+				uqmi -s -d "$device" --set-data-format 802.3
+				uqmi -s -d "$device" --wda-set-data-format 802.3
+			else
+				DATAFORM=$(uqmi -s -d "$device" --wda-get-data-format)
+			fi
+		fi
 		;;
 	"3"|"30" )
 		log "Start MBIM Connection"
@@ -691,7 +706,7 @@ if $QUECTEL; then
 	log "Quectel Unsolicited Responses Disabled"
 	if [ -e /etc/interwave ]; then
 		ATCMDD="AT+CGMM"
-		MODEL=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		model=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		EM160=$(echo $model | grep "EM160")
 		if [ $idV != "0800" ]; then
 			if [ $EM160 ]; then
@@ -703,6 +718,29 @@ if $QUECTEL; then
 		else
 			ATC="AT+QNWPREFCFG=\"mode_pref\",LTE:NR5G"
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
+		ATCMDD="AT+QCFG=\"usbnet\""
+		mode=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		mode=$(echo $mode" " | tr " " ",")
+		mode=$(echo $mode | cut -d, -f4)
+		if [ $mode -ne 2 ]; then
+			ATCMDD="AT+QCFG=\"usbnet\",2"
+			mode=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			ATCMDD="AT+CFUN=1,1"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			log "Hard modem reset done on /dev/ttyUSB$CPORT to reload drivers"
+			ifdown wan$CURRMODEM
+			uci delete network.wan$CURRMODEM
+			uci set network.wan$CURRMODEM=interface
+			uci set network.wan$CURRMODEM.proto=dhcp
+			uci set network.wan$CURRMODEM.ifname="wan"$CURRMODEM
+			uci set network.wan$CURRMODEM.metric=$CURRMODEM"0"
+			uci commit network
+			/etc/init.d/network reload
+			ifdown wan$CURRMODEM
+			echo "1" > /tmp/modgone
+			log "Setting Modem Removal flag (1)"
+			exit 0
 		fi
 	fi
 	$ROOTER/connect/bandmask $CURRMODEM 1

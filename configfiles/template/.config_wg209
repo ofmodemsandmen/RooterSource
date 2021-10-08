@@ -109,15 +109,15 @@ CONFIG_TARGET_ramips_mt7621=y
 # CONFIG_TARGET_ramips_mt7621_DEVICE_zbt-we1326v5 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_zbtlink_zbt-we3526 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_zbt-wg1602-16M is not set
-CONFIG_TARGET_ramips_mt7621_DEVICE_zbt-wg209-16M=y
+# CONFIG_TARGET_ramips_mt7621_DEVICE_zbt-wg209-16M is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_zbt-wg2626 is not set
-# CONFIG_TARGET_ramips_mt7621_DEVICE_zbt-wg3526-16M is not set
+CONFIG_TARGET_ramips_mt7621_DEVICE_zbt-wg3526-16M=y
 # CONFIG_TARGET_ramips_mt7621_DEVICE_zbt-wg3526-32M is not set
 CONFIG_HAS_SUBTARGETS=y
 CONFIG_HAS_DEVICES=y
 CONFIG_TARGET_BOARD="ramips"
 CONFIG_TARGET_SUBTARGET="mt7621"
-CONFIG_TARGET_PROFILE="DEVICE_zbt-wg209-16M"
+CONFIG_TARGET_PROFILE="DEVICE_zbt-wg3526-16M"
 CONFIG_TARGET_ARCH_PACKAGES="mipsel_24kc"
 CONFIG_DEFAULT_TARGET_OPTIMIZATION="-Os -pipe -mno-branch-likely -mips32r2 -mtune=24kc"
 CONFIG_CPU_TYPE="24kc"
@@ -2316,6 +2316,7 @@ CONFIG_PACKAGE_kmod-usb3=y
 #
 # Wireless Drivers
 #
+# CONFIG_PACKAGE_kmod-8192eu is not set
 # CONFIG_PACKAGE_kmod-acx-mac80211 is not set
 # CONFIG_PACKAGE_kmod-adm8211 is not set
 # CONFIG_PACKAGE_kmod-ath is not set
@@ -3974,6 +3975,7 @@ CONFIG_PACKAGE_liblucihttp-lua=y
 # CONFIG_PACKAGE_libmcrypt is not set
 # CONFIG_PACKAGE_libmicrohttpd-no-ssl is not set
 # CONFIG_PACKAGE_libmicrohttpd-ssl is not set
+# CONFIG_PACKAGE_libmicroxml is not set
 # CONFIG_PACKAGE_libmilter-sendmail is not set
 # CONFIG_PACKAGE_libminiupnpc is not set
 # CONFIG_PACKAGE_libmms is not set
@@ -5487,6 +5489,7 @@ CONFIG_PACKAGE_wpad-basic=y
 # Optional Applications
 #
 # CONFIG_PACKAGE_bwmon is not set
+# CONFIG_PACKAGE_easycwmp is not set
 # CONFIG_PACKAGE_ext-mosquitto is not set
 # CONFIG_PACKAGE_ext-speedtest is not set
 # CONFIG_PACKAGE_ext-wireguard is not set
@@ -5544,11 +5547,17 @@ CONFIG_PACKAGE_wpad-basic=y
 # Wifi
 #
 # CONFIG_PACKAGE_extra-wifi is not set
+# CONFIG_PACKAGE_ext-arc is not set
+# CONFIG_PACKAGE_ext-arc16 is not set
+# CONFIG_PACKAGE_ext-ltefix is not set
+# CONFIG_PACKAGE_ext-ltefix16 is not set
 # CONFIG_PACKAGE_ext-rooter-lite is not set
 # CONFIG_PACKAGE_ext-rooter16 is not set
 # CONFIG_PACKAGE_ext-rooter4 is not set
 # CONFIG_PACKAGE_ext-rooter8-vpn is not set
 # CONFIG_PACKAGE_ext-rooterbcm16 is not set
+# CONFIG_PACKAGE_ext-viper is not set
+# CONFIG_PACKAGE_ext-viper16 is not set
 
 #
 # Sound

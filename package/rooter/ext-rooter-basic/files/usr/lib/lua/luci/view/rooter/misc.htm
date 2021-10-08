@@ -1440,7 +1440,7 @@ end
 	</table>
 </fieldset>
 <fieldset class="cbi-section" id="cbi-condis">
-	<legend>Connection/Disconnection</legend>
+	<legend><%:Connection/Disconnection%></legend>
 	<table width="550"  border="0">
   	<tr>
 		<td width="25%">
@@ -1461,7 +1461,7 @@ end
 
 <% if nosms == 0 then %>
 <fieldset class="cbi-section" id="cbi-term">
-	<legend>AT-Command Terminal</legend>
+	<legend><%:AT-Command Terminal%></legend>
 	
 	<div id="popup">
 		<table width="500" border="0">
@@ -1530,7 +1530,7 @@ end
 
 <% if block == 0 then %>
 <fieldset class="cbi-section" id="cbi-mode-cb">
-	<legend>Cellular Bands</legend>
+	<legend><%:Cellular Bands%></legend>
 	<table width="500" border="0" id ="tab10">
 		<tr>
 			<td width="50%"><div align="left" id="mdl" style="font-size : 15px; width: 100%; height: 25px;"></div></td>
@@ -1540,7 +1540,7 @@ end
 	
 	<table width="500" border="0" id ="tab13">
 		<tr>
-			<td width="25%">No Modem or Band Locking not implemented for this modem.</td>
+			<td width="25%"><%:No Modem or Band Locking not implemented for this modem.%></td>
 			<td width="75%">&nbsp;</td>
 		</tr>
 	</table>
@@ -1548,7 +1548,7 @@ end
 	<table width="500" border="0" id="tab4g">
 		<tr>
 			<td width="8%">&nbsp;</td>
-			<td width="25%"><div align="left" style="font-size : 15px; width: 100%; height: 25px;"><strong>LTE Bands</strong></div></td>
+			<td width="25%"><div align="left" style="font-size : 15px; width: 100%; height: 25px;"><strong><%:LTE Bands%></strong></div></td>
 			<td width="20%">&nbsp;</td>
 		</tr>
 	</table>
@@ -1561,7 +1561,7 @@ end
 	<table width="500" border="0" id="tab5g">
 		<tr>
 			<td width="8%">&nbsp;</td>
-			<td width="25%"><div align="left" id="5gbnd" style="font-size : 15px; width: 100%; height: 25px;"><strong>5G Bands</strong></div></td>
+			<td width="25%"><div align="left" id="5gbnd" style="font-size : 15px; width: 100%; height: 25px;"><strong><%:5G Bands%></strong></div></td>
 			<td width="20%">&nbsp;</td>
 		</tr>
 	</table>
@@ -1594,7 +1594,7 @@ end
 	
 	<table width="800"  border="0" id="tab8">
   	<tr>
-    	<td width="20%"><div align="left"><strong>2 x Carrier Aggregation</strong></div></td>
+    	<td width="20%"><div align="left"><strong><%:2 x Carrier Aggregation%></strong></div></td>
 	</tr>
 	</table>
 	
@@ -1605,7 +1605,7 @@ end
 	
 	<table width="800"  border="0" id="tab9">
   	<tr>
-    	<td width="20%"><div align="left"><strong>3 x Carrier Aggregation</strong></div></td>
+    	<td width="20%"><div align="left"><strong><%:3 x Carrier Aggregation%></strong></div></td>
 	</tr>
 	</table>
 	
@@ -1625,7 +1625,7 @@ end
 	<tr>
 		<td width="8%"><input type="submit" id="sendbnd" class="cbi-button cbi-button-apply" value="<%:Scan%>" onclick="return scanbnd()" /></td>
 		<td width="4%">&nbsp;</td>
-		<td width="20%"><div align="left"><strong>Scan to Find Bands Available in Area</strong></div></td>
+		<td width="20%"><div align="left"><strong><%:Scan to Find Bands Available in Area%></strong></div></td>
 		<td width="68%">&nbsp;</td>
 		</tr>
 	</table>
@@ -1641,15 +1641,15 @@ end
 <% end %>
 	
 <fieldset class="cbi-section" id="cbi-mode">
-	<legend>Cellular Mode</legend>
+	<legend><%:Cellular Mode%></legend>
 	<table width="550"  border="0">
   	<tr>
-    		<td width="30%"><div align="right">Current Cellular Mode :</div></td>
+    		<td width="30%"><div align="right"><%:Current Cellular Mode :%></div></td>
     		<td width="20%"><ul><span id="netmode" class="r"></span></ul></td>
     		<td width="50%">&nbsp;</td>
   	</tr>
 	<tr>
-    		<td><div align="right">Change Cellular Mode :</div></td>
+    		<td><div align="right"><%:Change Cellular Mode :%></div></td>
     		<td>
 		<select style="visibility:hidden;width:auto" name="net_mode" id="net1">
 			<option value="1" selected="selected"><%:Automatic%></option>

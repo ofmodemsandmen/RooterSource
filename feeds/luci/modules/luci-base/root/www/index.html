@@ -1,57 +1,11 @@
-<!doctype html>
-<html lang="en">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta charset="utf-8">
-<script>
-
-var file		= "0";
-var url_checkImg= 'splash_files/check.gif';
-var url_fullImg= 'splash_files/full.gif';
-var url_splash	= 'splash.html';
-var url_splashfull	= 'splashfull.html';
-var url_luci	= 'cgi-bin/luci';
-
-function checkImageExists(imageUrl, callBack) {
-	var imageData = new Image();
-	imageData.onload = function() {
-		callBack(true);
-	};
-	imageData.onerror = function() {
-		callBack(false);
-	};
-	imageData.src = imageUrl;
-}
-function jump() {
-	if (file == '0'){
-		window.location.href = url_luci;		
-	}
-	else{
-		if (file == '2'){
-				window.location.href = url_splashfull;
-		}
-		else {
-			window.location.href = url_splash;
-		}
-	}
- }
- 
-checkImageExists(url_checkImg, function(existsImage) {
-	if(existsImage == true) {
-		file = "1";
-	}
-	else {
-		file = "0";
-	}
-});
-
-checkImageExists(url_fullImg, function(existsImage) {
-	if(existsImage == true) {
-		file = "2";
-	}
-});
-
-</script>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="refresh" content="0; URL=cgi-bin/luci/" />
 </head>
-<body onload="jump();" style="background-color: black"></body>
+<body style="background-color: white">
+<a style="color: black; font-family: arial, helvetica, sans-serif;" href="cgi-bin/luci/">LuCI - Lua Configuration Interface</a>
 </body>
 </html>

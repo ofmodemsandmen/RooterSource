@@ -154,7 +154,7 @@ if [ $SP -gt 0 ]; then
 	if [ $SP = 5 ]; then
 		if [ -e /etc/interwave ]; then
 			ATCMDD="AT+CGMM"
-			MODEL=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			model=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			EM160=$(echo $model | grep "EM160")
 			idV=$(uci get modem.modem$CURRMODEM.idV)
 			if [ $idV != "0800" ]; then

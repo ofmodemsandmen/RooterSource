@@ -46,7 +46,6 @@ CONFIG_TARGET_brcm2708=y
 # CONFIG_TARGET_brcm2708_bcm2709 is not set
 CONFIG_TARGET_brcm2708_bcm2710=y
 # CONFIG_TARGET_MULTI_PROFILE is not set
-# CONFIG_TARGET_brcm2708_bcm2709_DEVICE_rpi-2 is not set
 CONFIG_TARGET_brcm2708_bcm2710_DEVICE_rpi-3=y
 CONFIG_HAS_SUBTARGETS=y
 CONFIG_HAS_DEVICES=y
@@ -2237,6 +2236,7 @@ CONFIG_PACKAGE_kmod-usb-hid=y
 #
 # Wireless Drivers
 #
+# CONFIG_PACKAGE_kmod-8192eu is not set
 # CONFIG_PACKAGE_kmod-ath is not set
 # CONFIG_PACKAGE_kmod-ath6kl-sdio is not set
 # CONFIG_PACKAGE_kmod-ath6kl-usb is not set
@@ -4088,6 +4088,7 @@ CONFIG_PACKAGE_liblucihttp-lua=y
 # CONFIG_PACKAGE_libmcrypt is not set
 # CONFIG_PACKAGE_libmicrohttpd-no-ssl is not set
 # CONFIG_PACKAGE_libmicrohttpd-ssl is not set
+# CONFIG_PACKAGE_libmicroxml is not set
 # CONFIG_PACKAGE_libmilter-sendmail is not set
 # CONFIG_PACKAGE_libminiupnpc is not set
 # CONFIG_PACKAGE_libmms is not set
@@ -5601,6 +5602,7 @@ CONFIG_PACKAGE_wpad-basic=y
 # Optional Applications
 #
 # CONFIG_PACKAGE_bwmon is not set
+# CONFIG_PACKAGE_easycwmp is not set
 # CONFIG_PACKAGE_ext-mosquitto is not set
 # CONFIG_PACKAGE_ext-speedtest is not set
 # CONFIG_PACKAGE_ext-wireguard is not set
@@ -5657,11 +5659,17 @@ CONFIG_PACKAGE_fscheck=y
 #
 # Wifi
 #
+# CONFIG_PACKAGE_ext-arc is not set
+# CONFIG_PACKAGE_ext-arc16 is not set
+# CONFIG_PACKAGE_ext-ltefix is not set
+# CONFIG_PACKAGE_ext-ltefix16 is not set
 # CONFIG_PACKAGE_ext-rooter-lite is not set
 # CONFIG_PACKAGE_ext-rooter16 is not set
 # CONFIG_PACKAGE_ext-rooter4 is not set
 # CONFIG_PACKAGE_ext-rooter8-vpn is not set
 # CONFIG_PACKAGE_ext-rooterbcm16 is not set
+# CONFIG_PACKAGE_ext-viper is not set
+# CONFIG_PACKAGE_ext-viper16 is not set
 
 #
 # Sound

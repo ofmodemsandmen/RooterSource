@@ -19,7 +19,7 @@
 		"config": ".config_mw4530",
 		"image1": "openwrt-ar71xx-generic-mw4530r-v1-squashfs-factory.bin",
 		"image2": "openwrt-ar71xx-generic-mw4530r-v1-squashfs-sysupgrade.bin",
-		"imagepath": "/ar71xx/generic/",
+			"imagepath": "/ar71xx/generic/",
 		"mod": "Mercury-MW4530R",
 		"ext1": "-upgrade.bin",
 		"ext2": "-factory.bin",
@@ -34,7 +34,7 @@
 		"image1": "openwrt-ramips-mt7620-wt3020-8M-squashfs-sysupgrade.bin",
 		"image2": "openwrt-ramips-mt7620-wt3020-8M-squashfs-factory.bin",
 		"imagepath": "/ramips/mt7620/",
-		"mod": "Nexx-WT3020",
+		"mod": "Nexx-WT3020-8",
 		"ext1": "-upgrade.bin",
 		"ext2": "-factory.bin",
 		"addons": ["readme.pdf", "factory.txt"]
@@ -1259,6 +1259,17 @@
 		"ext": "-upgrade.bin",
 		"addons": ["readme.pdf", "readmerecovery.txt"]
 	},
+	"WE826T32": {
+		"details": "ZBT WE826-T 32meg",
+		"type": "1",
+		"build": "1907",
+		"config": ".config_we826t32",
+		"image": "openwrt-ramips-mt7620-zbt-we826-32M-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7620/",
+		"mod": "ZBT-WE826T-32meg",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf", "readmerecovery.txt"]
+	},
 	"WE826WD": {
 		"details": "ZBT WE826-WD",
 		"type": "1",
@@ -1423,6 +1434,55 @@
 		"mod": "Linksys-EA8300",
 		"ext1": "-factory.bin",
 		"ext2": "-upgrade.bin",
+		"addons": ["readme.pdf", "factory.txt"]
+	},
+	"RB912": {
+		"details": "Mikrotik RB912UAG-2HPnD",
+		"type": "2",
+		"build": "1907",
+		"flash": "8",
+		"config": ".config_rb912",
+		"image1": "openwrt-ar71xx-mikrotik-vmlinux-initramfs.elf",
+		"image2": "openwrt-ar71xx-mikrotik-nand-large-ac-squashfs-sysupgrade.bin",
+		"imagepath": "/ar71xx/mikrotik/",
+		"mod": "Mikrotik-RB912UAG-2HPnD",
+		"ext1": "-upgrade.bin",
+		"ext2": "-initramfs.elf",
+		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.pdf"]
+	},
+	"XMIFI": {
+		"details": "Xiaomi Mifi Mini",
+		"type": "1",
+		"build": "1907",
+		"config": ".config_xmifi",
+		"image": "openwrt-ramips-mt7620-miwifi-mini-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7620/",
+		"mod": "Xiaomi-Mifi-Mini",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf", "xiaomi.txt"]
+	},
+	"WG3526": {
+		"details": "ZBT WG3526",
+		"type": "1",
+		"build": "1907",
+		"config": ".config_wg3526",
+		"image": "openwrt-ramips-mt7621-zbt-wg3526-16M-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "ZBT-WG3526",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf", "readmerecovery.txt"]
+	},
+	"WT3020-16": {
+		"details": "Nexx WT3020-16",
+		"type": "2",
+		"build": "1907",
+		"config": ".config_wt3020-16",
+		"image1": "openwrt-ramips-mt7620-wt3020-16M-squashfs-sysupgrade.bin",
+		"image2": "openwrt-ramips-mt7620-wt3020-16M-squashfs-factory.bin",
+		"imagepath": "/ramips/mt7620/",
+		"mod": "Nexx-WT3020-16",
+		"ext1": "-upgrade.bin",
+		"ext2": "-factory.bin",
 		"addons": ["readme.pdf", "factory.txt"]
 	}
 }

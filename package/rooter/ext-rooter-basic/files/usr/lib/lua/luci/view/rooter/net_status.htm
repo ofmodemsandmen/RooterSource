@@ -230,8 +230,8 @@ end
 	function applyc(btn)
 	{
 		nmode=document.getElementById("rate1").value;
-		document.getElementById('crate').innerHTML = "Changing Rate ...";
-		document.getElementById('apply1').value="Applying Change";
+		document.getElementById('crate').innerHTML = '<%:Changing Rate ...%>';
+		document.getElementById('apply1').value='<%:Applying Change%>';
 		document.getElementById('apply1').disabled=true;
 
 		var mt=Number(nmode);
@@ -240,7 +240,7 @@ end
 			function()
 			{
 				document.getElementById('apply1').disabled=false;
-				document.getElementById('apply1').value="Apply Rate Change";
+				document.getElementById('apply1').value='<%:Apply Rate Change%>';
 			}
 		);
 	}
@@ -269,14 +269,14 @@ end
 
 <form method="post" action="<%=REQUEST_URI%>">
 <div class="cbi-map" id="cbi-modem">
-<h2><a id="content" name="content">Signal/Cell Information</a></h2>
+<h2><a id="content" name="content"><%:Signal/Cell Information%></a></h2>
 <div class="cbi-map-descr">Current Connection</div>
 
 <fieldset class="cbi-section" id="cbi-mod">
-	<legend>General Information</legend>
+	<legend><%:General Information%></legend>
 	<table width="550"  border="0">
   	<tr>
-    		<td width="30%"><div align="right">Modem :</div></td>
+    		<td width="30%"><div align="right"><%:Modem :%></div></td>
     		<td width="30%"><ul id="modem"></ul></td>
     		<td width="17%"><strong id="conntype"></strong></td>
 		<td width="12%">
@@ -287,19 +287,19 @@ end
 		</td>
   	</tr>
   	<tr>
-    		<td><div align="right">Modem ID : </div></td>
+    		<td><div align="right"><%:Modem ID : %></div></td>
     		<td><ul id="idvp"></ul></td>
     		<td>&nbsp;</td>
 		<td>&nbsp;</td>
   	</tr>
 	<tr>
-    		<td><div align="right">Provider : </div></td>
+    		<td><div align="right"><%:Provider : %></div></td>
     		<td><ul id="cops"></ul></td>
     		<td>&nbsp;</td>
 		<td>&nbsp;</td>
   	</tr>
   	<tr>
-    		<td><div align="right">Comm Port :</div></td>
+    		<td><div align="right"><%:Comm Port :%></div></td>
     		<td><ul id="port"></ul></td>
     		<td>
 			<input type="button" id="dec1" class="cbi-button cbi-button-apply" value="<%:Decrease%>" onclick="return decrease(this)" />
@@ -309,13 +309,13 @@ end
 		</td>
   	</tr>
 	<tr>
-    		<td><div align="right">Temperature : </div></td>
+    		<td><div align="right"><%:Temperature : %></div></td>
     		<td><ul id="tempur"></ul></td>
     		<td>&nbsp;</td>
 		<td>&nbsp;</td>
   	</tr>
 	<tr>
-    		<td><div align="right">Protocol : </div></td>
+    		<td><div align="right"><%:Protocol : %></div></td>
     		<td><ul id="proto"></ul></td>
     		<td>&nbsp;</td>
 		<td>&nbsp;</td>
@@ -325,7 +325,7 @@ end
 
 <% if nosms == 0 then %>
 <fieldset class="cbi-section" id="cbi-msinfo">
-	<legend>Modem/SIM Information</legend>
+	<legend><%:Modem/SIM Information%></legend>
 	<table width="550"  border="0">
 	<tr>
     		<td width="30%"><div align="right"></div></td>
@@ -337,23 +337,23 @@ end
 		<td width="11%">&nbsp;</td>
   	</tr>
 	<tr>
-    		<td><div align="right">Modem IMEI : </div></td>
+    		<td><div align="right"><%:Modem IMEI : %></div></td>
     		<td><ul id="imei"></ul></td>
 		<td>&nbsp;</td>
 		<td>&nbsp;</td>
   	</tr>
 	<tr>
-    		<td><div align="right">SIM IMSI : </div></td>
+    		<td><div align="right"><%:SIM IMSI : %></div></td>
     		<td><ul id="imsi"></ul></td>
 	</tr>
 	<tr>
-     		<td><div align="right">SIM ICCID : </div></td>
+     		<td><div align="right"><%:SIM ICCID : %></div></td>
 		<td><ul id="iccid"></ul></td>
   	</tr>
 	</table>
 	<table width="550"  border="0">
 	<tr>
-    		<td width="30%"><div align="right">SIM Phone Number : </div></td>
+    		<td width="30%"><div align="right"><%:SIM Phone Number : %></div></td>
     		<td width="30%"><input name="phone" id="phone" style="width: 250px;"></input></td>
 		<td width="17%">
 			<input type="button" id="pho" class="cbi-button cbi-button-apply" value="<%:Apply Change%>" onclick="return updaten(this)" />
@@ -362,7 +362,7 @@ end
 		<td width="11%">&nbsp;</td>
   	</tr>
 	<tr>
-     		<td><div align="right">SIM Name : </div></td>
+     		<td><div align="right"><%:SIM Name : %></div></td>
 		<td><input name="phonen" id="phonen" style="width: 250px;"></input></td>
   	</tr>
 	</table>
@@ -370,45 +370,45 @@ end
 <% end %>
 
 <fieldset class="cbi-section" id="cbi-sig">
-	<legend>Signal Information</legend>
+	<legend><%:Signal Information%></legend>
 	<table width="550"  border="0">
   	<tr>
-    		<td width="30%"><div align="right">Network :</div></td>
+    		<td width="30%"><div align="right"><%:Network :%></div></td>
     		<td width="69%"><ul id="mode"></ul></td>
     		<td width="1%">&nbsp;</td>
   	</tr>
 	<tr>
-    		<td><div align="right">CSQ : </div></td>
+    		<td><div align="right"><%:CSQ : %></div></td>
     		<td><ul id="csq"></ul></td>
     		<td>&nbsp;</td>
   	</tr>
   	<tr>
-    		<td><div align="right">Signal Strength : </div></td>
+    		<td><div align="right"><%:Signal Strength : %></div></td>
     		<td><ul id="per"></ul></td>
     		<td>&nbsp;</td>
   	</tr>
   	<tr>
-    		<td><div align="right">RSSI : </div></td>
+    		<td><div align="right"><%:RSSI : %></div></td>
     		<td><ul id="rssi"></ul></td>
     		<td>&nbsp;</td>
   	</tr>
   	<tr>
-    		<td><div align="right">ECIO<g>3G</g>/RSRQ<g>4G</g>/SS_RSRQ<g>5G</g> : </div></td>
+    		<td><div align="right"><%:ECIO%><g><%:3G%></g><%:/RSRQ%><g><%:4G%></g><%:/SS_RSRQ%><g><%:5G%></g> : </div></td>
     		<td><ul><span id="ecio" class="r"></span><span id="ecio1" class="r"></span></ul></td>
     		<td>&nbsp;</td>
   	</tr>
   	<tr>
-    		<td><div align="right">RSCP<g>3G</g>/RSRP<g>4G</g>/SS_RSRP<g>5G</g> : </div></td>
+    		<td><div align="right"><%:RSCP%><g><%:3G%></g><%:/RSRP%><g><%:4G%></g><%:/SS_RSRP%><g><%:5G%></g> : </div></td>
     		<td><ul><span id="rscp" class="r"></span><span id="rscp1" class="r"></span></ul></td>
     		<td>&nbsp;</td>
   	</tr>
 	<tr>
-    		<td><div align="right">SINR : </div></td>
+    		<td><div align="right"><%:SINR : %></div></td>
     		<td><ul id="sinr"></ul></td>
     		<td>&nbsp;</td>
   	</tr>
 	<tr>
-    		<td><div align="right">Connection Monitoring Status : </div></td>
+    		<td><div align="right"><%:Connection Monitoring Status : %></div></td>
     		<td><ul id="conmon"></ul></td>
     		<td>&nbsp;</td>
   	</tr>
@@ -416,45 +416,45 @@ end
 </fieldset>
 
 <fieldset class="cbi-section" id="cbi-cell">
-	<legend>Cell Information</legend>
+	<legend><%:Cell Information%></legend>
 	<table width="550"  border="0">
   	<tr>
-    		<td width="30%"><div align="right">MCC MNC :</div></td>
+    		<td width="30%"><div align="right"><%:MCC MNC :%></div></td>
     		<td width="69%"><ul><span id="mcc" class="r"></span><span id="mnc" class="r"></span></ul></td>
     		<td width="1%">&nbsp;</td>
   	</tr>
   	<tr>
-    		<td><div align="right">RNC<g>3G</g>/eNB ID<g>4G/5G</g> :</div></td>
+    		<td><div align="right"><%:RNC%><g><%:3G%></g><%:/eNB ID%><g><%:4G/5G%></g> :</div></td>
     		<td><ul><span id="rnc" class="r"></span><span id="rncn" class="r"></span></ul></td>
     		<td>&nbsp;</td>
   	</tr>
   	<tr>
-    		<td><div align="right">LAC<g>3G</g>/TAC<g>4G/5G</g> :</div></td>
+    		<td><div align="right"><%:LAC%><g><%:3G%></g><%:/TAC%><g><%:4G/5G%></g> :</div></td>
     		<td><ul><span id="lac" class="r"></span><span id="lacn" class="r"></span></ul></td>
     		<td>&nbsp;</td>
   	</tr>
   	<tr>
-    		<td><div align="right">Cell ID : </div></td>
+    		<td><div align="right"><%:Cell ID : %></div></td>
     		<td><ul><span id="cid" class="r"></span><span id="cidn" class="r"></span></ul></td>
     		<td>&nbsp;</td>
   	</tr>
 	<tr>
-    		<td><div align="right">Band : </div></td>
+    		<td><div align="right"><%:Band : %></div></td>
     		<td><ul id="lband"></ul></td>
     		<td>&nbsp;</td>
   	</tr>
   	<tr>
-    		<td><div align="right">Channel : </div></td>
+    		<td><div align="right"><%:Channel : %></div></td>
     		<td><ul id="chan"></ul></td>
     		<td>&nbsp;</td>
   	</tr>
 	<tr>
-    		<td><div align="right">PCI : </div></td>
+    		<td><div align="right"><%:PCI : %></div></td>
     		<td><ul id="pci"></ul></td>
     		<td>&nbsp;</td>
   	</tr>
   	<tr>
-    		<td><div align="right">Maximum Qos : </div></td>
+    		<td><div align="right"><%:Maximum Qos : %></div></td>
     		<td><ul><span id="down" class="r"></span><span id="up" class="r"></span></ul></td>
     		<td>&nbsp;</td>
   	</tr>
@@ -462,15 +462,15 @@ end
 </fieldset>
 
 <fieldset class="cbi-section" id="cbi-mode">
-	<legend>Refresh Rate</legend>
+	<legend><%:Refresh Rate%></legend>
 	<table width="550"  border="0">
   	<tr>
-    		<td width="30%"><div align="right">Current Refresh Rate :</div></td>
+    		<td width="30%"><div align="right"><%:Current Refresh Rate :%></div></td>
     		<td width="20%"><ul><span id="crate" class="r"></span></ul></td>
     		<td width="50%">&nbsp;</td>
   	</tr>
 	<tr>
-    		<td><div align="right">Change Refresh Rate :</div></td>
+    		<td><div align="right"><%:Change Refresh Rate :%></div></td>
     		<td>
 		<select name="nrate" id="rate1" style="width:100px;">
 			<option value="1" selected="selected"><%:Fast    %></option>

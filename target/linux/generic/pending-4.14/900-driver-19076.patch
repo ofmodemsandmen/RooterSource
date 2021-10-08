@@ -8,7 +8,7 @@
  	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0620)},	/* Quectel EM160R-GL */
  	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0800)},	/* Quectel RM500Q-GL */
  
-@@ -1031,6 +1032,13 @@
+@@ -1031,6 +1032,14 @@
  	{QMI_FIXED_INTF(0x05c6, 0x9021, 1)},
  	{QMI_FIXED_INTF(0x05c6, 0x9022, 2)},
  	{QMI_QUIRK_SET_DTR(0x05c6, 0x9025, 4)},	/* Alcatel-sbell ASB TL131 TDD LTE (China Mobile) */
@@ -19,6 +19,7 @@
 +	{QMI_FIXED_INTF(0x19d2, 0x1432, 3)},	/* ME3620-Z*/
 +	{QMI_FIXED_INTF(0x05c6, 0x90db, 2)},
 +	{QMI_QUIRK_SET_DTR(0x1199, 0x90b1, 8)}, /* Sierra Wireless EM7511 */
++	{QMI_FIXED_INTF(0x2dee, 0x4d22, 5)},
  	{QMI_FIXED_INTF(0x05c6, 0x9026, 3)},
  	{QMI_FIXED_INTF(0x05c6, 0x902e, 5)},
  	{QMI_FIXED_INTF(0x05c6, 0x9031, 5)},
@@ -98,7 +99,7 @@
  
  	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_6001) },
  	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_CMU_300) },
-@@ -2055,6 +2072,24 @@
+@@ -2055,6 +2072,26 @@
  	  .driver_info = RSVD(0) | RSVD(1) | RSVD(6) },
  	{ USB_DEVICE(0x0489, 0xe0b5),						/* Foxconn T77W968 ESIM */
  	  .driver_info = RSVD(0) | RSVD(1) | RSVD(6) },
@@ -120,6 +121,8 @@
 +	  .driver_info = RSVD(0) | RSVD(1) | RSVD(6) },
 +	{ USB_DEVICE_INTERFACE_CLASS(0x2cb7, 0x0001, 0xff),			/* Fibocom L716 series */
 +	  .driver_info = RSVD(6) },
++	{ USB_DEVICE_INTERFACE_CLASS(0x2dee, 0x4d22, 0xff),
++	 .driver_info = RSVD(4) | RSVD(5) },
  	{ USB_DEVICE(0x1508, 0x1001),						/* Fibocom NL668 (IOT version) */
  	  .driver_info = RSVD(4) | RSVD(5) | RSVD(6) },
  	{ USB_DEVICE(0x2cb7, 0x0104),						/* Fibocom NL678 series */
