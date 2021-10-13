@@ -16,6 +16,7 @@ if [ -e $ROOTER/simlock.sh ]; then
 fi
 
 sierrabandmask() {
+	enb=$(uci -q get custom.bandlock.enabled)
 	ATCMDD='AT!ENTERCND="A710";!BAND?'
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	if [ -e /etc/fake ]; then
@@ -38,7 +39,7 @@ Unknown band mask. Use AT!BAND to set band.
 		OX=' AT!ENTERCND="A710";!BAND?
 Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band Mask    L Band Mask 2    L Band Mask 3    L Band Mask 4 00, All bands                     100600000EC00000 000000000000000A 0000000000000000 0000000000000002 0000000000000000 0000000000000000 OK'
 	fi
-	if [ -e /etc/bandlock ]; then
+	if [ $enb == "1" ]; then
 		log " "
 		log "Sierra Response : $OX"
 		log " "
@@ -48,7 +49,7 @@ Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band M
 	Unk=$(echo $line | grep "Unknown")
 	if [ "$Unk" ]; then
 		BND=$(echo $line | cut -d, -f6 | tr " " ",")
-		if [ -e /etc/bandlock ]; then
+		if [ $enb == "1" ]; then
 			log "Unknw : $BND"
 		fi
 		L1=$(echo $BND | cut -d, -f11)
@@ -58,7 +59,7 @@ Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band M
 		all=$(echo $line | grep "L Band Mask 2")
 		if [ "$all" ]; then
 			BND=$(echo $line | cut -d, -f4 | tr " " ",")
-			if [ -e /etc/bandlock ]; then
+			if [ $enb == "1" ]; then
 				log "EM7511 : $BND"
 			fi
 			OK=8
@@ -67,7 +68,7 @@ Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band M
 				OK=$(( OK + 1 ))
 				EOK=$(echo $BND | cut -d, -f$OK)
 			done
-			if [ -e /etc/bandlock ]; then
+			if [ $enb == "1" ]; then
 				log "$OK"
 			fi
 			ex1=$(( OK - 5 ))
@@ -78,7 +79,7 @@ Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band M
 			L2=$(echo $BND | cut -d, -f$ex3)
 		else
 			BND=$(echo $line | cut -d, -f5 | tr " " ",")
-			if [ -e /etc/bandlock ]; then
+			if [ $enb == "1" ]; then
 				log "$BND"
 			fi
 			L1=$(echo $BND | cut -d, -f3)
@@ -92,7 +93,7 @@ Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band M
 	if [ $L2 = "OK" ]; then
 		L2="0000000000000000"
 	fi
-	if [ -e /etc/bandlock ]; then
+	if [ $enb == "1" ]; then
 		log " "
 		log "LTE Band Mask : $L2$L1"
 		log " "
@@ -107,6 +108,7 @@ Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band M
 }
 
 quebandmask() {
+	enb=$(uci -q get custom.bandlock.enabled)
 	idP=$(uci get modem.modem$CURRMODEM.idP)
 	CPORT=$(uci get modem.modem$CURRMODEM.commport)
 	ATCMDD="AT+CGMM"
@@ -114,7 +116,7 @@ quebandmask() {
 	uci set modem.modem$CURRMODEM.model=$model
 	ATCMDD='AT+QCFG="band"'
 	EM160=0
-	if [ -e /etc/bandlock ]; then
+	if [ $enb == "1" ]; then
 		log " "
 		log "Modem PID : $idP"
 		log "Modem Model : $model"
@@ -128,7 +130,7 @@ quebandmask() {
 		fi
 	fi
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if [ -e /etc/bandlock ]; then
+	if [ $enb == "1" ]; then
 		log " "
 		log "Quectel Response : $OX"
 		log " "
@@ -142,7 +144,7 @@ quebandmask() {
 	fi
 	if [ $EM160 = $EMT ]; then
 		qm=$(echo $OX" " | grep "+QCFG:" | tr -d '"' | tr " " ",")
-		if [ -e /etc/bandlock ]; then
+		if [ $enb == "1" ]; then
 			log "EM20 $qm"
 			log " "
 		fi
@@ -155,7 +157,7 @@ quebandmask() {
 			OX='AT+QNWPREFCFG="lte_band" +QNWPREFCFG: "lte_band",0  OK'
 		fi
 		qm=$(echo $OX" " | grep "+QNWPREFCFG:" | tr -d '"' | tr " " ":" | tr "," ":")
-		if [ -e /etc/bandlock ]; then
+		if [ $enb == "1" ]; then
 			log "EM160/RM500 $qm"
 			log " "
 		fi
@@ -188,7 +190,7 @@ quebandmask() {
 				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			fi
 			qm=$(echo $OX" " | grep "+QNWPREFCFG:" | tr -d '"' | tr " " ":" | tr "," ":")
-			if [ -e /etc/bandlock ]; then
+			if [ $enb == "1" ]; then
 				log "EM160/RM500 $qm"
 			fi
 			bd=5
@@ -215,7 +217,7 @@ quebandmask() {
 				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			fi
 			qm=$(echo $OX" " | grep "+QNWPREFCFG:" | tr -d '"' | tr " " ":" | tr "," ":")
-			if [ -e /etc/bandlock ]; then
+			if [ $enb == "1" ]; then
 				log "EM160/RM500 $qm"
 			fi
 			bd=5
@@ -250,13 +252,13 @@ quebandmask() {
 			fi
 			uci set modem.modem$CURRMODEM.NET="$NET"
 			if [ $NET = "8" -a $L1 = "0" ]; then
-				if [ -e /etc/bandlock ]; then
+				if [ $enb == "1" ]; then
 					log "NSA no LTE"
 				fi
 			fi
 		fi
 	fi
-	if [ -e /etc/bandlock ]; then
+	if [ $enb == "1" ]; then
 		log " "
 		log "LTE Band Mask : $L1"
 		log "5G NSA Band Mask : $L5"
@@ -272,6 +274,7 @@ quebandmask() {
 }
 
 fibomask() {
+	enb=$(uci -q get custom.bandlock.enabled)
 	idV=$(uci get modem.modem$CURRMODEM.idV)
 	idP=$(uci get modem.modem$CURRMODEM.idP)
 	if [ $idP = "0001" ]; then
@@ -296,7 +299,7 @@ fibomask() {
 			qm=$(echo $OX" " | grep "+GTACT:" | tr -d '"' | tr " " ",")
 		fi
 	fi
-	if [ -e /etc/bandlock ]; then
+	if [ $enb == "1" ]; then
 		log " "
 		log "Get Current Bands : $ATCMDD"
 		log "Current Bands : $OX"
@@ -347,7 +350,7 @@ fibomask() {
 		L5="0x"$(encodemask $msk)
 	fi
 	if [ ! -z "$L1" ]; then
-		if [ -e /etc/bandlock ]; then
+		if [ $enb == "1" ]; then
 			log " "
 			log "LTE Band Mask : $L1"
 			log "5G Band Mask : $L5"

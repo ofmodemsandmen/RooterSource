@@ -226,17 +226,13 @@ function action_check_misc()
 		netmode = luci.model.uci.cursor():get("modem", "modem" .. miscnum, "netmode")
 		rv["netmode"] = netmode
 	end
-	file = io.open("/etc/passlock", "r")
-	if file == nil then
-		rv["plock"] = "0"
-	else
-		line = file:read("*line")
-		rv["atlock"] = line
-		file:close()
-		rv["plock"] = "1"
+	rv["plock"] = luci.model.uci.cursor():get("custom", "atcmd", "lock")
+	if rv["plock"] == "1" then
+		rv["atlock"] = luci.model.uci.cursor():get("custom", "atcmd", "password")
+		generic = luci.model.uci.cursor():get("custom", "atcmd", "generic")
 		aindx = 0
 		if active == "0" then
-			file = io.open("/etc/atlist", "r")
+			file = io.open(generic, "r")
 		else
 			os.execute("/usr/lib/custom/locktype.sh " .. miscnum )
 			file1 = io.open("/tmp/modemlock", "r")
@@ -245,7 +241,7 @@ function action_check_misc()
 				file1:close()
 				file = io.open(linex, "r")
 			else
-				file = io.open("/etc/atlist", "r")
+				file = io.open(generic, "r")
 			end
 		end
 		if file ~= nil then
@@ -258,9 +254,6 @@ function action_check_misc()
 				line = file:read("*line")
 			until line == nil
 			file:close()
-			--at1[aindx] = linex
-			--at2[aindx] = linex
-			--aindx = aindx +1
 			rv['at1'] = at1
 			rv['at2'] = at2
 			rv['aindx'] = tostring(aindx)

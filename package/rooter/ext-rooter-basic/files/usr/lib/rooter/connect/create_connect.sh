@@ -283,8 +283,6 @@ chkraw() {
 		RAW=1
 	elif [ $idV = 413c -a $idP = 81d7 ]; then
 		RAW=1
-	elif [ $idV = 2dee -a $idP = 4d22 ]; then
-		RAW=1
 	fi
 }
 
@@ -480,8 +478,11 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 		else
 			if [ $idV = 1bc7 ]; then
 				TPORT=2
-			elif [ $idV = 2c7c -a $idP = 0620 ]; then
-				TPORT=2
+			elif [ $idV = 2c7c ]; then
+				QUEIF2="0121 0125 0306 0296 0512 0620 0800"
+				if [[ $(echo "$QUEIF2" | grep -o -i "$idP") ]]; then
+					TPORT=2
+				fi
 			elif [ $idV = 05c6 -a $idP = 9025 ]; then
 				[ $MAN = "Telit" ] || TPORT=2
 			else
@@ -499,19 +500,6 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 		devpath="$(readlink -f /sys/class/usbmisc/$devname/device/)"
 		ifname="$( ls "$devpath"/net )"
 		chkraw
-		uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null & sleep 10 ; 
-		if [ $RAW -eq 1 ]; then
-			DATAFORM='"raw-ip"'
-		else
-			if [ $idV = 1199 -a $idP = 9055 ]; then
-				$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
-				DATAFORM="802.3"
-				uqmi -s -d "$device" --set-data-format 802.3
-				uqmi -s -d "$device" --wda-set-data-format 802.3
-			else
-				DATAFORM=$(uqmi -s -d "$device" --wda-get-data-format)
-			fi
-		fi
 		;;
 	"3"|"30" )
 		log "Start MBIM Connection"
@@ -522,7 +510,7 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 
 		chksierra
 		SIERRAIF2='1199:90b1'
-		if [[ $(echo $SIERRAIF2 | grep -q -i "$idV:$idP") ]]; then
+		if [[ $(echo $SIERRAIF2 | grep -o -i "$idV:$idP") ]]; then
 			IfNum=02
 		else
 			IfNum=03
@@ -706,7 +694,7 @@ if $QUECTEL; then
 	log "Quectel Unsolicited Responses Disabled"
 	if [ -e /etc/interwave ]; then
 		ATCMDD="AT+CGMM"
-		model=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		MODEL=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		EM160=$(echo $model | grep "EM160")
 		if [ $idV != "0800" ]; then
 			if [ $EM160 ]; then
@@ -714,33 +702,10 @@ if $QUECTEL; then
 			else
 				ATC="AT+QCFG=\"nwscanmode\",3"
 			fi
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATC")
 		else
 			ATC="AT+QNWPREFCFG=\"mode_pref\",LTE:NR5G"
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		fi
-		ATCMDD="AT+QCFG=\"usbnet\""
-		mode=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		mode=$(echo $mode" " | tr " " ",")
-		mode=$(echo $mode | cut -d, -f4)
-		if [ $mode -ne 2 ]; then
-			ATCMDD="AT+QCFG=\"usbnet\",2"
-			mode=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			ATCMDD="AT+CFUN=1,1"
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			log "Hard modem reset done on /dev/ttyUSB$CPORT to reload drivers"
-			ifdown wan$CURRMODEM
-			uci delete network.wan$CURRMODEM
-			uci set network.wan$CURRMODEM=interface
-			uci set network.wan$CURRMODEM.proto=dhcp
-			uci set network.wan$CURRMODEM.ifname="wan"$CURRMODEM
-			uci set network.wan$CURRMODEM.metric=$CURRMODEM"0"
-			uci commit network
-			/etc/init.d/network reload
-			ifdown wan$CURRMODEM
-			echo "1" > /tmp/modgone
-			log "Setting Modem Removal flag (1)"
-			exit 0
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATC")
 		fi
 	fi
 	$ROOTER/connect/bandmask $CURRMODEM 1
@@ -753,6 +718,10 @@ if [ $SIERRAID -eq 1 ]; then
 	fi
 	$ROOTER/connect/bandmask $CURRMODEM 0
 	$ROOTER/luci/celltype.sh $CURRMODEM
+fi
+if [ $idV = "2dee" ]; then
+	ATC="AT^MODE=0"
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATC")
 fi
 if [ $idV = "2cb7" -o $idV = "8087" ]; then
 	if [ -e /etc/interwave ]; then
@@ -775,7 +744,7 @@ if [ -n "$CHKPORT" ]; then
 	$ROOTER/common/gettype.sh $CURRMODEM
 	$ROOTER/connect/get_profile.sh $CURRMODEM
 	INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
-	[ $INTER = 3 ] && log "Modem Modem $CURRMODEM disabled in Connection Profile" && exit 1
+	[ $INTER = 3 ] && log "Modem $CURRMODEM disabled in Connection Profile" && exit 1
 	$ROOTER/sms/check_sms.sh $CURRMODEM &
 	get_connect
 	if [ -z "$INTER" ]; then
@@ -1114,7 +1083,7 @@ while [ 1 -lt 6 ]; do
 				v6cap=0
 			fi
 			
-			if [ -n "ip6" -a -z "$ip" ]; then
+			if [ -n "$ip6" -a -z "$ip" ]; then
 				log "Running IPv6-only mode"
 				nat46=1
 			fi
@@ -1201,7 +1170,7 @@ while [ 1 -lt 6 ]; do
 		sleep 10
 	else
 		$ROOTER/log/logger "Modem #$CURRMODEM Connected"
-		log "Connected"
+		log "Modem $CURRMODEM Connected"
 		break
 	fi
 done

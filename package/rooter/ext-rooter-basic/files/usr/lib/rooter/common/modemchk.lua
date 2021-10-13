@@ -93,18 +93,6 @@ function process_port()
 	end
 end
 
-if uvid == "12d1" then
-	if upid == "14cc" or upid == "1464" or upid == "151b" then
-		cport = "0"
-	end
-	if upid == "14ac" then
-		cport = "1"
-	end
-	if upid == "140c" then
-		cport = "1"
-	end
-end
-
 read_modem()
 retval = 0
 cretval = 0
@@ -121,29 +109,6 @@ if cretval > 0 then
 else
 	cretval = tonumber(cport)
 end
-
-if uvid == "2001" and upid == "7e35" then
-	cretval = 2
-	retval = 1
-end
---
--- may need    echo "2c7c 0125" > /sys/bus/usb/drivers/qmi_wwan/new_id
--- may need    echo "2c7c 0121" > /sys/bus/usb/drivers/qmi_wwan/new_id
--- may need    echo "2c7c 0306 ff" > /sys/bus/usb-serial/drivers/option1/new_id
---
-if uvid == "2c7c" and (upid == "0121" or upid == "0125" or upid == "0306" or upid == "0296" or upid == "0512" or upid == "0620" or upid == "0800") then
-	cretval = 2
-	retval = 3
-end
-if uvid == "05c6" and upid == "9215" then
-	cretval = 2
-	retval = 3
-end
-if uvid == "1e0e" and upid == "9001" then
-	cretval = 2
-	retval = 3
-end
-
 
 dret = string.format("%d", retval)
 cret = string.format("%d", cretval)

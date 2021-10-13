@@ -1,10 +1,27 @@
 
 config settings 'bwallocate'
 	option rollover '1'
-	option enabled '0'
 	option allocate '1000'
+	option password '1234'
+	option lock '0'
+	option enabled '0'
 
 config menu 'menu'
 	option password '1234'
-	option full '1'
+	option full '0'
 
+config atcmd 'atcmd'
+	option lock '0'
+	option enabled '1'
+	option password '1234'
+	option sierra '/etc/sierracmd'
+	option quectel '/etc/quectelcmd'
+	option generic '/etc/genericcmd'
+	
+config bandlock 'bandlock'
+	option enabled '0'
+
+config zerotier 'zerotier'
+	option password '1234'
+	option lock '0'
+	option networkid 'xxxxxxxxxxxxxxxx'

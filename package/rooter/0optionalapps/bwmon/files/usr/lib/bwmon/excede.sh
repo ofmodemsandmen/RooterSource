@@ -4,7 +4,8 @@ log() {
 	logger -t "excede BW " "$@"
 }
 
-if [ -e /etc/bwlock ]; then
+lock=$(uci -q get custom.bwallocate.enabled)
+if [ $lock = "1" ]; then
 	enb=$(uci -q get custom.bwallocate.enabled)
 	if [ $enb = '1' ]; then
 		allocate=$2

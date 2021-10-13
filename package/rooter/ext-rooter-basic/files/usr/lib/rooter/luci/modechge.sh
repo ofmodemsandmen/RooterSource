@@ -111,17 +111,17 @@ fi
 # Quectel
 if [ $MODEMTYPE -eq 6 ]; then
 	CURRMODEM=$(uci -q get modem.general.modemnum)
-	VID=$(uci -q get modem.modem$CURRMODEM.idV)
-	PID=$(uci -q get modem.modem$CURRMODEM.idP)
+	idV=$(uci -q get modem.modem$CURRMODEM.idV)
+	idP=$(uci -q get modem.modem$CURRMODEM.idP)
 	ATCMDD="AT+CGMM"
 	model=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	EM20=$(echo "$model" | grep "EM20")
 	if [ $EM20 ]; then
-		PID="0"
+		idP="0"
 	fi
 	NEWFMT=false
-	if [ "$VID" = "2c7c" ]; then
-		if [ "$PID" = "0800" ] || [ "$PID" = "0620" ]; then
+	if [ "$idV" = "2c7c" ]; then
+		if [ "$idP" = "0800" ] || [ "$idP" = "0620" ]; then
 			NEWFMT=true
 		fi
 	fi
@@ -158,16 +158,37 @@ fi
 
 # MEIG
 if [ $MODEMTYPE -eq 7 ]; then
-	case $NETMODE in
-		"3")
-			ATC="AT+MODODR=3" ;;
-		"5")
-			ATC="AT+MODODR=1" ;;
-		"7")
-			ATC="AT+MODODR=5" ;;
-		*)
-			ATC="AT+MODODR=2" ;;
-	esac
+	CURRMODEM=$(uci -q get modem.general.modemnum)
+	idV=$(uci -q get modem.modem$CURRMODEM.idV)
+	if [ $idV == "2dee" ]; then
+		case $NETMODE in
+			"4")
+				ATC="AT^SYSCFGEX=\"020304\"" ;;
+			"5")
+				ATC="AT^SYSCFGEX=\"02\"" ;;
+			"6")
+				ATC="AT^SYSCFGEX=\"030402\"" ;;
+			"7")
+				ATC="AT^SYSCFGEX=\"03\"" ;;
+			"8")
+				ATC="AT^SYSCFGEX=\"0403\"" ;;
+			"9")
+				ATC="AT^SYSCFGEX=\"04\"" ;;
+			*)
+				ATC="AT^SYSCFGEX=\"00\"" ;;
+		esac
+	else
+		case $NETMODE in
+			"3")
+				ATC="AT+MODODR=3" ;;
+			"5")
+				ATC="AT+MODODR=1" ;;
+			"7")
+				ATC="AT+MODODR=5" ;;
+			*)
+				ATC="AT+MODODR=2" ;;
+		esac
+	fi
 fi
 
 # Foxconn, Telit, etc.

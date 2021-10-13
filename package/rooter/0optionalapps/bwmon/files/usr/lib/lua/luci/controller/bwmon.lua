@@ -44,15 +44,8 @@ function action_check_bw()
 	else
 		rv['days'] = 0
 	end
-	file = io.open("/etc/bwlock", "r")
-	if file ~= nil then
-		rv['lock'] = 1
-		file:close()
-		rv['rollover'] = luci.model.uci.cursor():get("custom", "bwallocate", "rollover")
-	else
-		rv['lock'] = 0
-		rv['rollover'] = luci.model.uci.cursor():get("custom", "bwallocate", "rollover")
-	end
+	rv['lock']  = luci.model.uci.cursor():get("custom", "bwallocate", "lock")
+	rv['rollover'] = luci.model.uci.cursor():get("custom", "bwallocate", "rollover")
 	rv['enabled'] = luci.model.uci.cursor():get("custom", "bwallocate", "enabled")
 	
 	luci.http.prepare_content("application/json")

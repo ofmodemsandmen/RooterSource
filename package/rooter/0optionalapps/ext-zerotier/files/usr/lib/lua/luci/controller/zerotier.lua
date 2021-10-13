@@ -2,9 +2,12 @@ module("luci.controller.zerotier", package.seeall)
 function index()
 	local fs = require "nixio.fs"
 	if fs.stat("/etc/config/zerotier") then
-		local page
-		page = entry({"admin", "services", "zerotier"}, template("zerotier/zerotier"), "Zerotier", 71)
-		page.dependent = true
+		local lock = luci.model.uci.cursor():get("custom", "zerotier", "lock")
+		if lock == "1" then
+			local page
+			page = entry({"admin", "services", "zerotier"}, template("zerotier/zerotier"), "Zerotier", 71)
+			page.dependent = true
+		end
 	end
 	
 	entry({"admin", "services", "getid"}, call("action_getid"))
@@ -18,13 +21,7 @@ function action_getid()
 	rv["netid"] = id
 	secret = luci.model.uci.cursor():get("zerotier", "zerotier1", "secret")
 	rv["routerid"] = string.sub(secret,1,10)
-	file = io.open("/etc/zlock", "r")
-	if file == nil then
-		rv["password"] = "password"
-	else
-		rv["password"] = file:read("*line")
-		file:close()
-	end
+	rv["password"] = luci.model.uci.cursor():get("custom", "zerotier", "password")
 	luci.http.prepare_content("application/json")
 	luci.http.write_json(rv)
 end

@@ -18,14 +18,11 @@ let t=time()+f
 gosub getresult
 if $s="^mTIMEOUT ERROR" print $s
 
+if $s="^jERROR" goto newmodel
+
 send "AT+MODODR?^m"
 let t=time()+f
 gosub getresult
-if $s="^mTIMEOUT ERROR" print $s
-
-send "AT+SGCELLINFO^m"
-let t=time()+f
-gosub getresult 
 if $s="^mTIMEOUT ERROR" print $s
 
 send "AT+CELLINFO^m"
@@ -33,7 +30,31 @@ let t=time()+f
 gosub getresult
 if $s="^mTIMEOUT ERROR" print $s
 
- exit 0
+send "AT+SGCELLINFO^m"
+let t=time()+f
+gosub getresult
+if $s="^mTIMEOUT ERROR" print $s
+
+exit 0
+
+:newmodel
+
+send "AT\^SYSCFGEX?^m"
+let t=time()+f
+gosub getresult
+if $s="^mTIMEOUT ERROR" print $s
+
+send "AT+SGCELLINFOEX^m"
+let t=time()+f
+gosub getresult
+if $s="^mTIMEOUT ERROR" print $s
+
+send "AT+CELLINFO=3^m"
+let t=time()+f
+gosub getresult
+if $s="^mTIMEOUT ERROR" print $s
+
+exit 0
 
 :getresult
 get 1 "^m" $s

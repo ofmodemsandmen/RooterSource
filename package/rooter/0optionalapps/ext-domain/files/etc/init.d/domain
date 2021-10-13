@@ -1,0 +1,8 @@
+#!/bin/sh /etc/rc.common
+
+START=88
+
+start_service()
+{
+	/usr/lib/domain/filter.sh
+}

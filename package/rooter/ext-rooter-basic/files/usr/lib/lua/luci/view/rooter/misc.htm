@@ -3,13 +3,16 @@
 local sys = require "luci.sys"
 local utl = require "luci.util" 
 local fs = require "nixio.fs"
+local uci = require "luci.model.uci".cursor()
+local s = uci:get("custom", "bandlock", "enabled")
+local a = uci:get("custom", "atcmd", "enabled")
 nosms = 1
-if not fs.stat("/etc/noat") then
+if a == "1" then
 	nosms = 0
 end
-block = 0
-if not fs.stat("/etc/bandlock") then
-	block = 1
+block = 1
+if s == "1" then
+	block = 0
 end
 
 function showicon(lck)
@@ -57,9 +60,9 @@ end
 		function(x, rv)
 		{
 			document.getElementById("conntype").innerHTML=rv.conntype;
-			stat = rv.active
-			gpio = rv.gpio
-			usb = rv.usb
+			stat = rv.active;
+			gpio = rv.gpio;
+			usb = rv.usb;
 
 			if ( stat == "0" )
 			{
@@ -76,26 +79,6 @@ end
 				document.getElementById("net3").style.display="none";
 				document.getElementById("net4").style.display="none";
 				document.getElementById("apply1").style.display="none";
-				document.getElementById("tab5").style.display = "none";
-				document.getElementById("tab6").style.display = "none";
-				document.getElementById("tab7").style.display = "none";
-				document.getElementById("tab8").style.display = "none";
-				document.getElementById("tab9").style.display = "none";
-				document.getElementById("tab11").style.display = "none";
-				document.getElementById("tab12").style.display = "none";
-				document.getElementById("dym1").style.display = "none";
-				document.getElementById("dym5g1").style.display = "none";
-				document.getElementById("tab5g").style.display = "none";
-				document.getElementById("tab4g").style.display = "none";
-				document.getElementById("dym2").style.display = "none";
-				document.getElementById("dym3").style.display = "none";
-				document.getElementById("tab10").style.display = "none";
-				document.getElementById("tab13").style.display = "";
-				document.getElementById("tab14").style.display = "none";
-				document.getElementById("bndtxt").value=" ";
-				document.getElementById("senddropat").disabled=true;
-				document.getElementById("atcmdlck").disabled=true;
-				document.getElementById("sendfullat").disabled=true;
 			
 				if ( gpio == "0" )
 				{
@@ -120,6 +103,7 @@ end
 				if ( plock == "0" )
 				{
 					document.getElementById("droptxt").style.display="none";
+					document.getElementById("droptxt").style.visibility="hidden";
 					document.getElementById("linetxt").style.display="block";
 					document.getElementById("atcmd").disabled=true;
 					document.getElementById("sendcmdat").disabled=true;
@@ -161,6 +145,7 @@ end
 				if ( plock == "0" )
 				{
 					document.getElementById("droptxt").style.display="none";
+					document.getElementById("droptxt").style.visibility="hidden";
 					document.getElementById("linetxt").style.display="block";
 					document.getElementById("atcmd").disabled=false;
 					document.getElementById("sendcmdat").disabled=false;

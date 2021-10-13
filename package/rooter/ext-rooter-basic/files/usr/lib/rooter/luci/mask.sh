@@ -9,7 +9,8 @@ log() {
 #
 # remove for band locking
 #
-if [ ! -e /etc/bandlock ]; then
+enb=$(uci -q get custom.bandlock.enabled)
+if [ $enb == "0" ]; then
 	exit 0
 fi
 
@@ -76,17 +77,35 @@ M6="x"
 case $uVid in
 	"2c7c" )
 		case $uPid in
-			"0125" ) # EC25-A
+			"0125" ) # EC25
+				#EUX EC25EUXGAR	B1/B3/B7/B8/B20/B28A/B38/B40/B41
+				#EU EC25EUGAR	B1/B3/B7/B8/B20/B28A/B38/B40/B41
+				#EC EC25ECGAR
+				#E EC25EFAR		B1/B3/B5/B7/B8/B20/B38/B40/B41
+				#AU EC25AUGCR
+				#AF-FD EC25AFFDR	B2/B4/B5/B12/B13/B14/B66/B71 
+				#AF EC25AFFAR		B2/B4/B5/B12/B13/B14/B66/B71 
+				#A EC25AFAR
 				CA=""
 				M1='ATI'
 				OX=$($ROOTER/gcom/gcom-locked "$CPORT" "run-at.gcom" "$CURRMODEM" "$M1")
 				REV=$(echo $OX" " | grep -o "Revision: .\+ OK " | tr " " ",")
 				MODL=$(echo $REV | cut -d, -f2)
-				EC25AF=$(echo $MODL | grep "EC25AFFAR")
-				if [ ! -z "$EC25AF" ]; then
+				EC25AF=$(echo $MODL | grep "EC25AFF")
+				if [ ! -z "$EC25AF" ]; then # EC25-AF
 					M2='01011000000111000000000000000000000000000000000000000000000000000100001'
 				else
-					M2='01011000000111000000000000000000000000000000000000000000000000000100001'
+					EC25AF=$(echo $MODL | grep "EC25E")
+					if [ ! -z "$EC25AF" ]; then # EC25-E
+						M2='1010101100000000000100000000000000000101100'
+					else
+						EC25AF=$(echo $MODL | grep "EC25AU")
+						if [ ! -z "$EC25AF" ]; then # EC25-AU
+							M2='111110110000000000000000000100000000000100'
+						else # EC25-A
+							M2='01010000000100'
+						fi
+					fi
 				fi
 			;;
 			"0306" ) # EP06-A

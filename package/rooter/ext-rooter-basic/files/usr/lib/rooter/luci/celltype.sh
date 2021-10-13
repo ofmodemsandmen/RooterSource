@@ -246,22 +246,46 @@ quectel_type() {
 }
 
 meig_type() {
-	ATCMDD="AT+MODODR?"
-	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	MODODR=$(echo $OX | grep -o "[0-9]")
-	if [ -n "$MODODR" ]; then
-		case $MODODR in
-		"1"|"8" )
-			NETMODE="5" ;;
-		"2" )
-			NETMODE="1" ;;
-		"3" )
-			NETMODE="3" ;;
-		"5" )
-			NETMODE="7" ;;
-		esac
-		uci set modem.modem$CURRMODEM.modemtype="7"
+	if [ $idV == "2dee" ]; then
+		ATCMDD="AT^SYSCFGEX?"
+		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		RATs=$(echo "$OX" | grep -o "\^SYSCFGEX: \"[0-9]\{2,6\}\"" | grep -o "[0-9]\{2,6\}")
+		if [ -n "$RATs" ]; then
+			case $RATs in
+			"02" )
+				NETMODE="5" ;;
+			"03" )
+				NETMODE="7" ;;
+			"04" )
+				NETMODE="9" ;;
+			"0203" | "0204" | "020304" | "020403" )
+				NETMODE="4" ;;
+			"0304" | "0302" | "030402" | "030204" )
+				NETMODE="6" ;;
+			"0403" )
+				NETMODE="8" ;;
+			* )
+				NETMODE="1" ;;
+			esac
+		fi
+	else
+		ATCMDD="AT+MODODR?"
+		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		MODODR=$(echo $OX | grep -o "[0-9]")
+		if [ -n "$MODODR" ]; then
+			case $MODODR in
+			"1"|"8" )
+				NETMODE="5" ;;
+			"2" )
+				NETMODE="1" ;;
+			"3" )
+				NETMODE="3" ;;
+			"5" )
+				NETMODE="7" ;;
+			esac
+		fi
 	fi
+	uci set modem.modem$CURRMODEM.modemtype="7"
 	uci set modem.modem$CURRMODEM.netmode=$NETMODE
 	uci commit modem
 }
@@ -400,6 +424,9 @@ case $idV in
 	;;
 "2cb7"|"8087" )
 	fibocom_type
+	;;
+"2dee" )
+	meig_type
 	;;
 "05c6" )
 	case $idP in

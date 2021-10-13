@@ -170,6 +170,9 @@ while [ 1 = 1 ]; do
 			"2cb7" )
 				$ROOTER/common/fibocomdata.sh $CURRMODEM $COMMPORT
 				;;
+			"2dee" )
+				$ROOTER/common/meigdata.sh $CURRMODEM $COMMPORT
+				;;
 			"05c6" )
 				case $PROD in
 					"f601" )

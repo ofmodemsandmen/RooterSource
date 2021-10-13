@@ -157,27 +157,22 @@ if dataname ~= nil then
 	--
 	-- allocated bandwidth in K
 	--
-	file = io.open("/etc/bwallocate", "r")
+	bwallo='rm -f /tmp/bwallo; x=$(uci -q get custom.bwallocate.allocate); echo $x >> /tmp/bwallo; x=$(uci -q get custom.bwallocate.password); echo $x >> /tmp/bwallo'
+	os.execute(bwallo)
+	file = io.open("/tmp/bwallo", "r")
 	if file == nil then
 		allo = 1000000000
+		passw = "password"
 	else
 		allos = file:read("*line")
 		allo = tonumber(allos) * 1000000
+		passw = file:read("*line")
 		file:close()
 	end
 	tfile:write(tostring(allo), "\n")
 	tfile:write(calc(allo), "\n")
-	--
-	-- unlock password
-	--
-	file = io.open("/etc/bwlock", "r")
-	if file == nil then
-		passw = "password"
-	else
-		passw = file:read("*line")
-		file:close()
-	end
 	tfile:write(passw, "\n")
+	
 	showdevices(bw, maclist)
 	tfile:write(tostring(totaldevices), "\n")
 	if totaldevices > 0 then
