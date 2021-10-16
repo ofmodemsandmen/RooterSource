@@ -164,8 +164,7 @@ esac
 CALIST=$(echo "${OX//[ ]/}" | grep -o "+CELLINFO:\"SCC\",[0-9],2,[0-9],[0-9]\{1,6\},[0-9]\{1,4\},[0-9]\{1,3\},[0-9]\{1,3\},[-0-9]\{1,4\},[-0-9]\{1,4\},[-0-9]\{1,4\},[-0-9]\{1,4\}")
 
 for CAVAL in $(echo "$CALIST"); do
-	CATYPE=$(echo "$CAVAL" | cut -d, -f2)
-	if [ "$CATYPE" == "1" ]; then
+	if [ "$(echo $CAVAL | cut -d, -f2)" == "1" ]; then
 		CATYPE="CA+"
 	else
 		CATYPE="CA"
@@ -177,19 +176,15 @@ for CAVAL in $(echo "$CALIST"); do
 	else
 		BWv="1.4"
 	fi
-	BANDv=$(echo $CAVAL | cut -d, -f7)
 	if [ $CHANv -ge 123400 ]; then
-		BANDv="n"$BANDv
+		BANDv="n"$(echo $CAVAL | cut -d, -f7)
 	else
-		BANDv="B"$BANDv
+		BANDv="B"$(echo $CAVAL | cut -d, -f7)
 	fi
 	LBAND=$LBAND"<br />"$BANDv" ($CATYPE, Bandwidth "$BWv" MHz)"
-	PCIv=$(echo $CAVAL | cut -d, -f8)
-	PCI=$PCI","$PCIv
-	RSRQv=$(echo $CAVAL | cut -d, -f9)
-	ECIO=$ECIO" dBm<br />"$RSRQv
-	RSRPv=$(echo $CAVAL | cut -d, -f10)
-	RSCP=$RSCP" dBm<br />"$RSRPv
+	PCI=$PCI","$(echo $CAVAL | cut -d, -f8)
+	ECIO=$ECIO" dBm<br />"$(echo $CAVAL | cut -d, -f9)
+	RSCP=$RSCP" dBm<br />"$(echo $CAVAL | cut -d, -f10)
 	SINRv=$(echo $CAVAL | cut -d, -f12)
 	SINRv=$((($SINRv / 5) - 20))" dB"
 	CHANNEL=$CHANNEL","$CHANv
@@ -243,21 +238,23 @@ if [ -n "$RATs" ]; then
 	esac
 fi
 
-echo 'CSQ="'"$CSQ"'"' > /tmp/signal$CURRMODEM.file
-echo 'CSQ_PER="'"$CSQ_PER"'"' >> /tmp/signal$CURRMODEM.file
-echo 'CSQ_RSSI="'"$CSQ_RSSI"'"' >> /tmp/signal$CURRMODEM.file
-echo 'ECIO="'"$ECIO"'"' >> /tmp/signal$CURRMODEM.file
-echo 'RSCP="'"$RSCP"'"' >> /tmp/signal$CURRMODEM.file
-echo 'ECIO1="'"$ECIO1"'"' >> /tmp/signal$CURRMODEM.file
-echo 'RSCP1="'"$RSCP1"'"' >> /tmp/signal$CURRMODEM.file
-echo 'MODE="'"$MODE"'"' >> /tmp/signal$CURRMODEM.file
-echo 'MODTYPE="'"$MODTYPE"'"' >> /tmp/signal$CURRMODEM.file
-echo 'NETMODE="'"$NETMODE"'"' >> /tmp/signal$CURRMODEM.file
-echo 'CHANNEL="'"$CHANNEL"'"' >> /tmp/signal$CURRMODEM.file
-echo 'LBAND="'"$LBAND"'"' >> /tmp/signal$CURRMODEM.file
-echo 'TEMP="'"$TEMP"'"' >> /tmp/signal$CURRMODEM.file
-echo 'PCI="'"$PCI"'"' >> /tmp/signal$CURRMODEM.file
-echo 'SINR="'"$SINR"'"' >> /tmp/signal$CURRMODEM.file
+{
+	echo 'CSQ="'"$CSQ"'"'
+	echo 'CSQ_PER="'"$CSQ_PER"'"'
+	echo 'CSQ_RSSI="'"$CSQ_RSSI"'"'
+	echo 'ECIO="'"$ECIO"'"'
+	echo 'RSCP="'"$RSCP"'"'
+	echo 'ECIO1="'"$ECIO1"'"'
+	echo 'RSCP1="'"$RSCP1"'"'
+	echo 'MODE="'"$MODE"'"'
+	echo 'MODTYPE="'"$MODTYPE"'"'
+	echo 'NETMODE="'"$NETMODE"'"'
+	echo 'CHANNEL="'"$CHANNEL"'"'
+	echo 'LBAND="'"$LBAND"'"'
+	echo 'TEMP="'"$TEMP"'"'
+	echo 'PCI="'"$PCI"'"'
+	echo 'SINR="'"$SINR"'"'
+}  > /tmp/signal$CURRMODEM.file
 
 CONNECT=$(uci get modem.modem$CURRMODEM.connected)
 if [ "$CONNECT" == "0" ]; then

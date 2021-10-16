@@ -128,7 +128,6 @@ check_apn() {
 	fi
 	ATCMDD="AT+CGDCONT=?"
 	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	
 	[ "$PDPT" = "0" ] && PDPT=""
 	for PDP in "$PDPT" IPV4V6; do
 		if [[ "$(echo $OX | grep -o "$PDP")" ]]; then
@@ -566,7 +565,6 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 					case $idV in
 						"2c7c"|"05c6" )
 							get_tty_fix 2
-							DPORT=`expr 1 + $CPORT`
 							lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$DPORT" "$CPORT"
 							source /tmp/parmpass
 							uci set modem.modem$CURRMODEM.commport=$CPORT
