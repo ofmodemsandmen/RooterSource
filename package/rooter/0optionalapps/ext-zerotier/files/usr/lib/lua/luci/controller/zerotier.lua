@@ -5,7 +5,7 @@ function index()
 		local lock = luci.model.uci.cursor():get("custom", "zerotier", "lock")
 		if lock == "1" then
 			local page
-			page = entry({"admin", "services", "zerotier"}, template("zerotier/zerotier"), "Zerotier", 71)
+			page = entry({"admin", "services", "zerotier"}, template("zerotier/zerotier"), "ROUTER ID", 71)
 			page.dependent = true
 		end
 	end
