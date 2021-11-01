@@ -175,7 +175,7 @@ case $RAT in
 			LBAND="-"
 		else
 			if [ -n "$QCA" ]; then
-				QCA=$(echo $QCA | grep -o "\"S[CS]\{2\}\"[0-9A-Z,\"]\+")
+				QCA=$(echo $QCA | grep -o "\"S[CS]\{2\}\"[-0-9A-Z,\"]\+")
 				for QCAL in $(echo "$QCA"); do
 					if [ $(echo "$QCAL" | cut -d, -f7) = "2" ]; then
 						SCHV=$(echo $QCAL | cut -d, -f2 | grep -o "[0-9]\+")
@@ -191,10 +191,19 @@ case $RAT in
 							LBAND=$LBAND"<br />"$SRATP$SLBV
 							BWD=$(echo $QCAL | cut -d, -f3 | grep -o "[0-9]\{1,3\}")
 							if [ -n "$BWD" ]; then
+								UPDOWN=$(echo $QCAL | cut -d, -f13)
+								case "$UPDOWN" in
+									"UL" )
+										CATYPE="CA"$(printf "\xe2\x86\x91") ;;
+									"DL" )
+										CATYPE="CA"$(printf "\xe2\x86\x93") ;;
+									* )
+										CATYPE="CA" ;;
+								esac
 								if [ $BWD -gt 14 ]; then
-									LBAND=$LBAND" (CA, Bandwidth "$(($(echo $BWD) / 5))" MHz)"
+									LBAND=$LBAND" ("$CATYPE", Bandwidth "$(($(echo $BWD) / 5))" MHz)"
 								else
-									LBAND=$LBAND" (CA, Bandwidth 1.4 MHz)"
+									LBAND=$LBAND" ("$CATYPE", Bandwidth 1.4 MHz)"
 								fi
 							fi
 							LBAND=$LBAND

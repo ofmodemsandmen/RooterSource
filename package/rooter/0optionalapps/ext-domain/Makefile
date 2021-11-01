@@ -14,7 +14,7 @@ define Package/ext-domain
   SECTION:=utils
   CATEGORY:=ROOter
   SUBMENU:=Optional Applications
-  DEPENDS:=+dnsmasq-full
+  DEPENDS:=+dnsmasq-full +ipset
   TITLE:=Domain Filter
   PKGARCH:=all
 endef

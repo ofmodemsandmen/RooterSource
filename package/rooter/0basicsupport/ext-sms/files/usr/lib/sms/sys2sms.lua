@@ -80,4 +80,3 @@ if isok then
 	pdul = string.format("%03d", (math.floor(#pdu / 2) - 1))
 	os.execute("echo " .. pdul .. " "  .. pdu .. " > /tmp/pdu" .. pid)
 end
-

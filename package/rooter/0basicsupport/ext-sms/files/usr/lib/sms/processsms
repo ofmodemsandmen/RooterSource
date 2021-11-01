@@ -6,20 +6,35 @@ log() {
 	logger -t "sms process" "$@"
 }
 
-log "SMS Supported"
-
 CURRMODEM=$1
+
+log "SMS Supported Modem$CURRMODEM"
+
 COMMPORT="/dev/ttyUSB"$(uci get modem.modem$CURRMODEM.commport)
 
 LOCKDIR="/tmp/smslock$CURRMODEM"
 PIDFILE="${LOCKDIR}/PID"
 rm -rf "${LOCKDIR}"
 
+idV=$(uci -q get modem.modem$CURRMODEM.idV)
+idP=$(uci -q get modem.modem$CURRMODEM.idP)
+MODEMID="$idV${idP:0:3}"
+
 ATCMDD="AT+CMGF=0"
 OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 sleep 1
 ATCMDD="AT+CPMS=\"SM\",\"SM\",\"SM\""
 OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+OX=$(echo $OX | grep -o "+CPMS:.\+")
+if [ "$(echo "$OX" | cut -d, -f2)" == "0" -a "$MODEMID" != "119968a" ]; then
+	ATCMDD="AT+CPMS=\"ME\",\"ME\",\"ME\""
+	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	uci set modem.modem$CURRMODEM.smsloc="ME"
+	SMSLOC="ME"
+else
+	uci set modem.modem$CURRMODEM.smsloc="SM"
+	SMSLOC="SM"
+fi
 sleep 1
 uci set modem.modem$CURRMODEM.smsnum=999
 uci commit modem
@@ -48,7 +63,7 @@ while true; do
 	while true; do
 		if mkdir "${LOCKDIR}" &>/dev/null; then
 			echo "$$" > "${PIDFILE}"
-			ATCMDD="AT+CPMS=\"SM\""
+			ATCMDD="AT+CPMS=\"$SMSLOC\""
 			SX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			M2=$(echo "$SX" | sed -e "s/+CPMS:/+CPMS: /")
 			SX=$(echo "$M2" | sed -e "s/  / /g")
@@ -58,7 +73,7 @@ while true; do
 				SLEEP="1800"
 			fi
 			if [ $USED -eq $(uci get modem.modem$CURRMODEM.smsnum) ] && [ $HH -eq $(date +%H) ]; then
-				if [ $(uci get modem.sms.menable) -eq 1 ]; then
+				if [ $(uci get modem.sms.menable) -eq 1 -a $SMSLOC == "SM" ]; then
 					RSRV=2
 				else
 					RSRV=99999

@@ -270,7 +270,7 @@ chkraw() {
 		RAW=1
 	elif [ $idV = 1e0e -a $idP = 9001 ]; then
 		RAW=1
-	elif [ $idV = 2c7c -a $idP = 0800 ]; then
+	elif [ $idV = 2c7c ]; then
 		RAW=1
 	elif [ $idV = 05c6 -a $idP = 9025 ]; then
 		[ $MAN = "Telit" ] || RAW=1
@@ -499,6 +499,12 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 		devpath="$(readlink -f /sys/class/usbmisc/$devname/device/)"
 		ifname="$( ls "$devpath"/net )"
 		chkraw
+		if [ $idV = 2c7c -a $idP = 0800 ]; then
+			uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null & sleep 10 ; kill -9 $!
+			if [ -f /sys/class/net/$ifname/qmi/raw_ip ]; then
+				echo "Y" > /sys/class/net/$ifname/qmi/raw_ip
+			fi
+		fi
 		;;
 	"3"|"30" )
 		log "Start MBIM Connection"
@@ -565,7 +571,7 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 					case $idV in
 						"2c7c"|"05c6" )
 							get_tty_fix 2
-							lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$DPORT" "$CPORT"
+							lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
 							source /tmp/parmpass
 							uci set modem.modem$CURRMODEM.commport=$CPORT
 							uci set modem.modem$CURRMODEM.proto="30"
@@ -573,8 +579,7 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 						;;
 						"1bc7" )
 							get_tty_fix 2
-							DPORT=`expr $CPORT - 1`
-							lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$DPORT" "$CPORT"
+							lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
 							source /tmp/parmpass
 							uci set modem.modem$CURRMODEM.commport=$CPORT
 							uci set modem.modem$CURRMODEM.proto="30"
@@ -583,8 +588,7 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 						"03f0" )
 							if [ $idP = 0a57 ]; then
 								get_tty_fix 2
-								DPORT=`expr $CPORT - 1`
-								lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$DPORT" "$CPORT"
+								lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
 								source /tmp/parmpass
 								uci set modem.modem$CURRMODEM.commport=$CPORT
 								uci set modem.modem$CURRMODEM.proto="30"
@@ -693,7 +697,7 @@ if $QUECTEL; then
 	if [ -e /etc/interwave ]; then
 		ATCMDD="AT+CGMM"
 		MODEL=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		EM160=$(echo $model | grep "EM160")
+		EM160=$(echo $MODEL | grep "EM160")
 		if [ $idV != "0800" ]; then
 			if [ $EM160 ]; then
 				ATC="AT+QNWPREFCFG=\"mode_pref\",LTE"
@@ -1028,9 +1032,10 @@ while [ 1 -lt 6 ]; do
 	"28" )
 		. /lib/functions.sh
 		. /lib/netifd/netifd-proto.sh
-		OX=$(grep . /sys/class/net/usb*/../../bInterfaceNumber | grep ":06" | cut -d'/' -f5)
-		USBPORT=$(echo $OX | grep -o "[[:digit:]]\+")
-		ifname=usb$USBPORT
+		match="$(uci get modem.modem$CURRMODEM.maxcontrol | cut -d/ -f3- | xargs dirname)"
+		OX="$(for a in /sys/class/net/*; do readlink $a; done | grep "$match" | grep ".6/net/")"
+		ifname=$(basename $OX)
+		log "Fibocom NCM Data Port : $ifname"
 		COMMPORT="/dev/ttyUSB"$CPORT
 		ATCMDD="AT+CGACT=0,1"
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")

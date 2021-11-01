@@ -9,7 +9,13 @@ ID=$2
 
 log "$ID"
 
-uci delete zerotier.zerotier1.join
-uci add_list zerotier.zerotier1.join=$ID
+if [ $ID = "xxxxxxxxxxxxxxxx" ]; then
+	uci set zerotier.zerotier.enabled='0'
+else
+	uci set zerotier.zerotier.enabled='1'
+fi
+
+uci delete zerotier.zerotier.join
+uci add_list zerotier.zerotier.join=$ID
 uci commit zerotier
 /etc/init.d/zerotier restart

@@ -7,7 +7,8 @@ log() {
 amount=$1
 log "Allocate $amount"
 
-echo $amount > /etc/bwallocate
+uci set custom.bwallocate.allocate=$amount
+uci commit custom
 result=`ps | grep -i "create_data.lua" | grep -v "grep" | wc -l`
 if [ $result -lt 1 ]; then
 	lua /usr/lib/bwmon/create_data.lua

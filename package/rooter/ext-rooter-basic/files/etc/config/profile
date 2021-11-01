@@ -13,3 +13,5 @@ config default 'default'
 	option nodhcp '0'
 	option pdptype '0'
 
+config disable 'disable'
+	option enabled '0'

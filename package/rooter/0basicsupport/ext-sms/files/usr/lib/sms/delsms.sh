@@ -12,6 +12,8 @@ SLOTS="$@"
 
 COMMPORT="/dev/ttyUSB"$(uci get modem.modem$CURRMODEM.commport)
 
+SMSLOC=$(uci -q get modem.modem$CURRMODEM.smsloc)
+
 LOCKDIR="/tmp/smslock$CURRMODEM"
 PIDFILE="${LOCKDIR}/PID"
 
@@ -20,7 +22,7 @@ while [ 1 -lt 6 ]; do
 		echo "$$" > "${PIDFILE}"
 		for SLOT in $SLOTS
 		do
-			ATCMDD="AT+CPMS=\"SM\";+CMGD=$SLOT"
+			ATCMDD="AT+CPMS=\"$SMSLOC\";+CMGD=$SLOT"
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		done
 		uci set modem.modem$CURRMODEM.smsnum=999

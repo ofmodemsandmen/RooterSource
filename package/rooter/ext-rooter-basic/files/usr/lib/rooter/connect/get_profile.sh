@@ -17,8 +17,7 @@ idV=$(uci get modem.modem$CURRMODEM.idV)
 idP=$(uci get modem.modem$CURRMODEM.idP)
 IMEI=$(uci get modem.modem$CURRMODEM.imei)
 IMSI=$(uci -q get modem.modem$CURRMODEM.imsi)
-TEMPICCID=$(uci get modem.modem$CURRMODEM.iccid)
-ICCID=${TEMPICCID:0:5}
+ICCID=$(uci get modem.modem$CURRMODEM.iccid)
 
 log "Modem $CURRMODEM is $MANUF $MODEL"
 
@@ -86,10 +85,12 @@ do_custom() {
 				;;
 			"4" )
 				config_get iccid $1 iccid
-				if [ "$ICCID" == "$iccid" ]; then
+				case $ICCID in
+				"$iccid"*)
 					MATCH=1
 					log "SIM ICCID Profile - "$name""
-				fi
+					;;
+				esac
 				;;
 			esac
 			if [ $MATCH = 1 ]; then
@@ -231,9 +232,13 @@ do_custom() {
 	fi
 }
 
-
-config_load profile
-config_foreach do_custom custom
+autod=$(uci -q get profile.disable.enabled)
+if [ $autod = "1" ]; then
+	MATCH=0
+else
+	config_load profile
+	config_foreach do_custom custom
+fi
 
 if [ $MATCH = 0 ]; then
 	uci set modem.modeminfo$CURRMODEM.apn=$(uci -q get profile.default.apn)
@@ -291,6 +296,9 @@ if [ $MATCH = 0 ]; then
 	log "Default Profile Used"
 	[ -n "$(uci -q get profile.default.apn)" ] || log "Default profile has no APN configured"
 fi
+
+APN=$(uci -q get modem.modeminfo$CURRMODEM.apn)
+log "APN of profile used is $APN"
 
 touch /tmp/profile$CURRMODEM
 

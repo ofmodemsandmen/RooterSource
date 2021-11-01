@@ -17,9 +17,9 @@ end
 
 function action_getid()
 	local rv = {}
-	id = luci.model.uci.cursor():get("zerotier", "zerotier1", "join")
+	id = luci.model.uci.cursor():get("zerotier", "zerotier", "join")
 	rv["netid"] = id
-	secret = luci.model.uci.cursor():get("zerotier", "zerotier1", "secret")
+	secret = luci.model.uci.cursor():get("zerotier", "zerotier", "secret")
 	rv["routerid"] = string.sub(secret,1,10)
 	rv["password"] = luci.model.uci.cursor():get("custom", "zerotier", "password")
 	luci.http.prepare_content("application/json")
@@ -33,10 +33,14 @@ end
 
 function action_get_ids()
 	local rv = {}
-	id = luci.model.uci.cursor():get("zerotier", "zerotier1", "join")
+	id = luci.model.uci.cursor():get("zerotier", "zerotier", "join")
 	rv["netid"] = id
-	secret = luci.model.uci.cursor():get("zerotier", "zerotier1", "secret")
-	rv["routerid"] = string.sub(secret,1,10)
+	secret = luci.model.uci.cursor():get("zerotier", "zerotier", "secret")
+	if secret ~= nil then
+		rv["routerid"] = string.sub(secret,1,10)
+	else
+		rv["routerid"] = "xxxxxxxxxx"
+	end
 	luci.http.prepare_content("application/json")
 	luci.http.write_json(rv)
 end

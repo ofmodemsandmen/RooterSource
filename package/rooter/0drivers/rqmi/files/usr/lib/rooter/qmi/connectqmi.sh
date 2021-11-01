@@ -78,9 +78,9 @@ if [ "$DATAFORM" = '"raw-ip"' ]; then
 		log "Device only supports raw-ip mode but is missing this required driver attribute: /sys/class/net/$ifname/qmi/raw_ip"
 		ret=1
 	}
-	ip link set dev $ifname down
+	#ip link set dev $ifname down
 	echo "Y" > /sys/class/net/$ifname/qmi/raw_ip
-	ip link set dev $ifname up
+	#ip link set dev $ifname up
 fi
 
 log "Setting FCC Auth: $(uqmi -s -d "$device" --fcc-auth)"

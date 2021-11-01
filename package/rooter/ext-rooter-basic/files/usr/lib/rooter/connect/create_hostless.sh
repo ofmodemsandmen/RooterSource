@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh 
 
 ROOTER=/usr/lib/rooter
 ROOTER_LINK="/tmp/links"
@@ -32,22 +32,42 @@ handle_timeout(){
 }
 
 set_dns() {
-	local DNS1=$(uci get modem.modeminfo$CURRMODEM.dns1)
-	local DNS2=$(uci get modem.modeminfo$CURRMODEM.dns2)
-	if [ -z $DNS1 ]; then
-		if [ -z $DNS2 ]; then
-			return
-		else
-			uci set network.wan$INTER.peerdns=0
-			uci set network.wan$INTER.dns=$DNS2
-		fi
-	else
+	local pDNS1=$(uci -q get modem.modeminfo$CURRMODEM.dns1)
+	local pDNS2=$(uci -q get modem.modeminfo$CURRMODEM.dns2)
+	local pDNS3=$(uci -q get modem.modeminfo$CURRMODEM.dns3)
+	local pDNS4=$(uci -q get modem.modeminfo$CURRMODEM.dns4)
+
+	local aDNS="$pDNS1 $pDNS2 $pDNS3 $pDNS4"
+	local bDNS=""
+
+	echo "$aDNS" | grep -o "[[:graph:]]" &>/dev/null
+	if [ $? = 0 ]; then
+		log "Using DNS settings from the Connection Profile"
+		pdns=1
+		for DNSV in $(echo "$aDNS"); do
+			if [ "$DNSV" != "0.0.0.0" ] && [ -z "$(echo "$bDNS" | grep -o "$DNSV")" ]; then
+				[ -n "$(echo "$DNSV" | grep -o ":")" ] && continue
+				bDNS="$bDNS $DNSV"
+			fi
+		done
+
+		bDNS=$(echo $bDNS)
 		uci set network.wan$INTER.peerdns=0
-		if [ -z $DNS2 ]; then
-			uci set network.wan$INTER.dns="$DNS1"
-		else
-			uci set network.wan$INTER.dns="$DNS2 $DNS1"
-		fi
+		uci set network.wan$INTER.dns="$bDNS"
+		echo "$bDNS" > /tmp/v4dns$INTER
+
+		bDNS=""
+		for DNSV in $(echo "$aDNS"); do
+			if [ "$DNSV" != "0:0:0:0:0:0:0:0" ] && [ -z "$(echo "$bDNS" | grep -o "$DNSV")" ]; then
+				[ -z "$(echo "$DNSV" | grep -o ":")" ] && continue
+				bDNS="$bDNS $DNSV"
+			fi
+		done
+		echo "$bDNS" > /tmp/v6dns$INTER
+	else
+		log "Using Hostless Modem as a DNS"
+		pdns=0
+		rm -f /tmp/v[46]dns$INTER
 	fi
 }
 
@@ -91,6 +111,15 @@ get_connect() {
 	uci commit modem
 }
 
+get_tty_fix() {
+# $1 is fixed ttyUSB or ttyACM port number
+	local POS
+	POS=`expr 1 + $1`
+	CPORT=$(echo "$TTYDEVS" | cut -d' ' -f"$POS" | grep -o "[[:digit:]]\+")
+}
+
+
+
 CURRMODEM=$1
 source /tmp/variable.file
 
@@ -105,47 +134,54 @@ idP=$(uci get modem.modem$CURRMODEM.idP)
 log " "
 log "Hostless ID $idV:$idP"
 log " "
-SP=0
+
+MDEVICE=$(uci -q get modem.modem$CURRMODEM.device)
+OX=$(ls /sys/bus/usb/devices/"$MDEVICE":*/ | grep -o ttyUSB[0-9])
+if [ $? -ne 0 ]; then
+	log "No ECM Comm Port"
+else
+	TTYDEVS=$(echo "$OX" | tr '\n' ' ')
+	TTYDEVS=$(echo "$TTYDEVS")
+	log Modem at $MDEVICE is a parent of $TTYDEVS
+fi
+
 if [ $idV = 1546 -a $idP = 1146 ]; then
 	SP=1
-fi
-if [ $idV = 19d2 -a $idP = 1476 ]; then
+elif [ $idV = 19d2 -a $idP = 1476 ]; then
 	SP=2
-fi
-if [ $idV = 1410 -a $idP = 9022 ]; then
-        SP=3
-fi
-if [ $idV = 1410 -a $idP = 9032 ]; then
+elif [ $idV = 1410 -a $idP = 9022 ]; then
 	SP=3
-fi
-if [ $idV = 2cb7 ]; then
+elif [ $idV = 1410 -a $idP = 9032 ]; then
+	SP=3
+elif [ $idV = 2cb7 ]; then
 	log "Fibocom ECM"
 	SP=4
-fi
-if [ $idV = 2c7c ]; then
+elif [ $idV = 2c7c ]; then
 	SP=5
-fi
-if [ $idV = 12d1 -a $idP = 15c1 ]; then
+elif [ $idV = 12d1 -a $idP = 15c1 ]; then
 	SP=6
+else
+	SP=0
 fi
+
 log " "
 log "Modem Type $SP"
 log " "
 if [ $SP -gt 0 ]; then
 	if [ $SP -eq 3 ]; then
-		CPORT=0
+		PORTN=0
 	elif [ $SP -eq 4 ]; then
-		CPORT=2
+		PORTN=2
 	elif [ $SP -eq 5 ]; then
-		CPORT=2
+		PORTN=2
 	elif [ $SP -eq 6 ]; then
-		CPORT=2
+		PORTN=2
 	else
-		CPORT=1
+		PORTN=1
 	fi
+	get_tty_fix $PORTN
 	lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
 	source /tmp/parmpass
-	CPORT=`expr $CPORT + $BASEP`
 	uci set modem.modem$CURRMODEM.commport=$CPORT
 	uci commit modem
 	log "ECM Comm Port : /dev/ttyUSB$CPORT"
@@ -155,7 +191,7 @@ if [ $SP -gt 0 ]; then
 		if [ -e /etc/interwave ]; then
 			ATCMDD="AT+CGMM"
 			MODEL=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			EM160=$(echo $model | grep "EM160")
+			EM160=$(echo $MODEL | grep "EM160")
 			idV=$(uci get modem.modem$CURRMODEM.idV)
 			if [ $idV != "0800" ]; then
 				if [ $EM160 ]; then
@@ -197,7 +233,7 @@ else
 		INTER=$CURRMODEM
 	fi
 fi
-log "Profile for Modem$CURRMODEM sets interface to WAN$INTER"
+log "Profile for Modem $CURRMODEM sets interface to WAN$INTER"
 OTHER=1
 if [ $CURRMODEM = 1 ]; then
 	OTHER=2
@@ -220,12 +256,20 @@ uci commit modem
 log "Modem$CURRMODEM is using WAN$INTER"
 
 log "Checking Network Interface"
-set_network usb$USBN
-if
+match="$(uci get modem.modem$CURRMODEM.maxcontrol | cut -d/ -f3- | xargs dirname)"
+interface="$(if [ "$match" ]; then for a in /sys/class/net/*; do readlink $a; done | grep "$match"; fi | xargs -r basename)"
+
+if [ "$interface" ]; then
+	log "ECM Data Port : $interface"
+	set_network "$interface"
+elif
 	ifconfig usb$USBN
 then
 	log "Using usb$USBN as network interface"
 	uci set modem.modem$CURRMODEM.interface=usb$USBN
+	if [ -e $ROOTER/changedevice.sh ]; then
+		$ROOTER/changedevice.sh usb$USBN
+	fi
 	USBN=`expr 1 + $USBN`
 else
 	set_network eth$ETHN
@@ -234,6 +278,9 @@ else
 	then
 		log "Using eth$ETHN as network interface"
 		uci set modem.modem$CURRMODEM.interface=eth$ETHN
+		if [ -e $ROOTER/changedevice.sh ]; then
+			$ROOTER/changedevice.sh eth$ETHN
+		fi
 		ETHN=`expr 1 + $ETHN`
 	fi
 fi
