@@ -1,5 +1,5 @@
 
-config settings 'bwallocate'
+config bwallocate 'bwallocate'
 	option rollover '1'
 	option allocate '1000'
 	option password '1234'
@@ -9,6 +9,7 @@ config settings 'bwallocate'
 config menu 'menu'
 	option password '1234'
 	option full '0'
+	option enabled '0'
 
 config atcmd 'atcmd'
 	option lock '0'

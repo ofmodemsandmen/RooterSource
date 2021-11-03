@@ -228,7 +228,7 @@ function action_check_misc()
 	end
 	rv["plock"] = luci.model.uci.cursor():get("custom", "atcmd", "lock")
 	if rv["plock"] == "1" then
-		rv["atlock"] = luci.model.uci.cursor():get("custom", "atcmd", "password")
+		rv["atlock"] = luci.model.uci.cursor():get("custom", "menu", "full")
 		generic = luci.model.uci.cursor():get("custom", "atcmd", "generic")
 		aindx = 0
 		if active == "0" then

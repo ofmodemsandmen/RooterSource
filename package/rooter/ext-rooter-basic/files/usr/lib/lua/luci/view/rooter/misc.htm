@@ -128,6 +128,21 @@ end
 					
 					atlock = rv["atlock"];
 					document.getElementById("password").value=atlock;
+					document.getElementById("attxt").value=atlock;
+					if ( atlock == "1" )
+					{
+						document.getElementById("atcmdlck").disabled=false;
+						document.getElementById("sendfullat").disabled=false;
+						document.getElementById("atcmdlck").style.visibility="visible";
+						document.getElementById("sendfullat").style.visibility="visible";
+					}
+					else
+					{
+						document.getElementById("atcmdlck").disabled=true;
+						document.getElementById("sendfullat").disabled=true;
+						document.getElementById("atcmdlck").style.visibility="hidden";
+						document.getElementById("sendfullat").style.visibility="hidden";
+					}
 				}
 			}
 			if ( stat == "1" )
@@ -182,6 +197,20 @@ end
 					}
 					atlock = rv["atlock"];
 					document.getElementById("password").value=atlock;
+					if ( atlock == "1" )
+					{
+						document.getElementById("atcmdlck").disabled=false;
+						document.getElementById("sendfullat").disabled=false;
+						document.getElementById("atcmdlck").style.visibility="visible";
+						document.getElementById("sendfullat").style.visibility="visible";
+					}
+					else
+					{
+						document.getElementById("atcmdlck").disabled=true;
+						document.getElementById("sendfullat").disabled=true;
+						document.getElementById("atcmdlck").style.visibility="hidden";
+						document.getElementById("sendfullat").style.visibility="hidden";
+					}
 				}
 				if ( gpio == "0" )
 				{
@@ -275,6 +304,20 @@ end
 					}
 					atlock = rv["atlock"];
 					document.getElementById("password").value=atlock;
+					if ( atlock == "1" )
+					{
+						document.getElementById("atcmdlck").disabled=false;
+						document.getElementById("sendfullat").disabled=false;
+						document.getElementById("atcmdlck").style.visibility="visible";
+						document.getElementById("sendfullat").style.visibility="visible";
+					}
+					else
+					{
+						document.getElementById("atcmdlck").disabled=true;
+						document.getElementById("sendfullat").disabled=true;
+						document.getElementById("atcmdlck").style.visibility="hidden";
+						document.getElementById("sendfullat").style.visibility="hidden";
+					}
 				} 
 				if ( gpio == "0" )
 				{
@@ -1297,7 +1340,7 @@ end
 		}
 		if ( r == passw )
 		{
-			document.getElementById("lockbtn").src="<%=showicon(0)%>";
+			//document.getElementById("lockbtn").src="<%=showicon(0)%>";
 			document.getElementById("atcmdlck").style.visibility="visible";
 			document.getElementById("sendfullat").style.visibility="visible";
 			document.getElementById("pass").value="";
@@ -1308,7 +1351,7 @@ end
 			alert("Incorrect Password!!!");
 			document.getElementById("pass").value="";
 		}
-		document.getElementById("lockbtn").disabled=false;
+		//document.getElementById("lockbtn").disabled=false;
 		return false;
 	};
 
@@ -1318,11 +1361,11 @@ end
 		if ( lockb == 0 )
 		{
 			document.getElementById("popup").style.display = "block";
-			document.getElementById("lockbtn").disabled=true;
+			//document.getElementById("lockbtn").disabled=true;
 		}
 		else
 		{
-			document.getElementById("lockbtn").src="<%=showicon(1)%>";
+			//document.getElementById("lockbtn").src="<%=showicon(1)%>";
 			document.getElementById("atcmdlck").style.visibility="hidden";
 			document.getElementById("sendfullat").style.visibility="hidden";
 			lockb = 0;
@@ -1469,9 +1512,7 @@ end
 			<select style="width:200px" name="atdrop" id="drop1">
 			</select>
 		</td>
-		<td width="3%">
-			<input type="image" id="lockbtn" name="lockbtn" src="<%=showicon(1)%>" style="width:48px;height:48px;" onclick="return unlock(this)" />
-		</td>
+		
 		<td width="15%" ><input style="visibility:hidden;width: 500px;maxlength="200" type="text" name="atcmdlck" id="atcmdlck" class="cbi-input-text"  onkeydown="sndfullcmd(event)" ></input>
 		</td>
 		<td width="10%"><input style="visibility:hidden" type="submit" id="sendfullat" class="cbi-button cbi-button-apply" value="<%:Send Command%>" onclick="return sendfullcmd()" />

@@ -583,6 +583,17 @@
 		"ext2": "-initramfs-kernel.bin",
 		"addons": ["readme.pdf", "readmerecovery.txt"]
 	},
+	"HG553": {
+		"details": "Huawei HG553",
+		"type": "1",
+		"build": "1907",
+		"config": ".config_hg553",
+		"image": "openwrt-brcm63xx-generic-HG553-squashfs-cfe.bin",
+		"imagepath": "/brcm63xx/generic/",
+		"mod": "Huawei-HG553",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf"]
+	},
 	"HG556A": {
 		"details": "Huawei HG556a-A",
 		"type": "1",
@@ -905,6 +916,19 @@
 		"ext2": "-upgrade.bin",
 		"addons": ["readme.pdf", "factory.txt"]
 	},
+	"R7500V1": {
+		"details": "Netgear R7500-V1",
+		"type": "2",
+		"build": "1907",
+		"config": ".config_r7500v1",
+		"image1": "openwrt-ipq806x-generic-netgear_r7500-squashfs-factory.img",
+		"image2": "openwrt-ipq806x-generic-netgear_r7500-squashfs-sysupgrade.bin",
+		"imagepath": "/ipq806x/generic/",
+		"mod": "Netgear-R7500-V1",
+		"ext1": "-factory.img",
+		"ext2": "-upgrade.bin",
+		"addons": ["readme.pdf", "factory.txt"]
+	},
 	"R7800": {
 		"details": "Netgear R7800",
 		"type": "2",
@@ -1135,6 +1159,19 @@
 		"ext2": "-update.bin",
 		"addons": ["readme.pdf", "archer.txt"]
 	},
+	"WR942": {
+		"details": "TP-Link WR942N",
+		"type": "2",
+		"build": "1907",
+		"config": ".config_wr942",
+		"image1": "openwrt-ar71xx-generic-tl-wr942n-v1-squashfs-factory.bin",
+		"image2": "openwrt-ar71xx-generic-tl-wr942n-v1-squashfs-sysupgrade.bin",
+		"imagepath": "/ar71xx/generic/",
+		"mod": "TP-Link-WR942N",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["readme.pdf", "archer.txt"]
+	},
 	"WR1043V5": {
 		"details": "TP-Link WR1043N-V5",
 		"type": "2",
@@ -1266,7 +1303,7 @@
 		"config": ".config_we826t32",
 		"image": "openwrt-ramips-mt7620-zbt-we826-32M-squashfs-sysupgrade.bin",
 		"imagepath": "/ramips/mt7620/",
-		"mod": "ZBT-WE826T-32meg",
+		"mod": "ZBT-WE826-T-32meg",
 		"ext": "-upgrade.bin",
 		"addons": ["readme.pdf", "readmerecovery.txt"]
 	},
@@ -1484,5 +1521,56 @@
 		"ext1": "-upgrade.bin",
 		"ext2": "-factory.bin",
 		"addons": ["readme.pdf", "factory.txt"]
+	},	
+	"KEENXII": {
+		"details": "ZyXEL Keenetic Extra II",
+		"type": "2",
+		"build": "1907",
+		"config": ".config_keenxii",
+		"image1": "openwrt-ramips-mt76x8-zyxel_keenetic-extra-ii-squashfs-factory.bin",
+		"image2": "openwrt-ramips-mt76x8-zyxel_keenetic-extra-ii-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt76x8/",
+		"mod": "ZyXEL-Keenetic-Extra-II",
+		"ext1": "-upgrade.bin",
+		"ext2": "-factory.bin",
+		"addons": ["readme.pdf"]
+	},
+	"KEENOMNI": {
+		"details": "ZyXEL Keenetic Omni",
+		"type": "2",
+		"build": "1907",
+		"flash": "8",
+		"config": ".config_keenomni",
+		"image1": "openwrt-ramips-mt7620-kn_rc-squashfs-factory.bin",
+		"image2": "openwrt-ramips-mt7620-kn_rc-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7620/",
+		"mod": "ZyXEL-Keenetic-Omni",
+		"ext1": "-upgrade.bin",
+		"ext2": "-factory.bin",
+		"addons": ["readme.pdf"]
+	},
+	"WE526": {
+		"details": "ZBT WE526",
+		"type": "1",
+		"build": "1907",
+		"flash": "8",
+		"config": ".config_we526",
+		"image": "openwrt-ramips-mt7620-zbt-ape522ii-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7620/",
+		"mod": "ZBT-WE526",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf"]
+	},
+	"IRZ00": {
+		"details": "IRZ-MT00",
+		"type": "1",
+		"flash": "8",
+		"build": "1907",
+		"config": ".config_irz00",
+		"image": "openwrt-ramips-mt7620-irz_mt00-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7620/",
+		"mod": "IRZ-MT00",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf", "readmerecovery.txt"]
 	}
 }
