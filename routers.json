@@ -1572,5 +1572,27 @@
 		"mod": "IRZ-MT00",
 		"ext": "-upgrade.bin",
 		"addons": ["readme.pdf", "readmerecovery.txt"]
+	},
+	"NEWIFI": {
+		"details": "Newifi D2",
+		"type": "1",
+		"build": "1907",
+		"config": ".config_newifi",
+		"image": "openwrt-ramips-mt7621-d-team_newifi-d2-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "Newifi-D2",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf", "readmerecovery.txt"]
+	},
+	"HH5": {
+		"details": "BT HomeHub 5",
+		"type": "1",
+		"build": "1907",
+		"config": ".config_hh5",
+		"image": "openwrt-lantiq-xrx200-bt_homehub-v5a-squashfs-sysupgrade.bin",
+		"imagepath": "/lantiq/xrx200/",
+		"mod": "BT-HomeHub-5",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf", "readmerecovery.txt"]
 	}
 }

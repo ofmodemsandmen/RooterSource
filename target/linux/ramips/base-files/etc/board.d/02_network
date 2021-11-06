@@ -494,6 +494,10 @@ ramips_setup_interfaces()
 		ucidef_add_switch "switch0" \
 			"1:lan" "2:lan" "3:lan" "4:lan" "0:wan" "6@eth0"
 		;;
+	zbtlink,zbt-we2802d)
+       ucidef_add_switch "switch0" \
+       "0:lan" "4:wan" "6@eth0"
+        ;;
 	*)
 		RT3X5X=`cat /proc/cpuinfo | egrep "(RT3.5|RT5350)"`
 		if [ -n "${RT3X5X}" ]; then
@@ -703,6 +707,9 @@ ramips_setup_macs()
 		;;
 	zyxel,keenetic-start)
 		wan_mac=$(mtd_get_mac_binary factory 40)
+		;;
+	irz_mt00)
+		ucidef_add_switch "switch0" "0:lan" "6t@eth0"
 		;;
 	*)
 		lan_mac=$(cat /sys/class/net/eth0/address)
