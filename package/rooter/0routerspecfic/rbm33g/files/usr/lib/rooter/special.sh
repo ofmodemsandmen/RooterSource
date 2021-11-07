@@ -1,5 +1,11 @@
-#!/bin/sh 
+#!/bin/sh
 . /lib/functions.sh
+
+ROOTER=/usr/lib/rooter
+
+log() {
+	logger -t "Special" "$@"
+}
 
 VL=0
 do_vlan() {
@@ -24,47 +30,33 @@ if [ ! -f /etc/rbm33 ]; then
 		/etc/init.d/network restart
 	fi
 	echo "0" > /etc/rbm33
-fi 
+fi
 
-echo "1" > /sys/class/gpio/gpio9/value
-sleep 1
-echo "1" > /sys/class/gpio/gpio12/value
+if [ -e /etc/dual ]; then
+	# 1st modem location in a dual modem setup: USB port or pcie1 (port 1-1)
+	WAIT1=15	# wait time for a primary modem; set 0 for pcie1 and 10+ for USB
+	WAIT2=45	# delay for the second modem (pcie0 port 1-2)
 
-# 1 Check USB Devices, Rev=0.00 is probably a boothold device, awk reverses the line order
-var="`cat /sys/kernel/debug/usb/devices | grep -E '^T:|^P:|^C:' | grep -E 'Rev= 0.00$' -C1 | awk '{a[i++]=$0} END {for (j=i-1; j>=0;) print a[j--] }'`"
-while read -r line; do
-    case $line in 'T:  Bus='*)
-        if [ $ProdID ] && [ $Vendor ]; then
-            BPort="`echo $line | awk -F'[ =]' '{print $3$9}'`"
-            case $BPort in
-                '0101') GPIO_PIN=gpio9; ;; # pcie0
-                '0100') GPIO_PIN=gpio10; ;; # pcie1/USB in USB 2.0 mode
-                '0200') GPIO_PIN=gpio12; ;; # USB in USB 3.0 mode
-                *) unset GPIO_PIN; ;;
-            esac;
-            if [ $GPIO_PIN ]; then
-                echo "Modem in BOOTHOLD!" > /dev/kmsg
-                echo "0" > /sys/class/gpio/$GPIO_PIN/value
-                echo "1" > /sys/class/gpio/$GPIO_PIN/value
-                echo "Toggled GPIO $GPIO_PIN" > /dev/kmsg
-                unset GPIO_PIN
-            fi
-        fi
-    esac
-    unset Vendor
-    unset ProdID
-    case $line in 'P:  Vendor='*)
-        if [ $trigger -eq 1 ]; then
-            # 3 add logic to check against VID/PID from list
-            Vendor=`echo $line | awk -F'[ =]' '{print $3}'`
-            ProdID=`echo $line | awk -F'[ =]' '{print $5}'`
-            trigger=0
-        fi
-    esac
-    case $line in 'C:* #Ifs= 1'*)
-        # 2 Found a device with only one interface, so we'll assume is a boothold modem for now
-        trigger=1
-    esac
-done <<EOF
-$var
-EOF
+	CNTR=0
+	while [ $CNTR -le ${WAIT1} ]; do
+		if [ -e /sys/bus/usb/drivers/usb/1-1 ]; then
+			M1=1
+			break
+		fi
+		CNTR=`expr $CNTR + 1`
+		sleep 1
+	done
+
+	if [ "$M1" = 1 ]; then
+		log "Found a modem in \"1-1\", adding ${WAIT2} sec delay before powering pcie0"
+	else
+		WAIT2=""
+		log "No other modem found, powering pcie0 immediately"
+	fi
+else
+	WAIT2=""
+fi
+
+if [ -x $ROOTER/gpio-set.sh ]; then
+	$ROOTER/gpio-set.sh pcie0_power 1 ${WAIT2} &
+fi

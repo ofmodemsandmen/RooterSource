@@ -10,6 +10,7 @@ log() {
 	. /lib/netifd/netifd-proto.sh
 
 CURRMODEM=$1
+devname=$2
 device=/dev/$2
 auth=$3
 NAPN=$4
@@ -18,6 +19,11 @@ password=$6
 RAW=$7
 DHCP=$8
 pincode=$9
+
+ifname1="ifname"
+if [ -e /etc/newstyle ]; then
+	ifname1="device"
+fi
 
 INTER=$(uci -q get modem.modem$CURRMODEM.inter)
 interface="wan"$INTER
@@ -43,9 +49,7 @@ if [ $password = NIL ]; then
 	password=
 fi
 
-devname="$(basename "$device")"
-devpath="$(readlink -f /sys/class/usbmisc/$devname/device/)"
-ifname="$( ls "$devpath"/net )"
+ifname="$(ls /sys/class/usbmisc/$devname/device/net/)"
 
 #while uqmi -s -d "$device" --get-pin-status | grep '"UIM uninitialized"' > /dev/null; do
 #		sleep 1;
@@ -60,32 +64,35 @@ ifname="$( ls "$devpath"/net )"
 
 uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null & sleep 10 ; kill -9 $!
 
+#uqmi -s -d "$device" --set-data-format 802.3
+#uqmi -s -d "$device" --wda-set-data-format 802.3
 if [ $RAW -eq 1 ]; then
 	DATAFORM='"raw-ip"'
-elif [ $idV = 1199 -a $idP = 9055 ]; then
-	$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
-	DATAFORM="802.3"
-	uqmi -s -d "$device" --set-data-format 802.3
-	uqmi -s -d "$device" --wda-set-data-format 802.3
+	echo "Y" > /sys/class/net/$ifname/qmi/raw_ip
 else
 	DATAFORM=$(uqmi -s -d "$device" --wda-get-data-format)
 fi
-
 log "WDA-GET-DATA-FORMAT is $DATAFORM"
-
 if [ "$DATAFORM" = '"raw-ip"' ]; then
 	[ -f /sys/class/net/$ifname/qmi/raw_ip ] || {
 		log "Device only supports raw-ip mode but is missing this required driver attribute: /sys/class/net/$ifname/qmi/raw_ip"
 		ret=1
 	}
-	#ip link set dev $ifname down
 	echo "Y" > /sys/class/net/$ifname/qmi/raw_ip
-	#ip link set dev $ifname up
 fi
 
-log "Setting FCC Auth: $(uqmi -s -d "$device" --fcc-auth)"
-sleep 1
-# uqmi -s -d "$device" --sync > /dev/null 2>&1
+log "Query radio state"
+uqmi -s -d "$device" --get-signal-info | grep -q "Information unavailable"
+STATUS=$?
+
+[ "$STATUS" -ne 0 ] || {
+	sleep 1
+	log "Setting FCC Auth"
+	uqmi -s -d "$device" --fcc-auth
+	sleep 1
+	}
+
+uqmi -s -d "$device" --sync > /dev/null 2>&1
 
 log "Waiting for network registration"
 while uqmi -s -d "$device" --get-serving-system | grep '"searching"' > /dev/null; do
@@ -110,7 +117,7 @@ log "Status is $CONN"
 
 if [[ -z $(echo "$CONN" | grep -o "disconnected") ]]; then
 	ret=0
-	
+
 	CONN4=$(uqmi -s -d "$device" --set-client-id wds,"$cid" --get-current-settings)
 	log "GET-CURRENT-SETTINGS is $CONN4"
 
@@ -131,7 +138,7 @@ if [[ -z $(echo "$CONN" | grep -o "disconnected") ]]; then
 	else
 		rm -f /tmp/ipv6supp$INTER
 	fi
-	
+
 	if [ $DATAFORM = '"raw-ip"' ]; then
 		log "Handle raw-ip"
 		json_load "$CONN4"
@@ -166,7 +173,7 @@ if [[ -z $(echo "$CONN" | grep -o "disconnected") ]]; then
 			uci delete network.wan$INTER
 			uci set network.wan$INTER=interface
 			uci set network.wan$INTER.proto=static
-			uci set network.wan$INTER.ifname=$ifname
+			uci set network.wan$INTER.${ifname1}=$ifname
 			uci set network.wan$INTER.metric=$INTER"0"
 			uci set network.wan$INTER.ipaddr=$ip/$subnet
 			uci set network.wan$INTER.gateway='0.0.0.0'

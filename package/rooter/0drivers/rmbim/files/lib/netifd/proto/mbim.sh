@@ -14,6 +14,11 @@ log() {
 	logger -t "MBIM Connect" "$@"
 }
 
+ifname1="ifname"
+if [ -e /etc/newstyle ]; then
+	ifname1="device"
+fi
+
 get_connect() {
 	NAPN=$(uci -q get modem.modeminfo$CURRMODEM.apn)
 	NUSER=$(uci -q get modem.modeminfo$CURRMODEM.user)
@@ -144,21 +149,20 @@ _proto_mbim_setup() {
 	}
 
 	[ -n "$delay" ] && sleep "$delay"
-	
+
 	log "Query radio state"
-	umbim $DBG -d $device -n radio| grep "off"
+	umbim $DBG -n -d $device radio | grep "off"
 	STATUS=$?
-	
+
 	[ "$STATUS" -ne 0 ] || {
 		sleep 1
 		log "Setting FCC Auth"
-		uqmi $DBG -m -d $device --fcc-auth
+		uqmi $DBG -s -m -d $device --fcc-auth
 		sleep 1
 	}
 
 	log "Reading capabilities"
-	tid=$((tid + 1))
-	DCAPS=$(umbim $DBG -n -t $tid -d $device caps)
+	DCAPS=$(umbim $DBG -n -d $device caps)
 	retq=$?
 	if [ $retq -ne 0 ]; then
 
@@ -172,13 +176,13 @@ _proto_mbim_setup() {
 	echo 'CUSTOM="'"$CUSTOM"'"' > /tmp/mbimcustom$CURRMODEM
 
 	get_sub
-		
+
 	if [ ! -f /tmp/profile$CURRMODEM ]; then
 		$ROOTER/connect/get_profile.sh $CURRMODEM
 	fi
-	
+
 	get_connect
-	
+
 	log "Checking PIN state"
 	tid=$((tid + 1))
 	umbim -n -t $tid -d $device pinstate
@@ -210,7 +214,7 @@ _proto_mbim_setup() {
 	else
 		log "PIN is not required"
 	fi
-	
+
 	log "Register with network"
 	for i in $(seq 30); do
 		tid=$((tid + 1))
@@ -250,9 +254,9 @@ _proto_mbim_setup() {
 		sleep 1;
 	done
 	tid=$((tid + 1))
-	
+
 	log "Get IP config"
-	CONFIG=$(umbim $DBG -d $device -n -t $tid config) || {
+	CONFIG=$(umbim $DBG -n -t $tid -d $device config) || {
 		log "config failed"
 		return 1
 	}
@@ -270,13 +274,13 @@ _proto_mbim_setup() {
 	[ -n "$DNS2" ] && echo "DNS2: $DNS2"
 	[ -n "$DNS3" ] && echo "DNS3: $DNS3"
 	[ -n "$DNS4" ] && echo "DNS4: $DNS4"
-	
+
 	log "Connected, setting IP"
 
 	if [ -n "$IP6" -a -z "$IP" ]; then
 		log "Running IPv6-only mode"
 		nat46=1
-	fi	
+	fi
 
 	if [[ $(echo "$IP6" | grep -o "^[23]") ]]; then
 		# Global unicast IP acquired
@@ -304,7 +308,7 @@ _proto_mbim_setup() {
 	fi
 
 	proto_init_update "$ifname" 1
-	
+
 	if [ -n "$IP" ]; then
 		proto_add_ipv4_address $IP "255.255.255.255"
 		proto_add_ipv4_route "0.0.0.0" 0
@@ -330,7 +334,7 @@ _proto_mbim_setup() {
 		json_add_string zone wan
 	proto_close_data
 
-	proto_send_update "$interface"	
+	proto_send_update "$interface"
 
 	if [ "$v6cap" -gt 0 ]; then
 		local zone="$(fw3 -q network "$interface" 2>/dev/null)"
@@ -339,7 +343,7 @@ _proto_mbim_setup() {
 		log "Adding IPv6 dynamic interface"
 		json_init
 		json_add_string name "${interface}_6"
-		json_add_string ifname "@$interface"
+		json_add_string ${ifname1} "@$interface"
 		json_add_string proto "dhcpv6"
 		json_add_string extendprefix 1
 		[ -n "$zone" ] && json_add_string zone "$zone"
@@ -430,7 +434,7 @@ _proto_mbim_setup() {
 	$ROOTER_LINK/con_monitor$CURRMODEM $CURRMODEM &
 	#ln -s $ROOTER/mbim/monitor.sh $ROOTER_LINK/mbim_monitor$CURRMODEM
 	#$ROOTER_LINK/mbim_monitor$CURRMODEM $CURRMODEM $device &
-		
+
 	uci set modem.modem$CURRMODEM.connected=1
 	uci commit modem
 	CLB=$(uci -q get modem.modeminfo$CURRMODEM.lb)
@@ -449,7 +453,7 @@ _proto_mbim_setup() {
 				$ROOTER/timezone.sh &
 			fi
 		fi
-		ENB=$(uci get mwan3.wan$CURRMODEM.enabled)
+		ENB=$(uci -q get mwan3.wan$CURRMODEM.enabled)
 		if [ ! -z $ENB ]; then
 			if [ $CLB = "1" ]; then
 				uci set mwan3.wan$INTER.enabled=1
@@ -501,7 +505,7 @@ proto_mbim_teardown() {
 
 	proto_init_update "*" 0
 	proto_send_update "$interface"
-	
+
 }
 
 [ -n "$INCLUDE_ONLY" ] || add_protocol mbim

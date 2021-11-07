@@ -86,10 +86,10 @@ gpio[26] = 9
 gpio2[26] = 10
 gpio3[26] = 11
 gpio4[26] = 12
-gpioname[26] = "gpio9"
-gpioname2[26] = "gpio10"
-gpioname3[26] = "gpio11"
-gpioname4[26] = "gpio12"
+gpioname[26] = "pcie0_power"
+gpioname2[26] = "pcie1_power"
+gpioname3[26] = "pcie2_power"
+gpioname4[26] = "usb_power"
 model[27] = "m11g"
 gpio[27] = 9
 gpioname[27] = "gpio9"
@@ -108,8 +108,10 @@ gpio[32] = 17
 gpioname[32] = "power_usb"
 model[33] = "mk01"
 gpio[33] = 6
+model[34] = "rbsxtr"
+gpio[34] = 13
 
-numodel = 33
+numodel = 34
 
 local file = io.open(mfile, "r")
 if file == nil then

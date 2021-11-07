@@ -4,8 +4,13 @@ ROOTER=/usr/lib/rooter
 ROOTER_LINK="/tmp/links"
 
 log() {
-	logger -t "Create Connection" "$@" 
+	logger -t "Create Connection" "$@"
 }
+
+ifname1="ifname"
+if [ -e /etc/newstyle ]; then
+	ifname1="device"
+fi
 
 handle_timeout(){
 	local wget_pid="$1"
@@ -128,6 +133,7 @@ check_apn() {
 	fi
 	ATCMDD="AT+CGDCONT=?"
 	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+
 	[ "$PDPT" = "0" ] && PDPT=""
 	for PDP in "$PDPT" IPV4V6; do
 		if [[ "$(echo $OX | grep -o "$PDP")" ]]; then
@@ -254,7 +260,7 @@ chkT77() {
 		T77=1
 	fi
 	if [ $T77 = 1 ]; then
-		[ -e /dev/ttyUSB0 ] || T77=0
+		[ -n "$TTYDEVS" ] || T77=0
 	fi
 }
 
@@ -315,11 +321,11 @@ addv6() {
 	. /lib/netifd/netifd-proto.sh
 	local interface=wan$INTER
 	local zone="$(fw3 -q network "$interface" 2>/dev/null)"
-	
+
 	log "Adding IPv6 dynamic interface"
 	json_init
 	json_add_string name "${interface}_6"
-	json_add_string ifname "@$interface"
+	json_add_string ${ifname1} "@$interface"
 	json_add_string proto "dhcpv6"
 	json_add_string extendprefix 1
 	[ -n "$zone" ] && json_add_string zone "$zone"
@@ -358,7 +364,7 @@ get_tty_fix() {
 
 get_tty_ncm() {
 	local IfProt OX
-	PROTS="72 62 42 32 12 10 02 2"
+	PROTS="12 62 02 2"	# PC UI interface bInterfaceProtocol value
 	for IfProt in $PROTS; do
 		for TTYD in $(echo "$TTYDEVS"); do
 			OX=$(cat /sys/class/tty/$TTYD/../../../bInterfaceProtocol | grep -w "$IfProt")
@@ -375,7 +381,6 @@ get_tty_ncm() {
 CURRMODEM=$1
 RECON=$2
 SIERRAID=0
-source /tmp/variable.file
 
 MAN=$(uci -q get modem.modem$CURRMODEM.manuf)
 MOD=$(uci -q get modem.modem$CURRMODEM.model)
@@ -418,37 +423,38 @@ else
 		DELAY=5
 	fi
 
-	uci set modem.modem$CURRMODEM.wdm=$WDMN
-	uci set modem.modem$CURRMODEM.wwan=$WWAN
-	uci set modem.modem$CURRMODEM.interface=wwan$WWAN
-	uci commit modem
-
-
 #
 # QMI, NCM and MBIM use cdc-wdm
 #
-	case $PROT in
+
+rm -f /tmp/usbwait
+
+MATCH="$(uci get modem.modem$CURRMODEM.maxcontrol | cut -d/ -f3- | xargs dirname)"
+
+case $PROT in
 	"2"|"3"|"30"|"4"|"6"|"7" )
-		WDMNX=$WDMN
-		WDMN=`expr 1 + $WDMN`
-		;;
-	esac
+	OX="$(for a in /sys/class/usbmisc/*; do readlink $a; done | grep "$MATCH")"
+	devname=$(basename $OX)
+	log "Modem $CURRMODEM WDM Device : $devname"
+	WDMNX=$(echo $devname | grep -o "[[:digit:]]")
+	ifname="$(ls /sys/class/usbmisc/$devname/device/net/)"
+	WWANX=$(echo $ifname | grep -o "[[:digit:]]")
 
-	WWANX=$WWAN
-	WWANZ=$WWAN
-	WWAN=`expr 1 + $WWAN`
-	save_variables
-	rm -f /tmp/usbwait
+	uci set modem.modem$CURRMODEM.wdm=$WDMNX
+	uci set modem.modem$CURRMODEM.wwan=$WWANX
+	uci set modem.modem$CURRMODEM.interface=$ifname
+	uci commit modem
+	;;
+esac
 
-MDEVICE=$(uci -q get modem.modem$CURRMODEM.device)
-OX=$(ls /sys/bus/usb/devices/"$MDEVICE":*/ | grep -o ttyUSB[0-9])
+OX=$(for a in /sys/class/tty/*; do readlink $a; done | grep "$MATCH" | tr '\n' ' ' | xargs -r -n1 basename)
+TTYDEVS=$(echo "$OX" | grep -o ttyUSB[0-9])
 if [ $? -ne 0 ]; then
-	OX=$(ls /sys/bus/usb/devices/"$MDEVICE":*/tty/ | grep -o ttyACM[0-9])
-	ACM=1
+	TTYDEVS=$(echo "$OX" | grep -o ttyACM[0-9])
+	[ $? -eq 0 ] && ACM=1
 fi
-TTYDEVS=$(echo "$OX" | tr '\n' ' ')
-TTYDEVS=$(echo "$TTYDEVS")
-log Modem at $MDEVICE is a parent of $TTYDEVS
+TTYDEVS=$(echo "$TTYDEVS" | tr '\n' ' ')
+log Modem $CURRMODEM is a parent of $TTYDEVS
 
 	case $PROT in
 #
@@ -466,9 +472,6 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 #
 	"2" )
 		log "Start QMI Connection"
-		while [ ! -e /dev/cdc-wdm$WDMNX ]; do
-			sleep 1
-		done
 		sleep $DELAY
 
 		chksierra
@@ -493,24 +496,11 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 		lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
 		source /tmp/parmpass
 
-		log "QMI Comm Port : /dev/ttyUSB$CPORT"
-		device=/dev/cdc-wdm$WDMNX
-		devname="$(basename "$device")"
-		devpath="$(readlink -f /sys/class/usbmisc/$devname/device/)"
-		ifname="$( ls "$devpath"/net )"
+		log "Modem $CURRMODEM QMI Comm Port : /dev/ttyUSB$CPORT"
 		chkraw
-		if [ $idV = 2c7c -a $idP = 0800 ]; then
-			uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null & sleep 10 ; kill -9 $!
-			if [ -f /sys/class/net/$ifname/qmi/raw_ip ]; then
-				echo "Y" > /sys/class/net/$ifname/qmi/raw_ip
-			fi
-		fi
 		;;
 	"3"|"30" )
 		log "Start MBIM Connection"
-		while [ ! -e /dev/cdc-wdm$WDMNX ]; do
-			sleep 1
-		done
 		sleep $DELAY
 
 		chksierra
@@ -531,7 +521,7 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 					if [ -n "$CPORT" ]; then
 						uci set modem.modem$CURRMODEM.proto="30"
 					fi
-					log "MBIM Comm Port : /dev/ttyUSB$CPORT"
+					log "Modem $CURRMODEM MBIM Comm Port : /dev/ttyUSB$CPORT"
 				else
 					uci set modem.modem$CURRMODEM.commport=""
 					uci set modem.modem$CURRMODEM.proto="3"
@@ -605,7 +595,7 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 
 							uci set modem.modem$CURRMODEM.commport=$CPORT
 							uci set modem.modem$CURRMODEM.proto="30"
-							log "Fibocom MBIM Comm Port : /dev/ttyUSB$CPORT"
+							log "Modem $CURRMODEM Fibocom MBIM Comm Port : /dev/ttyUSB$CPORT"
 						;;
 						* )
 							uci set modem.modem$CURRMODEM.commport=""
@@ -622,18 +612,6 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 #
 	"4"|"6"|"7"|"24"|"26"|"27" )
 		log "Start NCM Connection"
-		case $PROT in
-		"4"|"6"|"7" )
-			while [ ! -e /dev/cdc-wdm$WDMNX ]; do
-				sleep 1
-			done
-			;;
-		"24"|"26"|"27" )
-			while [ ! -e /dev/ttyUSB$BASEP ]; do
-				sleep 1
-			done
-			;;
-		esac
 		sleep $DELAY
 
 		get_tty_ncm
@@ -650,7 +628,7 @@ log Modem at $MDEVICE is a parent of $TTYDEVS
 		ACMPORT=$CPORT
 		CPORT="8$ACMPORT"
 		ln -fs /dev/ttyACM$ACMPORT /dev/ttyUSB$CPORT
-		log "Fibocom NCM Comm Port : /dev/ttyUSB$CPORT"
+		log "Modem $CURRMODEM Fibocom NCM Comm Port : /dev/ttyUSB$CPORT"
 		;;
 	esac
 
@@ -789,18 +767,12 @@ if [ -n "$CHKPORT" ]; then
 		DHCP=0
 		log "Using QMI without DHCP"
 	fi
-	
+
 	if [ $DHCP = 1 ]; then
 		uci delete network.wan$INTER
 		uci set network.wan$INTER=interface
 		uci set network.wan$INTER.proto=dhcp
-		source /etc/openwrt_release
-		tone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
-		ifname="ifname"
-		if [ ! -z $tone ]; then
-			ifname="device"
-		fi
-		uci set network.wan$INTER.$ifname=wwan$WWANZ
+		uci set network.wan$INTER.${ifname1}=$ifname
 		uci set network.wan$INTER._orig_bridge=false
 		uci set network.wan$INTER.metric=$INTER"0"
 		set_dns
@@ -808,9 +780,9 @@ if [ -n "$CHKPORT" ]; then
 	else
 		set_dns
 	fi
-	
+
 	if [ -e $ROOTER/changedevice.sh ]; then
-		$ROOTER/changedevice.sh wwan0
+		$ROOTER/changedevice.sh $ifname
 	fi
 
 	export SETAPN=$NAPN
@@ -911,7 +883,7 @@ while [ 1 -lt 6 ]; do
 	if [ -e $ROOTER/modem-led.sh ]; then
 		$ROOTER/modem-led.sh $CURRMODEM 2
 	fi
-	
+
 	BRK=0
 	case $PROT in
 #
@@ -1032,10 +1004,10 @@ while [ 1 -lt 6 ]; do
 	"28" )
 		. /lib/functions.sh
 		. /lib/netifd/netifd-proto.sh
-		match="$(uci get modem.modem$CURRMODEM.maxcontrol | cut -d/ -f3- | xargs dirname)"
-		OX="$(for a in /sys/class/net/*; do readlink $a; done | grep "$match" | grep ".6/net/")"
+		MATCH="$(uci get modem.modem$CURRMODEM.maxcontrol | cut -d/ -f3- | xargs dirname)"
+		OX="$(for a in /sys/class/net/*; do readlink $a; done | grep "$MATCH" | grep ".6/net/")"
 		ifname=$(basename $OX)
-		log "Fibocom NCM Data Port : $ifname"
+		log "Modem $CURRMODEM Fibocom NCM Data Port : $ifname"
 		COMMPORT="/dev/ttyUSB"$CPORT
 		ATCMDD="AT+CGACT=0,1"
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
@@ -1071,7 +1043,7 @@ while [ 1 -lt 6 ]; do
 			ip6=$(echo $ip6 | cut -d' ' -f1)
 			DNS3=$(echo "$OX6" | cut -d, -f6)
 			DNS4=$(echo "$OX6" | cut -d, -f7)
-			
+
 			log "IP address(es): $ip $ip6"
 			log "DNS servers 1&2: $DNS1 $DNS2"
 			log "DNS servers 3&4: $DNS3 $DNS4"
@@ -1085,27 +1057,21 @@ while [ 1 -lt 6 ]; do
 			else
 				v6cap=0
 			fi
-			
+
 			if [ -n "$ip6" -a -z "$ip" ]; then
 				log "Running IPv6-only mode"
 				nat46=1
 			fi
-			
+
 			ATCMDD="AT+XDATACHANNEL=1,1,\"/USBCDC/0\",\"/USBHS/NCM/0\",2,1"
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			RDNS=$(uci -q get network.wan$INTER.dns)
-			
-			log "Applying IP settings to wan$INTER"			
+
+			log "Applying IP settings to wan$INTER"
 			uci delete network.wan$INTER
 			uci set network.wan$INTER=interface
 			uci set network.wan$INTER.proto=static
-			source /etc/openwrt_release
-			tone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
-			ifname1="ifname"
-			if [ ! -z $tone ]; then
-				ifname1="device"
-			fi
-			uci set network.wan$INTER.$ifname1=$ifname
+			uci set network.wan$INTER.${ifname1}=$ifname
 			uci set network.wan$INTER.metric=$INTER"0"
 			if [ -n "$ip" ]; then
 				uci set network.wan$INTER.ipaddr=$ip/32
@@ -1127,7 +1093,7 @@ while [ 1 -lt 6 ]; do
 			ip link set dev $ifname arp off
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "raw-ip.gcom" "$CURRMODEM")
 			RESP=$(echo $OX | sed "s/AT+CGDATA=\"M-RAW_IP\",1 //")
-			log "Final Modem $CURRMODEM result code is $RESP"
+			log "Final Modem $CURRMODEM result code is \"$RESP\""
 			if [ "$RESP" = "OK CONNECT" ]; then
 				ifup wan$INTER
 				if [ -e /sys/class/net/$ifname/cdc_ncm/tx_timer_usecs ]; then
@@ -1212,14 +1178,14 @@ esac
 	$ROOTER_LINK/con_monitor$CURRMODEM $CURRMODEM &
 	uci set modem.modem$CURRMODEM.connected=1
 	uci commit modem
-	
+
 	if [ -e /etc/bandlock ]; then
 		M1='AT+COPS=?'
 		export TIMEOUT="120"
 		#OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$M1")
 		export TIMEOUT="5"
 	fi
-	
+
 	if [ -e $ROOTER/timezone.sh ]; then
 		TZ=$(uci -q get modem.modeminfo$CURRMODEM.tzone)
 		if [ "$TZ" = "1" ]; then

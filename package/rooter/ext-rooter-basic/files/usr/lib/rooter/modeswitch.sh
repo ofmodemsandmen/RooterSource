@@ -141,7 +141,7 @@ change_bconf() {
 	log "Switching Modem at $DEVICENAME to $mode by selecting Cfg# $bestcfg"
 	echo $unconf >/sys/bus/usb/devices/$devname/bConfigurationValue
 	sleep 1
-	echo $conf >/sys/bus/usb/devices/$devname/bConfigurationValue	
+	echo $conf >/sys/bus/usb/devices/$devname/bConfigurationValue
 }
 
 
@@ -527,13 +527,11 @@ if [ "$ACTION" = remove ]; then
 			uci delete network.wan$INTER
 			uci set network.wan$INTER=interface
 			uci set network.wan$INTER.proto=dhcp
-			source /etc/openwrt_release
-			tone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
-			ifname="ifname"
-			if [ ! -z $tone ]; then
-				ifname="device"
+			ifname1="ifname"
+			if [ -e /etc/newstyle ]; then
+				ifname1="device"
 			fi
-			uci set network.wan$INTER.$ifname=" "
+			uci set network.wan$INTER.${ifname1}=" "
 			uci set network.wan$INTER.metric=$INTER"0"
 			uci commit network
 			/etc/init.d/network reload

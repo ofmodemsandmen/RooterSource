@@ -54,7 +54,7 @@ firstboot() {
 	fi
 	uci set system.@system[-1].cronloglevel="9"
 	uci commit system
-	
+
 	AP=$(uci -q get profile.default.apn)
 	if [ -z "$AP" ]; then
 		uci set profile.default.apn="internet"
@@ -67,7 +67,7 @@ firstboot() {
 	config_foreach do_zone zone
 
 	source /etc/openwrt_release
-	twone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
+	tone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
 }
 
 if [ -e /tmp/installing ]; then
@@ -114,7 +114,7 @@ USBN=0
 ETHN=1
 BASEPORT=0
 WDMN=0
-if 
+if
 	ifconfig eth1 &>/dev/null
 then
 	if [ -e "/sys/class/net/eth1/device/bInterfaceProtocol" ]; then
@@ -144,8 +144,8 @@ fi
 
 COUNTER=1
 while [ $COUNTER -le $MODCNT ]; do
-	uci delete modem.modem$COUNTER        
-	uci set modem.modem$COUNTER=modem  
+	uci delete modem.modem$COUNTER
+	uci set modem.modem$COUNTER=modem
 	uci set modem.modem$COUNTER.empty=1
 
 	IPEX=$(uci get modem.pinginfo$COUNTER.alive)
@@ -163,19 +163,12 @@ while [ $COUNTER -le $MODCNT ]; do
 	rm -f $ROOTER_LINK/reconnect$COUNTER
 	rm -f $ROOTER_LINK/create_proto$COUNTER
 	$ROOTER/signal/status.sh $COUNTER "No Modem Present"
-	
-	source /etc/openwrt_release
-	tone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
-	ifname="ifname"
-	if [ ! -z $tone ]; then
-		ifname="device"
-	fi
 
-	uci -q delete network.wan$COUNTER       
+	uci -q delete network.wan$COUNTER
 	uci set network.wan$COUNTER=interface
-	uci set network.wan$COUNTER.proto=dhcp 
+	uci set network.wan$COUNTER.proto=dhcp
 	uci set network.wan$COUNTER.metric=$COUNTER"0"
-	uci set network.wan$COUNTER.$ifname="wan"$COUNTER
+	uci set network.wan$COUNTER.ifname="wan"$COUNTER
 
 	if [ -e /etc/config/mwan3 ]; then
 		ENB=$(uci get mwan3.wan$COUNTER.enabled)
@@ -185,11 +178,11 @@ while [ $COUNTER -le $MODCNT ]; do
 	fi
 
 	if [ -e /etc/config/failover ]; then
-		uci delete failover.Modem$COUNTER       
+		uci delete failover.Modem$COUNTER
 		uci set failover.Modem$COUNTER=member
 	fi
 
-	let COUNTER=COUNTER+1 
+	let COUNTER=COUNTER+1
 done
 
 if [ -e /etc/config/failover ]; then
@@ -275,10 +268,6 @@ fi
 echo "1546 1146" > /sys/bus/usb-serial/drivers/option1/new_id
 echo "106c 3718" > /sys/bus/usb-serial/drivers/option1/new_id
 #echo "1199 9091" > /sys/bus/usb-serial/drivers/option1/new_id
-# recently found models:
-#echo "2001 7e3d ff 2001 7e35" > /sys/bus/usb/drivers/qmi_wwan/new_id
-#echo "1508 1001 ff 2c7c 0125" > /sys/bus/usb/drivers/qmi_wwan/new_id
-#echo "03f0 0a57" > /sys/bus/usb-serial/drivers/option1/new_id
 
 # end of bootup
 echo "0" > /tmp/bootend.file
@@ -289,6 +278,7 @@ chown -R root:root /etc/dropbear/
 chmod 700 /etc/dropbear/
 chmod 644 /etc/dropbear/authorized_keys 2>/dev/null
 
-if [ ! -z $twone ]; then
+if [ ! -z $tone ]; then
+	[ -e /etc/newstyle ] || touch /etc/newstyle
 	reboot -f
 fi

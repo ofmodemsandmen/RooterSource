@@ -29,7 +29,7 @@
 		compatible = "gpio-leds";
  
 		led_usr: usr {
-			label = "rbm33g:green:usr";
+			label = "green:usr";
 			gpios = <&gpio0 0 GPIO_ACTIVE_HIGH>;
 		};
 	};
@@ -45,26 +45,30 @@
 		};
 	};
  
-	gpio-export {
+	gpio_export {
 		compatible = "gpio-export";
  
-		gpio_pcie0_power {
+		pcie0_power {
+			gpio-export,name = "pcie0_power";
 			gpio-export,output = <0>;
 			gpios = <&gpio0 9 GPIO_ACTIVE_HIGH>;
 		};
  
-		gpio_pcie1_power {
+		pcie1_power {
+			gpio-export,name = "pcie1_power";
 			gpio-export,output = <1>;
 			gpios = <&gpio0 10 GPIO_ACTIVE_HIGH>;
 		};
  
-		gpio_pcie2_power {
+		pcie2_power {
+			gpio-export,name = "pcie2_power";
 			gpio-export,output = <1>;
 			gpios = <&gpio0 11 GPIO_ACTIVE_HIGH>;
 		};
  
-		gpio_usb_vcc {
-			gpio-export,output = <0>;
+		usb_power {
+			gpio-export,name = "usb_power";
+			gpio-export,output = <1>;
 			gpios = <&gpio0 12 GPIO_ACTIVE_HIGH>;
 		};
 	};
@@ -171,4 +175,4 @@
 &pcie {
 	status = "okay";
 };
- 
+

@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/sh
 
 ROOTER=/usr/lib/rooter
 ROOTER_LINK="/tmp/links"
@@ -6,6 +6,12 @@ ROOTER_LINK="/tmp/links"
 log() {
 	logger -t "Create iPhone Connection" "$@"
 }
+
+
+ifname1="ifname"
+if [ -e /etc/newstyle ]; then
+	ifname1="device"
+fi
 
 handle_timeout(){
 	local wget_pid="$1"
@@ -75,13 +81,7 @@ set_network() {
 	uci delete network.wan$INTER
 	uci set network.wan$INTER=interface
 	uci set network.wan$INTER.proto=dhcp
-	source /etc/openwrt_release
-	tone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
-	ifname="ifname"
-	if [ ! -z $tone ]; then
-		ifname="device"
-	fi
-	uci set network.wan$INTER.$ifname=$1
+	uci set network.wan$INTER.${ifname1}=$1
 	uci set network.wan$INTER.metric=$INTER"0"
 	set_dns
 	uci commit network
@@ -99,7 +99,7 @@ save_variables() {
 
 chcklog() {
 	OOX=$1
-	CLOG=$(uci get modem.modeminfo$CURRMODEM.log)
+	CLOG=$(uci -q get modem.modeminfo$CURRMODEM.log)
 	if [ $CLOG = "1" ]; then
 		log "$OOX"
 	fi
@@ -107,14 +107,13 @@ chcklog() {
 
 
 CURRMODEM=$1
-source /tmp/variable.file
 
 MAN=$(uci get modem.modem$CURRMODEM.manuf)
 MOD=$(uci get modem.modem$CURRMODEM.model)
 $ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Connecting"
 $ROOTER/log/logger "Attempting to Connect Modem #$CURRMODEM ($MAN $MOD)"
 
-BASEP=$(uci get modem.modem$CURRMODEM.baseport)
+BASEP=$(uci -q get modem.modem$CURRMODEM.baseport)
 idV=$(uci get modem.modem$CURRMODEM.idV)
 idP=$(uci get modem.modem$CURRMODEM.idP)
 
@@ -142,47 +141,27 @@ if [ $EMPTY = 0 ]; then
 			if [ $OINTER = 1 ]; then
 				INTER=2
 			fi
-			log "Switched Modem$CURRMODEM to WAN$INTER as Modem$OTHER is using WAN$OINTER"
+			log "Switched Modem $CURRMODEM to WAN$INTER as Modem $OTHER is using WAN$OINTER"
 		fi
 	fi
 fi
 uci set modem.modem$CURRMODEM.inter=$INTER
 uci commit modem
-log "Modem$CURRMODEM is using WAN$INTER"
+log "Modem $CURRMODEM is using WAN$INTER"
 
 log "Checking Network Interface"
-match="$(uci get modem.modem$CURRMODEM.maxcontrol | cut -d/ -f3- | xargs dirname)"
-interface="$(if [ "$match" ]; then for a in /sys/class/net/*; do readlink $a; done | grep "$match"; fi | xargs -r basename)"
+MATCH="$(uci get modem.modem$CURRMODEM.maxcontrol | cut -d/ -f3- | xargs dirname)"
+ifname="$(if [ "$MATCH" ]; then for a in /sys/class/net/*; do readlink $a; done | grep "$MATCH"; fi | xargs -r basename)"
 
-if [ "$interface" ]; then
-	log "ECM Data Port : $interface"
-	set_network "$interface"
-elif
-	ifconfig usb$USBN
-then
-	log "Using usb$USBN as network interface"
-	uci set modem.modem$CURRMODEM.interface=usb$USBN
-	if [ -e $ROOTER/changedevice.sh ]; then
-		$ROOTER/changedevice.sh usb$USBN
-	fi
-	USBN=`expr 1 + $USBN`
+if [ "$ifname" ]; then
+	log "Modem $CURRMODEM - iPhone - Data Port : $ifname"
+	set_network "$ifname"
+	uci set modem.modem$CURRMODEM.interface=$ifname
 else
-	set_network eth$ETHN
-	if
-		ifconfig eth$ETHN
-	then
-		log "Using eth$ETHN as network interface"
-		uci set modem.modem$CURRMODEM.interface=eth$ETHN
-		if [ -e $ROOTER/changedevice.sh ]; then
-			$ROOTER/changedevice.sh eth$ETHN
-		fi
-		ETHN=`expr 1 + $ETHN`
-	fi
+	log "Modem $CURRMODEM - No iPhone Data Port found"
 fi
 uci commit modem
 
-
-save_variables
 rm -f /tmp/usbwait
 
 ifup wan$INTER
@@ -228,9 +207,9 @@ if [ -e $ROOTER/timezone.sh ]; then
 	fi
 fi
 
-CLB=$(uci get modem.modeminfo$CURRMODEM.lb)
+CLB=$(uci -q get modem.modeminfo$CURRMODEM.lb)
 if [ -e /etc/config/mwan3 ]; then
-	ENB=$(uci get mwan3.wan$INTER.enabled)
+	ENB=$(uci -q get mwan3.wan$INTER.enabled)
 	if [ ! -z $ENB ]; then
 		if [ $CLB = "1" ]; then
 			uci set mwan3.wan$INTER.enabled=1
