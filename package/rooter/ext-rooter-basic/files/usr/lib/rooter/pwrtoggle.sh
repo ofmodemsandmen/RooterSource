@@ -7,6 +7,11 @@ log() {
         logger -t "Power Toggle" "$@"
 }
 
+ifname1="ifname"
+if [ -e /etc/newstyle ]; then
+	ifname1="device"
+fi
+
 waitfor() {
 	CNTR=0
 	while [ -e /tmp/modgone ]; do
@@ -51,7 +56,7 @@ rebind() {
 			uci delete network.wan$CURRMODEM
 			uci set network.wan$CURRMODEM=interface
 			uci set network.wan$CURRMODEM.proto=dhcp
-			uci set network.wan$CURRMODEM.ifname="wan"$CURRMODEM
+			uci set network.wan$CURRMODEM.${ifname1}="wan"$CURRMODEM
 			uci set network.wan$CURRMODEM.metric=$CURRMODEM"0"
 			uci commit network
 			/etc/init.d/network reload
@@ -71,7 +76,7 @@ rebind() {
 		uci delete network.wan$CURRMODEM
 		uci set network.wan$CURRMODEM=interface
 		uci set network.wan$CURRMODEM.proto=dhcp
-		uci set network.wan$CURRMODEM.ifname="wan"$CURRMODEM
+		uci set network.wan$CURRMODEM.${ifname1}="wan"$CURRMODEM
 		uci set network.wan$CURRMODEM.metric=$CURRMODEM"0"
 		uci commit network
 		/etc/init.d/network reload

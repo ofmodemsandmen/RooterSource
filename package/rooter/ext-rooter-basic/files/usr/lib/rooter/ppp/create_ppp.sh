@@ -7,23 +7,50 @@ log() {
 	logger -t "Create Connection" "$@"
 }
 
+ifname1="ifname"
+if [ -e /etc/newstyle ]; then
+	ifname1="device"
+fi
+
 set_dns() {
-	local DNS1=$(uci get modem.modeminfo$CURRMODEM.dns1)
-	local DNS2=$(uci get modem.modeminfo$CURRMODEM.dns2)
-	if [ -z $DNS1 ]; then
-		if [ -z $DNS2 ]; then
-			return
-		else
+	local pDNS1=$(uci -q get modem.modeminfo$CURRMODEM.dns1)
+	local pDNS2=$(uci -q get modem.modeminfo$CURRMODEM.dns2)
+	local pDNS3=$(uci -q get modem.modeminfo$CURRMODEM.dns3)
+	local pDNS4=$(uci -q get modem.modeminfo$CURRMODEM.dns4)
+
+	local aDNS="$pDNS1 $pDNS2 $pDNS3 $pDNS4"
+	local bDNS=""
+
+	echo "$aDNS" | grep -o "[[:graph:]]" &>/dev/null
+	if [ $? = 0 ]; then
+		log "Using DNS settings from the Connection Profile"
+		pdns=1
+		for DNSV in $(echo "$aDNS"); do
+			if [ "$DNSV" != "0.0.0.0" ] && [ -z "$(echo "$bDNS" | grep -o "$DNSV")" ]; then
+				[ -n "$(echo "$DNSV" | grep -o ":")" ] && continue
+				bDNS="$bDNS $DNSV"
+			fi
+		done
+
+		bDNS=$(echo $bDNS)
+		if [ $DHCP = 1 ]; then
 			uci set network.wan$INTER.peerdns=0
-			uci set network.wan$INTER.dns=$DNS2
+			uci set network.wan$INTER.dns="$bDNS"
 		fi
+		echo "$bDNS" > /tmp/v4dns$INTER
+
+		bDNS=""
+		for DNSV in $(echo "$aDNS"); do
+			if [ "$DNSV" != "0:0:0:0:0:0:0:0" ] && [ -z "$(echo "$bDNS" | grep -o "$DNSV")" ]; then
+				[ -z "$(echo "$DNSV" | grep -o ":")" ] && continue
+				bDNS="$bDNS $DNSV"
+			fi
+		done
+		echo "$bDNS" > /tmp/v6dns$INTER
 	else
-		uci set network.wan$INTER.peerdns=0
-		if [ -z $DNS2 ]; then
-			uci set network.wan$INTER.dns="$DNS1"
-		else
-			uci set network.wan$INTER.dns="$DNS2 $DNS1"
-		fi
+		log "Using Provider assigned DNS"
+		pdns=0
+		rm -f /tmp/v[46]dns$INTER
 	fi
 }
 
@@ -156,7 +183,7 @@ else
 		INTER=$CURRMODEM
 	fi
 fi
-log "Profile for Modem$CURRMODEM sets interface to WAN$INTER"
+log "Profile for Modem $CURRMODEM sets interface to WAN$INTER"
 OTHER=1
 if [ $CURRMODEM = 1 ]; then
 	OTHER=2
@@ -170,22 +197,16 @@ if [ $EMPTY = 0 ]; then
 			if [ $OINTER = 1 ]; then
 				INTER=2
 			fi
-			log "Switched Modem$CURRMODEM to WAN$INTER as Modem$OTHER is using WAN$OINTER"
+			log "Switched Modem $CURRMODEM to WAN$INTER as Modem $OTHER is using WAN$OINTER"
 		fi
 	fi
 fi
 uci set modem.modem$CURRMODEM.inter=$INTER
 uci commit modem
-log "Modem$CURRMODEM is using WAN$INTER"
+log "Modem $CURRMODEM is using WAN$INTER"
 uci delete network.wan$INTER
 uci set network.wan$INTER=interface
-source /etc/openwrt_release
-tone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
-ifname="ifname"
-if [ ! -z $tone ]; then
-	ifname="device"
-fi
-uci set network.wan$INTER.$ifname=3x-wan$INTER
+uci set network.wan$INTER.${ifname1}=3x-wan$INTER
 uci set network.wan$INTER.proto=3x
 if [ $retval -eq 0 ]; then
 	uci set network.wan$INTER.service=umts

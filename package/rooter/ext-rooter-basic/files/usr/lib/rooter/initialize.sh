@@ -142,6 +142,11 @@ if [ ! -z $OPING ]; then
 	uci delete modem.ping
 fi
 
+ifname1="ifname"
+if [ -n "$tone" -o -e /etc/newstyle ]; then
+	ifname1="device"
+fi
+
 COUNTER=1
 while [ $COUNTER -le $MODCNT ]; do
 	uci delete modem.modem$COUNTER
@@ -168,10 +173,10 @@ while [ $COUNTER -le $MODCNT ]; do
 	uci set network.wan$COUNTER=interface
 	uci set network.wan$COUNTER.proto=dhcp
 	uci set network.wan$COUNTER.metric=$COUNTER"0"
-	uci set network.wan$COUNTER.ifname="wan"$COUNTER
+	uci set network.wan$COUNTER.${ifname1}="wan"$COUNTER
 
 	if [ -e /etc/config/mwan3 ]; then
-		ENB=$(uci get mwan3.wan$COUNTER.enabled)
+		ENB=$(uci -q get mwan3.wan$COUNTER.enabled)
 		if [ ! -z $ENB ]; then
 			uci set mwan3.wan$COUNTER.enabled=0
 		fi

@@ -9,6 +9,11 @@ log() {
 
 log "Failover System is Started"
 
+ifname1="ifname"
+if [ -e /etc/newstyle ]; then
+	ifname1="device"
+fi
+
 i=1
 STAT="0"
 track_ips=
@@ -38,9 +43,9 @@ get_interface() {
 ping_interface() {
 	interf=$(uci get failover.$1.interface)
 	if [ $interf = "wwan" ]; then
-		IFN="$(ubus -S call network.wireless status | jsonfilter -e '@.*.interfaces[@.config.mode="sta"].ifname')"
+		IFN="$(ubus -S call network.wireless status | jsonfilter -e '@.*.interfaces[@.config.mode="sta"].${ifname1}')"
 	else
-		IFN=$(uci get network.$interf.ifname)
+		IFN=$(uci get network.$interf.${ifname1})
 	fi
 	if [ ! -z $IFN ]; then
 		STAT="1"
@@ -142,7 +147,7 @@ while true; do
 	make_status "wan" $use_wan $STAT
 	WAN_STATUS=$STAT
 	if [ $WAN_STATUS = "2" ];then
-		if [ $MODEM_IFUP = true -a $MODEM_STATUS == "2" ]; then	
+		if [ $MODEM_IFUP = true -a $MODEM_STATUS == "2" ]; then
 			MODEM_IFUP=false
 			MODEM_STATUS="3"
 			ifdown $(uci get failover.$use_modem.interface)
@@ -153,7 +158,7 @@ while true; do
 			MODEM_STATUS="2"
 			ifup $(uci get failover.$use_modem.interface)
 			sleep 10
-		fi	
+		fi
 	fi
 
 	if [ $MODEM_STATUS != "3" ]; then
@@ -168,7 +173,7 @@ while true; do
 		fi
 	else
 		interf=$(uci get failover.$use_modem.interface)
-		IFN=$(uci get network.$interf.ifname)
+		IFN=$(uci get network.$interf.${ifname1})
 		if [ -z $IFN ]; then
 			MODEM_IFUP=false
 			make_status "modem" $use_modem "0"

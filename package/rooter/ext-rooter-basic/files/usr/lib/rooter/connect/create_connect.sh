@@ -384,7 +384,6 @@ SIERRAID=0
 
 MAN=$(uci -q get modem.modem$CURRMODEM.manuf)
 MOD=$(uci -q get modem.modem$CURRMODEM.model)
-BASEP=$(uci -q get modem.modem$CURRMODEM.baseport)
 PROT=$(uci -q get modem.modem$CURRMODEM.proto)
 idV=$(uci -q get modem.modem$CURRMODEM.idV)
 idP=$(uci -q get modem.modem$CURRMODEM.idP)
@@ -456,6 +455,14 @@ fi
 TTYDEVS=$(echo "$TTYDEVS" | tr '\n' ' ')
 log Modem $CURRMODEM is a parent of $TTYDEVS
 
+get_tty_fix 0
+if [ -n "$CPORT" ]; then
+	uci set modem.modem$CURRMODEM.baseport=$CPORT
+else
+	uci set modem.modem$CURRMODEM.baseport=""
+fi
+uci commit modem.modem$CURRMODEM
+	
 	case $PROT in
 #
 # Sierra Direct-IP modem comm port

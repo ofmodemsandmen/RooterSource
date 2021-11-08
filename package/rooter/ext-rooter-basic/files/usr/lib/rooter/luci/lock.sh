@@ -6,6 +6,11 @@ log() {
 	logger -t "Lock Band" "$@"
 }
 
+ifname1="ifname"
+if [ -e /etc/newstyle ]; then
+	ifname1="device"
+fi
+
 fibdecode() {
 	j=$1
 	tdec=$2
@@ -270,8 +275,8 @@ case $uVid in
 		log " "
 		log " Get Current Bands Response : $OX"
 		log " "
-		
-		lte=""		
+
+		lte=""
 		if [ ! -z $mask ]; then
 			fibdecode $mask 1 0
 			lte=","$lst
@@ -291,9 +296,9 @@ case $uVid in
 		log " "
 		log "Lock Command : $ATCMDD"
 		log " "
-		
+
 		#exit 0
-		
+
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		log " "
 		log "Lock Response : $OX"
@@ -320,7 +325,7 @@ if `echo ${OX} | grep "OK" 1>/dev/null 2>&1` && \
 	uci delete network.wan$CURRMODEM
 	uci set network.wan$CURRMODEM=interface
 	uci set network.wan$CURRMODEM.proto=dhcp
-	uci set network.wan$CURRMODEM.ifname="wan"$CURRMODEM
+	uci set network.wan$CURRMODEM.${ifname1}="wan"$CURRMODEM
 	uci set network.wan$CURRMODEM.metric=$CURRMODEM"0"
 	uci commit network
 	/etc/init.d/network reload
@@ -345,7 +350,7 @@ if ! $CFUNDONE; then
 		uci delete network.wan$CURRMODEM
 		uci set network.wan$CURRMODEM=interface
 		uci set network.wan$CURRMODEM.proto=dhcp
-		uci set network.wan$CURRMODEM.ifname="wan"$CURRMODEM
+		uci set network.wan$CURRMODEM.${ifname1}="wan"$CURRMODEM
 		uci set network.wan$CURRMODEM.metric=$CURRMODEM"0"
 		uci commit network
 		/etc/init.d/network reload
@@ -361,4 +366,3 @@ if ! $CFUNDONE; then
 			fi
 		fi
 	fi
-	

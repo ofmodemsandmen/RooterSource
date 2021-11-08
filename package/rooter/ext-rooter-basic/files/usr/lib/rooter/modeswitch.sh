@@ -119,7 +119,7 @@ check_all_empty() {
 	USBN=0
 	ETHN=1
 	WDMN=0
-	BASEPORT=0
+
 	if
 		ifconfig eth1
 	then
@@ -327,7 +327,7 @@ if [ "$ACTION" = add ]; then
 				if [ $bConfig -ne $bestcfg ]; then
 					change_bconf $DEVICENAME $bestcfg ECM
 				fi
-			elif [ $FILEN = "413c:81d7" ]; then
+			elif [ $FILEN = "413c:81d7" -o $FILEN = "05c6:9025" ]; then
 				bestcfg=1
 				case $bNumConfs in
 				"3" )
@@ -379,15 +379,6 @@ if [ "$ACTION" = add ]; then
 	display_top; display "ProtoFind returns : $retval"; display_bottom
 	rm -f /tmp/wdrv
 
-	if [ $reinsert = 0 ]; then
-		BASEP=$BASEPORT
-		if [ -f /tmp/drv ]; then
-			source /tmp/drv
-			BASEPORT=`expr $PORTN + $BASEPORT`
-		fi
-	fi
-	rm -f /tmp/drv
-
 	if [ $retval -ne 0 ]; then
 		log "Found Modem $CURRMODEM"
 		if [ $reinsert = 0 ]; then
@@ -397,8 +388,6 @@ if [ "$ACTION" = add ]; then
 			uci set modem.modem$CURRMODEM.idV=$idV
 			uci set modem.modem$CURRMODEM.idP=$idP
 			uci set modem.modem$CURRMODEM.device=$DEVICENAME
-			uci set modem.modem$CURRMODEM.baseport=$BASEP
-			uci set modem.modem$CURRMODEM.maxport=$BASEPORT
 			uci set modem.modem$CURRMODEM.proto=$retval
 			uci set modem.modem$CURRMODEM.maxcontrol=/sys$DEVPATH/descriptors
 			find_usb_attrs
@@ -556,7 +545,7 @@ if [ "$ACTION" = remove ]; then
 			rm -f $ROOTER_LINK/mbim_monitor$retresult
 			$ROOTER/signal/status.sh $retresult "No Modem Present"
 			$ROOTER/log/logger "Disconnect (Removed) Modem #$retresult"
-			display_top; display "Remove : $DEVICENAME : Modem$retresult"; display_bottom
+			display_top; display "Remove : $DEVICENAME : Modem $retresult"; display_bottom
 			check_all_empty
 			rm -f /tmp/usbwait
 			rm -f /tmp/mdown$retresult
