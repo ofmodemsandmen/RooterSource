@@ -70,6 +70,22 @@ platform_do_upgrade() {
 		MTD_ARGS="-t romfile"
 		default_do_upgrade "$1"
 		;;
+	irz_mt00)
+		[ "$magic" != "27051956" -a "$(tar xf $1 sysupgrade-$board/CONTROL -O | wc -c 2> /dev/null)" = "0" ] && {
+			echo "Invalid image type."
+			return 1
+		}
+		
+		if [ "$(tar xf $1 sysupgrade-$board/CONTROL -O | wc -c 2> /dev/null)" != "0" ]; then
+		    
+		    if [ "$(tar xf $1 sysupgrade-$board/firmware -O | wc -c 2> /dev/null)" = "0" ]; then
+			echo "Please, use non-legacy upgrade image"
+			return 1
+		    fi
+		fi
+		
+		return 0
+		;;
 	*)
 		default_do_upgrade "$1"
 		;;

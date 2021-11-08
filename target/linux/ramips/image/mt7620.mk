@@ -398,6 +398,15 @@ define Device/iodata_wn-ac733gr3
 endef
 TARGET_DEVICES += iodata_wn-ac733gr3
 
+define Device/irz_mt00
+  DTS := R0
+  DEVICE_TITLE := irz_mt00 board
+  SUPPORTED_DEVICES := irz_mt00
+  IMAGE := sysupgrade.bin
+  IMAGE/sysupgrade.bin := append-kernel | append-rootfs | pad-rootfs | append-metadata | check-size $$$$(IMAGE_SIZE)
+endef
+TARGET_DEVICES += irz_mt00
+
 define Device/kimax_u35wf
   DTS := U35WF
   IMAGE_SIZE := 16064k
@@ -854,6 +863,13 @@ define Device/zbt-wr8305rt
   DEVICE_PACKAGES := kmod-usb2 kmod-usb-ohci
 endef
 TARGET_DEVICES += zbt-wr8305rt
+
+define Device/zbt-we2802d
+  DTS := ZBT-WE2802D
+  IMAGE_SIZE := $(ralink_default_fw_size_16M)
+  DEVICE_TITLE := Zbtlink ZBT-WE2802D
+endef
+TARGET_DEVICES += zbt-we2802d
 
 define Device/zte-q7
   DTS := ZTE-Q7

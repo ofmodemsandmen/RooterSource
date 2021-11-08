@@ -1,0 +1,183 @@
+/dts-v1/;
+
+/include/ "mt7620a.dtsi"
+
+/ {
+	compatible = "ralink,irz_mt00", "ralink,mt7620a-soc";
+	model = "R0 board";
+
+	palmbus@10000000 {
+		spi@b00 {
+			status = "okay";
+
+			m25p80@0 {
+				#address-cells = <1>;
+				#size-cells = <1>;
+				compatible = "w25q128";
+				reg = <0 0>;
+				linux,modalias = "m25p80", "w25q128";
+				spi-max-frequency = <50000000>;
+
+				partition@0 {
+					label = "u-boot";
+					reg = <0x0 0x30000>;
+				};
+
+				partition@30000 {
+					label = "u-boot-env";
+					reg = <0x30000 0x10000>;
+				};
+
+				factory: partition@40000 {
+					label = "factory";
+					reg = <0x40000 0x10000>;
+				};
+				partition@50000 {
+					label = "firmware";
+					reg = <0x50000 0xbb0000>;
+				};
+				partition {
+					label = "opt";
+					reg = <0xc00000 0x400000>;
+				};
+			};
+		};
+	    	gpio@600 {
+			status = "okay";
+		};
+		gpio@638 {
+			status = "okay";
+		};
+		gpio@660 {
+			status = "okay";
+		};
+		gpio@688 {
+			status = "okay";
+		};
+	};
+
+	pinctrl {
+		state_default: pinctrl0 {
+			gpio {
+				ralink,group = "rgmii1", "rgmii2", "uartf", "pcie", "wled", "nd_sd";
+				ralink,function = "gpio";
+			};
+		};
+		
+	};
+
+	ethernet@10100000 {
+		status = "okay";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&mdio_pins>;
+
+		ralink,port-map = "lwwww";
+		mtd-mac-address = <&factory 0x28>;
+
+		port@4 {
+			status = "okay";
+			phy-mode = "disabled";
+			phy-handle = <&phy4>;
+		};
+
+		mdio-bus {
+			status = "okay";
+
+			phy4: ethernet-phy@4 {
+				reg = <4>;
+				phy-mode = "ephy";
+			};
+		};
+	};
+
+	gsw@10110000 {
+		ralink,port4 = "disabled";
+	};
+
+	pcie@10140000 {
+		status = "disabled";
+	};
+
+	gpio {
+		compatible = "gpio-export";
+		GSM_POWER {
+		    gpios = <&gpio1 3 1>;
+		    gpio-export,name  = "gsm:power";
+		    gpio-export,output = <1>;
+		};
+/*
+		GSM_ENABLE {
+		    gpios = <&gpio1 12 1>;
+		    gpio-export,name  = "gsm:enable";
+		    gpio-export,output = <1>;
+		};
+*/
+		GSM_RESET {
+		    gpios = <&gpio1 1 0>;
+		    gpio-export,name  = "gsm:reset";
+		    gpio-export,output = <0>;
+		};
+
+		SIM_SELECT {
+		   gpios = <&gpio1 4 0>;
+		   gpio-export,name = "sim:select";
+		   gpio-export,output = <0>;
+		};
+
+		USB_DET {
+		    gpios = <&gpio0 0 0>;
+		    gpio-export,name  = "gsm:detect";
+		    gpio-export,output = <0>;
+		};
+	};
+	gpio-keys-polled {
+		compatible = "gpio-keys-polled";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		poll-interval = <20>;
+		reset {
+			label = "reset";
+			gpios = <&gpio1 0 0>;
+			linux,code = <0x198>;
+		};
+	};
+	gpio-leds {
+		compatible = "gpio-leds";
+		power {
+			label = "power";
+			gpios = <&gpio1 2 1>;
+		};
+		ppp_green {
+			label = "ppp:green";
+			gpios = <&gpio0 12 0>;
+		};
+		ppp_blue {
+			label = "ppp:blue";
+			gpios = <&gpio0 11 0>;
+		};
+		csq_green {
+			label = "csq:green";
+			gpios = <&gpio0 14 0>;
+		};
+		csq_red {
+			label = "csq:red";
+			gpios = <&gpio0 13 0>;
+		};
+		wlan {
+			label = "wlan";
+			gpios = <&gpio3 0 0>;
+		};
+	};
+	ehci@101c0000 {
+		status = "okay";
+	};
+
+	ohci@101c1000 {
+		status = "okay";
+	};
+	wmac@10180000 {
+		status = "okay";
+		ralink,mtd-eeprom = <&factory 0>;
+	};
+};
