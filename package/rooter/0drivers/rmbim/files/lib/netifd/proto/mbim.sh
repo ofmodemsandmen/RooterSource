@@ -437,6 +437,12 @@ _proto_mbim_setup() {
 
 	uci set modem.modem$CURRMODEM.connected=1
 	uci commit modem
+	if [ -e $ROOTER/timezone.sh ]; then
+		TZ=$(uci -q get modem.modeminfo$CURRMODEM.tzone)
+		if [ "$TZ" = "1" ]; then
+			$ROOTER/timezone.sh &
+		fi
+	fi
 	CLB=$(uci -q get modem.modeminfo$CURRMODEM.lb)
 	if [ -e /etc/config/mwan3 ]; then
 		INTER=$(uci get modem.modeminfo$CURRMODEM.inter)
@@ -445,12 +451,6 @@ _proto_mbim_setup() {
 		else
 			if [ $INTER = 0 ]; then
 				INTER=$CURRMODEM
-			fi
-		fi
-		if [ -e $ROOTER/timezone.sh ]; then
-			TZ=$(uci -q get modem.modeminfo$CURRMODEM.tzone)
-			if [ "$TZ" = "1" ]; then
-				$ROOTER/timezone.sh &
 			fi
 		fi
 		ENB=$(uci -q get mwan3.wan$CURRMODEM.enabled)
