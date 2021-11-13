@@ -3,7 +3,10 @@
 module("luci.controller.domain", package.seeall)
 
 function index()
-	local page
-	page = entry({"admin", "network", "domain"}, cbi("domainfltr"), _("Domain Filter"), 65)
-	page.dependent = true
+	local lock = luci.model.uci.cursor():get("custom", "menu", "full")
+	if lock == "1" then
+		local page
+		page = entry({"admin", "services", "domain"}, cbi("domainfltr"), _("---Domain Filter"), 9)
+		page.dependent = true
+	end
 end

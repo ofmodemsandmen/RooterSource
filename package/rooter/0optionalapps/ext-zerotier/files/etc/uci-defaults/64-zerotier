@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh /etc/rc.common
 
 id=$(uci -q get custom.zerotier.networkid)
 uci delete zerotier.zerotier.join

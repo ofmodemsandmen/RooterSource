@@ -7,9 +7,16 @@ log() {
 amount=$1
 log "Allocate $amount"
 
-uci set custom.bwallocate.allocate=$amount
-uci commit custom
-result=`ps | grep -i "create_data.lua" | grep -v "grep" | wc -l`
-if [ $result -lt 1 ]; then
-	lua /usr/lib/bwmon/create_data.lua
+if [ $amount != "0" ]; then
+	uci set custom.bwallocate.allocate=$amount
+	uci commit custom
+else
+	sleep 3
 fi
+result=`ps | grep -i "create_data.lua" | grep -v "grep" | wc -l`
+while [ $result -ge 1 ]; do
+	sleep 2
+	result=`ps | grep -i "create_data.lua" | grep -v "grep" | wc -l`
+done
+
+lua /usr/lib/bwmon/create_data.lua

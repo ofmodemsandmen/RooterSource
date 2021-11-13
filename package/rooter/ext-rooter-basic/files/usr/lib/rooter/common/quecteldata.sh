@@ -2,7 +2,7 @@
 
 # /usr/lib/rooter/common/quecteldata.sh
 
-ROOTER=/usr/lib/rooter
+ROOTER=/usr/lib/rooter 
 
 CURRMODEM=$1
 COMMPORT=$2
@@ -138,8 +138,12 @@ case $RAT in
 			RSCP="-"$RSRP
 		fi
 		RSRQ=$(echo $QENG | cut -d, -f16 | grep -o "[0-9]\{1,3\}")
-		if [ -n $RSRQ ]; then
+		if [ -n "$RSRQ" ]; then
 			ECIO="-"$RSRQ
+		fi
+		RSSI=$(echo $QENG | cut -d, -f17 | grep -o "\-[0-9]\{1,3\}")
+		if [ -n "$RSSI" ]; then
+			CSQ_RSSI=$RSSI" dBm"
 		fi
 		SINRR=$(echo $QENG | cut -d, -f18 | grep -o "[0-9]\{1,3\}")
 		if [ -n "$SINRR" ]; then

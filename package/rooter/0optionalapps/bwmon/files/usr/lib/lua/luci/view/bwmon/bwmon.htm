@@ -41,8 +41,8 @@ var enabled = "0";
 					document.getElementById("allocate").style.display="";
 					document.getElementById("allocatet").style.visibility="visible";
 					document.getElementById("allocatet").style.display="";
-					document.getElementById("lockbtn").style.visibility="visible";
-					document.getElementById("lockbtn").style.display="";
+					//document.getElementById("lockbtn").style.visibility="visible";
+					//document.getElementById("lockbtn").style.display="";
 					//document.getElementById("rollday").style.visibility="visible";
 					//document.getElementById("rollover1").style.visibility="visible";
 					
@@ -74,8 +74,8 @@ var enabled = "0";
 					document.getElementById("allocate").style.display="none";
 					document.getElementById("allocatet").style.visibility="hidden";
 					document.getElementById("allocatet").style.display="none";
-					document.getElementById("lockbtn").style.visibility="hidden";
-					document.getElementById("lockbtn").style.display="none";
+					//document.getElementById("lockbtn").style.visibility="hidden";
+					//document.getElementById("lockbtn").style.display="none";
 					document.getElementById("rollover1").style.visibility="visible";
 					document.getElementById("rollday").style.visibility="visible";
 					document.getElementById("changeroll").style.visibility="visible";
@@ -196,7 +196,7 @@ var enabled = "0";
 		}
 		if ( r == passw )
 		{
-			document.getElementById("lockbtn").src="<%=showicon(0)%>";
+			//document.getElementById("lockbtn").src="<%=showicon(0)%>";
 			document.getElementById("alloc").style.visibility="visible";
 			document.getElementById("alloc1").style.visibility="visible";
 			document.getElementById("change").style.visibility="visible";
@@ -212,7 +212,7 @@ var enabled = "0";
 			alert("Incorrect Password!!!");
 			document.getElementById("pass").value="";
 		}
-		document.getElementById("lockbtn").disabled=false;
+		//document.getElementById("lockbtn").disabled=false;
 		return false;
 	};
 
@@ -221,11 +221,11 @@ var enabled = "0";
 		if ( lockb == 0 )
 		{
 			document.getElementById("popup").style.display = "block";
-			document.getElementById("lockbtn").disabled=true;
+			//document.getElementById("lockbtn").disabled=true;
 		}
 		else
 		{
-			document.getElementById("lockbtn").src="<%=showicon(1)%>";
+			//document.getElementById("lockbtn").src="<%=showicon(1)%>";
 			document.getElementById("alloc").style.visibility="hidden";
 			document.getElementById("alloc1").style.visibility="hidden";
 			document.getElementById("change").style.visibility="hidden";
@@ -360,7 +360,7 @@ var enabled = "0";
 		<tr>
 			<td><div align="right"><strong><%:Total Amount of Bandwidth used this Month : %></strong></div></td>
 			<td><div align="center" id="total"></div></td>
-			<td width="48"><input type="image" align="center" id="lockbtn" name="lockbtn" src="<%=showicon(1)%>" style="width:48px;height:48px;" onclick="return unlock(this)" /></td>
+
 			<td width="161"><input type="submit" style="visibility:hidden;" id="enable" class="cbi-button cbi-button-apply" value="<%:Bandwidth Allocation%>" onclick="return enablealloc()" />
 			</td>
 			<td></td>

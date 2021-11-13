@@ -10,6 +10,9 @@ CURRMODEM=$1
 COMMPORT=$2
 
 decode_signal() {
+	if [ $RSRP == 0 ]; then
+		RSRP=1
+	fi
 	if [ "$CRAT" -eq 4 ]; then
 		RSCPs=$(($RSRP - 141))
 		if [ -n "$RSCP" ]; then
@@ -246,13 +249,14 @@ if [ -n "$GTCCDATA" ]; then
 			RSRQ=$(echo $CCVAL | cut -d, -f14)
 			if [ "$RSRP" -ne 255 ] && [ "$RSRQ" -ne 255 ]; then
 				decode_signal
-				CSQ="-"
-				CSQ_RSSI="-"
 				if [ "$CRAT" -eq 4 ]; then
 					CSQ_PER=$((100 - (($RSCPs + 44) * 100/-96)))"%"
+					CSQ=$(($RSRP * 10 / 31))
 				else
 					CSQ_PER=$((100 - (($RSCPs + 31) * 100/-125)))"%"
+					CSQ=$(($RSRP / 4))
 				fi
+				CSQ_RSSI=$((2 * CSQ - 113))" dBm"
 			fi
 		fi
 	done
@@ -313,17 +317,20 @@ if [ -n "$XLDATA" ]; then
 			LBAND=$LBAND" (Bandwidth $BW MHz)"
 		fi
 	fi
-	RSCP=$(echo $XLDATA | cut -d, -f10)
-	RSCP=$(($RSCP - 141))
+	RSRP=$(echo $XLDATA | cut -d, -f10)
+	if [ $RSRP == 0 ]; then
+		RSRP=1
+	fi
+	RSCP=$(($RSRP - 141))
 	ECIO=$(echo $XLDATA | cut -d, -f11)
 	ECIO=$((($ECIO / 2) - 20))
 	SINR=$(echo $XLDATA | cut -d, -f12 | grep -o "[-0-9]\{1,4\}")
 	if [ -n "$SINR" ] && [ "$SINR" != "255" ]; then
 		SINR=$(($SINR / 2))" dB"
 	fi
-	CSQ="-"
 	CSQ_PER=$((100 - (($RSCP + 44) * 100/-96)))"%"
-	CSQ_RSSI="-"
+	CSQ=$(($RSRP * 10 / 31))
+	CSQ_RSSI=$((2 * CSQ - 113))" dBm"
 fi
 if [ -n "$XUDATA" ]; then
 	MODE="UMTS"
@@ -352,9 +359,9 @@ if [ -n "$CADATA1" ]; then
 	RSRQ=$(echo $CADATA1 | cut -d, -f9)
 	if [ "$RSRP" -ne 255 ] && [ "$RSRQ" -ne 255 ]; then
 		decode_signal
-		CSQ="-"
 		CSQ_PER=$((100 - (($RSCPs + 44) * 100/-96)))"%"
-		CSQ_RSSI="-"
+		CSQ=$(($RSRP * 10 / 31))
+		CSQ_RSSI=$((2 * CSQ - 113))" dBm"
 	else
 		RSRP="-"
 		RSRQ="-"
