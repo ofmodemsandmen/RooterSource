@@ -224,14 +224,13 @@ udp_client() {
 	#log "udptunnel 127.0.0.1:$port $endpoint_host:$sport"
 }
 
-running=$(uci get wireguard.settings.enabled)
-if [ $running = 1 ]; then
-	exit 0
-fi
-
 config_load network
 SERVE=$(uci get wireguard."$WG".client)
 if [ $SERVE = "0" ]; then
+	running=$(uci get wireguard.settings.server)
+	if [ $running = 1 ]; then
+		exit 0
+	fi
 	UDP=$(uci get wireguard."$WG".udptunnel)
 	if [ $UDP = 1 ]; then
 		udp_server $WG
@@ -240,38 +239,25 @@ if [ $SERVE = "0" ]; then
 	uci commit network
 	ifup wg1
 	sleep 2
-	STA=$(cat /sys/class/net/wg1/operstate)
-	if [ $STA = "down" ]; then
-		UDP=$(uci get wireguard."$WG".udptunnel)
-		if [ $UDP = 1 ]; then
-			PID=$(ps |grep "udptunnel" | grep -v grep |head -n 1 | awk '{print $1}')
-			kill -9 $PID
-		fi
-		ifdown wg0
+	uci set wireguard.settings.server="1"
+else
+	running=$(uci get wireguard.settings.client)
+	log "Client running $running"
+	if [ $running = 1 ]; then
 		exit 0
 	fi
-else
 	UDP=$(uci get wireguard."$WG".udptunnel)
 	if [ $UDP = 1 ]; then
 		udp_client $WG
 	fi
 	handle_client
 	uci commit network
+	log "Start Interface"
 	ifup wg0
 	sleep 2
-	STA=$(cat /sys/class/net/wg0/operstate)
-	if [ $STA = "down" ]; then
-		UDP=$(uci get wireguard."$WG".udptunnel)
-		if [ $UDP = 1 ]; then
-			PID=$(ps |grep "udptunnel" | grep -v grep |head -n 1 | awk '{print $1}')
-			kill -9 $PID
-		fi
-		ifdown wg0
-		exit 0
-	fi
+	uci set wireguard.settings.client="1"
 fi
 
-uci set wireguard.settings.enabled="1"
 uci set wireguard."$WG".active="1"
 uci commit wireguard
 

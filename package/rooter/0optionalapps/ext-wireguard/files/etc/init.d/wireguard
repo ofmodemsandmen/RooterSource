@@ -2,7 +2,7 @@
 . /lib/functions.sh
 # Copyright (C) 2006 OpenWrt.org
 
-START=60
+START=99
 
 log() {
 	logger -t "WireGuard Init.d : " "$@"
@@ -75,13 +75,17 @@ chk_start() {
 	local config=$1
 	
 	config_get auto $config auto
-	if [ $auto = 0 ]; then
-		return
+	uci set wireguard."$config".active="0"
+	uci commit wireguard
+	if [ $auto = '1' ]; then
+		/usr/lib/wireguard/startvpn.sh $config
 	fi
-	/usr/lib/wireguard/startvpn.sh $config
 }
 
 start() {
+	uci set wireguard.settings.client="0"
+	uci set wireguard.settings.server="0"
+	uci commit wireguard
 	check_config
 	
 	config_load wireguard
