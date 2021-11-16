@@ -1594,5 +1594,21 @@
 		"mod": "BT-HomeHub-5",
 		"ext": "-upgrade.bin",
 		"addons": ["readme.pdf", "readmerecovery.txt"]
+	},
+	"MOFI4500": {
+		"details": "Mofi 4500",
+		"type": "1",
+		"build": "1907",
+		"config": ".config_mofi4500",
+		"image": "openwrt-ramips-mt7620-zbt-we826-16M-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7620/",
+		"mod": "Mofi-4500",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf", "readmerecovery.txt"],
+		"custom": {
+			"name": {
+				"model": "Mofi 4500"
+			}
+		}
 	}
 }
