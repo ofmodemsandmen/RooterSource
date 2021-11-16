@@ -9,10 +9,10 @@ log() {
 CURRMODEM=$1
 COMMPORT=$2
 
-OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "t77info.gcom" "$CURRMODEM" | tr 'a-z' 'A-Z')
+OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "t77info.gcom" "$CURRMODEM")
 
+OX=$(echo $OX | tr 'a-z' 'A-Z')
 O=$($ROOTER/common/processat.sh "$OX")
-OX=$(echo $OX)
 O=$(echo $O)
 
 REGXca="BAND:[0-9]\{1,3\} BW:[0-9.]\+MHZ EARFCN:[0-9]\+ PCI:[0-9]\+ RSRP:[^R]\+RSRQ:[^R]\+RSSI:[^S]\+SNR[^D]\+"
@@ -67,13 +67,13 @@ fi
 TECH=$(echo $O" " | grep -o "+COPS: .,.,[^,]\+,[027]")
 TECH="${TECH: -1}"
 if [ -n "$TECH" ]; then
+	RSSI=$(echo $O | grep -o " RSSI: [^D]\+D" | grep -o "[-0-9\.]\+")
+	if [ -n "$RSSI" ]; then
+		CSQ_RSSI=$(echo $RSSI)" dBm"
+	fi
 	case $TECH in
 		"7")
 			MODE="LTE"
-			RSSI=$(echo $O | grep -o " RSSI: [^D]\+D" | grep -o "[-0-9\.]\+")
-			if [ "$CSQ_RSSI" == "-" ]; then
-				CSQ_RSSI=$(echo $RSSI)" dBm"
-			fi
 			RSCP=$(echo $O | grep -o "[^G] RSRP: [^D]\+D" | grep -o "[-0-9\.]\+")
 			ECIO=$(echo $O | grep -o " RSRQ: [^D]\+D" | grep -o "[-0-9\.]\+")
 			SINR=$(echo $OX | grep -o "RS-S[I]*NR: [^D]\+D")

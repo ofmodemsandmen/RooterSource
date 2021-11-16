@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh 
 
 ROOTER=/usr/lib/rooter
 
@@ -10,9 +10,6 @@ CURRMODEM=$1
 COMMPORT=$2
 
 decode_signal() {
-	if [ $RSRP == 0 ]; then
-		RSRP=1
-	fi
 	if [ "$CRAT" -eq 4 ]; then
 		RSCPs=$(($RSRP - 141))
 		if [ -n "$RSCP" ]; then
@@ -249,14 +246,10 @@ if [ -n "$GTCCDATA" ]; then
 			RSRQ=$(echo $CCVAL | cut -d, -f14)
 			if [ "$RSRP" -ne 255 ] && [ "$RSRQ" -ne 255 ]; then
 				decode_signal
-				if [ "$CRAT" -eq 4 ]; then
-					CSQ_PER=$((100 - (($RSCPs + 44) * 100/-96)))"%"
-					CSQ=$(($RSRP * 10 / 31))
-				else
-					CSQ_PER=$((100 - (($RSCPs + 31) * 100/-125)))"%"
-					CSQ=$(($RSRP / 4))
-				fi
-				CSQ_RSSI=$((2 * CSQ - 113))" dBm"
+				RSSI=$(rsrp2rssi $RSCPs $BW)
+				CSQ_PER=$((100 - (($RSSI + 51) * 100/-62)))"%"
+				CSQ=$((($RSSI + 113) / 2))
+				CSQ_RSSI=$RSSI" dBm"
 			fi
 		fi
 	done
@@ -328,9 +321,10 @@ if [ -n "$XLDATA" ]; then
 	if [ -n "$SINR" ] && [ "$SINR" != "255" ]; then
 		SINR=$(($SINR / 2))" dB"
 	fi
-	CSQ_PER=$((100 - (($RSCP + 44) * 100/-96)))"%"
-	CSQ=$(($RSRP * 10 / 31))
-	CSQ_RSSI=$((2 * CSQ - 113))" dBm"
+	RSSI=$(rsrp2rssi $RSCP $BW)
+	CSQ_PER=$((100 - (($RSSI + 51) * 100/-62)))"%"
+	CSQ=$((($RSSI + 113) / 2))
+	CSQ_RSSI=$RSSI" dBm"
 fi
 if [ -n "$XUDATA" ]; then
 	MODE="UMTS"
@@ -359,9 +353,10 @@ if [ -n "$CADATA1" ]; then
 	RSRQ=$(echo $CADATA1 | cut -d, -f9)
 	if [ "$RSRP" -ne 255 ] && [ "$RSRQ" -ne 255 ]; then
 		decode_signal
-		CSQ_PER=$((100 - (($RSCPs + 44) * 100/-96)))"%"
-		CSQ=$(($RSRP * 10 / 31))
-		CSQ_RSSI=$((2 * CSQ - 113))" dBm"
+		RSSI=$(rsrp2rssi $RSCPs $BWD)
+		CSQ_PER=$((100 - (($RSSI + 51) * 100/-62)))"%"
+		CSQ=$((($RSSI + 113) / 2))
+		CSQ_RSSI=$RSSI" dBm"
 	else
 		RSRP="-"
 		RSRQ="-"

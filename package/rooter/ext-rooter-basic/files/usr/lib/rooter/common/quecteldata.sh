@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/sh 
 
 # /usr/lib/rooter/common/quecteldata.sh
 
-ROOTER=/usr/lib/rooter 
+ROOTER=/usr/lib/rooter
 
 CURRMODEM=$1
 COMMPORT=$2
