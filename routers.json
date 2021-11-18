@@ -1610,5 +1610,18 @@
 				"model": "Mofi 4500"
 			}
 		}
+	},	
+	"ARCHERC59": {
+		"details": "TP-Link Archer C59v1",
+		"type": "2",
+		"build": "1907",
+		"config": ".config_archerc59",
+		"image1": "openwrt-ath79-generic-tplink_archer-c59-v1-squashfs-sysupgrade.bin",
+		"image2": "openwrt-ath79-generic-tplink_archer-c59-v1-squashfs-factory.bin",
+		"imagepath": "/ath79/generic/",
+		"mod": "TP-Link-Archer-C59v1",
+		"ext1": "-upgrade.bin",
+		"ext2": "-factory.bin",
+		"addons": ["readme.pdf", "archer.txt"]
 	}
 }
