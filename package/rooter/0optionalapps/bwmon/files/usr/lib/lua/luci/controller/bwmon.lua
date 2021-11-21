@@ -1,4 +1,4 @@
-module("luci.controller.bwmon", package.seeall)
+module("luci.controller.bwmon", package.seeall) 
 
 function index()
 	local page
@@ -32,6 +32,9 @@ function action_check_bw()
 			rv['catotal'] = file:read("*line")
 			rv['password'] = file:read("*line")
 			j = file:read("*line")
+			if j == nil then
+				j = 0
+			end
 			rv['macsize'] = j
 			if j ~=0 then
 				for i=0, j-1 do

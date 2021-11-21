@@ -12,6 +12,9 @@ if [ $lock = "1" ]; then
 		total=$1
 		/usr/lib/bwmon/block 0
 		action=$(uci -q get custom.bwallocate.action)
+		if [ -z $action ]; then
+			action=0
+		fi
 		if [ ! -e /usr/lib/throttle/throttle.sh ]; then
 			action=0
 		fi
