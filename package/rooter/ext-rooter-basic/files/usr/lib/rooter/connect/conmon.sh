@@ -120,7 +120,10 @@ while [ 1 = 1 ]; do
 				sleep 20
 			else
 				# check to see if modem iface has an IP address, if not try a reconnect/power toggle
-                        	if [ -z "$(ifconfig ${INTER} 2>&1 | sed '/inet\ /!d;s/.*r://g;s/\ .*//g')" ]; then
+				OX=$(ip address show $IFNAME 2>&1)
+				ip4=$(echo "$OX" | grep 'inet ' | cut -d' ' -f6)
+				ip6=$(echo "$OX" | grep 'inet6' | grep global | cut -d' ' -f6)
+                        	if [ -z "$ip4" -a -z "$ip6" ]; then
                                 	do_down " (no IP address)"
                         	fi
 

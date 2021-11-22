@@ -194,6 +194,7 @@ get_connect() {
 	NPASS=$(uci -q get modem.modeminfo$CURRMODEM.passw)
 	NAUTH=$(uci -q get modem.modeminfo$CURRMODEM.auth)
 	PINC=$(uci -q get modem.modeminfo$CURRMODEM.pincode)
+	PDPT=$(uci -q get modem.modeminfo$CURRMODEM.pdptype)
 #
 # QMI and MBIM can't handle nil
 #

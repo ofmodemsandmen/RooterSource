@@ -366,7 +366,7 @@ cma.rmempty = true;
 
 pt = s:taboption(this_ctab, ListValue, "pdptype", translate("Protocol Type :"))
 pt:value("IP", "IPv4")
-pt:value("IPv6", "IPv6")
+pt:value("IPV6", "IPv6")
 pt:value("IPV4V6", "IPv4+IPv6")
 pt:value("0", "Default")
 pt.default = "0"
