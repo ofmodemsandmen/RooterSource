@@ -185,6 +185,10 @@ if [ $SP -gt 0 ]; then
 	$ROOTER/common/gettype.sh $CURRMODEM
 	if [ $SP = 5 ]; then
 		if [ -e /etc/interwave ]; then
+			ATCMDD="AT+QMBNCFG=\"Deactivate\""
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			ATCMDD="AT+QMBNCFG=\"AutoSel\",0"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			ATCMDD="AT+CGMM"
 			MODEL=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			EM160=$(echo $MODEL | grep "EM160")

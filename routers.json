@@ -1549,15 +1549,15 @@
 		"ext2": "-factory.bin",
 		"addons": ["readme.pdf"]
 	},
-	"WE526": {
-		"details": "ZBT WE526",
+	"WR8305": {
+		"details": "ZBT WR8305RT",
 		"type": "1",
 		"build": "1907",
 		"flash": "8",
-		"config": ".config_we526",
-		"image": "openwrt-ramips-mt7620-zbt-ape522ii-squashfs-sysupgrade.bin",
+		"config": ".config_wr8305",
+		"image": "openwrt-ramips-mt7620-zbt-wr8305rt-squashfs-sysupgrade.bin",
 		"imagepath": "/ramips/mt7620/",
-		"mod": "ZBT-WE526",
+		"mod": "ZBT-WR8305RT",
 		"ext": "-upgrade.bin",
 		"addons": ["readme.pdf"]
 	},
@@ -1620,6 +1620,19 @@
 		"image2": "openwrt-ath79-generic-tplink_archer-c59-v1-squashfs-factory.bin",
 		"imagepath": "/ath79/generic/",
 		"mod": "TP-Link-Archer-C59v1",
+		"ext1": "-upgrade.bin",
+		"ext2": "-factory.bin",
+		"addons": ["readme.pdf", "archer.txt"]
+	},	
+	"ARCHERC59V2": {
+		"details": "TP-Link Archer C59v2",
+		"type": "2",
+		"build": "1907",
+		"config": ".config_archerc59v2",
+		"image1": "openwrt-ar71xx-generic-archer-c59-v2-squashfs-sysupgrade.bin",
+		"image2": "openwrt-ar71xx-generic-archer-c59-v2-squashfs-factory.bin",
+		"imagepath": "/ar71xx/generic/",
+		"mod": "TP-Link-Archer-C59v2",
 		"ext1": "-upgrade.bin",
 		"ext2": "-factory.bin",
 		"addons": ["readme.pdf", "archer.txt"]

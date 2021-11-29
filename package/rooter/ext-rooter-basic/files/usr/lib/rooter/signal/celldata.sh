@@ -57,8 +57,8 @@ if [ -n "$REGV" ]; then
 	LAC=$(printf "%06X" 0x$LAC)
 	CID=$(echo "$REGV" | cut -d, -f4)
 	CID=$(printf "%010X" 0x$CID)
-#	RNC=${CID:1:7}		;# gNBID will be variable length in 5G - where do we read length?
-#	CID=${CID:8:2}		;# just show long cell ID for the time being
+	RNC=${CID:1:5}
+	CID=${CID:6:4}
 	RNC="-"
 else
 	REGV=$(echo "$OX" | grep -o "+CEREG:2,[0-9],[A-F0-9]\{2,4\},[A-F0-9]\{5,8\}")
