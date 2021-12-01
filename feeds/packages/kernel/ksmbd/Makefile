@@ -36,8 +36,7 @@ define KernelPackage/fs-ksmbd
 		+kmod-crypto-sha512 \
 		+kmod-crypto-aead \
 		+kmod-crypto-ccm \
-		+kmod-crypto-gcm \
-		+kmod-lib-crc32c
+		+kmod-crypto-gcm
 endef
 
 define KernelPackage/fs-ksmbd/description

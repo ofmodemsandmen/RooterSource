@@ -42,6 +42,7 @@ case $auth in
 		auth="none"
 	;;
 esac
+
 if [ $username = NIL ]; then
 	username=
 fi
@@ -63,15 +64,22 @@ ifname="$(ls /sys/class/usbmisc/$devname/device/net/)"
 }
 
 uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null & sleep 10 ; kill -9 $!
+uqmi -s -d "$device" --set-device-operating-mode online > /dev/null 2>&1
 
-#uqmi -s -d "$device" --set-data-format 802.3
-#uqmi -s -d "$device" --wda-set-data-format 802.3
 if [ $RAW -eq 1 ]; then
 	DATAFORM='"raw-ip"'
-	echo "Y" > /sys/class/net/$ifname/qmi/raw_ip
 else
-	DATAFORM=$(uqmi -s -d "$device" --wda-get-data-format)
+	if [ $idV = 1199 -a $idP = 9055 ]; then
+		$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
+		DATAFORM='"802.3"'
+		uqmi -s -d "$device" --set-data-format 802.3
+		uqmi -s -d "$device" --wda-set-data-format 802.3
+	else
+		log "getting data format"
+		DATAFORM=$(uqmi -s -d "$device" --wda-get-data-format)
+	fi
 fi
+
 log "WDA-GET-DATA-FORMAT is $DATAFORM"
 if [ "$DATAFORM" = '"raw-ip"' ]; then
 	[ -f /sys/class/net/$ifname/qmi/raw_ip ] || {
@@ -93,6 +101,8 @@ STATUS=$?
 	}
 
 uqmi -s -d "$device" --sync > /dev/null 2>&1
+
+uqmi -s -d "$device" --network-register > /dev/null 2>&1
 
 log "Waiting for network registration"
 while uqmi -s -d "$device" --get-serving-system | grep '"searching"' > /dev/null; do
