@@ -1,5 +1,5 @@
 <%+header%>
-<%
+<% 
 local sys = require "luci.sys"
 local utl = require "luci.util" 
 local fs = require "nixio.fs"
@@ -55,6 +55,7 @@ end
 	var indx3 ;
 	var caindx3 ;
 	var lockb = 0;
+	var cenable;
 	
 	XHR.poll(2, '<%=luci.dispatcher.build_url("admin", "modem", "check_misc")%>', null,
 		function(x, rv)
@@ -565,6 +566,48 @@ end
 					document.getElementById("dym2").style.display = "none";
 					document.getElementById("dym3").style.display = "none";
 					document.getElementById("bndtxt").value=" ";
+					uVid = rv.uVid ;
+					if ( uVid == "2c7c" )
+					{
+						document.getElementById("celllock1").style.display = "block";
+						document.getElementById("celllock2").style.display = "block";
+						document.getElementById("celllock3").style.display = "block";
+						cenable = rv.cenable;
+						if ( cenable == "0" )
+						{
+							document.getElementById('cellbtn').value="Enable Cell Lock";
+							document.getElementById("cstatus").innerHTML="Not Locked to Cell";
+						}
+						else
+						{
+							document.getElementById('cellbtn').value="Disable Cell Lock";
+							document.getElementById("cstatus").innerHTML="Locked to Cell";
+						}
+						earfcn = rv.earfcn;
+						if ( earfcn == "0" )
+						{
+							document.getElementById("earfcn").value="";
+						}
+						else
+						{
+							document.getElementById("earfcn").value=earfcn;
+						}
+						pci = rv.pci;
+						if ( pci == "0" )
+						{
+							document.getElementById("pci").value="";
+						}
+						else
+						{
+							document.getElementById("pci").value=pci;
+						}
+					}
+					else
+					{
+						document.getElementById("celllock1").style.display = "none";
+						document.getElementById("celllock2").style.display = "none";
+						document.getElementById("celllock3").style.display = "none";
+					} 
 					
 				
 					var ix = -1;
@@ -884,6 +927,9 @@ end
 				document.getElementById("dym2").style.display = "none";
 				document.getElementById("dym3").style.display = "none";
 				document.getElementById("dym5g1").style.display = "none";
+				document.getElementById("celllock1").style.display = "none";
+				document.getElementById("celllock2").style.display = "none";
+				document.getElementById("celllock3").style.display = "none";
 			}
 		}
 	);
@@ -1421,8 +1467,55 @@ end
 
 		return false;
 	}
-
-
+	
+	function cellenable()
+	{
+		var st;
+		state = cenable;
+		if ( state == "0" )
+		{
+			var ear = document.getElementById("earfcn").value;
+			var pc = document.getElementById("pci").value;
+			if ( ear.length == 0 )
+			{
+				alert("You must enter an EARFCN Number!!");
+				return false;
+			}
+			if ( pc.length == 0 )
+			{
+				alert("You must enter a PCI Number!!");
+				return false;
+			}
+			st = "1|" + ear + "|" + pc;
+			cenable = "1";
+		} 
+		else
+		{
+			st = "0|0|0";
+			cenable = "0";
+		}
+		if ( confirm("Modem will be restarted after change in cell lock status.\nContinue?") )
+		{
+			XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "change_cell")%>',
+				{ set: st },
+				function(x, rv)
+				{
+					if ( cenable == "0" )
+					{
+						document.getElementById('cellbtn').value="Enable Cell Lock";
+						document.getElementById("cstatus").innerHTML="Not Locked to Cell";
+					}
+					else
+					{
+						document.getElementById('cellbtn').value="Disable Cell Lock";
+						document.getElementById("cstatus").innerHTML="Locked to Cell";
+					}
+				}
+			);
+		}
+		return false;
+	}
+	
 //]]></script>
 
 <form method="post" action="<%=REQUEST_URI%>">
@@ -1566,7 +1659,7 @@ end
 	
 	<table width="500" border="0" id ="tab13">
 		<tr>
-			<td width="25%"><%:No Modem or Band Locking not implemented for this modem.%></td>
+			<td width="25%"><%:No Modem Present%></td>
 			<td width="75%">&nbsp;</td>
 		</tr>
 	</table>
@@ -1663,6 +1756,44 @@ end
 		</td>
 	</tr>
 	</table>
+	
+	<table id="celllock1" width="550"  border="0">
+  	<tr>
+		<td width="350">&nbsp;</td>
+		<td width="200">&nbsp;</td>
+	</tr>
+	<tr>
+		<td><div align="right" style="font-size:1.6em"><%:Lock to a Single Cell%></div></td>
+		<td>&nbsp;</td>
+	</tr>
+	</table>
+	
+	
+	
+	<table id="celllock3" width="700" border="0">
+	<tr>
+		<td width="8"><div align="right" style="font-size:1.3em"><strong><%:Status : %></strong></div></td>
+		<td width="10"><ul><span id="cstatus" class="r"  style="font-size:1.3em"></span></ul></td>
+		<td width="5">&nbsp;</td>
+		<td width="10">&nbsp;</td>
+		<td width="67%">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="8%"><div align="right"><strong><%:EARFCN : %></strong></div></td>
+		<td width="10%"><input type="text" name="earfcn" id="earfcn" class="cbi-input-text" style="width: 150px;" maxlength="20"></input></td>
+		<td width="5%"><div align="right"><strong><%:PCI : %></strong></div></td>
+		<td width="10%"><input type="text" name="pci" id="pci" class="cbi-input-text" style="width: 150px;" maxlength="20"></input></td>
+		<td width="67%">&nbsp;</td>
+	</tr>
+	</table>
+	
+	<table id="celllock2" width="550"  border="0">
+  	<tr>
+		<td width="10%"><input type="submit" id="cellbtn" class="cbi-button cbi-button-apply" value="<%:Enable Cell Lock%>" onclick="return cellenable()" /></td>
+		<td width="90%">&nbsp;</td>
+	</tr>
+	</table>
+	
 </fieldset>
 <% end %>
 	

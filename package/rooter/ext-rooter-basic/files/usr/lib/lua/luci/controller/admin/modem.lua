@@ -1,4 +1,4 @@
-module("luci.controller.admin.modem", package.seeall)
+module("luci.controller.admin.modem", package.seeall) 
 
 function index()
 	entry({"admin", "modem"}, firstchild(), "Modem", 25).dependent=false
@@ -35,6 +35,7 @@ function index()
 	entry({"admin", "modem", "send_scancmd"}, call("action_send_scancmd"))
 	entry({"admin", "modem", "send_lockcmd"}, call("action_send_lockcmd"))
 	entry({"admin", "modem", "extping"}, call("action_extping"))
+	entry({"admin", "modem", "change_cell"}, call("action_change_cell"))
 end
 
 function trim(s)
@@ -154,6 +155,20 @@ function action_check_misc()
 				rv["fake"] = "1"
 				file:close()
 			end
+			
+			rv["cenable"] = luci.model.uci.cursor():get("custom", "bandlock", "cenable")
+			if rv["cenable"] == nil then
+				rv["cenable"] = "0"
+			end
+			rv["earfcn"] = luci.model.uci.cursor():get("custom", "bandlock", "earfcn")
+			if rv["earfcn"] == nil then
+				rv["earfcn"] = "0"
+			end
+			rv["pci"] = luci.model.uci.cursor():get("custom", "bandlock", "pci")
+			if rv["pci"] == nil then
+				rv["pci"] = "0"
+			end
+			
 			file = io.open("/tmp/bmask", "r")
 			if file == nil then
 				rv["bndstr"] = "0"
@@ -559,4 +574,9 @@ function action_extping()
 
 	luci.http.prepare_content("application/json")
 	luci.http.write_json(rv)
+end
+
+function action_change_cell()
+	local set = luci.http.formvalue("set")
+	os.execute("/usr/lib/rooter/luci/setcell.sh " .. "\"" .. set .. "\"")
 end

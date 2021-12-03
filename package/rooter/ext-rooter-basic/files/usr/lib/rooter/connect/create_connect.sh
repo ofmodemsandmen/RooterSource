@@ -680,6 +680,22 @@ if $QUECTEL; then
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	fi
 	log "Quectel Unsolicited Responses Disabled"
+	
+	clck=$(uci -q get custom.bandlock.cenable)
+	if [ $clck = "1" ]; then
+		ear=$(uci -q get custom.bandlock.earfcn)
+		pc=$(uci -q get custom.bandlock.pci)
+		ATCMDD="at+qnwlock=\"common/4g\""
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		if `echo $OX | grep "ERROR" 1>/dev/null 2>&1`
+		then
+			ATCMDD="at+qnwlock=\"common/lte\""
+		fi
+		ATCMDD=$ATCMDD",1,"$ear","$pc
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		log "Cell Lock $OX"
+	fi
+	
 	if [ -e /etc/interwave ]; then
 		ATCMDD="AT+QMBNCFG=\"Deactivate\""
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
