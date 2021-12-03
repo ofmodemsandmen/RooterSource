@@ -21,6 +21,9 @@ config atcmd 'atcmd'
 	
 config bandlock 'bandlock'
 	option enabled '0'
+	option cenable '0'
+	option earfcn '0'
+	option pci '0'
 
 config zerotier 'zerotier'
 	option password '1234'

@@ -573,15 +573,20 @@ end
 						document.getElementById("celllock2").style.display = "block";
 						document.getElementById("celllock3").style.display = "block";
 						cenable = rv.cenable;
+						document.getElementById("cellbtn").disabled=false;
 						if ( cenable == "0" )
 						{
 							document.getElementById('cellbtn').value="Enable Cell Lock";
 							document.getElementById("cstatus").innerHTML="Not Locked to Cell";
+							document.getElementById("earfcn").disabled=false;
+							document.getElementById("pci").disabled=false;
 						}
 						else
 						{
 							document.getElementById('cellbtn').value="Disable Cell Lock";
 							document.getElementById("cstatus").innerHTML="Locked to Cell";
+							document.getElementById("earfcn").disabled=true;
+							document.getElementById("pci").disabled=true;
 						}
 						earfcn = rv.earfcn;
 						if ( earfcn == "0" )
@@ -1496,20 +1501,30 @@ end
 		}
 		if ( confirm("Modem will be restarted after change in cell lock status.\nContinue?") )
 		{
+			document.getElementById("earfcn").disabled=true;
+			document.getElementById("pci").disabled=true;
+			document.getElementById("cellbtn").disabled=true;
 			XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "change_cell")%>',
 				{ set: st },
 				function(x, rv)
 				{
-					if ( cenable == "0" )
+				/*	if ( cenable == "0" )
 					{
 						document.getElementById('cellbtn').value="Enable Cell Lock";
 						document.getElementById("cstatus").innerHTML="Not Locked to Cell";
+						document.getElementById("earfcn").disabled=false;
+						document.getElementById("pci").disabled=false;
 					}
 					else
 					{
 						document.getElementById('cellbtn').value="Disable Cell Lock";
 						document.getElementById("cstatus").innerHTML="Locked to Cell";
-					}
+						document.getElementById("earfcn").disabled=true;
+						document.getElementById("pci").disabled=true;
+					} 
+					document.getElementById("earfcn").disabled=true;
+					document.getElementById("pci").disabled=true;
+					document.getElementById("cellbtn").disabled=true; */
 				}
 			);
 		}
