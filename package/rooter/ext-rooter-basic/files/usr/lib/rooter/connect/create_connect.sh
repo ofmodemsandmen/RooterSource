@@ -704,7 +704,7 @@ if $QUECTEL; then
 		ATCMDD="AT+CGMM"
 		MODEL=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		EM160=$(echo $MODEL | grep "EM160")
-		if [ $idV != "0800" ]; then
+		if [ $idP != "0800" ]; then
 			if [ $EM160 ]; then
 				ATC="AT+QNWPREFCFG=\"mode_pref\",LTE"
 			else

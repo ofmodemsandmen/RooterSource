@@ -79,104 +79,110 @@ log "Start Connection Monitor for Modem $CURRMODEM"
 sleep 30
 
 while [ 1 = 1 ]; do
-	ACTIVE=$(uci get modem.pinginfo$CURRMODEM.alive)
-	if [ $ACTIVE = "0" ]; then
-		echo 'MONSTAT="'"Disabled"'"' > /tmp/monstat$CURRMODEM
+	CP=$(uci -q get ping.ping.enable)
+	if [ $CP = "1" ]; then
+		echo 'MONSTAT="'"Custom Ping Test"'"' > /tmp/monstat$CURRMODEM
 		sleep 60
 	else
-		track_ips=
-		INTER=$(uci get modem.modem$CURRMODEM.interface)
-		TIMEOUT=$(uci get modem.pinginfo$CURRMODEM.pingwait)
-		INTERVAL=$(uci get modem.pinginfo$CURRMODEM.pingtime)
-		RELIAB=$(uci get modem.pinginfo$CURRMODEM.reliability)
-		DOWN=$(uci get modem.pinginfo$CURRMODEM.down)
-		UP=$(uci get modem.pinginfo$CURRMODEM.up)
-		COUNT=$(uci get modem.pinginfo$CURRMODEM.count)
-		PACKETSIZE=$(uci get modem.pinginfo$CURRMODEM.packetsize)
-		INTERF=$(uci get modem.modeminfo$CURRMODEM.inter)
-
-		list_track_ips() {
-			track_ips="$1 $track_ips"
-		}
-
-		config_load modem
-		config_list_foreach "pinginfo$CURRMODEM" "trackip" list_track_ips
-
-		if [ -f "/tmp/connstat$CURRMODEM" ]; then
-			do_down " from Modem"
-			rm -f /tmp/connstat$CURRMODEM
-			sleep 20
+		ACTIVE=$(uci get modem.pinginfo$CURRMODEM.alive)
+		if [ $ACTIVE = "0" ]; then
+			echo 'MONSTAT="'"Disabled"'"' > /tmp/monstat$CURRMODEM
+			sleep 60
 		else
-			ENB="0"
-			if [ -e /etc/config/failover ]; then
-				ENB=$(uci get failover.enabled.enabled)
-			fi
-			if [ $ENB = "1" ]; then
-				if [ -e /tmp/mdown$CURRMODEM ]; then
-					do_down " (using Failover)"
-				else
-					echo 'MONSTAT="'"Up ($CURSOR) (using Failover)"'"' > /tmp/monstat$CURRMODEM
-				fi
+			track_ips=
+			INTER=$(uci get modem.modem$CURRMODEM.interface)
+			TIMEOUT=$(uci get modem.pinginfo$CURRMODEM.pingwait)
+			INTERVAL=$(uci get modem.pinginfo$CURRMODEM.pingtime)
+			RELIAB=$(uci get modem.pinginfo$CURRMODEM.reliability)
+			DOWN=$(uci get modem.pinginfo$CURRMODEM.down)
+			UP=$(uci get modem.pinginfo$CURRMODEM.up)
+			COUNT=$(uci get modem.pinginfo$CURRMODEM.count)
+			PACKETSIZE=$(uci get modem.pinginfo$CURRMODEM.packetsize)
+			INTERF=$(uci get modem.modeminfo$CURRMODEM.inter)
+
+			list_track_ips() {
+				track_ips="$1 $track_ips"
+			}
+
+			config_load modem
+			config_list_foreach "pinginfo$CURRMODEM" "trackip" list_track_ips
+
+			if [ -f "/tmp/connstat$CURRMODEM" ]; then
+				do_down " from Modem"
+				rm -f /tmp/connstat$CURRMODEM
 				sleep 20
 			else
-				# check to see if modem iface has an IP address, if not try a reconnect/power toggle
-				OX=$(ip address show $IFNAME 2>&1)
-				ip4=$(echo "$OX" | grep 'inet ' | cut -d' ' -f6)
-				ip6=$(echo "$OX" | grep 'inet6' | grep global | cut -d' ' -f6)
-                        	if [ -z "$ip4" -a -z "$ip6" ]; then
-                                	do_down " (no IP address)"
-                        	fi
-
-					UPDWN="0"
-					host_up_count=0
-					score_up=$UP
-					score_dwn=$DOWN
-					lost=0
-					while true; do
-						if [ ! -z "$track_ips" ]; then
-							for track_ip in $track_ips; do
-								ping -I $INTER -c $COUNT -W $TIMEOUT -s $PACKETSIZE -q $track_ip &> /dev/null
-								if [ $? -eq 0 ]; then
-									let host_up_count++
-								else
-									let lost++
+				ENB="0"
+				if [ -e /etc/config/failover ]; then
+					ENB=$(uci get failover.enabled.enabled)
+				fi
+				if [ $ENB = "1" ]; then
+					if [ -e /tmp/mdown$CURRMODEM ]; then
+						do_down " (using Failover)"
+					else
+						echo 'MONSTAT="'"Up ($CURSOR) (using Failover)"'"' > /tmp/monstat$CURRMODEM
+					fi
+					sleep 20
+				else
+					# check to see if modem iface has an IP address, if not try a reconnect/power toggle
+					OX=$(ip address show $IFNAME 2>&1)
+					ip4=$(echo "$OX" | grep 'inet ' | cut -d' ' -f6)
+					ip6=$(echo "$OX" | grep 'inet6' | grep global | cut -d' ' -f6)
+								if [ -z "$ip4" -a -z "$ip6" ]; then
+										do_down " (no IP address)"
 								fi
-							done
-							if [ $host_up_count -lt $RELIAB ]; then
-								let score_dwn--
-								score_up=$UP
-								if [ $score_dwn -eq 0 ]; then
-									UPDWN="1"
-									break
+
+						UPDWN="0"
+						host_up_count=0
+						score_up=$UP
+						score_dwn=$DOWN
+						lost=0
+						while true; do
+							if [ ! -z "$track_ips" ]; then
+								for track_ip in $track_ips; do
+									ping -I $INTER -c $COUNT -W $TIMEOUT -s $PACKETSIZE -q $track_ip &> /dev/null
+									if [ $? -eq 0 ]; then
+										let host_up_count++
+									else
+										let lost++
+									fi
+								done
+								if [ $host_up_count -lt $RELIAB ]; then
+									let score_dwn--
+									score_up=$UP
+									if [ $score_dwn -eq 0 ]; then
+										UPDWN="1"
+										break
+									fi
+								else
+									let score_up--
+									score_dwn=$DOWN
+									if [ $score_up -eq 0 ]; then
+										UPDWN="0"
+										break
+									fi
 								fi
 							else
-								let score_up--
-								score_dwn=$DOWN
-								if [ $score_up -eq 0 ]; then
-									UPDWN="0"
-									break
-								fi
+								UPDWN="0"
+								exit
 							fi
+							host_up_count=0
+							sleep $INTERVAL
+						done
+						if [ $UPDWN = "1" ]; then
+							do_down " (using Ping Test)"
 						else
-							UPDWN="0"
-							exit
+							echo 'MONSTAT="'"UP ($CURSOR) (using Ping Test)"'"' > /tmp/monstat$CURRMODEM
 						fi
-						host_up_count=0
 						sleep $INTERVAL
-					done
-					if [ $UPDWN = "1" ]; then
-						do_down " (using Ping Test)"
-					else
-						echo 'MONSTAT="'"UP ($CURSOR) (using Ping Test)"'"' > /tmp/monstat$CURRMODEM
-					fi
-					sleep $INTERVAL
 
+				fi
 			fi
-		fi
-		if [ $CURSOR = "-" ]; then
-			CURSOR="+"
-		else
-			CURSOR="-"
+			if [ $CURSOR = "-" ]; then
+				CURSOR="+"
+			else
+				CURSOR="-"
+			fi
 		fi
 	fi
 done
