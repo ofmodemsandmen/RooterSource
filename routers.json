@@ -1636,5 +1636,19 @@
 		"ext1": "-upgrade.bin",
 		"ext2": "-factory.bin",
 		"addons": ["readme.pdf", "archer.txt"]
+	},
+	"ARCHERC6V2": {
+		"details": "TP-Link Archer C6 V2",
+		"type": "2",
+		"flash": "8",
+		"build": "1907",
+		"config": ".config_archerc6v2",
+		"image1": "openwrt-ath79-generic-tplink_archer-c6-v2-squashfs-sysupgrade.bin",
+		"image2": "openwrt-ath79-generic-tplink_archer-c6-v2-squashfs-factory.bin",
+		"imagepath": "/ath79/generic/",
+		"mod": "TP-Link-Archer-C6-V2",
+		"ext1": "-upgrade.bin",
+		"ext2": "-factory.bin",
+		"addons": ["readme.pdf"]
 	}
 }
