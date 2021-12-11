@@ -150,28 +150,7 @@ case $uVid in
 				fi
 			;;
 			"0800" )
-				rm -f /tmp/scanx
-				echo "Scan for Neighbouring cells not supported" >> /tmp/scan
-				uci set modem.pinginfo$CURRMODEM.alive=$ALIVE
-				uci commit modem
-				exit 0
-				
-				GL=$(echo $model | grep "\-GL")
-				if [ ! -z "$GL" ]; then #FM500-GL
-					mask="42000087E2BB0F38DF"
-					fibdecode $mask 1 1
-					M4='AT+QNWPREFCFG="lte_band",'$lst
-					#mask5='70000000010000000000'
-					#fibdecode $mask5 1 1
-					#M5='AT+QNWPREFCFG="nsa_nr5g_band",'$lst
-				else # FM500-AE
-					mask="42000087E2BB0F38DF"
-					fibdecode $mask 1 1
-					M4='AT+QNWPREFCFG="lte_band",'$lst
-					#mask5='7042000081A0090808D7'
-					#fibdecode $mask5 1 1
-					#M5='AT+QNWPREFCFG="nsa_nr5g_band",'$lst
-				fi
+
 			;;
 			* )
 				M3="AT"
@@ -295,12 +274,13 @@ do
 		if [ "$qm" ]; then
 			INT=$(echo $qm | cut -d, -f3)
 			BND=$(echo $qm | cut -d, -f5)
+			PCI=$(echo $qm | cut -d, -f6)
 			RSSI=$(echo $qm | cut -d, -f9)
 			BAND=$(/usr/bin/chan2band.sh $BND)
 			if [ "$INT" = "intra" ]; then
-				echo "Band : $BAND    Signal : $RSSI (dBm) (current connected band)" >> /tmp/scan
+				echo "Band : $BAND    Signal : $RSSI (dBm) EARFCN : $BND  PCI : $PCI (current)" >> /tmp/scan
 			else
-				echo "Band : $BAND    Signal : $RSSI (dBm)" >> /tmp/scan
+				echo "Band : $BAND    Signal : $RSSI (dBm) EARFCN : $BND  PCI : $PCI" >> /tmp/scan
 			fi
 			flg=1
 		fi
@@ -311,9 +291,10 @@ do
 			read -r line
 			qm=$(echo $line" " | tr -d '"' | tr " " ",")
 			BND=$(echo $qm | cut -d, -f1)
+			PCI=$(echo $qm | cut -d, -f10)
 			BAND=$(/usr/bin/chan2band.sh $BND)
 			RSSI=$(echo $qm | cut -d, -f13)
-			echo "Band : $BAND    Signal : $RSSI (dBm) (current connected band)" >> /tmp/scan
+			echo "Band : $BAND    Signal : $RSSI (dBm) EARFCN : $BND  PCI : $PCI (current)" >> /tmp/scan
 			flg=1
 		else
 			qm=$(echo $line" " | grep "InterFreq:" | tr -d '"' | tr " " ",")
@@ -337,9 +318,10 @@ do
 						break
 					fi
 					BND=$(echo $qm | cut -d, -f1)
+					PCI=$(echo $qm | cut -d, -f10)
 					BAND=$(/usr/bin/chan2band.sh $BND)
 					RSSI=$(echo $qm | cut -d, -f8)
-					echo "Band : $BAND    Signal : $RSSI (dBm)" >> /tmp/scan
+					echo "Band : $BAND    Signal : $RSSI (dBm) EARFCN : $BND  PCI : $PCI" >> /tmp/scan
 					flg=1
 				done
 				break
@@ -361,24 +343,26 @@ echo "Done" >> /tmp/scan
 
 case $uVid in
 	"2c7c" )
-		if [ $uPid = 0620 -o $uPid = "0800" ]; then
-			EM20=$(echo $model | grep "EM20")
-			if [ ! -z $EM20 ]; then # EM20
-				M2='AT+QCFG="band",0,'$L1',0'
-				if [ -e /etc/fake ]; then
+		if [ $uPid != "0800" ]; then
+			if [ $uPid = 0620 -o $uPid = "0800" ]; then
+				EM20=$(echo $model | grep "EM20")
+				if [ ! -z $EM20 ]; then # EM20
+					M2='AT+QCFG="band",0,'$L1',0'
+					if [ -e /etc/fake ]; then
+						fibdecode $L1 1 1
+						M2F='AT+QNWPREFCFG="lte_band",'$lst
+						log "Fake EM160 Band Set "$M2F
+					fi
+				else
 					fibdecode $L1 1 1
-					M2F='AT+QNWPREFCFG="lte_band",'$lst
-					log "Fake EM160 Band Set "$M2F
+					M2='AT+QNWPREFCFG="lte_band",'$lst
 				fi
 			else
-				fibdecode $L1 1 1
-				M2='AT+QNWPREFCFG="lte_band",'$lst
+				M4='AT+QCFG="band",0,'$L1',0'
 			fi
-		else
-			M4='AT+QCFG="band",0,'$L1',0'
+			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M4")
+			log "$OX"
 		fi
-		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M4")
-		log "$OX"
 	;;
 	"1199" )
 		M1='AT!ENTERCND="A710"'
