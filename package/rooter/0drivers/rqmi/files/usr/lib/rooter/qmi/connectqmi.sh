@@ -63,8 +63,8 @@ ifname="$(ls /sys/class/usbmisc/$devname/device/net/)"
 	}
 }
 
-uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null & sleep 10 ; kill -9 $!
-uqmi -s -d "$device" --set-device-operating-mode online > /dev/null 2>&1
+uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null & sleep 5 ; kill -9 $!
+uqmi -s -d "$device" --set-device-operating-mode online > /dev/null 2>&1 & sleep 5 ; kill -9 $!
 
 if [ $RAW -eq 1 ]; then
 	DATAFORM='"raw-ip"'
@@ -90,17 +90,17 @@ if [ "$DATAFORM" = '"raw-ip"' ]; then
 fi
 
 log "Query radio state"
-uqmi -s -d "$device" --get-signal-info | grep -q "Information unavailable"
+uqmi -s -d "$device" --get-signal-info | grep -q "Information unavailable" & sleep 5 ; kill -9 $!
 STATUS=$?
 
 [ "$STATUS" -ne 0 ] || {
 	sleep 1
 	log "Setting FCC Auth"
-	uqmi -s -d "$device" --fcc-auth
+	uqmi -s -d "$device" --fcc-auth & sleep 5 ; kill -9 $!
 	sleep 1
 	}
 
-uqmi -s -d "$device" --sync > /dev/null 2>&1
+uqmi -s -d "$device" --sync > /dev/null 2>&1 & sleep 5 ; kill -9 $!
 
 uqmi -s -d "$device" --network-register > /dev/null 2>&1
 
