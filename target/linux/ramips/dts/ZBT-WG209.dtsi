@@ -33,8 +33,33 @@
 
 		led_status: status {
 			label = "green:status";
-			gpios = <&gpio0 24 GPIO_ACTIVE_LOW>;
+			gpios = <&gpio0 12 GPIO_ACTIVE_LOW>;
 		};
+		
+		signal1 {
+			label = "green:signal1";
+			gpios = <&gpio0 14 GPIO_ACTIVE_LOW>;
+			
+		signal2 {
+			label = "green:signal2";
+			gpios = <&gpio0 4 GPIO_ACTIVE_LOW>;
+			
+		signal3 {
+			label = "green:signal3";
+			gpios = <&gpio0 10 GPIO_ACTIVE_LOW>;
+			
+		internet {
+			label = "green:internet";
+			gpios = <&gpio0 17 GPIO_ACTIVE_LOW>;
+	};
+	
+	watchdog {
+		compatible = "linux,wdt-gpio";
+		gpios = <&gpio0 3 GPIO_ACTIVE_HIGH>;
+		hw_algo = "toggle";
+		/* hw_margin_ms is actually ~120s but driver limits it to 60s */
+		hw_margin_ms = <60000>;
+		always-running;
 	};
 };
 
