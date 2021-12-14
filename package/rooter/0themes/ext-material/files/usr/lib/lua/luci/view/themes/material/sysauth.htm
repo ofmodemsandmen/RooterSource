@@ -175,7 +175,7 @@
 			<a class="brand" href="/"><img src="/luci-static/img/open.png" class="icon-lg"></a>
 		<% end %>
 			<%if ( ifr ) then%>
-			<a><iframe src="/luci-static/test.html" height="<%=ifh%>" width="350" title="Iframe Example"></iframe></a>
+			<a><iframe src="/luci-static/display.html" height="<%=ifh%>" width="350" title="Iframe Example"></iframe></a>
 			<% end %>
 			<form class="form-login" method="post" action="<%=pcdata(luci.http.getenv("REQUEST_URI"))%>">
 
@@ -198,7 +198,7 @@
 					
 				</div>
 				<%if ( ifr1 ) then%>
-				<a><iframe src="/luci-static/test.html" height="<%=ifh1%>" width="350" title="Iframe Example"></iframe></a>
+				<a><iframe src="/luci-static/display.html" height="<%=ifh1%>" width="350" title="Iframe Example"></iframe></a>
 				<% end %>
 			</form>
 			
