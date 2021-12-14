@@ -5475,11 +5475,6 @@ CONFIG_PACKAGE_wpad-basic=y
 # CONFIG_PACKAGE_ext-sms is not set
 
 #
-# Custom Apps
-#
-# CONFIG_PACKAGE_customize is not set
-
-#
 # Drivers
 #
 # CONFIG_PACKAGE_rmbim is not set
@@ -5488,14 +5483,21 @@ CONFIG_PACKAGE_wpad-basic=y
 #
 # Optional Applications
 #
+# CONFIG_PACKAGE_bwallocate is not set
 # CONFIG_PACKAGE_bwmon is not set
-# CONFIG_PACKAGE_easycwmp is not set
+# CONFIG_PACKAGE_ext-domain is not set
+# CONFIG_PACKAGE_ext-easycwmp is not set
+# CONFIG_PACKAGE_ext-menu is not set
 # CONFIG_PACKAGE_ext-mosquitto is not set
 # CONFIG_PACKAGE_ext-speedtest is not set
+# CONFIG_PACKAGE_ext-texting is not set
+# CONFIG_PACKAGE_ext-throttle is not set
 # CONFIG_PACKAGE_ext-wireguard is not set
 # CONFIG_PACKAGE_ext-yamon3 is not set
 # CONFIG_PACKAGE_ext-zerotier is not set
+# CONFIG_PACKAGE_extramenu is not set
 # CONFIG_PACKAGE_pingtest is not set
+# CONFIG_PACKAGE_portal is not set
 # CONFIG_PACKAGE_qfirehose is not set
 # CONFIG_PACKAGE_qlog is not set
 # CONFIG_PACKAGE_udp-tunnel is not set
@@ -5513,18 +5515,19 @@ CONFIG_PACKAGE_wpad-basic=y
 # CONFIG_PACKAGE_alix2d13 is not set
 # CONFIG_PACKAGE_b1300 is not set
 # CONFIG_PACKAGE_cfe3 is not set
+# CONFIG_PACKAGE_cpe102 is not set
 # CONFIG_PACKAGE_d240 is not set
 # CONFIG_PACKAGE_dir860l is not set
-# CONFIG_PACKAGE_ext-ssh is not set
 # CONFIG_PACKAGE_fscheck is not set
+# CONFIG_PACKAGE_mofi4500 is not set
 # CONFIG_PACKAGE_mofi5500 is not set
 # CONFIG_PACKAGE_rbm11g is not set
 # CONFIG_PACKAGE_rbm33g is not set
 # CONFIG_PACKAGE_rd05a1 is not set
-# CONFIG_PACKAGE_rpi3bp is not set
 # CONFIG_PACKAGE_we826 is not set
 # CONFIG_PACKAGE_we826q is not set
 # CONFIG_PACKAGE_wg1608 is not set
+CONFIG_PACKAGE_wg209=y
 # CONFIG_PACKAGE_wrt1900 is not set
 
 #
@@ -5549,6 +5552,8 @@ CONFIG_PACKAGE_wpad-basic=y
 # CONFIG_PACKAGE_extra-wifi is not set
 # CONFIG_PACKAGE_ext-arc is not set
 # CONFIG_PACKAGE_ext-arc16 is not set
+# CONFIG_PACKAGE_ext-customx is not set
+# CONFIG_PACKAGE_ext-customx16 is not set
 # CONFIG_PACKAGE_ext-ltefix is not set
 # CONFIG_PACKAGE_ext-ltefix16 is not set
 # CONFIG_PACKAGE_ext-rooter-lite is not set
