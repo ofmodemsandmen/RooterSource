@@ -1,5 +1,5 @@
 <%#
-	Argon is a clean HTML5 theme for LuCI. It is based on luci-theme-bootstrap and MUI and Argon Template
+	Argon is a clean HTML5 theme for LuCI. It is based on luci-theme-bootstrap and MUI and Argon Template 
 
 	luci-theme-argon
 	Copyright 2020 Jerryk <jerrykuku@gmail.com>
@@ -98,6 +98,29 @@
 	if bgcount > 0 then
 		currentBg =  bgs[math.random(1,bgcount)]
 	end
+	if file_exists("/etc/iframe") then
+		os.execute("/usr/lib/iframe/update.sh")
+		file = io.open("/etc/iframe", "r")
+		ifr = file:read("*line")
+		if ifr == "true" then
+			ifr = true
+		else
+			ifr = false
+		end
+		ifh = file:read("*line")
+		ifr1 = file:read("*line")
+		if ifr1 == "true" then
+			ifr1 = true
+		else
+			ifr1 = false
+		end
+		ifh1 = file:read("*line")
+		file:close()
+	else
+		ifr = false
+		ifr1 = false
+	end
+
 %>
 <div class="login-page">
 	<% if (bgcount > 0 and currentBg.type == "mp4") then %>
@@ -142,6 +165,9 @@
 		<div class="login-form">
 			<a class="brand" href="/"><img src="/luci-static/img/open.png" class="icon"><span
 					class="brand-text"><%=striptags( (headername or "?") .. ( (node and node.title) and ' - ' .. translate(node.title) or '')) %></span></a>
+			<%if ( ifr ) then%>
+			<a><iframe src="/luci-static/test.html" height="<%=ifh%>" width="350" title="Iframe Example"></iframe></a>
+			<% end %>
 			<form class="form-login" method="post" action="<%=pcdata(luci.http.getenv("REQUEST_URI"))%>">
 
 				<%- if fuser then %>
@@ -160,8 +186,13 @@
 				</div>
 				<div>
 					<input type="submit" value="<%:Login%>" class="cbi-button cbi-button-apply" />
+					
 				</div>
+				<%if ( ifr1 ) then%>
+				<a><iframe src="/luci-static/test.html" height="<%=ifh1%>" width="350" title="Iframe Example"></iframe></a>
+				<% end %>
 			</form>
+			
 
 			<script type="text/javascript">//<![CDATA[
 				var input = document.getElementsByName('luci_password')[0];
