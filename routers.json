@@ -1419,7 +1419,7 @@
 		"type": "1",
 		"build": "1907",
 		"config": ".config_wg209",
-		"image": "openwrt-ramips-mt7621-zbt-wg3526-16M-squashfs-sysupgrade.bin",
+		"image": "openwrt-ramips-mt7621-zbt-wg209-16M-squashfs-sysupgrade.bin",
 		"imagepath": "/ramips/mt7621/",
 		"mod": "ZBT-WG209",
 		"ext": "-upgrade.bin",
