@@ -29,3 +29,6 @@ config zerotier 'zerotier'
 	option password '1234'
 	option lock '0'
 	option networkid 'xxxxxxxxxxxxxxxx'
+	
+config logo 'logo'
+	option size 'small'

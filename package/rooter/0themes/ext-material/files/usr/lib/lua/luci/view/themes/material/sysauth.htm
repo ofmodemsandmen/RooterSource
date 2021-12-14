@@ -1,5 +1,5 @@
 <%#
-	Argon is a clean HTML5 theme for LuCI. It is based on luci-theme-bootstrap and MUI and Argon Template 
+	Argon is a clean HTML5 theme for LuCI. It is based on luci-theme-bootstrap and MUI and Argon Template
 
 	luci-theme-argon
 	Copyright 2020 Jerryk <jerrykuku@gmail.com>
@@ -24,6 +24,11 @@
 <%+header_login%>
 <%
 	local util = require "luci.util"
+	local uci = require "luci.model.uci".cursor()
+	logosize = uci:get("custom", "logo", "size")
+	if logosize == nil then
+		logosize = "small"
+	end
 	
 	function file_exists(name)
 		local f=io.open(name,"r")
@@ -163,8 +168,12 @@
 	<% end %>
 	<div class="login-container">
 		<div class="login-form">
+		<%if logosize == "small"  then%>
 			<a class="brand" href="/"><img src="/luci-static/img/open.png" class="icon"><span
 					class="brand-text"><%=striptags( (headername or "?") .. ( (node and node.title) and ' - ' .. translate(node.title) or '')) %></span></a>
+		<%else%>
+			<a class="brand" href="/"><img src="/luci-static/img/open.png" class="icon-lg"></a>
+		<% end %>
 			<%if ( ifr ) then%>
 			<a><iframe src="/luci-static/test.html" height="<%=ifh%>" width="350" title="Iframe Example"></iframe></a>
 			<% end %>
