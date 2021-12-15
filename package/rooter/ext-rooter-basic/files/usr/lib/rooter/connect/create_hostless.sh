@@ -183,6 +183,11 @@ if [ $SP -gt 0 ]; then
 	log "Modem $CURRMODEM ECM Comm Port : /dev/ttyUSB$CPORT"
 	$ROOTER/sms/check_sms.sh $CURRMODEM &
 	$ROOTER/common/gettype.sh $CURRMODEM
+	
+	if [ -e $ROOTER/connect/preconnect.sh ]; then
+		$ROOTER/connect/preconnect.sh $CURRMODEM
+	fi
+	
 	if [ $SP = 5 ]; then
 		clck=$(uci -q get custom.bandlock.cenable)
 		if [ $clck = "1" ]; then
@@ -199,27 +204,6 @@ if [ $SP -gt 0 ]; then
 			log "Cell Lock $OX"
 		fi
 	
-		if [ -e /etc/interwave ]; then
-			ATCMDD="AT+QMBNCFG=\"Deactivate\""
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			ATCMDD="AT+QMBNCFG=\"AutoSel\",0"
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			ATCMDD="AT+CGMM"
-			MODEL=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			EM160=$(echo $MODEL | grep "EM160")
-			idV=$(uci get modem.modem$CURRMODEM.idV)
-			if [ $idP != "0800" ]; then
-				if [ $EM160 ]; then
-					ATC="AT+QNWPREFCFG=\"mode_pref\",LTE"
-				else
-					ATC="AT+QCFG=\"nwscanmode\",3"
-				fi
-				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			else
-				ATC="AT+QNWPREFCFG=\"mode_pref\",LTE:NR5G"
-				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATC")
-			fi
-		fi
 		$ROOTER/connect/bandmask $CURRMODEM 1
 		uci commit modem
 	fi
@@ -403,12 +387,6 @@ PROT=5
 if [ $SP -gt 1 ]; then
 	ln -s $ROOTER/signal/modemsignal.sh $ROOTER_LINK/getsignal$CURRMODEM
 	$ROOTER_LINK/getsignal$CURRMODEM $CURRMODEM $PROT &
-	if [ -e /etc/bandlock ]; then
-		M1='AT+COPS=?'
-		export TIMEOUT="120"
-		#OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$M1")
-		export TIMEOUT="5"
-	fi
 else
 	VENDOR=$(uci get modem.modem$CURRMODEM.idV)
 	case $VENDOR in
@@ -437,11 +415,17 @@ $ROOTER_LINK/con_monitor$CURRMODEM $CURRMODEM &
 uci set modem.modem$CURRMODEM.connected=1
 uci commit modem
 
-if [ -e $ROOTER/timezone.sh ]; then
-	TZ=$(uci -q get modem.modeminfo$CURRMODEM.tzone)
-	if [ "$TZ" = "1" ]; then
-		log "Set TimeZone"
-		$ROOTER/timezone.sh &
+if [ $SP -gt 0 ]; then
+	if [ -e $ROOTER/connect/postconnect.sh ]; then
+		$ROOTER/connect/postconnect.sh $CURRMODEM
+	fi
+	
+	if [ -e $ROOTER/timezone.sh ]; then
+		TZ=$(uci -q get modem.modeminfo$CURRMODEM.tzone)
+		if [ "$TZ" = "1" ]; then
+			log "Set TimeZone"
+			$ROOTER/timezone.sh &
+		fi
 	fi
 fi
 

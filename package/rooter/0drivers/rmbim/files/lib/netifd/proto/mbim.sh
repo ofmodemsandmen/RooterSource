@@ -437,6 +437,11 @@ _proto_mbim_setup() {
 
 	uci set modem.modem$CURRMODEM.connected=1
 	uci commit modem
+	
+	if [ -e $ROOTER/connect/postconnect.sh ]; then
+		$ROOTER/connect/postconnect.sh $CURRMODEM
+	fi
+	
 	if [ -e $ROOTER/timezone.sh ]; then
 		TZ=$(uci -q get modem.modeminfo$CURRMODEM.tzone)
 		if [ "$TZ" = "1" ]; then

@@ -660,6 +660,11 @@ elif [ "$idV" = "05c6" ]; then
 		QUECTEL=true
 	fi
 fi
+
+if [ -e $ROOTER/connect/preconnect.sh ]; then
+	$ROOTER/connect/preconnect.sh $CURRMODEM
+fi
+
 if $QUECTEL; then
 	ATCMDD="AT+CNMI?"
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
@@ -696,34 +701,10 @@ if $QUECTEL; then
 		log "Cell Lock $OX"
 	fi
 	
-	if [ -e /etc/interwave ]; then
-		ATCMDD="AT+QMBNCFG=\"Deactivate\""
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		ATCMDD="AT+QMBNCFG=\"AutoSel\",0"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		ATCMDD="AT+CGMM"
-		MODEL=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		EM160=$(echo $MODEL | grep "EM160")
-		if [ $idP != "0800" ]; then
-			if [ $EM160 ]; then
-				ATC="AT+QNWPREFCFG=\"mode_pref\",LTE"
-			else
-				ATC="AT+QCFG=\"nwscanmode\",3"
-			fi
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATC")
-		else
-			ATC="AT+QNWPREFCFG=\"mode_pref\",LTE:NR5G"
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATC")
-		fi
-	fi
 	$ROOTER/connect/bandmask $CURRMODEM 1
 	$ROOTER/luci/celltype.sh $CURRMODEM
 fi
 if [ $SIERRAID -eq 1 ]; then
-	if [ -e /etc/interwave ]; then
-		ATCMDD="AT!SELRAT=6"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	fi
 	$ROOTER/connect/bandmask $CURRMODEM 0
 	$ROOTER/luci/celltype.sh $CURRMODEM
 fi
@@ -732,16 +713,6 @@ if [ $idV = "2dee" ]; then
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATC")
 fi
 if [ $idV = "2cb7" -o $idV = "8087" ]; then
-	if [ -e /etc/interwave ]; then
-		idP=$(uci -q get modem.modem$CURRMODEM.idP)
-		idPP=${idP:1:1}
-		if [ "$idPP" = "1" ]; then
-			ATC="AT+GTRAT=17"
-		else
-			ATC="AT+XACT=4,2"
-		fi
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATC")
-	fi
 	$ROOTER/connect/bandmask $CURRMODEM 2
 fi
 CHKPORT=$(uci -q get modem.modem$CURRMODEM.commport)
@@ -1206,6 +1177,10 @@ esac
 	$ROOTER_LINK/con_monitor$CURRMODEM $CURRMODEM &
 	uci set modem.modem$CURRMODEM.connected=1
 	uci commit modem
+	
+	if [ -e $ROOTER/connect/postconnect.sh ]; then
+		$ROOTER/connect/postconnect.sh $CURRMODEM
+	fi
 
 	if [ -e /etc/bandlock ]; then
 		M1='AT+COPS=?'
