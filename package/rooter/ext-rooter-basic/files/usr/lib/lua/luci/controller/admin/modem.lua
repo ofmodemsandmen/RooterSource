@@ -169,6 +169,15 @@ function action_check_misc()
 				rv["pci"] = "0"
 			end
 			
+			rv["earfcn1"] = luci.model.uci.cursor():get("custom", "bandlock", "earfcn1")
+			if rv["earfcn1"] == nil then
+				rv["earfcn1"] = "0"
+			end
+			rv["pci1"] = luci.model.uci.cursor():get("custom", "bandlock", "pci1")
+			if rv["pci1"] == nil then
+				rv["pci1"] = "0"
+			end
+			
 			file = io.open("/tmp/bmask", "r")
 			if file == nil then
 				rv["bndstr"] = "0"

@@ -580,6 +580,8 @@ end
 							document.getElementById("cstatus").innerHTML="Not Locked to Cell";
 							document.getElementById("earfcn").disabled=false;
 							document.getElementById("pci").disabled=false;
+							document.getElementById("earfcn1").disabled=false;
+							document.getElementById("pci1").disabled=false;
 						}
 						else
 						{
@@ -587,6 +589,8 @@ end
 							document.getElementById("cstatus").innerHTML="Locked to Cell";
 							document.getElementById("earfcn").disabled=true;
 							document.getElementById("pci").disabled=true;
+							document.getElementById("earfcn1").disabled=true;
+							document.getElementById("pci1").disabled=true;
 						}
 						earfcn = rv.earfcn;
 						if ( earfcn == "0" )
@@ -605,6 +609,25 @@ end
 						else
 						{
 							document.getElementById("pci").value=pci;
+						}
+						
+						earfcn1 = rv.earfcn1;
+						if ( earfcn1 == "0" )
+						{
+							document.getElementById("earfcn1").value="";
+						}
+						else
+						{
+							document.getElementById("earfcn1").value=earfcn1;
+						}
+						pci1 = rv.pci1;
+						if ( pci1 == "0" )
+						{
+							document.getElementById("pci1").value="";
+						}
+						else
+						{
+							document.getElementById("pci1").value=pci1;
 						}
 					}
 					else
@@ -1481,6 +1504,8 @@ end
 		{
 			var ear = document.getElementById("earfcn").value;
 			var pc = document.getElementById("pci").value;
+			var ear1 = document.getElementById("earfcn1").value;
+			var pc1 = document.getElementById("pci1").value;
 			if ( ear.length == 0 )
 			{
 				alert("You must enter an EARFCN Number!!");
@@ -1491,7 +1516,15 @@ end
 				alert("You must enter a PCI Number!!");
 				return false;
 			}
-			st = "1|" + ear + "|" + pc;
+			if ( ear1.length == 0 )
+			{
+				ear1 = "0";
+			}
+			if ( pc1.length == 0 )
+			{
+				pc1 = "0";
+			}
+			st = "1|" + ear + "|" + pc + "|" + ear1 + "|" + pc1;
 			cenable = "1";
 		} 
 		else
@@ -1503,6 +1536,8 @@ end
 		{
 			document.getElementById("earfcn").disabled=true;
 			document.getElementById("pci").disabled=true;
+			document.getElementById("earfcn1").disabled=true;
+			document.getElementById("pci1").disabled=true;
 			document.getElementById("cellbtn").disabled=true;
 			XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "change_cell")%>',
 				{ set: st },
@@ -1777,10 +1812,17 @@ end
 		<td width="67%">&nbsp;</td>
 	</tr>
 	<tr>
-		<td width="8%"><div align="right"><strong><%:EARFCN : %></strong></div></td>
+		<td width="8%"><div align="right"><strong><%:EARFCN 1 : %></strong></div></td>
 		<td width="10%"><input type="text" name="earfcn" id="earfcn" class="cbi-input-text" style="width: 150px;" maxlength="20"></input></td>
-		<td width="5%"><div align="right"><strong><%:PCI : %></strong></div></td>
+		<td width="5%"><div align="right"><strong><%:PCI 1 : %></strong></div></td>
 		<td width="10%"><input type="text" name="pci" id="pci" class="cbi-input-text" style="width: 150px;" maxlength="20"></input></td>
+		<td width="67%">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="8%"><div align="right"><strong><%:EARFCN 2 : %></strong></div></td>
+		<td width="10%"><input type="text" name="earfcn1" id="earfcn1" class="cbi-input-text" style="width: 150px;" maxlength="20"></input></td>
+		<td width="5%"><div align="right"><strong><%:PCI 2 : %></strong></div></td>
+		<td width="10%"><input type="text" name="pci1" id="pci1" class="cbi-input-text" style="width: 150px;" maxlength="20"></input></td>
 		<td width="67%">&nbsp;</td>
 	</tr>
 	</table>

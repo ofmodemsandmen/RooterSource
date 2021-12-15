@@ -690,13 +690,21 @@ if $QUECTEL; then
 	if [ $clck = "1" ]; then
 		ear=$(uci -q get custom.bandlock.earfcn)
 		pc=$(uci -q get custom.bandlock.pci)
+		ear1=$(uci -q get custom.bandlock.earfcn1)
+		pc1=$(uci -q get custom.bandlock.pci1)
+		if [ $ear1 = "0" -o $pc1 = "0" ]; then
+			earcnt="1,"$ear","$pc
+		else
+			earcnt="2,"$ear","$pc","$ear1","$pc1
+		fi			
 		ATCMDD="at+qnwlock=\"common/4g\""
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		if `echo $OX | grep "ERROR" 1>/dev/null 2>&1`
 		then
-			ATCMDD="at+qnwlock=\"common/lte\""
+			ATCMDD="at+qnwlock=\"common/lte\",2,$ear,$pc"
+		else
+			ATCMDD=$ATCMDD","$earcnt
 		fi
-		ATCMDD=$ATCMDD",1,"$ear","$pc
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		log "Cell Lock $OX"
 	fi

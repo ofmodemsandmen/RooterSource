@@ -15,9 +15,13 @@ if [ $dat2 = "0" ]; then
 else
 	ear=$(echo $dat1 | cut -d, -f2)
 	pc=$(echo $dat1 | cut -d, -f3)
+	ear1=$(echo $dat1 | cut -d, -f4)
+	pc1=$(echo $dat1 | cut -d, -f5)
 	uci set custom.bandlock.cenable='1'
 	uci set custom.bandlock.earfcn=$ear
 	uci set custom.bandlock.pci=$pc
+	uci set custom.bandlock.earfcn1=$ear1
+	uci set custom.bandlock.pci1=$pc1
 fi
 uci commit custom
 
