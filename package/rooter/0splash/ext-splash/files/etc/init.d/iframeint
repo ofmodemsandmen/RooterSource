@@ -10,5 +10,9 @@ log() {
 
 start_service()
 {
-	/usr/lib/iframe/create.sh
+	if [ ! -d /tmp/www ]; then
+		mkdir -p /tmp/www
+	fi
+	/usr/lib/iframe/create.sh &
+	/usr/lib/iframe/status.sh &
 }

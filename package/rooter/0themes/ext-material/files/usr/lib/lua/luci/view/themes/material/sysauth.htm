@@ -103,27 +103,37 @@
 	if bgcount > 0 then
 		currentBg =  bgs[math.random(1,bgcount)]
 	end
-	if file_exists("/etc/iframe") then
+	
+	iframe = uci:get("iframe", "iframe", "logframe")
+	if iframe == nil then
+		iframe = "0"
+	end
+	stframe = uci:get("iframe", "iframe", "statusframe")
+	if stframe == nil then
+		stframe = "0"
+	end
+	
+	if iframe == "1" then
 		os.execute("/usr/lib/iframe/update.sh")
-		file = io.open("/etc/iframe", "r")
-		ifr = file:read("*line")
-		if ifr == "true" then
+		ifloc = uci:get("iframe", "iframe", "loglocation")
+
+		if ifloc == "0" then
 			ifr = true
-		else
-			ifr = false
 		end
-		ifh = file:read("*line")
-		ifr1 = file:read("*line")
-		if ifr1 == "true" then
+		if ifloc == "1" then
 			ifr1 = true
-		else
-			ifr1 = false
 		end
-		ifh1 = file:read("*line")
-		file:close()
+		ifh = uci:get("iframe", "iframe", "logheight")
+		ifw = uci:get("iframe", "iframe", "logwidth")
 	else
 		ifr = false
 		ifr1 = false
+	end
+	
+	if stframe == "1" then
+		os.execute("/usr/lib/iframe/stupdate.sh")
+		ifsh = uci:get("iframe", "iframe", "statusheight")
+		ifsw = uci:get("iframe", "iframe", "statuswidth")
 	end
 
 %>
@@ -166,6 +176,15 @@
 	></div>
 	
 	<% end %>
+	
+	<%if stframe == "1"  then%>
+	<div class="status-container">
+		<div class="status-form">	
+			<a><iframe src="/luci-static/ifstatus.html" height="<%=ifsh%>" width="<%=ifsw%>" title="Iframe Status"></iframe></a>
+		</div>
+	</div>
+	<% end %>
+	
 	<div class="login-container">
 		<div class="login-form">
 		<%if logosize == "small"  then%>
@@ -174,9 +193,11 @@
 		<%else%>
 			<a class="brand" href="/"><img src="/luci-static/img/open.png" class="icon-lg"></a>
 		<% end %>
+		
 			<%if ( ifr ) then%>
-			<a><iframe src="/luci-static/display.html" height="<%=ifh%>" width="350" title="Iframe Example"></iframe></a>
+			<a><iframe src="/luci-static/display.html" height="<%=ifh%>" width="<%=ifw%>" title="Iframe Example"></iframe></a>
 			<% end %>
+			
 			<form class="form-login" method="post" action="<%=pcdata(luci.http.getenv("REQUEST_URI"))%>">
 
 				<%- if fuser then %>
@@ -197,11 +218,14 @@
 					<input type="submit" value="<%:Login%>" class="cbi-button cbi-button-apply" />
 					
 				</div>
+				
 				<%if ( ifr1 ) then%>
-				<a><iframe src="/luci-static/display.html" height="<%=ifh1%>" width="350" title="Iframe Example"></iframe></a>
+				<a><iframe src="/luci-static/display.html" height="<%=ifh%>" width="<%=ifw%>" title="Iframe Example"></iframe></a>
 				<% end %>
+				
 			</form>
-			
+				
+
 
 			<script type="text/javascript">//<![CDATA[
 				var input = document.getElementsByName('luci_password')[0];
@@ -220,6 +244,7 @@
 			if https_port and fs.access(https_key) then
 				https_port = https_port:match("(%d+)$")
 			%>
+
 			<script type="text/javascript">//<![CDATA[
 				if (document.location.protocol != 'https:') {
 					var url = 'https://' + window.location.hostname + ':' + '<%=https_port%>' + window.location.pathname;
@@ -232,4 +257,5 @@
 				}
 			//]]></script>
 			<% end %>
+
 <%+footer%>

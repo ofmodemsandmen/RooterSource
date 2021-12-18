@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh 
 
 ROOTER=/usr/lib/rooter
 
@@ -165,7 +165,7 @@ CALIST=$(echo "${OX//[ ]/}" | grep -o "+CELLINFO:\"SCC\",[0-9],2,[0-9],[0-9]\{1,
 
 for CAVAL in $(echo "$CALIST"); do
 	if [ "$(echo $CAVAL | cut -d, -f2)" == "1" ]; then
-		CATYPE="CA+"
+		CATYPE="CA"$(printf "\xe2\x86\x91")
 	else
 		CATYPE="CA"
 	fi

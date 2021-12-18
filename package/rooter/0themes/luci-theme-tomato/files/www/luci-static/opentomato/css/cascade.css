@@ -1,4 +1,4 @@
-﻿@import url(fonts.css?v=3);
+﻿@import url(fonts.css?v=3); 
 
 @import url(pure-min.css?v=1);
 
@@ -307,6 +307,39 @@ hr {
 	transition: all .5s;
 }
 
+
+.login-page .status-container {
+	height: 100%;
+	position: absolute;
+	top: 0px;
+
+	right: 0px;
+	display: flex;
+	flex-direction: column;
+	-webkit-box-pack: center;
+	justify-content: center;
+	align-items: flex-start;
+	min-height: 100%;
+	z-index: 2;
+	width: 800px;
+	box-shadow: rgba(0,0,0,0.75) 0 0 35px -5px;
+	margin-left: 5%;
+	background: transparent;
+}
+
+.login-page .status-container .status-form {
+	display: flex;
+	flex-direction: column;
+	-webkit-box-align: center;
+	align-items: right;
+	position: absolute;
+	top: 0px;
+	width: 100%;
+	min-height: 100%;
+	max-width: 800px;
+	background-color: rgba(224,224,224,0);
+}
+
 .login-page .login-container {
 	height: 100%;
 	position: absolute;
@@ -324,6 +357,7 @@ hr {
 	background: transparent;
 }
 
+/* color of login panel */
 .login-page .login-container .login-form {
 	display: flex;
 	flex-direction: column;
@@ -337,12 +371,20 @@ hr {
 	background-color: rgba(224,224,224,0.7);
 }
 
+/* change for login box */
 .login-page .login-container .login-form .brand {
 	display: flex;
 	-webkit-box-align: center;
 	align-items: center;
 	color: var(--default);
-	margin: 50px auto 100px 50px;
+	margin: 50px auto 30px 50px;
+}
+
+/* size of logo displayed */
+.login-page .login-container .login-form .brand .icon-lg {
+	width: 300px;
+	height: auto;
+	margin-right: 25px;
 }
 
 .login-page .login-container .login-form .brand .icon {
