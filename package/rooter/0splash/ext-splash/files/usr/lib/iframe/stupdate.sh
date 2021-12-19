@@ -191,9 +191,7 @@ if [ $splash = "1" ]; then
 	button="<div class='rooterPageContentBut'><div class="" id=\"rooterItems\"><a href='cgi-bin/luci'><div class=\"rooterItem\" id=\"rooterItem1\"><div class=\"rooterItemTitle\"><i class='icon icon-cog'></i> Click for Router Login</div><div class=\"rooterItemTitle\">to the Web GUI.</div></div></a></div></div>"
 	sed -i -e "s!#BUTTON#!$button!g" $STEMP
 	sed -i -e "s!#LUCIS#!luci-static/!g" $STEMP
-	titlebar="<div class='rooterPageHead'>
-		<div class=\"rooterHeadTitle\">#TITLE#</div>
-	</div>"
+	titlebar="<div class='rooterPageHead'><div class=\"rooterHeadTitle\">#TITLE#</div></div>"
 	sed -i -e "s!#TITLEBAR#!$titlebar!g" $STEMP
 	title=$(uci -q get iframe.iframe.splashtitle)
 	sed -i -e "s!#TITLE#!$title!g" $STEMP
