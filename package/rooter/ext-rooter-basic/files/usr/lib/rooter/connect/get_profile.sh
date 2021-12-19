@@ -62,10 +62,12 @@ do_custom() {
 				;;
 			"1" )
 				config_get imei $1 imei
-				if [ "$IMEI" == "$imei" ]; then
+				case $IMEI in
+				"$imei"*)
 					MATCH=1
-					log "Modem IMEI Profile - "$name""
-				fi
+					log "SIM IMEI Profile - "$name""
+					;;
+				esac
 				;;
 			"2" )
 				config_get model $1 model
@@ -108,10 +110,12 @@ do_custom() {
 						;;
 					"1" )
 						config_get imei1 $1 imei1
-						if [ "$IMEI" == "$imei1" ]; then
-							MATCH=1
-							log "Modem IMEI Profile - "$name""
-						fi
+						case $IMEI in
+							"$imei"*)
+								MATCH=1
+								log "SIM IMEI Profile - "$name""
+								;;
+							esac
 						;;
 					"2" )
 						config_get model1 $1 model1
@@ -242,6 +246,13 @@ fi
 
 if [ $MATCH = 0 ]; then
 	uci set modem.modeminfo$CURRMODEM.apn=$(uci -q get profile.default.apn)
+	$imei="891490"
+	case $IMEI in
+	"$imei"*)
+		uci set modem.modeminfo$CURRMODEM.apn="internet.freedommobile.ca"
+		;;
+	esac
+
 	uci set modem.modeminfo$CURRMODEM.user=$(uci -q get profile.default.user)
 	uci set modem.modeminfo$CURRMODEM.passw=$(uci -q get profile.default.passw)
 	uci set modem.modeminfo$CURRMODEM.pincode=$(uci -q get profile.default.pincode)
