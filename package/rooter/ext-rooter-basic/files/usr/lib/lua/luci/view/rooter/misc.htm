@@ -56,6 +56,49 @@ end
 	var caindx3 ;
 	var lockb = 0;
 	var cenable;
+	var modtype;
+	
+	function num2pro(pro, mod)
+	{
+		if ( mod == "1" )
+		{
+			elem = document.getElementById("qpro");
+		}
+		else
+		{
+			elem = document.getElementById("spro");
+		}
+		
+		elem.options['0'].disabled=true;
+		if ( pro == "3" || pro == "30" )
+		{
+			elem.options['2'].disabled=true;
+			if ( mod == "1" )
+			{
+				elem.options['3'].disabled=false;
+			}
+			elem.options['1'].disabled=false;
+			return "MBIM"
+		}
+		if ( pro == "2" )
+		{
+			elem.options['1'].disabled=true;
+			if ( mod == "1" )
+			{
+				elem.options['3'].disabled=false;
+			}
+			elem.options['2'].disabled=false;
+			return "QMI";
+		}
+		if ( pro == "5" )
+		{
+			elem.options['3'].disabled=true;
+			elem.options['2'].disabled=false;
+			elem.options['1'].disabled=false;
+			return "ECM";
+		}
+		return "Unknown";
+	}
 	
 	XHR.poll(2, '<%=luci.dispatcher.build_url("admin", "modem", "check_misc")%>', null,
 		function(x, rv)
@@ -476,11 +519,40 @@ end
 				document.getElementById("apply1").style.visibility="visible";
 			}
 	
+			uVid = rv.uVid ;
+			uPid = rv.uPid ;
+			if ( uVid == "2c7c" )
+			{
+				document.getElementById("prochnge").style.display = "block";
+				document.getElementById("modpro").style.display = "block";
+				document.getElementById("modpro").innerHTML = num2pro(rv.proto, "1");
+				document.getElementById("qpro").style.display="block";
+				document.getElementById("qpro").style.visibility="visible";
+				document.getElementById("spro").style.display="none";
+				modtype = "1";
+			}
+			else
+			{
+				if ( uVid == "1199" )
+				{
+					document.getElementById("modpro").style.display = "block";
+					document.getElementById("modpro").innerHTML = num2pro(rv.proto, "2");
+					document.getElementById("spro").style.display="block";
+					document.getElementById("spro").style.visibility="visible";
+					document.getElementById("prochnge").style.display = "block";
+					document.getElementById("qpro").style.display="none";
+					modtype = "2";
+				}
+				else
+				{
+					document.getElementById("modpro").style.display = "none";
+					document.getElementById("prochnge").style.display = "none";
+					modtype = "0";
+				}
+			}
 			
 			// Start of Band locking
 			
-			uVid = rv.uVid ;
-			uPid = rv.uPid ;
 			model = rv.model;
 			fake = rv.fake;
 			bxx = rv.bndstr ;
@@ -572,6 +644,7 @@ end
 						document.getElementById("celllock1").style.display = "block";
 						document.getElementById("celllock2").style.display = "block";
 						document.getElementById("celllock3").style.display = "block";
+						document.getElementById("prochnge").style.display = "block";
 						cenable = rv.cenable;
 						document.getElementById("cellbtn").disabled=false;
 						if ( cenable == "0" )
@@ -958,6 +1031,7 @@ end
 				document.getElementById("celllock1").style.display = "none";
 				document.getElementById("celllock2").style.display = "none";
 				document.getElementById("celllock3").style.display = "none";
+				document.getElementById("prochnge").style.display = "none";
 			}
 		}
 	);
@@ -1107,6 +1181,52 @@ end
 			}
 		);
 
+		return false;
+	}
+	
+	function applyp(btn)
+	{
+		switch(modtype)
+		{
+			case "1":
+				nmode=document.getElementById("qpro").value;
+				break;
+			case "2":
+				nmode=document.getElementById("spro").value;
+				break;
+			case "0":
+				return false;
+		}
+		if ( nmode == "0" )
+		{
+			return false;
+		}
+		if ( confirm("Modem will be restarted after Protocol change\nContinue?") )
+		{
+			document.getElementById("modpro").innerHTML = "Changing Protocol ...";
+			document.getElementById("probutton").value="Applying Change";
+			document.getElementById("probutton").disabled=true;
+			
+			XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "change_proto")%>',
+			{ set: nmode },
+			function()
+			{
+				switch(modtype)
+				{
+					case "1":
+						document.getElementById("qpro").value="0";
+						break;
+					case "2":
+						document.getElementById("spro").value="0";
+						break;
+				}
+				window.location.reload(false);
+			}
+		);
+
+			
+
+		}
 		return false;
 	}
 
@@ -1836,13 +1956,43 @@ end
 	
 </fieldset>
 <% end %>
+
+<fieldset class="cbi-section" id="cbi-mode-pro">
+	<legend><%:Modem Protocol%></legend>
+	<table id="prochnge" border="0">
+		<tr>
+				<td width="20%">&nbsp;</td>
+				<td width="30%"><div align="right"><%:Current Modem Protocol :%></div></td>
+				<td width="20%"><ul><span id="modpro" class="r"></span></ul></td>
+				<td width="30%">&nbsp;</td>
+		</tr>
+		<tr>
+			<td width="10%">&nbsp;</td>
+    		<td><div align="right"><%:Change Cellular Mode :%></div></td>
+    		<td>
+				<select style="visibility:hidden;width:auto" name="qspro" id="qpro">
+					<option value="0" selected="selected"><%:Select Protocol%></option>
+					<option value="1"><%:Switch to QMI Protocol%></option>
+					<option value="2"><%:Switch to MBIM Protocol%></option>
+					<option value="3"><%:Switch to ECM Protocol%></option>
+				</select>
+				<select style="visibility:hidden;width:auto" name="qspro" id="spro">
+					<option value="0" selected="selected"><%:Select Protocol%></option>
+					<option value="1"><%:Switch to QMI Protocol%></option>
+					<option value="2"><%:Switch to MBIM Protocol%></option>
+				</select>
+			</td>
+			<td><input type="button" id="probutton" class="cbi-button cbi-button-apply" value="<%:Apply Protocol Change%>" onclick="return applyp(this)" /></td>
+		</tr>
+	</table>
+</fieldset>
 	
 <fieldset class="cbi-section" id="cbi-mode">
 	<legend><%:Cellular Mode%></legend>
 	<table width="550"  border="0">
   	<tr>
     		<td width="30%"><div align="right"><%:Current Cellular Mode :%></div></td>
-    		<td width="20%"><ul><span id="netmode" class="r"></span></ul></td>
+    		<td width="10%"><ul><span id="netmode" class="r"></span></ul></td>
     		<td width="50%">&nbsp;</td>
   	</tr>
 	<tr>

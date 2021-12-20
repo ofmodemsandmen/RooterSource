@@ -36,6 +36,7 @@ function index()
 	entry({"admin", "modem", "send_lockcmd"}, call("action_send_lockcmd"))
 	entry({"admin", "modem", "extping"}, call("action_extping"))
 	entry({"admin", "modem", "change_cell"}, call("action_change_cell"))
+	entry({"admin", "modem", "change_proto"}, call("action_change_proto"))
 end
 
 function trim(s)
@@ -589,3 +590,9 @@ function action_change_cell()
 	local set = luci.http.formvalue("set")
 	os.execute("/usr/lib/rooter/luci/setcell.sh " .. "\"" .. set .. "\"")
 end
+
+function action_change_proto()
+	local set = luci.http.formvalue("set")
+	os.execute("/usr/lib/rooter/luci/protochnge.sh " ..set)
+end
+
