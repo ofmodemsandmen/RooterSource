@@ -772,3 +772,12 @@ define Device/zbt-wg3526-32M
 	kmod-usb3 kmod-usb-ledtrig-usbport wpad-basic
 endef
 TARGET_DEVICES += zbt-wg3526-32M
+
+define Device/dualq_h721-256m-16m
+  DTS := H721-256M-16M
+  IMAGE_SIZE := 16064k
+  DEVICE_TITLE := DualQ H721 (256M RAM/16M flash)
+  DEVICE_PACKAGES := kmod-ata-core kmod-ata-ahci kmod-sdhci-mt7620 kmod-usb3
+  SUPPORTED_DEVICES += h721-256M-16M
+endef
+TARGET_DEVICES += dualq-h721-256m-16m

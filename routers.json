@@ -1650,5 +1650,21 @@
 		"ext1": "-upgrade.bin",
 		"ext2": "-factory.bin",
 		"addons": ["readme.pdf"]
+	},
+	"H721": {
+		"details": "DualQ H721",
+		"type": "1",
+		"build": "1907",
+		"config": ".config_h721",
+		"image": "openwrt-ramips-mt7621-dualq-h721-256m-16m-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "DualQ-H721",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf", "readmerecovery.txt"],
+		"custom": {
+			"name": {
+				"model": "DualQ H721"
+			}
+		}
 	}
 }
