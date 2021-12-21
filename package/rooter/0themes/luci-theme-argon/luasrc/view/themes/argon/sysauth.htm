@@ -104,7 +104,7 @@
 		currentBg =  bgs[math.random(1,bgcount)]
 	end
 	
-	iframe = uci:get("iframe", "iframe", "logframe")
+	iframe = uci:get("iframe", "login", "logframe")
 	if iframe == nil then
 		iframe = "0"
 	end
@@ -115,7 +115,7 @@
 	
 	if iframe == "1" then
 		os.execute("/usr/lib/iframe/update.sh")
-		ifloc = uci:get("iframe", "iframe", "loglocation")
+		ifloc = uci:get("iframe", "login", "loglocation")
 
 		if ifloc == "0" then
 			ifr = true
@@ -123,8 +123,8 @@
 		if ifloc == "1" then
 			ifr1 = true
 		end
-		ifh = uci:get("iframe", "iframe", "logheight")
-		ifw = uci:get("iframe", "iframe", "logwidth")
+		ifh = uci:get("iframe", "login", "logheight")
+		ifw = uci:get("iframe", "login", "logwidth")
 	else
 		ifr = false
 		ifr1 = false

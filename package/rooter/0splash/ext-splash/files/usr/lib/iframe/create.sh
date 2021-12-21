@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh 
 . /lib/functions.sh
 
 bwdata() {
@@ -17,12 +17,15 @@ bwdata() {
 
 bwdata
 /usr/lib/iframe/update.sh
-sleep 300
-while [ true ]
-do
-	result=`ps | grep -i "update.sh" | grep -v "grep" | wc -l`
-	if [ $result -lt 1 ]; then
-		/usr/lib/iframe/update.sh
-	fi
+logtype=$(uci -q get iframe.iframe.logtype)
+if [ $logtype = "1" ]; then
 	sleep 300
-done
+	while [ true ]
+	do
+		result=`ps | grep -i "update.sh" | grep -v "grep" | wc -l`
+		if [ $result -lt 1 ]; then
+			/usr/lib/iframe/update.sh
+		fi
+		sleep 300
+	done
+fi

@@ -1,7 +1,7 @@
 /* @override http://src.dev.lo.lo/ROOter/www/luci-static/rooter/css/splash.css */
 
 /*
-	CSS for ROOter splash pages
+	CSS for ROOter splash pages 
 	Copyright Francois Dechery
 	https://github.com/soif
 */
@@ -157,6 +157,12 @@
 	max-width: 600px ;
 	margin: auto;
 }
+
+#rooterItemss{
+	clear: both;
+	max-width: 300px ;
+	margin: auto;
+}
 .rooterItem{
 	overflow: hidden;
 	border: 5px solid #00;
@@ -184,6 +190,21 @@
 	font-size: 2em;
 	vertical-align: middle;
 }
+
+.rooterItemsp{
+	overflow: hidden;
+	border: 5px solid #00;
+	border-color: #00 #DDD #DDD #00;
+	padding: 5px 15px;
+	margin-bottom: 5px;
+	border-radius: 8px;
+	background-color: #AFAFAF;
+}
+.rooterItemsp:hover{
+	background-color: #CFCFCF;
+	border-color: #AAA;
+}
+
 #rooterItems A{
 	text-decoration: none;	
 }

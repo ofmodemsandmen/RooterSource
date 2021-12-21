@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh 
 . /lib/functions.sh
 
 bwdata() {
@@ -61,6 +61,17 @@ if [ $logtype = "2" ]; then
 	sed -i -e "s!#HEIGHT#!$logimageheight!g" $STEMP
 	logimagepos=$(uci -q get iframe.iframe.logimagepos)
 	sed -i -e "s!#POS#!$logimagepos!g" $STEMP
+	
+	mv $STEMP $IFSTATUS
+fi
+
+if [ $logtype = "3" ]; then
+	STEMP="/tmp/www/itemp.html"
+	STATUS="/usr/lib/iframe/speed.html"
+	IFSTATUS="/tmp/www/display.html"
+	
+	rm -f $STEMP
+	cp $STATUS $STEMP
 	
 	mv $STEMP $IFSTATUS
 fi

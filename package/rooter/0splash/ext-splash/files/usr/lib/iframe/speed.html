@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<script>
+		
+	function applyc(btn)
+	{
+		//window.location.reload(true);
+		var iframe = document.getElementById('apply4');
+		iframe.src = iframe.src;
+	}
+	
+	function applys(btn)
+	{
+		document.getElementById("apply3").style.visibility="hidden";
+		document.getElementById("apply3").style.display = "none";
+		document.getElementById("apply1").style.visibility="visible";
+		document.getElementById("apply1").style.display = "block";
+		document.getElementById("apply2").style.visibility="visible";
+		document.getElementById("apply2").style.display = "block";
+	}
+</script>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" href="rooter/css/iconmoon_splash.css">
+	<link rel="stylesheet" href="rooter/css/splash.css">
+	<link rel="SHORTCUT ICON" href="luci-static/rooter/img/favicon.gif">
+	<link rel="icon" type="image/gif" href="luci-static/rooter/img/favicon.gif">
+</head>
+
+<body style="background-color: LightSteelBlue"  class='rooterSplash'>
+
+	<table width="340" border="0" id="apply3" >
+		<tr>
+			<td align="middle"><h2><i class="icon icon-signal"></i> OpenSpeedTest <span class="msCell" id='msCell_speed'><span></span></span></h2></td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td align="middle">
+				<div class="" id="rooterItemss">
+				<a onclick="return applys(this)">
+					<div class="rooterItem" id="rooterItem1">
+						<div class="rooterItemTitle">
+							<i class='icon icon-cog'></i> Click to Start Speed Test
+						</div>
+					</div>
+				<a>
+				</div>
+			</td>
+		</tr>
+	</table>
+    
+    <a  style="visibility:hidden;display:none;" id="apply2"><iframe id="apply4" src="https://openspeedtest.com/Get-widget.php?Auto=5" width="325" height="280" style="border:2px solid black;" title="OpenSpeedTest"></iframe></a>
+    
+	<table id="apply1" border="0" style="visibility:hidden;display:none;" >
+		<tr>
+			<td align="middle">
+				<div class="" id="rooterItemss">
+				<a onclick="return applyc(this)">
+					<div class="rooterItemsp" id="rooterItem1">
+						<div class="rooterItemTitle">
+							<i class='icon icon-cog'></i> Click to Test Again
+						</div>
+					</div>
+				<a>
+				</div>
+			</td>
+		</tr>
+ 	</table>
+	
+
+</body>
+</html>
