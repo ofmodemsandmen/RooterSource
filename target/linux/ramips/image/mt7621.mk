@@ -773,7 +773,7 @@ define Device/zbt-wg3526-32M
 endef
 TARGET_DEVICES += zbt-wg3526-32M
 
-define Device/dualq_h721-256m-16m
+define Device/dualq-h721-256m-16m
   DTS := H721-256M-16M
   IMAGE_SIZE := 16064k
   DEVICE_TITLE := DualQ H721 (256M RAM/16M flash)
