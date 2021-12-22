@@ -119,7 +119,7 @@ check_all_empty() {
 	USBN=0
 	ETHN=1
 	WDMN=0
-
+	BASEPORT=0
 	if
 		ifconfig eth1
 	then
@@ -340,6 +340,9 @@ if [ "$ACTION" = add ]; then
 					fi
 					;;
 				esac
+			elif [ $FILEN = "03f0:9d1d" -a $bNumConfs -eq 3 ]; then
+				bestcfg=1
+				change_bconf $DEVICENAME $bestcfg QMI
 			else
 				if [ $bConfig -ne $retval ]; then
 					change_bconf $DEVICENAME $retval MBIM
@@ -379,6 +382,15 @@ if [ "$ACTION" = add ]; then
 	display_top; display "ProtoFind returns : $retval"; display_bottom
 	rm -f /tmp/wdrv
 
+	if [ $reinsert = 0 ]; then
+		BASEP=$BASEPORT
+		if [ -f /tmp/drv ]; then
+			source /tmp/drv
+			BASEPORT=`expr $PORTN + $BASEPORT`
+		fi
+	fi
+	rm -f /tmp/drv
+
 	if [ $retval -ne 0 ]; then
 		log "Found Modem $CURRMODEM"
 		if [ $reinsert = 0 ]; then
@@ -388,6 +400,8 @@ if [ "$ACTION" = add ]; then
 			uci set modem.modem$CURRMODEM.idV=$idV
 			uci set modem.modem$CURRMODEM.idP=$idP
 			uci set modem.modem$CURRMODEM.device=$DEVICENAME
+			uci set modem.modem$CURRMODEM.baseport=$BASEP
+			uci set modem.modem$CURRMODEM.maxport=$BASEPORT
 			uci set modem.modem$CURRMODEM.proto=$retval
 			uci set modem.modem$CURRMODEM.maxcontrol=/sys$DEVPATH/descriptors
 			find_usb_attrs
