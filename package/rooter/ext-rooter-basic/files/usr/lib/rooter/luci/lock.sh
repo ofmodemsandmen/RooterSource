@@ -258,8 +258,8 @@ case $uVid in
 		if [ $RESTART = "1" ]; then
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			ATCMDD='AT!ENTERCND="AWRONG"'
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		fi
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	;;
 	"8087"|"2cb7" )
 		FM150=""
@@ -319,10 +319,11 @@ case $uVid in
 	;;
 esac
 
-rm -f /tmp/bmask
 if [ $RESTART = "0" ]; then
+log "No Restart"
 	exit 0
 fi
+rm -f /tmp/bmask
 uci set modem.modem$CURRMODEM.connected=0
 uci commit modem
 
