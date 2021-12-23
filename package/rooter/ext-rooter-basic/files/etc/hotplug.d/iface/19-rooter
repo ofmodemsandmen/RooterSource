@@ -10,12 +10,6 @@ IFACE="wan1"
 
 if [ ${INTERFACE} = "$IFACE" ]; then
 	if [ ${ACTION} = "ifup" ]; then
-# TTL fix
-		ENB=$(uci get ttl.ttl.enabled)
-		if [ ! -z "$ENB" ]; then
-			exst=$(cat /etc/firewall.user | grep " mangle .* $DEVICE " | wc -l)
-			[ "$exst" -eq 4 ] || /usr/lib/custom/ttlx.sh
-		fi
 
 # configure custom MTU value in 'System - Startup - Local Startup' by using "echo 1500 > /tmp/wan1.mtu"
 

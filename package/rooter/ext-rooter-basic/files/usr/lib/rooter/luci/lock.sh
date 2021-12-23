@@ -6,6 +6,8 @@ log() {
 	logger -t "Lock Band" "$@"
 }
 
+RESTART="1"
+
 ifname1="ifname"
 if [ -e /etc/newstyle ]; then
 	ifname1="device"
@@ -217,7 +219,9 @@ case $uVid in
 		log "Locking Cmd Response : $OX"
 		log "Locking Cmd Response : $OX5"
 		log " "
-		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		if [ $RESTART = "1" ]; then
+			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
 	;;
 	"1199" )
 		M1='AT!ENTERCND="A710"'
@@ -251,9 +255,11 @@ case $uVid in
 		M2='AT!BAND=00;!BAND=11'
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M2")
 		log "$OX"
-		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		ATCMDD='AT!ENTERCND="AWRONG"'
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		if [ $RESTART = "1" ]; then
+			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			ATCMDD='AT!ENTERCND="AWRONG"'
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
 	;;
 	"8087"|"2cb7" )
 		FM150=""
@@ -303,9 +309,10 @@ case $uVid in
 		log " "
 		log "Lock Response : $OX"
 		log " "
-		ATCMDD="AT+CFUN=1,1"
-
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		if [ $RESTART = "1" ]; then
+			ATCMDD="AT+CFUN=1,1"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
 	;;
 	* )
 		exit 0
@@ -313,6 +320,9 @@ case $uVid in
 esac
 
 rm -f /tmp/bmask
+if [ $RESTART = "0" ]; then
+	exit 0
+fi
 uci set modem.modem$CURRMODEM.connected=0
 uci commit modem
 

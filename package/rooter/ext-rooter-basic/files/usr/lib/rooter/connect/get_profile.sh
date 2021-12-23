@@ -194,6 +194,11 @@ do_custom() {
 						pdptype=""
 					fi
 					uci set modem.modeminfo$CURRMODEM.pdptype=$pdptype
+					config_get ttl $1 ttl
+					if [ -z $ttl ]; then
+						ttl="0"
+					fi
+					$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl"
 
 					[ -n "$apn" ] || log "This profile has no APN configured !!!"
 
@@ -246,9 +251,9 @@ fi
 
 if [ $MATCH = 0 ]; then
 	uci set modem.modeminfo$CURRMODEM.apn=$(uci -q get profile.default.apn)
-	iccid="891490"
-	case $ICCID in
-	"$iccid"*)
+	$imei="891490"
+	case $IMEI in
+	"$imei"*)
 		uci set modem.modeminfo$CURRMODEM.apn="internet.freedommobile.ca"
 		;;
 	esac
@@ -278,6 +283,11 @@ if [ $MATCH = 0 ]; then
 		pdp=""
 	fi
 	uci set modem.modeminfo$CURRMODEM.pdptype=$pdp
+	ttl=$(uci -q get profile.default.ttl)
+	if [ -z $ttl ]; then
+		ttl="0"
+	fi
+	$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl"
 
 	alive=$(uci get profile.default.alive)
 	uci delete modem.pinginfo$CURRMODEM

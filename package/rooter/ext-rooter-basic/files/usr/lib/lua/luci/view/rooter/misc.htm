@@ -1,6 +1,6 @@
 <%+header%>
 <% 
-local sys = require "luci.sys"
+local sys = require "luci.sys" 
 local utl = require "luci.util" 
 local fs = require "nixio.fs"
 local uci = require "luci.model.uci".cursor()
@@ -1387,7 +1387,7 @@ end
 			rstr = rstr + ',' + rstr5g ;
 		}
 
-		if ( confirm("Modem will be restarted after band change\nContinue?") )
+		if ( confirm("Modem will be locked to selected bands.\nContinue?") )
 		{
 			s = rstr ;
 			XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "send_lockcmd")%>',
