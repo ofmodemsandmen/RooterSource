@@ -6,7 +6,7 @@ m = Map("profile", translate("Modem Connection Profiles"),
 	translate("Create Profiles used to provide information at connection time"))
 
 m.on_after_commit = function(self)
-	--luci.sys.call("/etc/modpwr") 
+	--luci.sys.call("/etc/modpwr")
 end
 
 -- 
@@ -29,11 +29,11 @@ tt = di:taboption(this_tab, ListValue, "ttl", translate("Custom TTL Value :"))
 tt:value("0", "Use Current Value")
 tt:value("1", "No TTL Value")
 tt:value("63", "TTL 63")
-tt:value("64", "TTL 63")
-tt:value("65", "TTL 63")
-tt:value("66", "TTL 63")
-tt:value("67", "TTL 63")
-tt:value("117", "TTL 63")
+tt:value("64", "TTL 64")
+tt:value("65", "TTL 65")
+tt:value("66", "TTL 66")
+tt:value("67", "TTL 67")
+tt:value("117", "TTL 117")
 tt:value("TTL-INC 1", "TTL-INC 1")
 tt.default = "0"
 
@@ -387,11 +387,11 @@ tt = s:taboption(this_ctab, ListValue, "ttl", translate("Custom TTL Value :"))
 tt:value("0", "Use Current Value")
 tt:value("1", "No TTL Value")
 tt:value("63", "TTL 63")
-tt:value("64", "TTL 63")
-tt:value("65", "TTL 63")
-tt:value("66", "TTL 63")
-tt:value("67", "TTL 63")
-tt:value("117", "TTL 63")
+tt:value("64", "TTL 64")
+tt:value("65", "TTL 65")
+tt:value("66", "TTL 66")
+tt:value("67", "TTL 67")
+tt:value("117", "TTL 117")
 tt:value("TTL-INC 1", "TTL-INC 1")
 tt.default = "0"
 

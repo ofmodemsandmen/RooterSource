@@ -1666,5 +1666,18 @@
 				"model": "DualQ H721"
 			}
 		}
+	},
+	"Z6817": {
+		"details": "ZyXEL NBG6817",
+		"type": "2",
+		"build": "1907",
+		"config": ".config_z6817",
+		"image1": "openwrt-ipq806x-generic-zyxel_nbg6817-squashfs-sysupgrade.bin",
+		"image2": "openwrt-ipq806x-generic-zyxel_nbg6817-squashfs-factory.bin",
+		"imagepath": "/ipq806x/generic/",
+		"mod": "ZyXEL-NBG6817",
+		"ext1": "-upgrade.bin",
+		"ext2": "-factory.bin",
+		"addons": ["readme.pdf", "factory.txt"]
 	}
 }
