@@ -32,3 +32,7 @@ config zerotier 'zerotier'
 	
 config logo 'logo'
 	option size 'small'
+	
+config connect 'connect'
+	option ipv6 '1'
+	

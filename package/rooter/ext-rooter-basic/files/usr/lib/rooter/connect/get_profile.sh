@@ -251,12 +251,14 @@ fi
 
 if [ $MATCH = 0 ]; then
 	uci set modem.modeminfo$CURRMODEM.apn=$(uci -q get profile.default.apn)
-	$imei="891490"
-	case $IMEI in
-	"$imei"*)
-		uci set modem.modeminfo$CURRMODEM.apn="internet.freedommobile.ca"
-		;;
-	esac
+	if [ -n "$ICCID" ]; then
+		$iccid="891490"
+		case $ICCID in
+		"$iccid"*)
+			uci set modem.modeminfo$CURRMODEM.apn="internet.freedommobile.ca"
+			;;
+		esac
+	fi
 
 	uci set modem.modeminfo$CURRMODEM.user=$(uci -q get profile.default.user)
 	uci set modem.modeminfo$CURRMODEM.passw=$(uci -q get profile.default.passw)

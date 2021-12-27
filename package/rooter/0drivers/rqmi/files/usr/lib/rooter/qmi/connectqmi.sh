@@ -20,6 +20,11 @@ RAW=$7
 DHCP=$8
 pincode=$9
 
+enb=$(uci -q get custom.connect.ipv6)
+if [ -z $enb ]; then
+	enb="1"
+fi
+
 ifname1="ifname"
 if [ -e /etc/newstyle ]; then
 	ifname1="device"
@@ -131,22 +136,25 @@ if [[ -z $(echo "$CONN" | grep -o "disconnected") ]]; then
 	CONN4=$(uqmi -s -d "$device" --set-client-id wds,"$cid" --get-current-settings)
 	log "GET-CURRENT-SETTINGS is $CONN4"
 
-	cid6=`uqmi -s -d "$device" --get-client-id wds`
-	[ $? -ne 0 ] && {
-		log "Unable to obtain client ID"
-		ret=1
-	}
-	uqmi -s -d "$device" --set-client-id wds,"$cid6" --set-ip-family ipv6 > /dev/null
-	ST6=$(uqmi -s -d "$device" --set-client-id wds,"$cid6" --start-network ${NAPN:+--apn $NAPN} ${auth:+--auth-type $auth} \
-	${username:+--username $username} ${password:+--password $password})
-	log "IPv6 Connection returned : $ST6"
-	CONN6=$(uqmi -s -d "$device" --set-client-id wds,"$cid6" --get-current-settings)
-	CONF6=$(jsonfilter -s $CONN6 -e '@.ipv6')
-	if [ -n "$CONF6" ];then
-		log "IPv6 settings are $CONF6"
-		touch /tmp/ipv6supp$INTER
-	else
-		rm -f /tmp/ipv6supp$INTER
+	if [ $enb = "1" ]; then
+		cid6=`uqmi -s -d "$device" --get-client-id wds`
+		[ $? -ne 0 ] && {
+			log "Unable to obtain client ID"
+			ret=1
+		}
+
+		uqmi -s -d "$device" --set-client-id wds,"$cid6" --set-ip-family ipv6 > /dev/null
+		ST6=$(uqmi -s -d "$device" --set-client-id wds,"$cid6" --start-network ${NAPN:+--apn $NAPN} ${auth:+--auth-type $auth} \
+		${username:+--username $username} ${password:+--password $password})
+		log "IPv6 Connection returned : $ST6"
+		CONN6=$(uqmi -s -d "$device" --set-client-id wds,"$cid6" --get-current-settings)
+		CONF6=$(jsonfilter -s $CONN6 -e '@.ipv6')
+		if [ -n "$CONF6" ];then
+			log "IPv6 settings are $CONF6"
+			touch /tmp/ipv6supp$INTER
+		else
+			rm -f /tmp/ipv6supp$INTER
+		fi
 	fi
 
 	if [ $DATAFORM = '"raw-ip"' ]; then
@@ -154,14 +162,16 @@ if [[ -z $(echo "$CONN" | grep -o "disconnected") ]]; then
 		json_load "$CONN4"
 		json_select ipv4
 		json_get_vars ip subnet gateway dns1 dns2
-		if [ -n "$CONF6" ]; then
-			json_load "$CONN6"
-			json_select ipv6
-			json_get_var ip_6 ip
-			json_get_var gateway_6 gateway
-			json_get_var dns1_6 dns1
-			json_get_var dns2_6 dns2
-			json_get_var ip_prefix_length ip-prefix-length
+		if [ $enb = "1" ]; then
+			if [ -n "$CONF6" ]; then
+				json_load "$CONN6"
+				json_select ipv6
+				json_get_var ip_6 ip
+				json_get_var gateway_6 gateway
+				json_get_var dns1_6 dns1
+				json_get_var dns2_6 dns2
+				json_get_var ip_prefix_length ip-prefix-length
+			fi
 		fi
 
 		if [ -s /tmp/v4dns$INTER -o -s /tmp/v6dns$INTER ]; then
@@ -169,13 +179,17 @@ if [[ -z $(echo "$CONN" | grep -o "disconnected") ]]; then
 			if [ -s /tmp/v4dns$INTER ]; then
 				v4dns=$(cat /tmp/v4dns$INTER 2>/dev/null)
 			fi
-			if [ -s /tmp/v6dns$INTER ]; then
-				v6dns=$(cat /tmp/v6dns$INTER 2>/dev/null)
+			if [ $enb = "1" ]; then
+				if [ -s /tmp/v6dns$INTER ]; then
+					v6dns=$(cat /tmp/v6dns$INTER 2>/dev/null)
+				fi
 			fi
 		else
 			v4dns="$dns1 $dns2"
-			v6dns="$dns1_6 $dns2_6"
-			echo "$v6dns" > /tmp/v6dns$INTER
+			if [ $enb = "1" ]; then
+				v6dns="$dns1_6 $dns2_6"
+				echo "$v6dns" > /tmp/v6dns$INTER
+			fi
 		fi
 
 		if [ $DHCP -eq 0 ]; then

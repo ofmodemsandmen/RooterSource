@@ -99,6 +99,14 @@ datalist[45] = "eg25"
 celllist[45] = 2
 datalist[46] = "srm8"
 celllist[46] = 4
+datalist[47] = "4087"
+celllist[47] = 3
+datalist[48] = "rg5"
+celllist[48] = 4
+datalist[49] = "eg12"
+celllist[49] = 2
+datalist[50] = "eg18"
+celllist[50] = 2
 
 printf = function(s,...)
 	if echo == 0 then

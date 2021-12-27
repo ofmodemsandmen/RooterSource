@@ -215,10 +215,7 @@ repeat
 			break
 		end
 		if drv[i] == "usb-storage" then
-			if i == 1 then
-				retval = 97
-				break
-			end
+			retval = 97
 		end
 		i = i + 1
 	end

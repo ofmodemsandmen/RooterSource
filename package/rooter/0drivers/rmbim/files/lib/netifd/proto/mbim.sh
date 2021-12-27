@@ -14,6 +14,11 @@ log() {
 	logger -t "MBIM Connect" "$@"
 }
 
+enb=$(uci -q get custom.connect.ipv6)
+if [ -z $enb ]; then
+	enb="1"
+fi
+
 ifname1="ifname"
 if [ -e /etc/newstyle ]; then
 	ifname1="device"
@@ -264,33 +269,39 @@ _proto_mbim_setup() {
 	IP=$(echo -e "$CONFIG"|grep "ipv4address"|grep -E -o "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)")
 	DNS1=$(echo -e "$CONFIG"|grep "ipv4dnsserver"|grep -E -o "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)" |sed -n 1p)
 	DNS2=$(echo -e "$CONFIG"|grep "ipv4dnsserver"|grep -E -o "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)" |sed -n 2p)
-	IP6=$(echo "$CONFIG" | awk '/ipv6address:/ {print $2}' | cut -d / -f 1)
-	DNS3=$(echo "$CONFIG" | awk '/ipv6dnsserver:/ {print $2}' | sed -n 1p)
-	DNS4=$(echo "$CONFIG" | awk '/ipv6dnsserver:/ {print $2}' | sed -n 2p)
+	if [ $enb = "1" ]; then
+		IP6=$(echo "$CONFIG" | awk '/ipv6address:/ {print $2}' | cut -d / -f 1)
+		DNS3=$(echo "$CONFIG" | awk '/ipv6dnsserver:/ {print $2}' | sed -n 1p)
+		DNS4=$(echo "$CONFIG" | awk '/ipv6dnsserver:/ {print $2}' | sed -n 2p)
+	fi
 
 	[ -n "$IP" ] && echo "IP: $IP"
-	[ -n "$IP6" ] && echo "IPv6: $IP6"
 	[ -n "$DNS1" ] && echo "DNS1: $DNS1"
 	[ -n "$DNS2" ] && echo "DNS2: $DNS2"
-	[ -n "$DNS3" ] && echo "DNS3: $DNS3"
-	[ -n "$DNS4" ] && echo "DNS4: $DNS4"
+	if [ $enb = "1" ]; then
+		[ -n "$IP6" ] && echo "IPv6: $IP6"
+		[ -n "$DNS3" ] && echo "DNS3: $DNS3"
+		[ -n "$DNS4" ] && echo "DNS4: $DNS4"
+	fi
 
 	log "Connected, setting IP"
 
-	if [ -n "$IP6" -a -z "$IP" ]; then
-		log "Running IPv6-only mode"
-		nat46=1
-	fi
+	if [ $enb = "1" ]; then
+		if [ -n "$IP6" -a -z "$IP" ]; then
+			log "Running IPv6-only mode"
+			nat46=1
+		fi
 
-	if [[ $(echo "$IP6" | grep -o "^[23]") ]]; then
-		# Global unicast IP acquired
-		v6cap=1
-	elif
-		[[ $(echo "$IP6" | grep -o "^[0-9a-fA-F]\{1,4\}:") ]]; then
-		# non-routable address
-		v6cap=2
-	else
-		v6cap=0
+		if [[ $(echo "$IP6" | grep -o "^[23]") ]]; then
+			# Global unicast IP acquired
+			v6cap=1
+		elif
+			[[ $(echo "$IP6" | grep -o "^[0-9a-fA-F]\{1,4\}:") ]]; then
+			# non-routable address
+			v6cap=2
+		else
+			v6cap=0
+		fi
 	fi
 
 	INTER=$(uci get modem.modem$CURRMODEM.inter)
@@ -299,12 +310,16 @@ _proto_mbim_setup() {
 		if [ -e /tmp/v4dns$INTER ]; then
 			v4dns=$(cat /tmp/v4dns$INTER 2>/dev/null)
 		fi
-		if [ -e /tmp/v6dns$INTER ]; then
-			v6dns=$(cat /tmp/v6dns$INTER 2>/dev/null)
+		if [ $enb = "1" ]; then
+			if [ -e /tmp/v6dns$INTER ]; then
+				v6dns=$(cat /tmp/v6dns$INTER 2>/dev/null)
+			fi
 		fi
 	else
 		v4dns="$DNS1 $DNS2"
-		v6dns="$DNS3 $DNS4"
+		if [ $enb = "1" ]; then
+			v6dns="$DNS3 $DNS4"
+		fi
 	fi
 
 	proto_init_update "$ifname" 1
@@ -318,15 +333,17 @@ _proto_mbim_setup() {
 		proto_add_dns_server "$DNSV"
 	done
 
-	if [ "$v6cap" -gt 0 ]; then
-		# RFC 7278: Extend an IPv6 /64 Prefix to LAN
-		proto_add_ipv6_address $IP6 128
-		if [ "$v6cap" = 1 ]; then
-			proto_add_ipv6_prefix $IP6/64
-			proto_add_ipv6_route "::0" 0 "" "" "" $IP6/64
-			for DNSV in $(echo "$v6dns"); do
-				proto_add_dns_server "$DNSV"
-			done
+	if [ $enb = "1" ]; then
+		if [ "$v6cap" -gt 0 ]; then
+			# RFC 7278: Extend an IPv6 /64 Prefix to LAN
+			proto_add_ipv6_address $IP6 128
+			if [ "$v6cap" = 1 ]; then
+				proto_add_ipv6_prefix $IP6/64
+				proto_add_ipv6_route "::0" 0 "" "" "" $IP6/64
+				for DNSV in $(echo "$v6dns"); do
+					proto_add_dns_server "$DNSV"
+				done
+			fi
 		fi
 	fi
 
@@ -336,38 +353,40 @@ _proto_mbim_setup() {
 
 	proto_send_update "$interface"
 
-	if [ "$v6cap" -gt 0 ]; then
-		local zone="$(fw3 -q network "$interface" 2>/dev/null)"
-	fi
-	if [ "$v6cap" = 2 ]; then
-		log "Adding IPv6 dynamic interface"
-		json_init
-		json_add_string name "${interface}_6"
-		json_add_string ${ifname1} "@$interface"
-		json_add_string proto "dhcpv6"
-		json_add_string extendprefix 1
-		[ -n "$zone" ] && json_add_string zone "$zone"
-		[ "$nat46" = 1 ] || json_add_string iface_464xlat 0
-		json_add_boolean peerdns 0
-		json_add_array dns
-			for DNSV in $(echo "$v6dns"); do
-				json_add_string "" "$DNSV"
-			done
-		json_close_array
-		proto_add_dynamic_defaults
-		json_close_object
-		ubus call network add_dynamic "$(json_dump)"
-	elif
-		[ "$v6cap" = 1 -a "$nat46" = 1 ]; then
-		log "Adding 464XLAT (CLAT) dynamic interface"
-		json_init
-		json_add_string name "CLAT$INTER"
-		json_add_string proto "464xlat"
-		json_add_string tunlink "${interface}"
-		[ -n "$zone" ] && json_add_string zone "$zone"
-		proto_add_dynamic_defaults
-		json_close_object
-		ubus call network add_dynamic "$(json_dump)"
+	if [ $enb = "1" ]; then
+		if [ "$v6cap" -gt 0 ]; then
+			local zone="$(fw3 -q network "$interface" 2>/dev/null)"
+		fi
+		if [ "$v6cap" = 2 ]; then
+			log "Adding IPv6 dynamic interface"
+			json_init
+			json_add_string name "${interface}_6"
+			json_add_string ${ifname1} "@$interface"
+			json_add_string proto "dhcpv6"
+			json_add_string extendprefix 1
+			[ -n "$zone" ] && json_add_string zone "$zone"
+			[ "$nat46" = 1 ] || json_add_string iface_464xlat 0
+			json_add_boolean peerdns 0
+			json_add_array dns
+				for DNSV in $(echo "$v6dns"); do
+					json_add_string "" "$DNSV"
+				done
+			json_close_array
+			proto_add_dynamic_defaults
+			json_close_object
+			ubus call network add_dynamic "$(json_dump)"
+		elif
+			[ "$v6cap" = 1 -a "$nat46" = 1 ]; then
+			log "Adding 464XLAT (CLAT) dynamic interface"
+			json_init
+			json_add_string name "CLAT$INTER"
+			json_add_string proto "464xlat"
+			json_add_string tunlink "${interface}"
+			[ -n "$zone" ] && json_add_string zone "$zone"
+			proto_add_dynamic_defaults
+			json_close_object
+			ubus call network add_dynamic "$(json_dump)"
+		fi
 	fi
 
 	tid=$((tid + 1))

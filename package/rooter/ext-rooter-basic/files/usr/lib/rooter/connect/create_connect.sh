@@ -454,7 +454,12 @@ if [ $? -ne 0 ]; then
 	[ $? -eq 0 ] && ACM=1
 fi
 TTYDEVS=$(echo "$TTYDEVS" | tr '\n' ' ')
-log Modem $CURRMODEM is a parent of $TTYDEVS
+TTYDEVS=$(echo $TTYDEVS)
+if [ -n "$TTYDEVS" ]; then
+        log Modem $CURRMODEM is a parent of $TTYDEVS
+else
+        log "No Comm Ports"
+fi
 
 get_tty_fix 0
 if [ -n "$CPORT" ]; then
@@ -463,7 +468,7 @@ else
 	uci set modem.modem$CURRMODEM.baseport=""
 fi
 uci commit modem.modem$CURRMODEM
-	
+
 	case $PROT in
 #
 # Sierra Direct-IP modem comm port
@@ -575,23 +580,13 @@ uci commit modem.modem$CURRMODEM
 							uci set modem.modem$CURRMODEM.proto="30"
 							log "MBIM Comm Port : /dev/ttyUSB$CPORT"
 						;;
-						"1bc7" )
+						"1bc7"|"03f0" )
 							get_tty_fix 2
 							lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
 							source /tmp/parmpass
 							uci set modem.modem$CURRMODEM.commport=$CPORT
 							uci set modem.modem$CURRMODEM.proto="30"
 							log "MBIM Comm Port : /dev/ttyUSB$CPORT"
-						;;
-						"03f0" )
-							if [ $idP = 0a57 ]; then
-								get_tty_fix 2
-								lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
-								source /tmp/parmpass
-								uci set modem.modem$CURRMODEM.commport=$CPORT
-								uci set modem.modem$CURRMODEM.proto="30"
-								log "MBIM Comm Port : /dev/ttyUSB$CPORT"
-							fi
 						;;
 						"2cb7" )
 							get_tty_fix 0
@@ -685,7 +680,7 @@ if $QUECTEL; then
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	fi
 	log "Quectel Unsolicited Responses Disabled"
-	
+
 	clck=$(uci -q get custom.bandlock.cenable)
 	if [ $clck = "1" ]; then
 		ear=$(uci -q get custom.bandlock.earfcn)
@@ -696,7 +691,7 @@ if $QUECTEL; then
 			earcnt="1,"$ear","$pc
 		else
 			earcnt="2,"$ear","$pc","$ear1","$pc1
-		fi			
+		fi
 		ATCMDD="at+qnwlock=\"common/4g\""
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		if `echo $OX | grep "ERROR" 1>/dev/null 2>&1`
@@ -708,7 +703,7 @@ if $QUECTEL; then
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		log "Cell Lock $OX"
 	fi
-	
+
 	$ROOTER/connect/bandmask $CURRMODEM 1
 	$ROOTER/luci/celltype.sh $CURRMODEM
 fi
@@ -1185,7 +1180,7 @@ esac
 	$ROOTER_LINK/con_monitor$CURRMODEM $CURRMODEM &
 	uci set modem.modem$CURRMODEM.connected=1
 	uci commit modem
-	
+
 	if [ -e $ROOTER/connect/postconnect.sh ]; then
 		$ROOTER/connect/postconnect.sh $CURRMODEM
 	fi
