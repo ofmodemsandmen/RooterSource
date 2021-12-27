@@ -17,7 +17,7 @@ bwdata() {
 
 bwdata
 /usr/lib/iframe/update.sh
-logtype=$(uci -q get iframe.iframe.logtype)
+logtype=$(uci -q get iframe.login.logtype)
 if [ $logtype = "1" ]; then
 	sleep 300
 	while [ true ]

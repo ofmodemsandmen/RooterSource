@@ -3,13 +3,39 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="refresh" content="300">
+<link rel="stylesheet" href="rooter/css/iconmoon_splash.css">
+	<link rel="stylesheet" href="rooter/css/splash.css">
 </head>
-<body style="background-color: lightgrey">
-<p style="color: black; font-family: arial, helvetica, sans-serif; text-align: center;"><strong>#TITLE#</strong></p>
-<p style="color: black; font-family: arial, helvetica, sans-serif; text-align: left;">Days in Reporting Period : #DAYS#</p>
-<p style="color: black; font-family: arial, helvetica, sans-serif; text-align: left;">Total Bandwidth Used : #TOTAL#</p>
-<p style="color: black; font-family: arial, helvetica, sans-serif; text-align: left;">Total Download : #DOWN#</p>
-<p style="color: black; font-family: arial, helvetica, sans-serif; text-align: left;">Total Upload : #UP#</p>
-<p style="color: black; font-family: arial, helvetica, sans-serif; text-align: left;">Projected Usage : #PROJ#</p>
+<body style="background-color: lightgrey"  id='rooterSplashStatus' >
+	<h2><i class="icon icon-signal" ></i>  #TITLE# <span class="msCell"><span></span></span></h2>
+
+	<div class='rooterPageContentBW'>
+		<div class='modemStatusRow modemStatusRow1'>
+			<div class='msCell' id='msCell_per'>
+				<div class='msTitle'>Reporting Period (Days)</div>
+				<span>#DAYS#</span>
+			</div>
+		</div>
+		<div class='modemStatusRow modemStatusRow1'>
+			<div class='msCell' id='msCell_per'>
+				<div class='msTitle'>Total Bandwidth Used</div>
+				<span>#TOTAL#</span>
+			</div>
+			<div class='msCell' id='msCell_per'>
+				<div class='msTitle'>Projected Use</div>
+				<span>#PROJ#</span>
+			</div>
+		</div>
+		<div class='modemStatusRow modemStatusRow1'>
+			<div class='msCell' id='msCell_per'>
+				<div class='msTitle'>Total Downloaded</div>
+				<span>#DOWN#</span>
+			</div>
+			<div class='msCell' id='msCell_per'>
+				<div class='msTitle'>Total Uploaded</div>
+				<span>#UP#</span>
+			</div>
+		</div>
+	</div>
 </body>
-</html>
+

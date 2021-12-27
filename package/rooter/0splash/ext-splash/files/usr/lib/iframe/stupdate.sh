@@ -180,14 +180,13 @@ bwdata() {
 }
 
 splash=$(uci -q get iframe.iframe.splashpage)
-STEMP="/tmp/www/stemp.html"
-STATUS="/usr/lib/iframe/status.html"
-IFSTATUS="/tmp/www/ifstatus.html"
-SPSTATUS="/tmp/www/splash.html"
 
-rm -f $STEMP
-cp $STATUS $STEMP
 if [ $splash = "1" ]; then
+	STEMP="/tmp/www/stemp.html"
+	STATUS="/usr/lib/iframe/status.html"
+	SPSTATUS="/tmp/www/splash.html"
+	rm -f $STEMP
+	cp $STATUS $STEMP
 	button="<div class='rooterPageContentBut'><div class="" id=\"rooterItems\"><a href='cgi-bin/luci'><div class=\"rooterItem\" id=\"rooterItem1\"><div class=\"rooterItemTitle\"><i class='icon icon-cog'></i> Click for Router Login</div><div class=\"rooterItemTitle\">to the Web GUI.</div></div></a></div></div>"
 	sed -i -e "s!#BUTTON#!$button!g" $STEMP
 	sed -i -e "s!#LUCIS#!luci-static/!g" $STEMP
@@ -195,65 +194,60 @@ if [ $splash = "1" ]; then
 	sed -i -e "s!#TITLEBAR#!$titlebar!g" $STEMP
 	title=$(uci -q get iframe.iframe.splashtitle)
 	sed -i -e "s!#TITLE#!$title!g" $STEMP
-else
-	sed -i -e "s!#BUTTON#!!g" $STEMP
-	sed -i -e "s!#LUCIS#!!g" $STEMP
-	sed -i -e "s!#TITLEBAR#!!g" $STEMP
-fi
-readstatus
-level2txt "$csq" "single" 0
-sed -i -e "s!#CSQ#!$namev!g" $STEMP
-level2txt "$per" "per"
-sed -i -e "s!#PER#!$namev!g" $STEMP
-level2txt "$rssi" "rssi"
-sed -i -e "s!#RSSI#!$namev!g" $STEMP
-level2txt "$rscp" "rscp"
-sed -i -e "s!#RSCP#!$namev!g" $STEMP
-level2txt "$ecio" "single" 1
-sed -i -e "s!#RSRQ#!$namev!g" $STEMP
-level2txt "$sinr" "single" 1
-sed -i -e "s!#SINR#!$namev!g" $STEMP
 
-level2txt "$mode" "single"
-sed -i -e "s!#MODE#!$namev!g" $STEMP
-level2txt "$mcc" "single"
-sed -i -e "s!#MCC#!$namev!g" $STEMP
-level2txt "$mnc" "single"
-sed -i -e "s!#MNC#!$namev!g" $STEMP
-level2txt "$rnc" "single"
-sed -i -e "s!#RNC#!$namev!g" $STEMP
-level2txt "$rncn" "single"
-sed -i -e "s!#RNCN#!$namev!g" $STEMP
-level2txt "$lac" "single"
-sed -i -e "s!#LAC#!$namev!g" $STEMP
-level2txt "$lacn" "single"
-sed -i -e "s!#LACN#!$namev!g" $STEMP
-level2txt "$pci" "single"
-sed -i -e "s!#CELLID#!$namev!g" $STEMP
-level2txt "$channel" "single"
-sed -i -e "s!#CHAN#!$namev!g" $STEMP
-level2txt "$lband" "single"
-sed -i -e "s!#BAND#!$namev!g" $STEMP
+	readstatus
+	level2txt "$csq" "single" 0
+	sed -i -e "s!#CSQ#!$namev!g" $STEMP
+	level2txt "$per" "per"
+	sed -i -e "s!#PER#!$namev!g" $STEMP
+	level2txt "$rssi" "rssi"
+	sed -i -e "s!#RSSI#!$namev!g" $STEMP
+	level2txt "$rscp" "rscp"
+	sed -i -e "s!#RSCP#!$namev!g" $STEMP
+	level2txt "$ecio" "single" 1
+	sed -i -e "s!#RSRQ#!$namev!g" $STEMP
+	level2txt "$sinr" "single" 1
+	sed -i -e "s!#SINR#!$namev!g" $STEMP
 
-level2txt "$modem" "single"
-sed -i -e "s!#MODEM#!$namev!g" $STEMP
-level2txt "$proto" "single"
-sed -i -e "s!#PROTO#!$namev!g" $STEMP
-level2txt "$port" "single"
-sed -i -e "s!#PORT#!$namev!g" $STEMP
-level2txt "$tempur" "single"
-sed -i -e "s!#TEMP#!$namev!g" $STEMP
+	level2txt "$mode" "single"
+	sed -i -e "s!#MODE#!$namev!g" $STEMP
+	level2txt "$mcc" "single"
+	sed -i -e "s!#MCC#!$namev!g" $STEMP
+	level2txt "$mnc" "single"
+	sed -i -e "s!#MNC#!$namev!g" $STEMP
+	level2txt "$rnc" "single"
+	sed -i -e "s!#RNC#!$namev!g" $STEMP
+	level2txt "$rncn" "single"
+	sed -i -e "s!#RNCN#!$namev!g" $STEMP
+	level2txt "$lac" "single"
+	sed -i -e "s!#LAC#!$namev!g" $STEMP
+	level2txt "$lacn" "single"
+	sed -i -e "s!#LACN#!$namev!g" $STEMP
+	level2txt "$pci" "single"
+	sed -i -e "s!#CELLID#!$namev!g" $STEMP
+	level2txt "$channel" "single"
+	sed -i -e "s!#CHAN#!$namev!g" $STEMP
+	level2txt "$lband" "single"
+	sed -i -e "s!#BAND#!$namev!g" $STEMP
 
-bwdata
-	
-sed -i -e "s!#DAYS#!$days!g" $STEMP
-sed -i -e "s!#TOTAL#!$tused!g" $STEMP
-sed -i -e "s!#DOWN#!$tdwn!g" $STEMP
-sed -i -e "s!#UP#!$tup!g" $STEMP
-sed -i -e "s!#PROJECT#!$project!g" $STEMP
+	level2txt "$modem" "single"
+	sed -i -e "s!#MODEM#!$namev!g" $STEMP
+	level2txt "$proto" "single"
+	sed -i -e "s!#PROTO#!$namev!g" $STEMP
+	level2txt "$port" "single"
+	sed -i -e "s!#PORT#!$namev!g" $STEMP
+	level2txt "$tempur" "single"
+	sed -i -e "s!#TEMP#!$namev!g" $STEMP
 
-if [ $splash = "1" ]; then
+	bwdata
+		
+	sed -i -e "s!#DAYS#!$days!g" $STEMP
+	sed -i -e "s!#TOTAL#!$tused!g" $STEMP
+	sed -i -e "s!#DOWN#!$tdwn!g" $STEMP
+	sed -i -e "s!#UP#!$tup!g" $STEMP
+	sed -i -e "s!#PROJECT#!$project!g" $STEMP
+
 	mv $STEMP $SPSTATUS
-else
-	mv $STEMP $IFSTATUS
 fi
+
+

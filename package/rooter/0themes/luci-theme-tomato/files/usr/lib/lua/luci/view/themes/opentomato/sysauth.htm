@@ -108,35 +108,26 @@
 	if iframe == nil then
 		iframe = "0"
 	end
-	stframe = uci:get("iframe", "iframe", "statusframe")
-	if stframe == nil then
-		stframe = "0"
-	end
-	
 	if iframe == "1" then
 		os.execute("/usr/lib/iframe/update.sh")
-		ifloc = uci:get("iframe", "login", "loglocation")
-
-		if ifloc == "0" then
-			ifr = true
-		end
-		if ifloc == "1" then
-			ifr1 = true
-		end
-		ifh = uci:get("iframe", "login", "logheight")
-		ifw = uci:get("iframe", "login", "logwidth")
+		ifloc = uci:get("iframe", "login", "logtype")
+		ifr = true
 	else
 		ifr = false
-		ifr1 = false
-	end
-	
-	if stframe == "1" then
-		os.execute("/usr/lib/iframe/stupdate.sh")
-		ifsh = uci:get("iframe", "iframe", "statusheight")
-		ifsw = uci:get("iframe", "iframe", "statuswidth")
 	end
 
 %>
+<style type="text/css">
+body {
+  overflow: scroll; /* Show scrollbars */
+  
+  html {
+    height: 110%;
+    margin-bottom: 0.01em;
+	font-size: 1.1vw;
+	}
+}
+</style>
 <div class="login-page">
 	<% if (bgcount > 0 and currentBg.type == "mp4") then %>
 	<div class="video">
@@ -177,14 +168,6 @@
 	
 	<% end %>
 	
-	<%if stframe == "1"  then%>
-	<div class="status-container">
-		<div class="status-form">	
-			<a><iframe src="/luci-static/ifstatus.html" height="<%=ifsh%>" width="<%=ifsw%>" title="Iframe Status"></iframe></a>
-		</div>
-	</div>
-	<% end %>
-	
 	<div class="login-container">
 		<div class="login-form">
 		<%if logosize == "small"  then%>
@@ -193,10 +176,6 @@
 		<%else%>
 			<a class="brand" href="/"><img src="/luci-static/img/open.png" class="icon-lg"></a>
 		<% end %>
-		
-			<%if ( ifr ) then%>
-			<a><iframe src="/luci-static/display.html" height="<%=ifh%>" width="<%=ifw%>" title="Iframe Example"></iframe></a>
-			<% end %>
 			
 			<form class="form-login" method="post" action="<%=pcdata(luci.http.getenv("REQUEST_URI"))%>">
 
@@ -216,16 +195,46 @@
 				</div>
 				<div>
 					<input type="submit" value="<%:Login%>" class="cbi-button cbi-button-apply" />
-					
 				</div>
-				
-				<%if ( ifr1 ) then%>
-				<a><iframe src="/luci-static/display.html" height="<%=ifh%>" width="<%=ifw%>" title="Iframe Example"></iframe></a>
-				<% end %>
-				
 			</form>
-				
+			
+			<%if ( ifr ) then%>
+				<%if ( ifloc == "3" ) then%>
+					<div class="login-iframe">
+						<div class="login-iform">
+						<a  class="ifframe"><iframe src="/luci-static/display.html"  id="Iframe" title="Iframe Example" width="100%" height="100%"</iframe></a>
+						</div>
+					</div>
+				<% else %>
+					<div class="login-bframe">
+						<div class="login-bform">
+						<a  class="ibframe"><iframe src="/luci-static/display.html"  id="Iframe" title="Iframe Example" width="100%" height="100%"</iframe></a>
+						</div>
+					</div>
+				<% end %>
+			<% end %>
 
+			<script type="text/javascript">//<![CDATA[
+				// Selecting the iframe element
+				var frame = document.getElementById("Iframe");
+				  
+				// Adjusting the iframe height onload event
+				frame.onload = function()
+				// function execute while load the iframe
+				{
+				  // set the height of the iframe as 
+				  // the height of the iframe content
+				  frame.style.height = 
+				  frame.contentWindow.document.body.scrollHeight + 'px';
+				   
+		  
+				 // set the width of the iframe as the 
+				 // width of the iframe content
+				 frame.style.width  = 
+				  frame.contentWindow.document.body.scrollWidth+'px';
+					  
+				}
+			//]]></script>
 
 			<script type="text/javascript">//<![CDATA[
 				var input = document.getElementsByName('luci_password')[0];
@@ -258,4 +267,4 @@
 			//]]></script>
 			<% end %>
 
-<%+footer%>
+

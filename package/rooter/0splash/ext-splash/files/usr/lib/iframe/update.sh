@@ -26,7 +26,7 @@ bwdata() {
 	done < /tmp/bwdata
 }
 
-logtype=$(uci -q get iframe.iframe.logtype)
+logtype=$(uci -q get iframe.login.logtype)
 if [ $logtype = "1" ]; then
 	STEMP="/tmp/www/itemp.html"
 	STATUS="/usr/lib/iframe/iframe.html"
@@ -53,14 +53,10 @@ if [ $logtype = "2" ]; then
 	
 	rm -f $STEMP
 	cp $STATUS $STEMP
-	logimage=$(uci -q get iframe.iframe.logimage)
+	logimage=$(uci -q get iframe.login.logimage)
 	sed -i -e "s!#IMAGE#!$logimage!g" $STEMP
-	logimagewidth=$(uci -q get iframe.iframe.logimagewidth)
+	logimagewidth=$(uci -q get iframe.login.logimagewidth)
 	sed -i -e "s!#WIDTH#!$logimagewidth!g" $STEMP
-	logimageheight=$(uci -q get iframe.iframe.logimageheight)
-	sed -i -e "s!#HEIGHT#!$logimageheight!g" $STEMP
-	logimagepos=$(uci -q get iframe.iframe.logimagepos)
-	sed -i -e "s!#POS#!$logimagepos!g" $STEMP
 	
 	mv $STEMP $IFSTATUS
 fi
