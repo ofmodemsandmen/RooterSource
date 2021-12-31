@@ -226,6 +226,9 @@ while [ 1 = 1 ]; do
 					$ROOTER/common/fibocomdata.sh $CURRMODEM $COMMPORT
 				fi
 				;;
+			"0408" )
+				$ROOTER/common/quantadata.sh $CURRMODEM $COMMPORT
+				;;
 			* )
 				$ROOTER/common/otherdata.sh $CURRMODEM $COMMPORT
 				;;

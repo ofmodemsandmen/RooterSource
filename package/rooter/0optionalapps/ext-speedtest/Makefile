@@ -13,14 +13,14 @@ include $(INCLUDE_DIR)/package.mk
 define Package/ext-speedtest
   SECTION:=utils
   CATEGORY:=ROOter
-  DEPENDS:=+httping +curl +coreutils +coreutils-date
+  DEPENDS:=+ext-rspeedtest
   SUBMENU:=Optional Applications
-  TITLE:=support for SpeedTest.net
+  TITLE:=support for OpenSpeedTest
   PKGARCH:=all
 endef
 
 define Package/ext-speedtest/description
-  Helper scripts to enable SpeedTest.net
+  Helper scripts to enable OpenSpeedTest
 endef
 
 

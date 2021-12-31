@@ -311,10 +311,10 @@ telit_type() {
 			elif [ "$PREF" = ",2" ]; then
 				NETMODE="4"
 			else
-				NETMODE="0"
+				NETMODE="1"
 			fi ;;
 		* )
-			NETMODE="0" ;;
+			NETMODE="1" ;;
 		esac
 		uci set modem.modem$CURRMODEM.modemtype="8"
 	fi
@@ -397,6 +397,26 @@ simcom_type() {
 	uci commit modem
 }
 
+quanta_type() {
+	ATCMDD="AT^QCNCFG?"
+	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	TECH=$(echo $OX | grep -o "\^QCNCFG: \"[0123]\{2\}\"" | grep -o "[0123]\{2\}")
+	case $TECH in
+		"02")
+			NETMODE="5"
+			;;
+		"03")
+			NETMODE="7"
+			;;
+		*)
+			NETMODE="1"
+			;;
+	esac
+	uci set modem.modem$CURRMODEM.modemtype="11"
+	uci set modem.modem$CURRMODEM.netmode=$NETMODE
+	uci commit modem
+}
+
 CURRMODEM=$1
 COMMPORT="/dev/ttyUSB"$(uci get modem.modem$CURRMODEM.commport)
 
@@ -473,6 +493,9 @@ case $idV in
 	if [ $idP = "095a" ]; then
 		fibocom_type
 	fi
+	;;
+"0408" )
+	quanta_type
 	;;
 * )
 	:

@@ -259,7 +259,8 @@ hr {
 }
 
 .login-page {
-	height: 100%;
+	height: 95vh;
+	width: 95vw;
 }
 
 .login-page .video {
@@ -296,8 +297,8 @@ hr {
 
 .login-page .main-bg {
 	position: absolute;
-	width: 100%;
-	height: 100%;
+	width: 101vw;
+	height: 101vh;
 	left: 0;
 	top: 0;
 	background-image: url(../img/blank.png);
@@ -305,6 +306,7 @@ hr {
 	background-position: center;
 	background-size: cover;
 	transition: all .5s;
+	background-color: rgba(255,255,255,1);
 }
 
 
@@ -351,9 +353,9 @@ hr {
 	align-items: flex-start;
 	min-height: 100%;
 	z-index: 2;
-	width: 420px;
+	width: 20vw;
 	box-shadow: rgba(0,0,0,0.75) 0 0 35px -5px;
-	margin-left: 5%;
+	margin-left: 4%;
 	background: transparent;
 }
 
@@ -367,7 +369,7 @@ hr {
 	top: 0px;
 	width: 100%;
 	min-height: 100%;
-	max-width: 420px;
+	max-width: 100%;
 	background-color: rgba(224,224,224,0.7);
 }
 
@@ -380,21 +382,97 @@ hr {
 	margin: 50px auto 30px 50px;
 }
 
+.login-page .login-iframe {
+	height: 45vh;
+	position: absolute;
+	top: 52vh;
+	left: 0;
+	display: flex;
+	flex-direction: column;
+	-webkit-box-pack: center;
+	justify-content: center;
+	align-items: flex-start;
+	min-height: 45vh;
+	z-index: 2;
+	width: 24vw;
+	margin-left: 20vw;
+	background: transparent;
+}
+.login-page .login-iframe .login-iform {
+	display: flex;
+	flex-direction: column;
+	-webkit-box-align: center;
+	align-items: center;
+	position: absolute;
+	top: 0px;
+	width: 100%;
+	min-height: 45vh;
+	max-width: 100%;
+}
+
+.login-page .login-iframe .login-iform .ifframe {
+	width: 100vw;
+	max-width: 100%;
+	height: 50vh;
+	max-height: 100%;
+	left: 0px;
+	position: absolute;
+	top: 0px;
+}
+
+.login-page .login-bframe {
+	height: 45vh;
+	position: absolute;
+	top: 52vh;
+	left: 0;
+	display: flex;
+	flex-direction: column;
+	-webkit-box-pack: center;
+	justify-content: center;
+	align-items: flex-start;
+	min-height: 45vh;
+	z-index: 2;
+	width: 24vw;
+	margin-left: -2vw;
+	background: transparent;
+}
+.login-page .login-bframe .login-bform {
+	display: flex;
+	flex-direction: column;
+	-webkit-box-align: center;
+	align-items: center;
+	position: absolute;
+	top: 0px;
+	width: 100%;
+	min-height: 45vh;
+	max-width: 100%;
+}
+
+.login-page .login-bframe .login-bform .ibframe {
+	width: 100vw;
+	max-width: 100%;
+	height: 50vh;
+	max-height: 100%;
+	left: 0px;
+	position: absolute;
+	top: 0px;
+}
+
 /* size of logo displayed */
 .login-page .login-container .login-form .brand .icon-lg {
-	width: 300px;
+	width: 19vw;
 	height: auto;
-	margin-right: 25px;
+	margin-right: 10px;
 }
 
 .login-page .login-container .login-form .brand .icon {
-	width: 100px;
+	width: 7vw;
 	height: auto;
-	margin-right: 25px;
+	margin-right: 10px;
 }
 
 .login-page .login-container .login-form .brand .brand-text {
-	font-size: 1.25rem;
+	font-size: 1.2vw;
 	font-weight: 700;
 	font-family: TypoGraphica;
 }
@@ -497,7 +575,7 @@ hr {
 	border-color: initial;
 	border-style: none;
 	border-width: initial;
-	margin: 30px 0px 100px;
+	margin: 30px 0px 20px;
 	padding: 10px 0px;
 }
 

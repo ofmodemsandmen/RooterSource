@@ -258,6 +258,18 @@ if [ $MODEMTYPE -eq 10 ]; then
 	esac
 fi
 
+# Quanta, Megafon
+if [ $MODEMTYPE -eq 11 ]; then
+	case $NETMODE in
+		"5")
+			ATC="AT^QCNCFG=02" ;;
+		"7")
+			ATC="AT^QCNCFG=03" ;;
+		*)
+			ATC="AT^QCNCFG=00" ;;
+	esac
+fi
+
 ATCMDD="$ATC"
 OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 

@@ -7,7 +7,7 @@ log() {
 }
 
 setautocops() {
-	if [ "$MODTYPE" = "2" -o "$MODTYPE" = "6" ]; then
+	if [ "$MODTYPE" = "2" -o "$MODTYPE" = "6" -o "$MODTYPE" = "8" -o "$MODTYPE" = "11" ]; then
 		NETMODE=$(uci get modem.modem$CURRMODEM.netmode)
 		case $NETMODE in
 			"3")
@@ -68,7 +68,7 @@ fi
 if [ "$COPSMODE$COPSPLMN" = "$LOCK$MCC$MNC" ]; then
 	exit 0
 fi
-if [ "$MODTYPE" = "2" -o "$MODTYPE" = "6" ]; then
+if [ "$MODTYPE" = "2" -o "$MODTYPE" = "6" -o "$MODTYPE" = "8" -o "$MODTYPE" = "11" ]; then
 	NETMODE=$(uci get modem.modem$CURRMODEM.netmode)
 	case $NETMODE in
 		"3")
