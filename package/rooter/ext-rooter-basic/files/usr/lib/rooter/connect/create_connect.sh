@@ -1,5 +1,5 @@
 #!/bin/sh
-
+ 
 ROOTER=/usr/lib/rooter
 ROOTER_LINK="/tmp/links"
 
