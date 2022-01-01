@@ -515,7 +515,7 @@ end
 function action_externalip()
 	local rv ={}
 
-	os.execute("rm -f /tmp/ipip; wget --no-check-certificate -O /tmp/ipip https://ipecho.net/plain > /dev/null 2>&1")
+	os.execute("rm -f /tmp/ipip; wget -O /tmp/ipip http://ipecho.net/plain > /dev/null 2>&1")
 	file = io.open("/tmp/ipip", "r")
 	if file == nil then
 		rv["extip"] = "Not Available"

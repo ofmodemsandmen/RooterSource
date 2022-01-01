@@ -252,7 +252,7 @@ fi
 if [ $MATCH = 0 ]; then
 	uci set modem.modeminfo$CURRMODEM.apn=$(uci -q get profile.default.apn)
 	if [ -n "$ICCID" ]; then
-		$iccid="891490"
+		iccid="891490"
 		case $ICCID in
 		"$iccid"*)
 			uci set modem.modeminfo$CURRMODEM.apn="internet.freedommobile.ca"
