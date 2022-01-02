@@ -280,6 +280,7 @@ buldimage() {
 			WGET=$(cat "./.config" | grep "# CONFIG_PACKAGE_wget is not set")
 			if [ ! -z "$WGET" ]; then
 				sed -i -e 's/# CONFIG_PACKAGE_wget is not set/CONFIG_PACKAGE_wget=y/g' ./.config
+				make defconfig
 			fi
 		fi
 
