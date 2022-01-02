@@ -1,13 +1,13 @@
 module("luci.controller.rspeedtest", package.seeall)
 function index()
 	local page
-	page = entry({"admin", "services", "rspeedtest"}, template("speedtest/rspeedtest"), "ROOter SpeedTest", 72)
+	page = entry({"admin", "speed", "rspeedtest"}, template("speedtest/rspeedtest"), "ROOter SpeedTest", 72)
 	page.dependent = true
 	
-	entry({"admin", "services", "closeserver"}, call("action_closeserver"))
-	entry({"admin", "services", "pingserver"}, call("action_pingserver"))
-	entry({"admin", "services", "getspeed"}, call("action_getspeed"))
-	entry({"admin", "services", "getspeeddata"}, call("action_getspeeddata"))
+	entry({"admin", "speed", "closeserver"}, call("action_closeserver"))
+	entry({"admin", "speed", "pingserver"}, call("action_pingserver"))
+	entry({"admin", "speed", "getspeed"}, call("action_getspeed"))
+	entry({"admin", "speed", "getspeeddata"}, call("action_getspeeddata"))
 end
 
 function action_closeserver()

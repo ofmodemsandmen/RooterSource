@@ -8,7 +8,7 @@
 <script type="text/javascript" src="<%=resource%>/xhr.js"></script>
 <script type="text/javascript">//<![CDATA[
 
- XHR.poll(2, '<%=luci.dispatcher.build_url("admin", "services", "getspeeddata")%>', null,
+ XHR.poll(2, '<%=luci.dispatcher.build_url("admin", "speed", "getspeeddata")%>', null,
 		function(x, rv)
 		{
 			dlsize = parseFloat(rv.dlsize) ;
@@ -61,7 +61,7 @@
 		}
 ); 
 
- XHR.get('<%=luci.dispatcher.build_url("admin", "services", "closeserver")%>', null,
+ XHR.get('<%=luci.dispatcher.build_url("admin", "speed", "closeserver")%>', null,
 	function(x, rv)
 	{
 		status = rv.status;
@@ -96,7 +96,7 @@
 function getsp()
 {
 	document.getElementById("loading").style.visibility="visible";
-	XHR.get('<%=luci.dispatcher.build_url("admin", "services", "getspeed")%>', null,
+	XHR.get('<%=luci.dispatcher.build_url("admin", "speed", "getspeed")%>', null,
 		function(x, rv)
 		{
 		}
@@ -113,7 +113,7 @@ function dotest(btn)
 	document.getElementById("pingl").style.visibility="hidden";
 	document.getElementById("updwn").style.visibility="hidden";
 	document.getElementById("loading").style.visibility="visible";
-	XHR.get('<%=luci.dispatcher.build_url("admin", "services", "pingserver")%>', null,
+	XHR.get('<%=luci.dispatcher.build_url("admin", "speed", "pingserver")%>', null,
 		function(x, rv)
 		{
 			latency = rv.ping;
