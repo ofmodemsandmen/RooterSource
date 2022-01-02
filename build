@@ -274,6 +274,14 @@ buldimage() {
 		if [ ! -z $WPAD ]; then
 			sed -i -e 's/CONFIG_PACKAGE_wpad=y/# CONFIG_PACKAGE_wpad is not set/g' ./.config
 		fi
+		
+		WGET=$(cat "./.config" | grep "CONFIG_PACKAGE_wget ")
+		if [ ! -z "$WGET" ]; then
+			WGET=$(cat "./.config" | grep "# CONFIG_PACKAGE_wget is not set")
+			if [ ! -z "$WGET" ]; then
+				sed -i -e 's/# CONFIG_PACKAGE_wget is not set/CONFIG_PACKAGE_wget=y/g' ./.config
+			fi
+		fi
 
 	}
 
