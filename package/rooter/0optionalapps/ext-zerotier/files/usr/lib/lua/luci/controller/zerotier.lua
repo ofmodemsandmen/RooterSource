@@ -5,7 +5,7 @@ function index()
 	if lock == "1" then
 		if fs.stat("/etc/config/zerotier") then
 			local page
-				page = entry({"admin", "services", "zerotier"}, template("zerotier/zerotier"), "---Router ID", 7)
+				page = entry({"admin", "adminmenu", "zerotier"}, template("zerotier/zerotier"), "---Router ID", 7)
 				page.dependent = true
 		end
 	end
