@@ -26,6 +26,7 @@ fi
 
 get_connect() {
 	NAPN=$(uci -q get modem.modeminfo$CURRMODEM.apn)
+	NAPN2=$(uci -q get modem.modeminfo$CURRMODEM.apn2)
 	NUSER=$(uci -q get modem.modeminfo$CURRMODEM.user)
 	NPASS=$(uci -q get modem.modeminfo$CURRMODEM.passw)
 	NAUTH=$(uci -q get modem.modeminfo$CURRMODEM.auth)
@@ -33,6 +34,7 @@ get_connect() {
 	PDPT=$(uci -q get modem.modeminfo$CURRMODEM.pdptype)
 
 	apn=$NAPN
+	apn2=$NAPN2
 	username="$NUSER"
 	password="$NPASS"
 	auth=$NAUTH
@@ -79,6 +81,7 @@ proto_mbim_init_config() {
 	no_device=1
 	proto_config_add_string "device:device"
 	proto_config_add_string apn
+	proto_config_add_string apn2
 	proto_config_add_string pincode
 	proto_config_add_string delay
 	proto_config_add_string auth
@@ -107,7 +110,7 @@ _proto_mbim_setup() {
 	rm -f $ROOTER_LINK/mbim_monitor$CURRMODEM
 
 	local device apn pincode delay
-	json_get_vars device apn pincode delay auth username password
+	json_get_vars device apn apn2 pincode delay auth username password
 
 	case $auth in
 		"0" )
@@ -253,10 +256,30 @@ _proto_mbim_setup() {
 	UP=$(echo "$ATTACH" | awk '/uplinkspeed:/ {print $2}')
 	DOWN=$(echo "$ATTACH" | awk '/downlinkspeed:/ {print $2}')
 
-	log "Connect to network"
+	log "Connect to network using $apn"
+	tidd=0
 	while ! umbim $DBG -n -t $tid -d $device connect "$ipt""$apn" "$auth" "$username" "$password"; do
 		tid=$((tid + 1))
 		sleep 1;
+		tidd=$((tidd + 1))
+		if [ $tidd -gt 10 ]; then
+			if [ ! -z $apn2 ]; then
+				tidd=0
+				log "Using APN : $apn2"
+				while ! umbim $DBG -n -t $tid -d $device connect "$ipt""$apn2" "$auth" "$username" "$password"; do
+					tid=$((tid + 1))
+					sleep 1;
+					tidd=$((tidd + 1))
+					if [ $tidd -gt 10 ]; then
+						log "Failed to connect to network"
+						return 1
+					fi
+				done
+			else
+				log "Failed to connect to network"
+				return 1
+			fi
+		fi
 	done
 	tid=$((tid + 1))
 

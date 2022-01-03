@@ -110,8 +110,14 @@ uqmi -s -d "$device" --sync > /dev/null 2>&1 & sleep 5 ; kill -9 $!
 uqmi -s -d "$device" --network-register > /dev/null 2>&1
 
 log "Waiting for network registration"
+td=0
 while uqmi -s -d "$device" --get-serving-system | grep '"searching"' > /dev/null; do
 	sleep 5;
+	tid=$((tid + 1))
+	if [ $tid -gt 2 ]; then
+		uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null & sleep 10 ; kill -9 $!
+		exit 1
+	fi
 done
 
 log "Starting network $NAPN"

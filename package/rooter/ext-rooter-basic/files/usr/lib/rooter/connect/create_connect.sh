@@ -928,8 +928,22 @@ while [ 1 -lt 6 ]; do
 			[ -f /tmp/ipv6supp$INTER ] && addv6
 			sleep 20
 		else
-			BRK=1
-			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
+			apn2=$(uci -q get modem.modeminfo$CURRMODEM.apn2)
+			if [ -z $apn2 ]; then
+				BRK=1
+				$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
+			else
+				log "Trying second APN $apn2"
+				$ROOTER/qmi/connectqmi.sh $CURRMODEM cdc-wdm$WDMNX $NAUTH $apn2 $NUSER $NPASS $RAW $DHCP $PINC
+				if [ $? = 0 ]; then
+					ifup wan$INTER
+					[ -f /tmp/ipv6supp$INTER ] && addv6
+					sleep 20
+				else
+					BRK=1
+					$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
+				fi
+			fi
 		fi
 		;;
 #

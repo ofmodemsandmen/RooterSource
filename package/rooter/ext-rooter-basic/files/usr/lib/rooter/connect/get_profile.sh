@@ -148,7 +148,17 @@ do_custom() {
 					local apn user passw pincode auth ppp delay lock mcc mnc
 					local dns1 dns2 dns3 dns4 log lb at atc
 					config_get apn $1 apn
+					dapn=$(echo "$apn" | grep "|")
+					if [ -z $dapn ]; then
+						apn2=""
+					else
+						fapn=$apn"|"
+						fapn=$(echo $fapn" " | tr "|" ",")
+						apn=$(echo $fapn | cut -d, -f1)
+						apn2=$(echo $fapn | cut -d, -f2)
+					fi
 					uci set modem.modeminfo$CURRMODEM.apn=$apn
+					uci set modem.modeminfo$CURRMODEM.apn2=$apn2
 					config_get user $1 user
 					uci set modem.modeminfo$CURRMODEM.user=$user
 					config_get passw $1 passw
@@ -250,11 +260,23 @@ else
 fi
 
 if [ $MATCH = 0 ]; then
-	uci set modem.modeminfo$CURRMODEM.apn=$(uci -q get profile.default.apn)
+	apn=$(uci -q get profile.default.apn)
+	dapn=$(echo "$apn" | grep "|")
+	if [ -z $dapn ]; then
+		apn2=""
+	else
+		fapn=$apn"|"
+		fapn=$(echo $fapn" " | tr "|" ",")
+		apn=$(echo $fapn | cut -d, -f1)
+		apn2=$(echo $fapn | cut -d, -f2)
+	fi
+	uci set modem.modeminfo$CURRMODEM.apn=$apn
+	uci set modem.modeminfo$CURRMODEM.apn2=$apn2
 	if [ -n "$ICCID" ]; then
 		iccid="891490"
 		case $ICCID in
 		"$iccid"*)
+			uci set modem.modeminfo$CURRMODEM.apn2=""
 			uci set modem.modeminfo$CURRMODEM.apn="internet.freedommobile.ca"
 			;;
 		esac

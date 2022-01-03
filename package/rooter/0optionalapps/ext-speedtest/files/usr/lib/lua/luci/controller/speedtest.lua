@@ -1,10 +1,7 @@
-module("luci.controller.blacklist", package.seeall)
-
+module("luci.controller.speedtest", package.seeall)
 function index()
 	local page
-	local lock = luci.model.uci.cursor():get("custom", "menu", "full")
-	if lock == "1" then
-		page = entry({"admin", "services", "blacklist"}, cbi("blacklist"), "---Blacklist by Mac", 10)
-		page.dependent = true
-	end
+	entry({"admin", "speed"}, firstchild(), "Speed Test", 95).dependent=false
+	page = entry({"admin", "speed", "speedtest"}, template("speedtest/speedtest"), "OpenSpeedTest", 71)
+	page.dependent = true
 end
