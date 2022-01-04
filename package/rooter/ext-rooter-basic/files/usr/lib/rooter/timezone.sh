@@ -11,8 +11,9 @@ ZONEN=$(echo "$TZ" | cut -d, -f2)
 /usr/lib/rooter/tzone.lua "$ZONEN"
 source /tmp/tzone
 
-	uci set system.@system[-1].timezone="$ZNAME" 
-	uci set system.@system[-1].zonename="$ZONEN" 
-	uci commit system
+uci set system.@system[-1].timezone="$ZNAME" 
+uci set system.@system[-1].zonename="$ZONEN" 
+uci commit system
+/etc/init.d/system restart
 
 
