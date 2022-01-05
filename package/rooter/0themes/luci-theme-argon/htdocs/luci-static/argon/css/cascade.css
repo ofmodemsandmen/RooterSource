@@ -382,6 +382,20 @@ hr {
 	margin: 50px auto 30px 50px;
 }
 
+.login-page .login-container .login-form .brandim {
+	display: flex;
+	-webkit-box-align: center;
+	align-items: center;
+	color: var(--default);
+	margin: 12vh 0px 30px 0px;
+}
+
+.login-page .login-container .login-form .brandim .icon-im {
+	width: 19vw;
+	height: auto;
+	margin-right: 0px;
+}
+
 .login-page .login-iframe {
 	height: 45vh;
 	position: absolute;
