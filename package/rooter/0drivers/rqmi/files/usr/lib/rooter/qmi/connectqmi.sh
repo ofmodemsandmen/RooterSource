@@ -107,7 +107,7 @@ STATUS=$?
 
 uqmi -s -d "$device" --sync > /dev/null 2>&1 & sleep 5 ; kill -9 $!
 
-uqmi -s -d "$device" --network-register > /dev/null 2>&1
+#uqmi -s -d "$device" --network-register > /dev/null 2>&1
 
 log "Waiting for network registration"
 td=0
