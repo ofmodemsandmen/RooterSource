@@ -11,12 +11,7 @@
 	
 	function applys(btn)
 	{
-		document.getElementById("apply3").style.visibility="hidden";
-		document.getElementById("apply3").style.display = "none";
-		document.getElementById("apply1").style.visibility="visible";
-		document.getElementById("apply1").style.display = "block";
-		document.getElementById("apply2").style.visibility="visible";
-		document.getElementById("apply2").style.display = "block";
+
 	}
 </script>
 
@@ -32,42 +27,14 @@
 	<link rel="icon" type="image/gif" href="/luci-static/speed/img/favicon.gif">
 </head>
 
-<body style="background-color: LightSteelBlue"  class='rooterSplash'>
-
-	<table align="left" border="0" id="apply3" >
-		<tr>
-			<td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td>
-				<div class="" id="rooterItemss">
-				<a onclick="return applys(this)">
-					<div class="rooterItem" id="rooterItem1">
-						<div class="rooterItemTitle">
-							<i class='icon icon-cog'></i> Click to Start Speed Test
-						</div>
-					</div>
-				<a>
-				</div>
-			</td>
-		</tr>
-	</table>
+<body style="background-color: LightSteelBlue">
+	<div>
+    <a  id="apply2"><iframe id="apply4" src="https://openspeedtest.com/Get-widget.php?Auto=1" width="700" height="500" style="border:8px groove black;border-radius: 10px;" title="OpenSpeedTest"></iframe></a>
+	</div>
     
-    <a  style="visibility:hidden;display:none;" id="apply2"><iframe id="apply4" src="https://openspeedtest.com/Get-widget.php?Auto=1" width="700" height="500" style="border:2px solid black;" title="OpenSpeedTest"></iframe></a>
-    
-	<table id="apply1" border="0" style="visibility:hidden;display:none;" >
+	<table id="apply1" border="0">
 		<tr>
-			<td align="left">
-				<div class="" id="rooterItemss">
-				<a onclick="return applyc(this)">
-					<div class="rooterItemsp" id="rooterItem1">
-						<div class="rooterItemTitle">
-							<i class='icon icon-cog'></i> Click to Test Again
-						</div>
-					</div>
-				<a>
-				</div>
-			</td>
+			<td><input type="button" id="apply1" class="cbi-button cbi-button-apply" value="<%:Click to Test Again%>" onclick="return applyc(this)" /></td>
 		</tr>
  	</table>
 	
