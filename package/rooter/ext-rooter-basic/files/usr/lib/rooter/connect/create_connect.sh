@@ -705,8 +705,8 @@ if $QUECTEL; then
 	fi
 
 	$ROOTER/connect/bandmask $CURRMODEM 1
-	$ROOTER/luci/celltype.sh $CURRMODEM
 fi
+$ROOTER/luci/celltype.sh $CURRMODEM
 if [ $SIERRAID -eq 1 ]; then
 	$ROOTER/connect/bandmask $CURRMODEM 0
 	$ROOTER/luci/celltype.sh $CURRMODEM

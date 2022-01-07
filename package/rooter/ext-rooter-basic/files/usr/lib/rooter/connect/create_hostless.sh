@@ -70,7 +70,7 @@ set_dns() {
 		done
 		echo "$bDNS" > /tmp/v6dns$INTER
 	else
-		log "Using Hostless Modem as a DNS"
+		log "Using Hostless Modem as a DNS relay"
 		pdns=0
 		rm -f /tmp/v[46]dns$INTER
 	fi
@@ -106,6 +106,7 @@ chcklog() {
 
 get_connect() {
 	NAPN=$(uci -q get modem.modeminfo$CURRMODEM.apn)
+	PDPT=$(uci -q get modem.modeminfo$CURRMODEM.pdptype)
 	uci set modem.modem$CURRMODEM.apn="$NAPN"
 	uci commit modem
 }
@@ -115,6 +116,52 @@ get_tty_fix() {
 	local POS
 	POS=`expr 1 + $1`
 	CPORT=$(echo "$TTYDEVS" | cut -d' ' -f"$POS" | grep -o "[[:digit:]]\+")
+}
+
+get_ip() {
+	ATCMDD="AT+CGPIAF=1,1,1,0;+CGPADDR"
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	OX=$(echo "$OX" | grep "^+CGPADDR: 1," | cut -d'"' -f2)
+	ip4=$(echo $OX | cut -d, -f1 | grep "\.")
+	ip6=$(echo $OX | cut -d, -f2 | grep ":")
+	log "IP address(es) obtained: $ip4 $ip6"
+}
+
+check_ip() {
+	if [[ $(echo "$ip6" | grep -o "^[23]") ]]; then
+	# Global unicast IP acquired
+		v6cap=1
+	elif [[ $(echo "$ip6" | grep -o "^[0-9a-fA-F]\{1,4\}:") ]]; then
+	# non-routable address
+		v6cap=2
+	else
+		v6cap=0
+	fi
+
+	if [ -n "$ip6" -a -z "$ip4" ]; then
+		log "Running IPv6-only mode"
+		nat46=1
+	fi
+}
+
+addv6() {
+	. /lib/functions.sh
+	. /lib/netifd/netifd-proto.sh
+	local interface=wan$INTER
+	local zone="$(fw3 -q network "$interface" 2>/dev/null)"
+
+	log "Adding IPv6 dynamic interface"
+	json_init
+	json_add_string name "${interface}_6"
+	json_add_string ${ifname1} "@$interface"
+	json_add_string proto "dhcpv6"
+	json_add_string extendprefix 1
+	[ -n "$zone" ] && json_add_string zone "$zone"
+	[ "$pdns" = 1 ] && json_add_boolean peerdns 0
+	[ "$nat46" = 1 ] || json_add_string iface_464xlat 0
+	proto_add_dynamic_defaults
+	json_close_object
+	ubus call network add_dynamic "$(json_dump)"
 }
 
 CURRMODEM=$1
@@ -131,14 +178,19 @@ log " "
 log "Hostless ID $idV:$idP"
 log " "
 
-MDEVICE=$(uci -q get modem.modem$CURRMODEM.device)
-OX=$(ls /sys/bus/usb/devices/"$MDEVICE":*/ | grep -o ttyUSB[0-9])
+MATCH="$(uci get modem.modem$CURRMODEM.maxcontrol | cut -d/ -f3- | xargs dirname)"
+OX=$(for a in /sys/class/tty/*; do readlink $a; done | grep "$MATCH" | tr '\n' ' ' | xargs -r -n1 basename)
+TTYDEVS=$(echo "$OX" | grep -o ttyUSB[0-9])
 if [ $? -ne 0 ]; then
-	log "No ECM Comm Port"
+	TTYDEVS=$(echo "$OX" | grep -o ttyACM[0-9])
+	[ $? -eq 0 ] && ACM=1
+fi
+TTYDEVS=$(echo "$TTYDEVS" | tr '\n' ' ')
+TTYDEVS=$(echo $TTYDEVS)
+if [ -n "$TTYDEVS" ]; then
+	log Modem $CURRMODEM is a parent of $TTYDEVS
 else
-	TTYDEVS=$(echo "$OX" | tr '\n' ' ')
-	TTYDEVS=$(echo "$TTYDEVS")
-	log Modem at $MDEVICE is a parent of $TTYDEVS
+	log "No ECM Comm Port"
 fi
 
 if [ $idV = 1546 -a $idP = 1146 ]; then
@@ -156,6 +208,9 @@ elif [ $idV = 2c7c ]; then
 	SP=5
 elif [ $idV = 12d1 -a $idP = 15c1 ]; then
 	SP=6
+elif [ $idV = 2cd2 ]; then
+	log "MikroTik R11e ECM"
+	SP=7
 else
 	SP=0
 fi
@@ -172,22 +227,32 @@ if [ $SP -gt 0 ]; then
 		PORTN=2
 	elif [ $SP -eq 6 ]; then
 		PORTN=2
+	elif [ $SP -eq 7 ]; then
+		PORTN=0
 	else
 		PORTN=1
 	fi
 	get_tty_fix $PORTN
 	lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
 	source /tmp/parmpass
+
+	if [ "$ACM" = 1 ]; then
+		ACMPORT=$CPORT
+		CPORT="7$ACMPORT"
+		ln -fs /dev/ttyACM$ACMPORT /dev/ttyUSB$CPORT
+	fi
+
+	log "Modem $CURRMODEM ECM Comm Port : /dev/ttyUSB$CPORT"
 	uci set modem.modem$CURRMODEM.commport=$CPORT
 	uci commit modem
-	log "Modem $CURRMODEM ECM Comm Port : /dev/ttyUSB$CPORT"
+
 	$ROOTER/sms/check_sms.sh $CURRMODEM &
 	$ROOTER/common/gettype.sh $CURRMODEM
-	
+
 	if [ -e $ROOTER/connect/preconnect.sh ]; then
 		$ROOTER/connect/preconnect.sh $CURRMODEM
 	fi
-	
+
 	if [ $SP = 5 ]; then
 		clck=$(uci -q get custom.bandlock.cenable)
 		if [ $clck = "1" ]; then
@@ -199,7 +264,7 @@ if [ $SP -gt 0 ]; then
 				earcnt="1,"$ear","$pc
 			else
 				earcnt="2,"$ear","$pc","$ear1","$pc1
-			fi			
+			fi
 			ATCMDD="at+qnwlock=\"common/4g\""
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			if `echo $OX | grep "ERROR" 1>/dev/null 2>&1`
@@ -211,7 +276,7 @@ if [ $SP -gt 0 ]; then
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			log "Cell Lock $OX"
 	fi
-	
+
 		$ROOTER/connect/bandmask $CURRMODEM 1
 		uci commit modem
 	fi
@@ -263,7 +328,6 @@ uci commit modem
 log "Modem $CURRMODEM is using WAN$INTER"
 
 log "Checking Network Interface"
-MATCH="$(uci get modem.modem$CURRMODEM.maxcontrol | cut -d/ -f3- | xargs dirname)"
 ifname="$(if [ "$MATCH" ]; then for a in /sys/class/net/*; do readlink $a; done | grep "$MATCH"; fi | xargs -r basename)"
 
 if [ "$ifname" ]; then
@@ -295,23 +359,7 @@ if [ $SP -eq 2 ]; then
 		fi
 	done
 fi
-if [ $SP -eq 6 ]; then
-	get_connect
-	export SETAPN=$NAPN
-	BRK=1
 
-	while [ $BRK -eq 1 ]; do
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-ncm.gcom" "$CURRMODEM")
-		chcklog "$OX"
-		ERROR="ERROR"
-		if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
-		then
-			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
-		else
-			BRK=0
-		fi
-	done
-fi
 if [ $SP -eq 4 ]; then
 	get_connect
 	export SETAPN=$NAPN
@@ -321,7 +369,7 @@ if [ $SP -eq 4 ]; then
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-fecm.gcom" "$CURRMODEM")
 		chcklog "$OX"
 		log " "
-		log "FM150 Connect : $OX"
+		log "Fibocom Connect : $OX"
 		log " "
 		ERROR="ERROR"
 		if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
@@ -329,9 +377,11 @@ if [ $SP -eq 4 ]; then
 			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
 		else
 			BRK=0
+			get_ip
 		fi
 	done
 fi
+
 if [ $SP = 5 ]; then
 	get_connect
 	if [ -n "$NAPN" ]; then
@@ -373,6 +423,64 @@ if [ $SP = 5 ]; then
 	$ROOTER/luci/celltype.sh $CURRMODEM
 	ATCMDD="AT+QINDCFG=\"all\",1"
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+
+	get_ip
+	if [ -n "$ip6" ]; then
+		check_ip
+		if [ "$v6cap" -gt 0 ]; then
+			addv6
+		fi
+	fi
+fi
+
+if [ $SP -eq 6 ]; then
+	get_connect
+	export SETAPN=$NAPN
+	BRK=1
+
+	while [ $BRK -eq 1 ]; do
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-ncm.gcom" "$CURRMODEM")
+		chcklog "$OX"
+		ERROR="ERROR"
+		if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
+		then
+			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
+		else
+			BRK=0
+		fi
+	done
+fi
+
+if [ $SP -eq 7 ]; then
+	get_connect
+	export SETAPN=$NAPN
+	BRK=1
+
+	if [ -n "$NAPN" ]; then
+		IPVAR="$PDPT"
+		ATCMDD="AT+CGDCONT=1,\"$IPVAR\",\"$NAPN\",,0,0,1"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	fi
+
+	while [ $BRK -eq 1 ]; do
+		ATCMDD="AT\$ECMCALL=1"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		chcklog "$OX"
+		ERROR="ERROR"
+		if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
+		then
+			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
+		else
+			BRK=0
+			get_ip
+			if [ -n "$ip6" ]; then
+				check_ip
+				if [ "$v6cap" -gt 0 ]; then
+					addv6
+				fi
+			fi
+		fi
+	done
 fi
 
 rm -f /tmp/usbwait
@@ -427,7 +535,7 @@ if [ $SP -gt 0 ]; then
 	if [ -e $ROOTER/connect/postconnect.sh ]; then
 		$ROOTER/connect/postconnect.sh $CURRMODEM
 	fi
-	
+
 	if [ -e $ROOTER/timezone.sh ]; then
 		TZ=$(uci -q get modem.modeminfo$CURRMODEM.tzone)
 		if [ "$TZ" = "1" ]; then

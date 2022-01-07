@@ -75,7 +75,8 @@ case $TECH in
 		NETMODE="1"
 		;;
 esac
-MODTYPE="8"
+
+MODTYPE="11"
 
 {
 	echo 'CSQ="'"$CSQ"'"'
