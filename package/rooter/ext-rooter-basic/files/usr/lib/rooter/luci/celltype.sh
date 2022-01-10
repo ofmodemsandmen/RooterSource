@@ -303,16 +303,6 @@ telit_type() {
 			NETMODE="5" ;;
 		"17" )
 			NETMODE="7" ;;
-		"2" )
-			if [ "$PREF" = ",0" ]; then
-				NETMODE="1"
-			elif [ "$PREF" = ",1" ]; then
-				NETMODE="2"
-			elif [ "$PREF" = ",2" ]; then
-				NETMODE="4"
-			else
-				NETMODE="1"
-			fi ;;
 		* )
 			NETMODE="1" ;;
 		esac

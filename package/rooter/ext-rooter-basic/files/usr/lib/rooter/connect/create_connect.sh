@@ -1,5 +1,5 @@
 #!/bin/sh
- 
+
 ROOTER=/usr/lib/rooter
 ROOTER_LINK="/tmp/links"
 
@@ -456,9 +456,9 @@ fi
 TTYDEVS=$(echo "$TTYDEVS" | tr '\n' ' ')
 TTYDEVS=$(echo $TTYDEVS)
 if [ -n "$TTYDEVS" ]; then
-        log Modem $CURRMODEM is a parent of $TTYDEVS
+	log Modem $CURRMODEM is a parent of $TTYDEVS
 else
-        log "No Comm Ports"
+	log "No Comm Ports"
 fi
 
 get_tty_fix 0
@@ -490,10 +490,10 @@ uci commit modem.modem$CURRMODEM
 		chksierra
 		if [ $SIERRAID -eq 1 ]; then
 			get_tty 03
+		elif [ $idV = 1bc7 ]; then
+			get_tty 03
 		else
-			if [ $idV = 1bc7 ]; then
-				TPORT=2
-			elif [ $idV = 2c7c ]; then
+			if [ $idV = 2c7c ]; then
 				QUEIF2="0121 0125 0306 0296 0512 0620 0800"
 				if [[ $(echo "$QUEIF2" | grep -o -i "$idP") ]]; then
 					TPORT=2
@@ -581,7 +581,7 @@ uci commit modem.modem$CURRMODEM
 							log "MBIM Comm Port : /dev/ttyUSB$CPORT"
 						;;
 						"1bc7"|"03f0" )
-							get_tty_fix 2
+							get_tty 03
 							lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
 							source /tmp/parmpass
 							uci set modem.modem$CURRMODEM.commport=$CPORT

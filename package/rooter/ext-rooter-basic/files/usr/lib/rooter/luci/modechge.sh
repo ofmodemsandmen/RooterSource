@@ -191,21 +191,17 @@ if [ $MODEMTYPE -eq 7 ]; then
 	fi
 fi
 
-# Foxconn, Telit, etc.
+# Telit, Foxconn, etc.
 if [ $MODEMTYPE -eq 8 ]; then
 	case $NETMODE in
-		"2")
-			ATC="AT^SYSCONFIG=2,1,2,4" ;;
-		"3")
-			ATC="AT^SYSCONFIG=13,3,2,4" ;;
-		"4")
-			ATC="AT^SYSCONFIG=2,2,2,4" ;;
-		"5")
-			ATC="AT^SLMODE=1,14" ;;
-		"7")
-			ATC="AT^SLMODE=1,30" ;;
-		*)
-			ATC="AT^SLMODE=1,4" ;;
+		"3" )
+			ATC="AT\$QCNSP=1,0,0" ;;
+		"5" )
+			ATC="AT\$QCNSP=2,0,0" ;;
+		"7" )
+			ATC="AT\$QCNSP=6,0,0" ;;
+		* )
+			ATC="AT\$QCNSP=0,0,0" ;;
 	esac
 fi
 

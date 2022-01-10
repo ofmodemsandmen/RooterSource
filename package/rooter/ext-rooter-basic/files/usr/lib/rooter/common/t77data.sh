@@ -31,21 +31,19 @@ LBAND="-"
 PCI="-"
 SINR="-"
 
-CSQ=$(echo $O | grep -o "CSQ: [0-9]\+" | grep -o "[0-9]\+")
-[ "x$CSQ" = "x" ] && CSQ=-1
-
-if [ $CSQ -ge 0 -a $CSQ -le 31 ]; then
-    CSQ_PER=$(($CSQ * 100/31))
-    CSQ_RSSI=$((2 * CSQ - 113))
-    [ $CSQ -eq 0 ] && CSQ_RSSI="<= "$CSQ_RSSI
-    [ $CSQ -eq 31 ] && CSQ_RSSI=">= "$CSQ_RSSI
-    CSQ_PER=$CSQ_PER"%"
-    CSQ_RSSI=$CSQ_RSSI" dBm"
-else
-    CSQ="-"
-    CSQ_PER="-"
-    CSQ_RSSI="-"
+CSQ=$(echo $OX | grep -o "+CSQ: [0-9]\{1,2\}" | grep -o "[0-9]\{1,2\}")
+if [ "$CSQ" = "99" ]; then
+	CSQ=""
 fi
+if [ -n "$CSQ" ]; then
+	CSQ_PER=$(($CSQ * 100/31))"%"
+	CSQ_RSSI=$((2 * CSQ - 113))" dBm"
+else
+	CSQ="-"
+	CSQ_PER="-"
+	CSQ_RSSI="-"
+fi
+
 TEMP=$(echo $OX | grep -o "TSENS_TZ_SENSOR[0-9]:[0-9]\{1,3\}")
 if [ -n "$TEMP" ]; then
 	TEMP=${TEMP:17:3}
@@ -66,6 +64,7 @@ else
 fi
 TECH=$(echo $O" " | grep -o "+COPS: .,.,[^,]\+,[027]")
 TECH="${TECH: -1}"
+
 if [ -n "$TECH" ]; then
 	RSSI=$(echo $O | grep -o " RSSI: [^D]\+D" | grep -o "[-0-9\.]\+")
 	if [ -n "$RSSI" ]; then
@@ -74,19 +73,28 @@ if [ -n "$TECH" ]; then
 	case $TECH in
 		"7")
 			MODE="LTE"
-			RSCP=$(echo $O | grep -o "[^G] RSRP: [^D]\+D" | grep -o "[-0-9\.]\+")
 			ECIO=$(echo $O | grep -o " RSRQ: [^D]\+D" | grep -o "[-0-9\.]\+")
 			SINR=$(echo $OX | grep -o "RS-S[I]*NR: [^D]\+D")
 			SINR=${SINR:8}
 			SINR=$(echo "$SINR" | grep -o "[-0-9.]\{1,3\}")" dB"
-			CHANNEL=$(echo $O | grep -o " EARFCN(DL/UL): [0-9]\+" | grep -o "[0-9]\+")
 			LBAND="B"$(echo $O | grep -o " BAND: [0-9]\+" | grep -o "[0-9]\+")
-			BWD=$(echo $O | grep -o " BW: [0-9\.]\+ MHZ" | grep -o "[0-9\.]\+")
-			if [ "$BWD" != "1.4" ]; then
-				BWD=${BWD/.*}
+			DEBUGv1=$(echo $O | grep -o "EARFCN(DL/UL):")
+			DEBUGv2=$(echo $O | grep -o "LTE ENGINEERING")
+			if [ -n "$DEBUGv1" ]; then
+				RSCP=$(echo $O | grep -o "[^G] RSRP: [^D]\+D" | grep -o "[-0-9\.]\+")
+				CHANNEL=$(echo $O | grep -o " EARFCN(DL/UL): [0-9]\+" | grep -o "[0-9]\+")
+				BWD=$(echo $O | grep -o " BW: [0-9\.]\+ MHZ" | grep -o "[0-9\.]\+")
+				if [ "$BWD" != "1.4" ]; then
+					BWD=${BWD/.*}
+				fi
+				LBAND=$LBAND" (Bandwidth $BWD MHz)"
+				PCI=$(echo $OX | grep -o " ENB ID(PCI): [^(]\+([0-9]\{1,3\})" | grep -o "([0-9]\+)" | grep -o "[0-9]\+")
 			fi
-			LBAND=$LBAND" (Bandwidth $BWD MHz)"
-			PCI=$(echo $OX | grep -o " ENB ID(PCI): [^(]\+([0-9]\{1,3\})" | grep -o "([0-9]\+)" | grep -o "[0-9]\+")
+			if [ -n "$DEBUGv2" ]; then
+				RSCP=$(echo $O | grep -o "RSRP: [^D]\+D" | grep -o "[-0-9\.]\+")
+				CHANNEL=$(echo $O | grep -o " DL CHANNEL: [0-9]\+" | grep -o "[0-9]\+")
+				PCI=$(echo $OX | grep -o " PCI: [0-9]\{1,3\}" | grep -o "[0-9]\+")
+			fi
 			SCC=$(echo $OX | grep -o " SCELL[1-9]:")
 			if [ -n "$SCC" ]; then
 				SCCn=$(echo $SCC | grep -o [0-9])
@@ -129,15 +137,24 @@ if [ -n "$TECH" ]; then
 			;;
 		"2")
 			MODE="WCDMA"
-			RSCP=$(echo $O | grep -o "RSCP:[^)]\+" | grep -o "[-0-9\.]\+DBM," | grep -o "[^DBM,]\+")
-			ECIO=$(echo $O | grep -o " ECIO:[^D]\+D" | grep -o "[-0-9\.]\+")
-			ECIO=$(echo $ECIO)
-			CHANNEL=$(echo $O | grep -o " CHANNEL (DL): [0-9]\+" | grep -o "[0-9]\+")
-			LBAND="B"$(echo $O | grep -o " BAND: [0-9]\+" | grep -o "[0-9]\+")
-			BW=$(echo $O | grep -o " BW: [0-9\.]\+ MHZ" | grep -o "[0-9\.]\+")
-			BW=$(printf "%.0f" $BW )
-			LBAND=$LBAND" (Bandwidth $BW MHz)"
-			PCI=$(echo $OX | grep -o "PSC:.\?[0-9]\{1,3\}" | grep -o "[0-9]\+")
+			DEBUGv1=$(echo $O | grep -o "RAT:WCDMA")
+			if [ -n "$DEBUGv1" ]; then
+				RSCP=$(echo $O | grep -o "RSCP:[^)]\+" | grep -o "[-0-9\.]\+DBM," | grep -o "[^DBM,]\+")
+				ECIO=$(echo $O | grep -o " ECIO:[^D]\+D" | grep -o "[-0-9\.]\+")
+				ECIO=$(echo $ECIO)
+				CHANNEL=$(echo $O | grep -o " CHANNEL (DL): [0-9]\+" | grep -o "[0-9]\+")
+				LBAND="B"$(echo $O | grep -o " BAND: [0-9]\+" | grep -o "[0-9]\+")
+				BW=$(echo $O | grep -o " BW: [0-9\.]\+ MHZ" | grep -o "[0-9\.]\+")
+				BW=$(printf "%.0f" $BW )
+				LBAND=$LBAND" (Bandwidth $BW MHz)"
+				PCI=$(echo $OX | grep -o "PSC:.\?[0-9]\{1,3\}" | grep -o "[0-9]\+")
+			else
+				QCSQ=$(echo $O | grep -o "\$QCSQ: -[0-9]\{2,3\},[-0-9]\{1,3\},[-0-9]\{1,3\},")
+				if [ -n "$QCSQ" ]; then
+					RSCP=$(echo $QCSQ | cut -d, -f1 | grep -o "[-0-9]*")
+					ECIO=$(echo $QCSQ | cut -d, -f2)
+				fi
+			fi
 			;;
 		*)
 			MODE="GSM"
@@ -145,7 +162,20 @@ if [ -n "$TECH" ]; then
 	esac
 fi
 
-NETMODE="1"
+SCFG=$(echo $OX | grep -o "\^SYSCONFIG: [0-9]\{1,2\}" | grep -o "[0-9]\{1,2\}")
+if [ -n "$SCFG" ]; then
+	case $SCFG in
+	"13" )
+		NETMODE="3" ;;
+	"14" )
+		NETMODE="5" ;;
+	"17" )
+		NETMODE="7" ;;
+	* )
+		NETMODE="1" ;;
+	esac
+fi
+
 MODTYPE="8"
 
 {
