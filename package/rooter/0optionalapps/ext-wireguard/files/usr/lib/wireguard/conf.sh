@@ -19,7 +19,11 @@ extract() {
 	fi
 	PRK=$(echo "$line" | grep "Address" | tr " " "#")
 	if [ ! -z "$PRK" ]; then
-		Address=$(echo $PRK | cut -d# -f3)
+		if [ -z $Address ]; then
+			Address=$(echo $PRK | cut -d# -f3)
+		else
+			Address=$Address","$(echo $PRK | cut -d# -f3)
+		fi
 	fi
 	PRK=$(echo "$line" | grep "dns" | tr " " "#")
 	if [ ! -z "$PRK" ]; then
@@ -35,7 +39,11 @@ extract() {
 	fi
 	PRK=$(echo "$line" | grep "AllowedIPs" | tr " " "#")
 	if [ ! -z "$PRK" ]; then
-		allowedips=$(echo $PRK | cut -d# -f3)
+		if [ -z $allowedips ]; then
+			allowedips=$(echo $PRK | cut -d# -f3)
+		else
+			allowedips=$allowedips","$(echo $PRK | cut -d# -f3)
+		fi
 	fi
 	PRK=$(echo "$line" | grep "Endpoint" | tr " " ",")
 	if [ ! -z "$PRK" ]; then

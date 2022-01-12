@@ -1,3 +1,1 @@
 config filter filter
-	list ipset 'cache.cricketwireless.com'
-	list ipset 'redirect.ac.sl.attcompute.com'
