@@ -7,12 +7,24 @@ log() {
 
 WG=$1
 
+do_dns() {
+	cdns=$1
+	ldns=$(uci -q get network.lan.dns)
+	ex=$(echo "$ldns" | grep "$cdns")
+	if [ -z $ex ]; then
+		log "Add DNS $cdns to Lan"
+		uci add_list network.lan.dns="$cdns"
+		uci commit network
+		/etc/init.d/network reload
+	fi
+}
+
 do_port() {
 	PORT=$1
 	udp=$2
 	# look for rule for this port
 	INB="inbound"$PORT$udp
-	RULE=$(uci get firewall.$INB)
+	RULE=$(uci -q get firewall.$INB)
 	if [ -z $RULE ]; then
 		uci set firewall.$INB=rule
 		uci set firewall.$INB.name=$INB
@@ -45,7 +57,7 @@ create_speer() {
 	usepre=$(uci -q get wireguard.$WG.usepre)
 	log "$usepre"
 	if [ $usepre = "1" ]; then
-		presharedkey=$(uci get wireguard.$WG.presharedkey)
+		presharedkey=$(uci -q get wireguard.$WG.presharedkey)
 		log "$presharedkey"
 		uci set network.$config.preshared_key="$presharedkey"
 	fi
@@ -67,13 +79,16 @@ create_cpeer() {
 	
 	uci set network.$config="wireguard_wg0"
 
-	publickey=$(uci get wireguard."$config".publickey)
+	publickey=$(uci -q get wireguard."$config".publickey)
 	uci set network.$config.public_key="$publickey"
-	presharedkey=$(uci get wireguard."$WG".presharedkey)
+	presharedkey=$(uci -q get wireguard."$WG".presharedkey)
 	if [ ! -z $presharedkey ]; then
 		uci set network.$config.preshared_key="$presharedkey"
 	fi
-	persistent_keepalive=25
+	persistent_keepalive=$(uci -q get wireguard."$config".persistent_keepalive)
+	if [ -z $persistent_keepalive ]; then
+		persistent_keepalive=25
+	fi
 	uci set network.$config.persistent_keepalive="$persistent_keepalive"
 	route_allowed_ips=1
 	uci set network.$config.route_allowed_ips="$route_allowed_ips"
@@ -81,22 +96,22 @@ create_cpeer() {
 	if [ $UDP = 1 ]; then
 		endpoint_host="127.0.0.1"
 		uci set network.$config.endpoint_host="$endpoint_host"
-		sport=$(uci get wireguard."$config".port)
+		sport=$(uci -q get wireguard."$config".port)
 		if [ -z $sport ]; then
 			sport="54321"
 		fi
 		uci set network.$config.endpoint_port="$sport"
 	else
-		endpoint_host=$(uci get wireguard."$config".endpoint_host)
+		endpoint_host=$(uci -q get wireguard."$config".endpoint_host)
 		uci set network.$config.endpoint_host="$endpoint_host"
-		sport=$(uci get wireguard."$config".sport)
+		sport=$(uci -q get wireguard."$config".sport)
 		if [ -z $sport ]; then
 			sport="51280"
 		fi
 		uci set network.$config.endpoint_port="$sport"
 	fi
 	
-	ips=$(uci get wireguard."$config".ips)","
+	ips=$(uci -q get wireguard."$config".ips)","
 	cips=$(echo $ips | cut -d, -f1)
 	i=1
 	while [ ! -z $cips ]
@@ -114,23 +129,23 @@ handle_server() {
 	uci set network.wg1="interface"
 	uci set network.wg1.proto="wireguard"
 	
-	auto=$(uci get wireguard."$WG".auto)
+	auto=$(uci -q get wireguard."$WG".auto)
 	if [ -z $auto ]; then
 		auto="0"
 	fi
 	uci set network.wg1.auto="$auto"
 	
-	port=$(uci get wireguard."$WG".port)
+	port=$(uci -q get wireguard."$WG".port)
 	if [ -z $port ]; then
 		port="51280"
 	fi
 	uci set network.wg1.listen_port="$port"
 	do_port $port udp
 	
-	privatekey=$(uci get wireguard."$WG".privatekey)
+	privatekey=$(uci -q get wireguard."$WG".privatekey)
 	uci set network.wg1.private_key="$privatekey"
 
-	ips=$(uci get wireguard."$WG".addresses)","
+	ips=$(uci -q get wireguard."$WG".addresses)","
 	cips=$(echo $ips | cut -d, -f1)
 	i=1
 	while [ ! -z $cips ]
@@ -156,26 +171,30 @@ handle_client() {
 	uci set network.wg0="interface"
 	uci set network.wg0.proto="wireguard"
 	
-	auto=$(uci get wireguard."$WG".auto)
+	auto=$(uci -q get wireguard."$WG".auto)
 	if [ -z $auto ]; then
 		auto="0"
 	fi
 	uci set network.wg0.auto="$auto"
-	mtu=$(uci get wireguard."$WG".mtu)
+	mtu=$(uci -q get wireguard."$WG".mtu)
 	if [ ! -z $mtu ]; then
 		uci set network.wg0.mtu="$mtu"
 	fi
-	port=$(uci get wireguard."$WG".port)
+	dns=$(uci -q get wireguard."$WG".dns)
+	if [ ! -z $dns ]; then
+		do_dns $dns
+	fi
+	port=$(uci -q get wireguard."$WG".port)
 	if [ -z $port ]; then
 		port="51280"
 	fi
 	uci set network.wg0.listen_port="$port"
 	do_port $port udp
 	
-	privatekey=$(uci get wireguard."$WG".privatekey)
+	privatekey=$(uci -q get wireguard."$WG".privatekey)
 	uci set network.wg0.private_key="$privatekey"
 
-	ips=$(uci get wireguard."$WG".addresses)","
+	ips=$(uci -q get wireguard."$WG".addresses)","
 	cips=$(echo $ips | cut -d, -f1)
 	i=1
 	while [ ! -z "$cips" ]
@@ -195,11 +214,11 @@ handle_client() {
 
 udp_server() {
 	local config=$1
-	udpport=$(uci get wireguard."$WG".udpport)
+	udpport=$(uci -q get wireguard."$WG".udpport)
 	if [ -z $udpport ]; then
 		udpport="54321"
 	fi
-	port=$(uci get wireguard."$WG".port)
+	port=$(uci -q get wireguard."$WG".port)
 	if [ -z $port ]; then
 		port="54321"
 	fi
@@ -210,12 +229,12 @@ udp_server() {
 
 udp_client() {
 	local config=$1
-	port=$(uci get wireguard."$WG".port)
+	port=$(uci -q get wireguard."$WG".port)
 	if [ -z $port ]; then
 		port="54321"
 	fi
-	endpoint_host=$(uci get wireguard.$WG.endpoint_host)
-	sport=$(uci get wireguard.$WG.sport)
+	endpoint_host=$(uci -q get wireguard.$WG.endpoint_host)
+	sport=$(uci -q get wireguard.$WG.sport)
 	if [ -z $sport ]; then
 		sport="51280"
 	fi
@@ -225,13 +244,13 @@ udp_client() {
 }
 
 config_load network
-SERVE=$(uci get wireguard."$WG".client)
+SERVE=$(uci -q get wireguard."$WG".client)
 if [ $SERVE = "0" ]; then
-	running=$(uci get wireguard.settings.server)
+	running=$(uci -q get wireguard.settings.server)
 	if [ $running = 1 ]; then
 		exit 0
 	fi
-	UDP=$(uci get wireguard."$WG".udptunnel)
+	UDP=$(uci -q get wireguard."$WG".udptunnel)
 	if [ $UDP = 1 ]; then
 		udp_server $WG
 	fi
@@ -241,12 +260,12 @@ if [ $SERVE = "0" ]; then
 	sleep 2
 	uci set wireguard.settings.server="1"
 else
-	running=$(uci get wireguard.settings.client)
+	running=$(uci -q get wireguard.settings.client)
 	log "Client running $running"
 	if [ $running = 1 ]; then
 		exit 0
 	fi
-	UDP=$(uci get wireguard."$WG".udptunnel)
+	UDP=$(uci -q get wireguard."$WG".udptunnel)
 	if [ $UDP = 1 ]; then
 		udp_client $WG
 	fi

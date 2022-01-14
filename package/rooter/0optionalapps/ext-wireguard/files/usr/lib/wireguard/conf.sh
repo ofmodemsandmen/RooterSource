@@ -81,6 +81,7 @@ uci set wireguard.$name.ips="$allowedips"
 uci set wireguard.$name.name="$name"
 uci set wireguard.$name.sport="$sport"
 uci set wireguard.$name.mtu="$mtu"
+uci set wireguard.$name.persistent_keepalive='25'
 uci commit wireguard
 
 rm -f $file

@@ -50,6 +50,12 @@ mtu.optional=false;
 mtu.datatype = 'range(1280,1420)';
 mtu.default="1280";
 
+pka = s:option(Value, "persistent_keepalive", translate("Persistent Keep Alive :"), translate("Seconds between keep alive messages")); 
+pka.rmempty = true;
+pka.optional=false;
+pka.datatype = 'range(1,100)';
+pka.default="25";
+
 pkey = s:option(Value, "privatekey", translate("Private Key :"), translate("Private Key supplied by the Server")); 
 pkey.rmempty = true;
 pkey.optional=false;
