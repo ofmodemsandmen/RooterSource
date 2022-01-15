@@ -1679,5 +1679,16 @@
 		"ext1": "-upgrade.bin",
 		"ext2": "-factory.bin",
 		"addons": ["readme.pdf", "factory.txt"]
+	},
+	"O2BOX": {
+		"details": "O2 Box 6431",
+		"type": "1",
+		"build": "1907",
+		"config": ".config_o2box",
+		"image": "openwrt-lantiq-xrx200-arcadyan_vgv7510kw22-nor-squashfs-sysupgrade.bin",
+		"imagepath": "/lantiq/xrx200/",
+		"mod": "O2-Box-6431",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf", "O2-Box-6431-factory.bin"]
 	}
 }
