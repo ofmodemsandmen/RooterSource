@@ -7,6 +7,7 @@ do
 	result=`ps | grep -i "stupdate.sh" | grep -v "grep" | wc -l`
 	if [ $result -lt 1 ]; then
 		/usr/lib/iframe/stupdate.sh
+		/usr/lib/iframe/bwdays.sh
 	fi
 	splash=$(uci -q get iframe.iframe.splashpage)
 	if [ $splash = "1" ]; then

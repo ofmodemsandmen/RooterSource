@@ -239,14 +239,6 @@ if [ $splash = "1" ]; then
 	level2txt "$tempur" "single"
 	sed -i -e "s!#TEMP#!$namev!g" $STEMP
 
-	bwdata
-		
-	sed -i -e "s!#DAYS#!$days!g" $STEMP
-	sed -i -e "s!#TOTAL#!$tused!g" $STEMP
-	sed -i -e "s!#DOWN#!$tdwn!g" $STEMP
-	sed -i -e "s!#UP#!$tup!g" $STEMP
-	sed -i -e "s!#PROJECT#!$project!g" $STEMP
-
 	mv $STEMP $SPSTATUS
 fi
 
