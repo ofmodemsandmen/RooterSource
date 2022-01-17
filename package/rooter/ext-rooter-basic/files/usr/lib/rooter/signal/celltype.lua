@@ -109,6 +109,8 @@ datalist[50] = "eg18"
 celllist[50] = 2
 datalist[51] = "megafon"
 celllist[51] = 2
+datalist[52] = "ln9"
+celllist[52] = 2
 
 printf = function(s,...)
 	if echo == 0 then
@@ -119,7 +121,7 @@ printf = function(s,...)
 	end
 end
 
-found = 1
+found = 3
 index = 1
 line = datalist[index]
 data = string.lower(modem)
