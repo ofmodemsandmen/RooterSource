@@ -87,18 +87,22 @@ if dataname ~= nil then
 				day = "0" .. day
 			end
 			yearmonday = yearmon .. "-" .. day
-			daylist[i] = yearmonday
-			i = i + 1
+			
 			daydwn = 0
 			dayup = 0
 			repeat
 				line = file:read("*line")
 				s, e = line:find("end day")
 				if s ~= nil then
-					dayline[yearmonday] = {}
-					dayline[yearmonday]['down'] = daydwn
-					dayline[yearmonday]['up'] = dayup
-					dayline[yearmonday]['total'] = dayup + daydwn
+					dayt = dayup + daydwn
+					if dayt > 0 then
+						daylist[i] = yearmonday
+						i = i + 1
+						dayline[yearmonday] = {}
+						dayline[yearmonday]['down'] = daydwn
+						dayline[yearmonday]['up'] = dayup
+						dayline[yearmonday]['total'] = dayup + daydwn
+					end
 					break
 				end
 				s, e = line:find("\"down\":\"")
