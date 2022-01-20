@@ -189,8 +189,8 @@ if dataname ~= nil then
 			end
 		end
 		tfile:write(calc(fdown), "\n")
-		tfile:write(calc((fup), "\n")
-		tfile:write(calc((ftotal), "\n")
+		tfile:write(calc(fup), "\n")
+		tfile:write(calc(ftotal), "\n")
 		for j = 0,k-1
 		do
 			lin = monlist[j]
