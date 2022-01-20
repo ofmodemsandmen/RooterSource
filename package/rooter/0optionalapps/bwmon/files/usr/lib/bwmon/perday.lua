@@ -188,9 +188,9 @@ if dataname ~= nil then
 				ftotal = ConBytes(dataline:sub(e+1)) + ftotal
 			end
 		end
-		tfile:write(tostring(fdown), "\n")
-		tfile:write(tostring(fup), "\n")
-		tfile:write(tostring(ftotal), "\n")
+		tfile:write(calc(fdown), "\n")
+		tfile:write(calc((fup), "\n")
+		tfile:write(calc((ftotal), "\n")
 		for j = 0,k-1
 		do
 			lin = monlist[j]

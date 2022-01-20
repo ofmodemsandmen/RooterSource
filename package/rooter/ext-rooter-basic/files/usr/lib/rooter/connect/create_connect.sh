@@ -573,7 +573,7 @@ uci commit modem.modem$CURRMODEM
 				else
 					case $idV in
 						"2c7c"|"05c6" )
-							get_tty_fix 2
+							get_tty_fix 02
 							lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
 							source /tmp/parmpass
 							uci set modem.modem$CURRMODEM.commport=$CPORT
@@ -581,7 +581,7 @@ uci commit modem.modem$CURRMODEM
 							log "MBIM Comm Port : /dev/ttyUSB$CPORT"
 						;;
 						"1bc7"|"03f0" )
-							get_tty 03
+							get_tty 02
 							lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
 							source /tmp/parmpass
 							uci set modem.modem$CURRMODEM.commport=$CPORT
