@@ -67,6 +67,9 @@ firstboot() {
 	config_foreach do_zone zone
 
 	source /etc/openwrt_release
+	if [ $DISTRIB_RELEASE = "SNAPSHOT" ]; then
+		DISTRIB_RELEASE="21.02.2"
+	fi
 	tone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
 }
 
@@ -92,6 +95,9 @@ uci commit modem
 
 source /etc/openwrt_release
 rm -f /etc/openwrt_release
+if [ $DISTRIB_RELEASE = "SNAPSHOT" ]; then
+	DISTRIB_RELEASE="21.02.2"
+fi
 if [ -e /etc/custom ]; then
 	lua $ROOTER/customname.lua
 	DISTRIB_DESCRIPTION=$(uci get modem.Version.ver)
