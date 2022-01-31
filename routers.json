@@ -125,16 +125,14 @@
 	},	
 	"WR902ACV1": {
 		"details": "TP-Link WR902ACv1",
-		"type": "2",
+		"type": "1",
 		"build": "1907",
 		"flash": "8",
 		"config": ".config_wr902acv1",
-		"image1": "openwrt-ar71xx-generic-tl-wr902ac-v1-squashfs-sysupgrade.bin",
-		"image2": "openwrt-ar71xx-generic-tl-wr902ac-v1-squashfs-factory.bin",
+		"image": "openwrt-ar71xx-generic-tl-wr902ac-v1-squashfs-sysupgrade.bin",
 		"imagepath": "/ar71xx/generic/",
 		"mod": "TP-Link-WR902ACv1",
-		"ext1": "-upgrade.bin",
-		"ext2": "-factory.bin",
+		"ext": "-upgrade.bin",
 		"addons": ["readme.pdf", "archer.txt"]
 	},	
 	"WR902ACV3": {
