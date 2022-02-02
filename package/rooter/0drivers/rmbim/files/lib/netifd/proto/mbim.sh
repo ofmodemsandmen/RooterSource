@@ -61,7 +61,7 @@ get_connect() {
 get_sub() {
 	log "Checking subscriber"
 	tid=$((tid + 1))
-	SUB=$(umbim -n -t $tid -d $device subscriber)
+	SUB=$(umbim $DBG -n -t $tid -d $device subscriber)
 	retq=$?
 	if [ $retq -ne 0 ]; then
 		log "Subscriber init failed"
@@ -170,11 +170,14 @@ _proto_mbim_setup() {
 	}
 
 	log "Reading capabilities"
-	DCAPS=$(umbim $DBG -n -d $device caps)
+	tid=$((tid + 1))
+	DCAPS=$(umbim $DBG -n -t $tid -d $device caps)
 	retq=$?
 	if [ $retq -ne 0 ]; then
 
 		log "Failed to read modem caps"
+		tid=$((tid + 1))
+		umbim $DBG -t $tid -d "$device" disconnect
 		proto_notify_error "$interface" PIN_FAILED
 		return 1
 	fi
@@ -193,14 +196,14 @@ _proto_mbim_setup() {
 
 	log "Checking PIN state"
 	tid=$((tid + 1))
-	umbim -n -t $tid -d $device pinstate
+	umbim $DBG -n -t $tid -d $device pinstate
 	retq=$?
 	if [ $retq -eq 2 ]; then
 		log "PIN is required"
 		if [ ! -z $pincode ]; then
 			log "Sending PIN"
 			tid=$((tid + 1))
-			umbim -n -t $tid -d $device unlock "$pincode" 2>/dev/null
+			umbim $DBG -n -t $tid -d $device unlock "$pincode" 2>/dev/null
 			retq=$?
 			if [ $retq -ne 0 ]; then
 				log "PIN unlock failed"
@@ -246,7 +249,7 @@ _proto_mbim_setup() {
 	tid=$((tid + 1))
 
 	log "Attach to network"
-	ATTACH=$(umbim -n -t $tid -d $device attach)
+	ATTACH=$(umbim $DBG -n -t $tid -d $device attach)
 	retq=$?
 	if [ $retq != 0 ]; then
 		log "Failed to attach to network"
@@ -255,6 +258,8 @@ _proto_mbim_setup() {
 	fi
 	UP=$(echo "$ATTACH" | awk '/uplinkspeed:/ {print $2}')
 	DOWN=$(echo "$ATTACH" | awk '/downlinkspeed:/ {print $2}')
+
+	tid=$((tid + 1))
 
 	log "Connect to network using $apn"
 	tidd=0

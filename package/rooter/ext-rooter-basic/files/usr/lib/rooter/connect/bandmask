@@ -19,26 +19,6 @@ sierrabandmask() {
 	enb=$(uci -q get custom.bandlock.enabled)
 	ATCMDD='AT!ENTERCND="A710";!BAND?'
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if [ -e /etc/fake ]; then
-		# all bands set using index 0
-		OX1=' AT!ENTERCND="A710";!BAND?
-
-Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band Mask    L Band Mask 2    L Band Mask 3    L Band Mask 4
-
-00, All bands                     100600000FC00000 A300BA0E38DF 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-
-OK'
-		# all bands set usin index 11
-		OX3=' AT!ENTERCND="A710";!BAND?
-Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band Mask    L Band Mask 2    L Band Mask 3    L Band Mask 4 11, Test                          0000000000000000 000021002204284A 0000000000000000 0000000000000002 0000000000000000 0000000000000000 OK'
-		# all bands Unknown band
-		OX2='AT!ENTERCND="A710";!BAND?
-Unknown band mask. Use AT!BAND to set band.
-0000000000000000 0000A300BA0E38DF 0000000000000000 0000000000000002 0000000000000000 0000000000000000 OK'
-		# B42 using index 0
-		OX=' AT!ENTERCND="A710";!BAND?
-Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band Mask    L Band Mask 2    L Band Mask 3    L Band Mask 4 00, All bands                     100600000EC00000 000000000000000A 0000000000000000 0000000000000002 0000000000000000 0000000000000000 OK'
-	fi
 	if [ $enb == "1" ]; then
 		log " "
 		log "Sierra Response : $OX"
@@ -53,7 +33,7 @@ Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band M
 			log "Unknw : $BND"
 		fi
 		L1=$(echo $BND | cut -d, -f11)
-		GW=$(echo $BND | cut -d, -f10) 
+		GW=$(echo $BND | cut -d, -f10)
 		L2=$(echo $BND | cut -d, -f13)
 	else
 		all=$(echo $line | grep "L Band Mask 2")
@@ -75,7 +55,7 @@ Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band M
 			ex2=$(( OK - 6 ))
 			ex3=$(( OK - 3 ))
 			L1=$(echo $BND | cut -d, -f$ex1)
-			GW=$(echo $BND | cut -d, -f$ex2) 
+			GW=$(echo $BND | cut -d, -f$ex2)
 			L2=$(echo $BND | cut -d, -f$ex3)
 		else
 			BND=$(echo $line | cut -d, -f5 | tr " " ",")
@@ -83,7 +63,7 @@ Index, Name,                        GW Band Mask     L Band Mask 1    TDS Band M
 				log "$BND"
 			fi
 			L1=$(echo $BND | cut -d, -f3)
-			GW=$(echo $BND | cut -d, -f2) 
+			GW=$(echo $BND | cut -d, -f2)
 			L2=$(echo $BND | cut -d, -f5)
 		fi
 	fi
@@ -112,7 +92,8 @@ quebandmask() {
 	idP=$(uci get modem.modem$CURRMODEM.idP)
 	CPORT=$(uci get modem.modem$CURRMODEM.commport)
 	ATCMDD="AT+CGMM"
-    model=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	model=$(echo "$OX" | tr '\n' ' ' | cut -d' ' -f2)
 	uci set modem.modem$CURRMODEM.model=$model
 	ATCMDD='AT+QCFG="band"'
 	EM160=0
@@ -124,7 +105,7 @@ quebandmask() {
 	fi
 	if [ $idP = "0620" -o $idP = "0800" ]; then
 		EM20=$(echo $model | grep "EM20")
-		if [ -z $EM20 ]; then
+		if [ -z "$EM20" ]; then
 			EM160=1
 			ATCMDD='AT+QNWPREFCFG="lte_band"'
 		fi
@@ -137,28 +118,21 @@ quebandmask() {
 	fi
 	L5=""
 	L6=""
-	if [ -e /etc/qfake ]; then
-		EMT=1
-	else
-		EMT=0
-	fi
+	EMT=0
+
 	if [ $EM160 = $EMT ]; then
 		qm=$(echo $OX" " | grep "+QCFG:" | tr -d '"' | tr " " ",")
 		if [ $enb == "1" ]; then
-			log "EM20 $qm"
+			log "$qm"
 			log " "
 		fi
 		L1=$(echo $qm | cut -d, -f5)
 		GW=$(echo $qm | cut -d, -f4)
 		L2="0"
 	else
-		if [ -e /etc/qfake ]; then
-			#OX='AT+QNWPREFCFG="lte_band",+QNWPREFCFG:  "lte_band",1:2:3:4:5:7:8:12:13:14:17:18:19:20:25:26:28:29:30:32:34:38:39:40:41:42:43:48:66:71 OK'
-			OX='AT+QNWPREFCFG="lte_band" +QNWPREFCFG: "lte_band",0  OK'
-		fi
 		qm=$(echo $OX" " | grep "+QNWPREFCFG:" | tr -d '"' | tr " " ":" | tr "," ":")
 		if [ $enb == "1" ]; then
-			log "EM160/RM500 $qm"
+			log "$qm"
 			log " "
 		fi
 		bd=5
@@ -176,19 +150,11 @@ quebandmask() {
 		fi
 		L2="0"
 		GW="0"
-		if [ -e /etc/qfake ]; then
-			EMT=0620
-		else
-			EMT=0800
-		fi
+		EMT=0800
+
 		if [ $idP = $EMT ]; then
 			ATCMDD='AT+QNWPREFCFG="nsa_nr5g_band"'
-			if [ -e /etc/fake ]; then
-				#OX='AT+QNWPREFCFG="nsa_nr5g_band" +QNWPREFCFG:  "nsa_nr5g_band",1:2:3:5:7:8:12:20:25:28:38:40:41:48:66:71:77:78:79 OK'
-				OX='AT+QNWPREFCFG="nsa_nr5g_band" +QNWPREFCFG:  "nsa_nr5g_band",38 OK'
-			else
-				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			fi
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			qm=$(echo $OX" " | grep "+QNWPREFCFG:" | tr -d '"' | tr " " ":" | tr "," ":")
 			if [ $enb == "1" ]; then
 				log "EM160/RM500 $qm"
@@ -196,7 +162,7 @@ quebandmask() {
 			bd=5
 			msk=""
 			L5=$(echo $qm | cut -d: -f"$bd")
-			
+
 			while [ $L5 != "OK" ]
 			do
 				msk=$msk$L5" "
@@ -210,12 +176,7 @@ quebandmask() {
 			fi
 
 			ATCMDD='AT+QNWPREFCFG="nr5g_band"'
-			if [ -e /etc/qfake ]; then
-				#OX='AT+QNWPREFCFG="nr5g_band" +QNWPREFCFG: "nr5g_band",1:2:3:5:7:8:12:20:25:28:38:40:41:48:66:71:77:78:79 OK'
-				OX='AT+QNWPREFCFG="nr5g_band" +QNWPREFCFG: "nr5g_band",0 OK'
-			else
-				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			fi
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			qm=$(echo $OX" " | grep "+QNWPREFCFG:" | tr -d '"' | tr " " ":" | tr "," ":")
 			if [ $enb == "1" ]; then
 				log "EM160/RM500 $qm"
@@ -223,7 +184,7 @@ quebandmask() {
 			bd=5
 			msk=""
 			L6=$(echo $qm | cut -d: -f"$bd")
-			
+
 			while [ $L6 != "OK" ]
 			do
 				msk=$msk$L6" "
@@ -275,81 +236,61 @@ quebandmask() {
 
 fibomask() {
 	enb=$(uci -q get custom.bandlock.enabled)
-	idV=$(uci get modem.modem$CURRMODEM.idV)
-	idP=$(uci get modem.modem$CURRMODEM.idP)
-	if [ $idP = "0001" ]; then
-		return
-	fi
 	CPORT=$(uci get modem.modem$CURRMODEM.commport)
-	ATCMDD="AT+CGMM"
-    model=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if [ $idV = "8087" ]; then
+	msk=""
+	NRsupport=false
+	ATCMDD='AT+GTACT=?'
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	OX=$(echo $OX | grep -o "+GTACT:[^)]\+")
+	if [ -n "$OX" ]; then
+		RATlist=$(echo $OX | grep -o "[0-9]\{2\}")
+		for RATval in $(echo "$RATlist"); do
+			if [ $RATval == "14" -o $RATval == "16" -o $RATval == "17" -o $RATval == "20" ]; then
+				NRsupport=true
+			fi
+		done
+		ATCMDD='AT+GTACT?'
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		OX=$(echo $OX" " | grep "+GTACT:" | tr -d '"' | tr " " ",")
+	else
 		ATCMDD='AT+XACT?'
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		qm=$(echo $OX" " | grep "+XACT:" | tr -d '"' | tr " " ",")
-	else
-		FM150=$(echo "$model" | grep "FM150")
-		if [ -z $FM150 ]; then
-			ATCMDD='AT+XACT?'
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			qm=$(echo $OX" " | grep "+XACT:" | tr -d '"' | tr " " ",")
-		else
-			ATCMDD='AT+GTACT?'
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			qm=$(echo $OX" " | grep "+GTACT:" | tr -d '"' | tr " " ",")
+		OX=$(echo $OX" " | grep "+XACT:" | tr -d '"' | tr " " ",")
+		if [ -z "$OX" ]; then
+			ATCMDD=""
+			OX="No AT command found to read bands"
 		fi
 	fi
+	LTEbands=$(echo "$OX" | grep -o "1[0-9]\{2\}")
+	NRbands=$(echo "$OX" | grep -o "50[0-9]\{1,3\}")
+	for bandval in $(echo "$LTEbands"); do
+		msk=$msk$((bandval-100))" "
+	done
+	if [ -n "$msk" ]; then
+		L1=$(encodemask $msk)
+	else
+		L1="0"
+	fi
+	msk=""
+	for bandval in $(echo "$NRbands"); do
+		msk=$msk${bandval:2}" "
+	done
 	if [ $enb == "1" ]; then
 		log " "
 		log "Get Current Bands : $ATCMDD"
 		log "Current Bands : $OX"
 		log " "
 	fi
-	bd=4
-	msk=""
-	L1=$(echo $qm | cut -d, -f"$bd")
-	while [ $L1 != "OK" ]
-	do
-		if [ ! -z "$L1" ]; then
-			if [ "$L1" -ge 100 -a "$L1" -lt 200 ]; then
-				L1=$((L1-100))
-				msk=$msk$L1" "
-			fi
-		fi
-		bd=$((bd+1))
-		L1=$(echo $qm | cut -d, -f"$bd")
-		if [ -z "$L1" ]; then
-			bd=$((bd+1))
-			L1=$(echo $qm | cut -d, -f"$bd")
-		fi
-	done
-	L1=$(encodemask $msk)
-	
-	bd=6
-	msk=""
-	L5=$(echo $qm | cut -d, -f"$bd")
-	while [ "$L5" != "OK" ]
-	do
-		if [ "$L5" -ge 500 -a $L5 -lt 510 ]; then
-			L5=$((L5-500))
-			msk=$msk$L5" "
-		fi
-		if [ "$L5" -ge 5001 -a "$L5" -lt 5100 ]; then
-			L5=$((L5-5000))
-			msk=$msk$L5" "
-		fi
-		bd=$((bd+1))
-		L5=$(echo $qm | cut -d, -f"$bd")
-	done
 	if [ -z "$msk" ]; then
-		L5=""
-		if [ ! -z $FM150 ]; then
+		if $NRsupport; then
 			L5="0x0"
+		else
+			L5=""
 		fi
 	else
 		L5="0x"$(encodemask $msk)
 	fi
-	if [ ! -z "$L1" ]; then
+	if [ -n "$L1$L5" ]; then
 		if [ $enb == "1" ]; then
 			log " "
 			log "LTE Band Mask : $L1"
@@ -374,4 +315,4 @@ case $MODTYPE in
 	;;
 esac
 
-$ROOTER/luci/mask.sh		
+$ROOTER/luci/mask.sh

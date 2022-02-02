@@ -155,13 +155,13 @@ check_apn() {
 
 	ATCMDD="AT+CGDCONT?;+CFUN?"
 	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if `echo $OX | grep "+CGDCONT: 1,\"$IPVAR\",\"$NAPN\"," 1>/dev/null 2>&1`
+	if `echo $OX | grep "+CGDCONT: $CID,\"$IPVAR\",\"$NAPN\"," 1>/dev/null 2>&1`
 	then
 		if [ -z "$(echo $OX | grep -o "+CFUN: 1")" ]; then
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")
 		fi
 	else
-		ATCMDD="AT+CGDCONT=1,\"$IPVAR\",\"$NAPN\";+CFUN=$CFUNOFF"
+		ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\";+CFUN=$CFUNOFF"
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")
 		sleep 5
@@ -339,13 +339,13 @@ addv6() {
 
 get_tty() {
 # $1 is bInterfaceNumber value
-	local IfNum OX
-	IfNum=$1
+	local IFNUM OX
+	IFNUM=$1
 	for TTYD in $(echo "$TTYDEVS"); do
 		if [ ! "$ACM" = 1 ]; then
-			OX=$(cat /sys/class/tty/$TTYD/../../../bInterfaceNumber | grep "$IfNum")
+			OX=$(cat /sys/class/tty/$TTYD/../../../bInterfaceNumber | grep "$IFNUM")
 		else
-			OX=$(cat /sys/class/tty/$TTYD/../../bInterfaceNumber | grep "$IfNum")
+			OX=$(cat /sys/class/tty/$TTYD/../../bInterfaceNumber | grep "$IFNUM")
 		fi
 		if [ $? = 0 ]; then
 			CPORT=$(echo $TTYD | grep -o "[[:digit:]]\+")
@@ -364,11 +364,11 @@ get_tty_fix() {
 }
 
 get_tty_ncm() {
-	local IfProt OX
+	local IFPROT OX
 	PROTS="12 62 02 2"	# PC UI interface bInterfaceProtocol value
-	for IfProt in $PROTS; do
+	for IFPROT in $PROTS; do
 		for TTYD in $(echo "$TTYDEVS"); do
-			OX=$(cat /sys/class/tty/$TTYD/../../../bInterfaceProtocol | grep -w "$IfProt")
+			OX=$(cat /sys/class/tty/$TTYD/../../../bInterfaceProtocol | grep -w "$IFPROT")
 			if [ $? = 0 ]; then
 				CPORT=$(echo $TTYD | grep -o "[[:digit:]]\+")
 				break 2
@@ -377,6 +377,14 @@ get_tty_ncm() {
 			fi
 		done
 	done
+}
+
+mbimcport() {
+	lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
+	source /tmp/parmpass
+	uci set modem.modem$CURRMODEM.commport=$CPORT
+	uci set modem.modem$CURRMODEM.proto="30"
+	log "MBIM Comm Port : /dev/ttyUSB$CPORT"
 }
 
 CURRMODEM=$1
@@ -500,6 +508,8 @@ uci commit modem.modem$CURRMODEM
 				fi
 			elif [ $idV = 05c6 -a $idP = 9025 ]; then
 				[ $MAN = "Telit" ] || TPORT=2
+			elif [ $idV = 1e0e -a $idP = 9001 ]; then
+				TPORT=2
 			else
 				TPORT=1
 			fi
@@ -517,14 +527,14 @@ uci commit modem.modem$CURRMODEM
 		sleep $DELAY
 
 		chksierra
-		SIERRAIF2='1199:90b1'
-		if [[ $(echo $SIERRAIF2 | grep -o -i "$idV:$idP") ]]; then
-			IfNum=02
-		else
-			IfNum=03
-		fi
 		if [ $SIERRAID -eq 1 ]; then
-			get_tty $IfNum
+			SIERRAIF2='1199:90b1'
+			if [[ $(echo $SIERRAIF2 | grep -o -i "$idV:$idP") ]]; then
+				IFNUM=02
+			else
+				IFNUM=03
+			fi
+			get_tty $IFNUM
 			if [ -z "$CPORT" ]; then
 				if [ $idP = "90d3" ]; then
 					get_tty_fix 0
@@ -541,11 +551,7 @@ uci commit modem.modem$CURRMODEM
 					log "No MBIM Comm Port"
 				fi
 			else
-				lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
-				source /tmp/parmpass
-				uci set modem.modem$CURRMODEM.commport=$CPORT
-				uci set modem.modem$CURRMODEM.proto="30"
-				log "MBIM Comm Port : /dev/ttyUSB$CPORT"
+				mbimcport
 			fi
 		else
 			chktelitmbim
@@ -564,29 +570,17 @@ uci commit modem.modem$CURRMODEM
 			else
 				chkT77
 				if [ $T77 -eq 1 ]; then
-					get_tty_fix 0
-					lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
-					source /tmp/parmpass
-					uci set modem.modem$CURRMODEM.commport=$CPORT
-					uci set modem.modem$CURRMODEM.proto="30"
-					log "MBIM Comm Port : /dev/ttyUSB$CPORT"
+					get_tty 02
+					mbimcport
 				else
 					case $idV in
 						"2c7c"|"05c6" )
-							get_tty_fix 02
-							lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
-							source /tmp/parmpass
-							uci set modem.modem$CURRMODEM.commport=$CPORT
-							uci set modem.modem$CURRMODEM.proto="30"
-							log "MBIM Comm Port : /dev/ttyUSB$CPORT"
+							get_tty_fix 2
+							mbimcport
 						;;
 						"1bc7"|"03f0" )
 							get_tty 02
-							lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
-							source /tmp/parmpass
-							uci set modem.modem$CURRMODEM.commport=$CPORT
-							uci set modem.modem$CURRMODEM.proto="30"
-							log "MBIM Comm Port : /dev/ttyUSB$CPORT"
+							mbimcport
 						;;
 						"2cb7" )
 							get_tty_fix 0
@@ -625,7 +619,7 @@ uci commit modem.modem$CURRMODEM
 		;;
 	"28" )
 		log "Start Fibocom NCM Connection"
-		get_tty 00
+		get_tty_fix 2
 		lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
 		source /tmp/parmpass
 		ACMPORT=$CPORT
@@ -757,6 +751,14 @@ if [ -n "$CHKPORT" ]; then
 	uci set modem.modem$CURRMODEM.inter=$INTER
 	uci commit modem
 	log "Modem $CURRMODEM is using WAN$INTER"
+
+	if [ -s /tmp/wan$INTER.cid ]; then
+		CID=$(cat /tmp/wan$INTER.cid 2>/dev/null)
+		CID=$(echo $CID | grep -o "[[:digit:]]")
+		[ -n "$CID" ] && log "User selected PDP Context $CID"
+	fi
+
+	[ -z "$CID" ] && CID=1
 
 	DHCP=1
 	if [ $PROT = 28 ]; then
@@ -1025,12 +1027,12 @@ while [ 1 -lt 6 ]; do
 		ifname=$(basename $OX)
 		log "Modem $CURRMODEM Fibocom NCM Data Port : $ifname"
 		COMMPORT="/dev/ttyUSB"$CPORT
-		ATCMDD="AT+CGACT=0,1"
+		ATCMDD="AT+CGACT=0,$CID"
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		check_apn
-		ATCMDD="AT+CGPIAF=1,0,0,0;+XDNS=1,1;+XDNS=1,2"
+		ATCMDD="AT+CGPIAF=1,0,0,0;+XDNS=$CID,1;+XDNS=$CID,2"
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		ATCMDD="AT+CGACT=1,1"
+		ATCMDD="AT+CGACT=1,$CID"
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		ERROR="ERROR"
 		if [ -e /tmp/simerr$CURRMODEM ]; then
@@ -1047,14 +1049,14 @@ while [ 1 -lt 6 ]; do
 			BRK=1
 			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
 		else
-			ATCMDD="AT+CGCONTRDP=1"
+			ATCMDD="AT+CGCONTRDP=$CID"
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			OX=$(echo "${OX//[\" ]/}")
 			ip=$(echo $OX | cut -d, -f4 | grep -o "[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}")
 			ip=$(echo $ip | cut -d' ' -f1)
 			DNS1=$(echo $OX | cut -d, -f6)
 			DNS2=$(echo $OX | cut -d, -f7)
-			OX6=$(echo $OX | grep -o "+CGCONTRDP:1,[0-9]\+,[^,]\+,[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}.\+")
+			OX6=$(echo $OX | grep -o "+CGCONTRDP:$CID,[0-9]\+,[^,]\+,[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}.\+")
 			ip6=$(echo $OX6 | grep -o "[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}")
 			ip6=$(echo $ip6 | cut -d' ' -f1)
 			DNS3=$(echo "$OX6" | cut -d, -f6)
@@ -1079,7 +1081,7 @@ while [ 1 -lt 6 ]; do
 				nat46=1
 			fi
 
-			ATCMDD="AT+XDATACHANNEL=1,1,\"/USBCDC/0\",\"/USBHS/NCM/0\",2,1"
+			ATCMDD="AT+XDATACHANNEL=1,1,\"/USBCDC/2\",\"/USBHS/NCM/0\",2,$CID"
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			RDNS=$(uci -q get network.wan$INTER.dns)
 
@@ -1107,8 +1109,9 @@ while [ 1 -lt 6 ]; do
 			uci set modem.modem$CURRMODEM.interface=$ifname
 			uci commit modem
 			ip link set dev $ifname arp off
-			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "raw-ip.gcom" "$CURRMODEM")
-			RESP=$(echo $OX | sed "s/AT+CGDATA=\"M-RAW_IP\",1 //")
+			ATCMDD="AT+CGDATA=\"M-RAW_IP\",$CID"
+			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "raw-ip.gcom" "$CURRMODEM" "$ATCMDD")
+			RESP=$(echo $OX | sed "s/AT+CGDATA=\"M-RAW_IP\",$CID //")
 			log "Final Modem $CURRMODEM result code is \"$RESP\""
 			if [ "$RESP" = "OK CONNECT" ]; then
 				ifup wan$INTER

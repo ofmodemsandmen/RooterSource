@@ -9,7 +9,9 @@ let $g=$env("TIMEOUT")
 if $g = "" let f=25
 else let f = val($g)
 
-send "AT+CGDATA=\"M-RAW_IP\",1^m"
+let $x=$env("ATCMD")
+send $x
+send "^m"
 let t=time()+f
 gosub getresult
 if $s="^mTIMEOUT ERROR" print $s
