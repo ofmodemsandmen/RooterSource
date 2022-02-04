@@ -303,6 +303,7 @@ _proto_mbim_setup() {
 		DNS3=$(echo "$CONFIG" | awk '/ipv6dnsserver:/ {print $2}' | sed -n 1p)
 		DNS4=$(echo "$CONFIG" | awk '/ipv6dnsserver:/ {print $2}' | sed -n 2p)
 	fi
+	echo "$GATE" > /tmp/mbimgateway
 
 	[ -n "$IP" ] && echo "IP: $IP"
 	[ -n "$DNS1" ] && echo "DNS1: $DNS1"
@@ -355,7 +356,7 @@ _proto_mbim_setup() {
 
 	if [ -n "$IP" ]; then
 		proto_add_ipv4_address $IP "255.255.255.255"
-		proto_add_ipv4_route "0.0.0.0" 0 $GATE
+		proto_add_ipv4_route "0.0.0.0" 0
 	fi
 
 	for DNSV in $(echo "$v4dns"); do
