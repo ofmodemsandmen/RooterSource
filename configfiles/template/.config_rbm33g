@@ -59,6 +59,7 @@ CONFIG_TARGET_ramips_mt7621=y
 # CONFIG_TARGET_ramips_mt7621_DEVICE_wsr-600 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_xzwifi_creativebox-v1 is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_dir-860l-b1 is not set
+# CONFIG_TARGET_ramips_mt7621_DEVICE_dualq-h721-256m-16m is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_elecom_wrc-1167ghbk2-s is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_elecom_wrc-1900gst is not set
 # CONFIG_TARGET_ramips_mt7621_DEVICE_elecom_wrc-2533gst is not set
@@ -1614,9 +1615,9 @@ CONFIG_ZABBIX_POSTGRESQL=y
 # CONFIG_PACKAGE_ath10k-firmware-qca9887-ct is not set
 # CONFIG_PACKAGE_ath10k-firmware-qca9887-ct-htt is not set
 # CONFIG_PACKAGE_ath10k-firmware-qca9888 is not set
-# CONFIG_PACKAGE_ath10k-firmware-qca9888-ct is not set
+CONFIG_PACKAGE_ath10k-firmware-qca9888-ct=y
 # CONFIG_PACKAGE_ath10k-firmware-qca9888-ct-htt is not set
-# CONFIG_PACKAGE_ath10k-firmware-qca988x is not set
+CONFIG_PACKAGE_ath10k-firmware-qca988x=y
 # CONFIG_PACKAGE_ath10k-firmware-qca988x-ct is not set
 # CONFIG_PACKAGE_ath10k-firmware-qca988x-ct-htt is not set
 # CONFIG_PACKAGE_ath10k-firmware-qca9984 is not set
@@ -1847,7 +1848,33 @@ CONFIG_PACKAGE_wireless-regdb=y
 #
 # Hardware Monitoring Support
 #
-# CONFIG_PACKAGE_kmod-hwmon-core is not set
+CONFIG_PACKAGE_kmod-hwmon-core=y
+# CONFIG_PACKAGE_kmod-hwmon-adcxx is not set
+# CONFIG_PACKAGE_kmod-hwmon-ads1015 is not set
+# CONFIG_PACKAGE_kmod-hwmon-adt7410 is not set
+# CONFIG_PACKAGE_kmod-hwmon-adt7475 is not set
+# CONFIG_PACKAGE_kmod-hwmon-gpiofan is not set
+# CONFIG_PACKAGE_kmod-hwmon-ina209 is not set
+# CONFIG_PACKAGE_kmod-hwmon-ina2xx is not set
+# CONFIG_PACKAGE_kmod-hwmon-it87 is not set
+# CONFIG_PACKAGE_kmod-hwmon-lm63 is not set
+# CONFIG_PACKAGE_kmod-hwmon-lm75 is not set
+# CONFIG_PACKAGE_kmod-hwmon-lm77 is not set
+# CONFIG_PACKAGE_kmod-hwmon-lm85 is not set
+# CONFIG_PACKAGE_kmod-hwmon-lm90 is not set
+# CONFIG_PACKAGE_kmod-hwmon-lm92 is not set
+# CONFIG_PACKAGE_kmod-hwmon-lm95241 is not set
+# CONFIG_PACKAGE_kmod-hwmon-ltc4151 is not set
+# CONFIG_PACKAGE_kmod-hwmon-pwmfan is not set
+# CONFIG_PACKAGE_kmod-hwmon-sch5627 is not set
+# CONFIG_PACKAGE_kmod-hwmon-sht21 is not set
+# CONFIG_PACKAGE_kmod-hwmon-tmp102 is not set
+# CONFIG_PACKAGE_kmod-hwmon-tmp103 is not set
+# CONFIG_PACKAGE_kmod-hwmon-tmp421 is not set
+# CONFIG_PACKAGE_kmod-hwmon-vid is not set
+# CONFIG_PACKAGE_kmod-hwmon-w83793 is not set
+# CONFIG_PACKAGE_kmod-pmbus-core is not set
+# CONFIG_PACKAGE_kmod-pmbus-zl6100 is not set
 
 #
 # I2C support
@@ -2312,13 +2339,14 @@ CONFIG_ATH_USER_REGD=y
 CONFIG_PACKAGE_ATH_DFS=y
 # CONFIG_PACKAGE_ATH_DYNACK is not set
 # CONFIG_PACKAGE_kmod-ath10k is not set
-# CONFIG_PACKAGE_kmod-ath10k-ct is not set
+CONFIG_PACKAGE_kmod-ath10k-ct=y
+CONFIG_ATH10K-CT_LEDS=y
 # CONFIG_PACKAGE_kmod-ath10k-ct-smallbuffers is not set
 # CONFIG_PACKAGE_kmod-ath5k is not set
 # CONFIG_PACKAGE_kmod-ath6kl-sdio is not set
 # CONFIG_PACKAGE_kmod-ath6kl-usb is not set
 CONFIG_PACKAGE_kmod-ath9k=y
-# CONFIG_ATH9K_SUPPORT_PCOEM is not set
+CONFIG_ATH9K_SUPPORT_PCOEM=y
 # CONFIG_ATH9K_TX99 is not set
 CONFIG_PACKAGE_kmod-ath9k-common=y
 # CONFIG_PACKAGE_kmod-ath9k-htc is not set
@@ -2337,7 +2365,9 @@ CONFIG_PACKAGE_kmod-cfg80211=y
 # CONFIG_PACKAGE_kmod-iwl-legacy is not set
 # CONFIG_PACKAGE_kmod-iwl3945 is not set
 # CONFIG_PACKAGE_kmod-iwl4965 is not set
-# CONFIG_PACKAGE_kmod-iwlwifi is not set
+CONFIG_PACKAGE_kmod-iwlwifi=y
+# CONFIG_PACKAGE_IWLWIFI_DEBUG is not set
+# CONFIG_PACKAGE_IWLWIFI_DEBUGFS is not set
 # CONFIG_PACKAGE_kmod-lib80211 is not set
 # CONFIG_PACKAGE_kmod-libertas-sdio is not set
 # CONFIG_PACKAGE_kmod-libertas-spi is not set
@@ -5420,7 +5450,7 @@ CONFIG_PACKAGE_uclient-fetch=y
 # CONFIG_WPA_WOLFSSL is not set
 # CONFIG_DRIVER_WEXT_SUPPORT is not set
 CONFIG_DRIVER_11N_SUPPORT=y
-# CONFIG_DRIVER_11AC_SUPPORT is not set
+CONFIG_DRIVER_11AC_SUPPORT=y
 CONFIG_DRIVER_11W_SUPPORT=y
 # CONFIG_PACKAGE_wpa-supplicant-basic is not set
 # CONFIG_PACKAGE_wpa-supplicant-mesh-openssl is not set
@@ -5462,11 +5492,6 @@ CONFIG_DRIVER_11W_SUPPORT=y
 # CONFIG_PACKAGE_ext-sms is not set
 
 #
-# Custom Apps
-#
-# CONFIG_PACKAGE_customize is not set
-
-#
 # Drivers
 #
 # CONFIG_PACKAGE_rmbim is not set
@@ -5475,14 +5500,23 @@ CONFIG_DRIVER_11W_SUPPORT=y
 #
 # Optional Applications
 #
+# CONFIG_PACKAGE_bwallocate is not set
 # CONFIG_PACKAGE_bwmon is not set
-# CONFIG_PACKAGE_easycwmp is not set
+# CONFIG_PACKAGE_ext-blacklist is not set
+# CONFIG_PACKAGE_ext-domain is not set
+# CONFIG_PACKAGE_ext-easycwmp is not set
+# CONFIG_PACKAGE_ext-menu is not set
 # CONFIG_PACKAGE_ext-mosquitto is not set
+# CONFIG_PACKAGE_ext-rspeedtest is not set
 # CONFIG_PACKAGE_ext-speedtest is not set
+# CONFIG_PACKAGE_ext-texting is not set
+# CONFIG_PACKAGE_ext-throttle is not set
 # CONFIG_PACKAGE_ext-wireguard is not set
 # CONFIG_PACKAGE_ext-yamon3 is not set
 # CONFIG_PACKAGE_ext-zerotier is not set
+# CONFIG_PACKAGE_extramenu is not set
 # CONFIG_PACKAGE_pingtest is not set
+# CONFIG_PACKAGE_portal is not set
 # CONFIG_PACKAGE_qfirehose is not set
 # CONFIG_PACKAGE_qlog is not set
 # CONFIG_PACKAGE_udp-tunnel is not set
@@ -5500,23 +5534,27 @@ CONFIG_DRIVER_11W_SUPPORT=y
 # CONFIG_PACKAGE_alix2d13 is not set
 # CONFIG_PACKAGE_b1300 is not set
 # CONFIG_PACKAGE_cfe3 is not set
+# CONFIG_PACKAGE_cpe102 is not set
 # CONFIG_PACKAGE_d240 is not set
 # CONFIG_PACKAGE_dir860l is not set
-# CONFIG_PACKAGE_ext-ssh is not set
 # CONFIG_PACKAGE_fscheck is not set
+# CONFIG_PACKAGE_h721 is not set
+# CONFIG_PACKAGE_mofi4500 is not set
 # CONFIG_PACKAGE_mofi5500 is not set
 # CONFIG_PACKAGE_rbm11g is not set
 CONFIG_PACKAGE_rbm33g=y
 # CONFIG_PACKAGE_rd05a1 is not set
-# CONFIG_PACKAGE_rpi3bp is not set
 # CONFIG_PACKAGE_we826 is not set
 # CONFIG_PACKAGE_we826q is not set
 # CONFIG_PACKAGE_wg1608 is not set
+# CONFIG_PACKAGE_wg209 is not set
 # CONFIG_PACKAGE_wrt1900 is not set
 
 #
 # Splash Screens
 #
+# CONFIG_PACKAGE_ext-splash is not set
+# CONFIG_PACKAGE_ext-splashconfig is not set
 # CONFIG_PACKAGE_splash is not set
 # CONFIG_PACKAGE_status is not set
 
@@ -5536,6 +5574,8 @@ CONFIG_PACKAGE_rbm33g=y
 # CONFIG_PACKAGE_extra-wifi is not set
 # CONFIG_PACKAGE_ext-arc is not set
 # CONFIG_PACKAGE_ext-arc16 is not set
+# CONFIG_PACKAGE_ext-customx is not set
+# CONFIG_PACKAGE_ext-customx16 is not set
 # CONFIG_PACKAGE_ext-ltefix is not set
 # CONFIG_PACKAGE_ext-ltefix16 is not set
 # CONFIG_PACKAGE_ext-rooter-lite is not set
