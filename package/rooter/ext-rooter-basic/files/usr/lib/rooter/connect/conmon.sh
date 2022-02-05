@@ -90,7 +90,7 @@ while [ 1 = 1 ]; do
 			sleep 60
 		else
 			track_ips=
-			INTER=$(uci get modem.modem$CURRMODEM.interface)
+			IFNAME=$(uci get modem.modem$CURRMODEM.interface)
 			TIMEOUT=$(uci get modem.pinginfo$CURRMODEM.pingwait)
 			INTERVAL=$(uci get modem.pinginfo$CURRMODEM.pingtime)
 			RELIAB=$(uci get modem.pinginfo$CURRMODEM.reliability)
@@ -140,7 +140,7 @@ while [ 1 = 1 ]; do
 						while true; do
 							if [ ! -z "$track_ips" ]; then
 								for track_ip in $track_ips; do
-									ping -I $INTER -c $COUNT -W $TIMEOUT -s $PACKETSIZE -q $track_ip &> /dev/null
+									ping -I $IFNAME -c $COUNT -W $TIMEOUT -s $PACKETSIZE -q $track_ip &> /dev/null
 									if [ $? -eq 0 ]; then
 										let host_up_count++
 									else
