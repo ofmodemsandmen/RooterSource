@@ -363,7 +363,7 @@ endef
 TARGET_DEVICES += qcom_ap-dk04.1-c1
 
 define Device/p2w_r619ac
-	$(call Device/FitzImage)
+	$(call Device/FitImage)
 	$(call Device/UbiFit)
 	DEVICE_TITLE := P&W R619AC
 	DEVICE_DTS := qcom-ipq4019-r619ac
