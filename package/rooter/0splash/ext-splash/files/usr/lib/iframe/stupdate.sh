@@ -82,6 +82,7 @@ level2txt() {
 }
 
 readstatus() {
+modd=$1
 	while IFS= read -r line; do
 		port="$line"
 		read -r line
@@ -151,7 +152,7 @@ readstatus() {
 		read -r line
 		sinr="$line"
 		break
-	done < /tmp/status1.file
+	done < /tmp/status$modd.file
 }
 
 bwdata() {
@@ -195,7 +196,7 @@ if [ $splash = "1" ]; then
 	title=$(uci -q get iframe.iframe.splashtitle)
 	sed -i -e "s!#TITLE#!$title!g" $STEMP
 
-	readstatus
+	readstatus 1
 	level2txt "$csq" "single" 0
 	sed -i -e "s!#CSQ#!$namev!g" $STEMP
 	level2txt "$per" "per"
@@ -238,8 +239,88 @@ if [ $splash = "1" ]; then
 	sed -i -e "s!#PORT#!$namev!g" $STEMP
 	level2txt "$tempur" "single"
 	sed -i -e "s!#TEMP#!$namev!g" $STEMP
+	
+	dual=$(uci -q get iframe.iframe.dual)
+	if [ $dual = "1" ]; then
+		STEMP2="/tmp/www/stemp2.html"
+		STATUS2="/usr/lib/iframe/modem2.html"
+		rm -f $STEMP2
+		cp $STATUS2 $STEMP2
+		
+		readstatus 2
+		level2txt "$csq" "single" 0
+		sed -i -e "s!#CSQ#!$namev!g" $STEMP2
+		level2txt "$per" "per"
+		sed -i -e "s!#PER#!$namev!g" $STEMP2
+		level2txt "$rssi" "rssi"
+		sed -i -e "s!#RSSI#!$namev!g" $STEMP2
+		level2txt "$rscp" "rscp"
+		sed -i -e "s!#RSCP#!$namev!g" $STEMP2
+		level2txt "$ecio" "single" 1
+		sed -i -e "s!#RSRQ#!$namev!g" $STEMP2
+		level2txt "$sinr" "single" 1
+		sed -i -e "s!#SINR#!$namev!g" $STEMP2
+
+		level2txt "$mode" "single"
+		sed -i -e "s!#MODE#!$namev!g" $STEMP2
+		level2txt "$mcc" "single"
+		sed -i -e "s!#MCC#!$namev!g" $STEMP2
+		level2txt "$mnc" "single"
+		sed -i -e "s!#MNC#!$namev!g" $STEMP2
+		level2txt "$rnc" "single"
+		sed -i -e "s!#RNC#!$namev!g" $STEMP2
+		level2txt "$rncn" "single"
+		sed -i -e "s!#RNCN#!$namev!g" $STEMP2
+		level2txt "$lac" "single"
+		sed -i -e "s!#LAC#!$namev!g" $STEMP2
+		level2txt "$lacn" "single"
+		sed -i -e "s!#LACN#!$namev!g" $STEMP2
+		level2txt "$pci" "single"
+		sed -i -e "s!#CELLID#!$namev!g" $STEMP2
+		level2txt "$channel" "single"
+		sed -i -e "s!#CHAN#!$namev!g" $STEMP2
+		level2txt "$lband" "single"
+		sed -i -e "s!#BAND#!$namev!g" $STEMP2
+
+		level2txt "$modem" "single"
+		sed -i -e "s!#MODEM#!$namev!g" $STEMP2
+		level2txt "$proto" "single"
+		sed -i -e "s!#PROTO#!$namev!g" $STEMP2
+		level2txt "$port" "single"
+		sed -i -e "s!#PORT#!$namev!g" $STEMP2
+		level2txt "$tempur" "single"
+		sed -i -e "s!#TEMP#!$namev!g" $STEMP2
+		
+		MODEM2=$(cat $STEMP2)
+		sed -i -e "s!#MODEM2#!$MODEM2!g" $STEMP
+	else
+		sed -i -e "s!#MODEM2#!!g" $STEMP
+	fi
+	
+	open=$(uci -q get iframe.iframe.speed)
+	if [ $open = "1" ]; then
+		STEMP2="/tmp/www/stemp2.html"
+		STATUS2="/usr/lib/iframe/open.html"
+		rm -f $STEMP2
+		cp $STATUS2 $STEMP2
+		MODEM2=$(cat $STEMP2)
+		sed -i -e "s!#OPEN#!$MODEM2!g" $STEMP
+	else
+		sed -i -e "s!#OPEN#!!g" $STEMP
+	fi
+	
+	band=$(uci -q get iframe.iframe.band)
+	if [ $band = "1" ]; then
+		STEMP2="/tmp/www/stemp2.html"
+		STATUS2="/usr/lib/iframe/band.html"
+		rm -f $STEMP2
+		cp $STATUS2 $STEMP2
+		MODEM2=$(cat $STEMP2)
+		sed -i -e "s!#BWMON#!$MODEM2!g" $STEMP
+	else
+		sed -i -e "s!#BWMON#!!g" $STEMP
+	fi
 
 	mv $STEMP $SPSTATUS
 fi
-
 

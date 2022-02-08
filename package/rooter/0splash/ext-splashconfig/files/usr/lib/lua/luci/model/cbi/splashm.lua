@@ -22,36 +22,23 @@ a1.optional=false;
 a1.default = "ROOter Status"
 a1:depends("splashpage", "1")
 
-
-ss = m:section(TypedSection, "login", "Login Page Configuration")
-ss.anonymous = true
-ss.addremove = false
-
-dc1 = ss:option(ListValue, "logframe", "Enable Login Page Window : ");
+dc1 = s:option(ListValue, "dual", "Enable Modem 2 Status :");
 dc1:value("0", "Disabled")
 dc1:value("1", "Enabled")
 dc1.default=0
+dc1:depends("splashpage", "1")
 
-d1 = ss:option(ListValue, "logtype", "Type of Window : ");
-d1:value("1", "Bandwidth Statistics")
-d1:value("2", "Image")
-d1:value("3", "OpenSpeedTest")
-d1.default=1
-d1:depends("logframe", "1")
+cc1 = s:option(ListValue, "speed", "Enable OpenSpeedTest :");
+cc1:value("0", "Disabled")
+cc1:value("1", "Enabled")
+cc1.default=0
+cc1:depends("splashpage", "1")
 
-e1 = ss:option(Value, "logimage", "Image Name :"); 
-e1.optional=false;
-e1.default = "open.png"
-e1:depends("logtype", "2")
+ec1 = s:option(ListValue, "band", "Enable Bandwidth Summary :");
+ec1:value("0", "Disabled")
+ec1:value("1", "Enabled")
+ec1.default=0
+ec1:depends("splashpage", "1")
 
-d1 = ss:option(ListValue, "logimagepos", "Position in Window : ");
-d1:value("absmiddle", "Absolute Middle")
-d1:value("middle", "Middle")
-d1:value("left", "Left")
-d1:value("right", "Right")
-d1:value("top", "Top")
-d1:value("bottom", "Bottom")
-d1.default="absmiddle"
-d1:depends("logtype", "2")
 	
 return m

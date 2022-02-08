@@ -161,8 +161,9 @@ check_apn() {
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")
 		fi
 	else
-		ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\";+CFUN=$CFUNOFF"
+		ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\""
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=$CFUNOFF")
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")
 		sleep 5
 	fi

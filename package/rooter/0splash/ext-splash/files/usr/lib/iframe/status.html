@@ -17,30 +17,33 @@
 </head>
 <script src="luci-static/material/js/jquery.min.js"></script>
 <script type="text/javascript">
+
+
     window.onload = startInterval;
     function startInterval()
     {
         setInterval("startTime();",5000);
-		setInterval("bandTime();",60000);
+		setInterval("bandTime();",600000);
     }
     
     function startTime()
     {
-         $('#block1').load(document.URL +  ' #block1');  
+         $('#modem').load(document.URL +  ' #modem'); 
     }
 	
 	function bandTime()
     {
-         $('#block2').load(document.URL +  ' #block2');  
+         $('#band').load(document.URL +  ' #band');  
     }
 	
   </script>
 <body id='rooterSplashStatus' class='rooterSplash' >
 	#TITLEBAR#
 	#BUTTON#
-	<div class='rooterPageContent' id="block1">
+	<div class='rooterPageContent' id='blank"></div>
+	<div class='rooterPageContent' id="modem">
 
-		<h2><i class="icon icon-signal"></i> Modem <span class="msCell" id='msCell_conntype'><span></span></span></h2>
+		<h2><i class="icon icon-signal"></i> Modem 1 <span class="msCell" id='msCell_conntype'><span></span></span></h2>
 		<div class='modemStatusRow modemStatusRow1'>
 				<div class='msCell' id='msCell_per'>
 					<div class='msTitle'>Strength (%)</div>
@@ -129,43 +132,13 @@
 				</div>
 			</div>
 		</div>
+		#MODEM2#
 	</div>
 	
 		
-	<div class='rooterPageContent' id="block3">
-		<div class='rooterPageHead'>
-			<div class="rooterHeadTitle"> OpenSpeedTest</div>
-		</div>
-		<div>
-			<table width="100%" height="100%" border="0" id="apply3" >
-				<tr>
-					<td align="middle">
-						<div id="rooterItems" >
-							<a><iframe id="apply4" src="https://openspeedtest.com/Get-widget.php?" width="600" height="350" style="border:8px groove black;border-radius: 10px;" title="OpenSpeedTest"></iframe></a>
-						</div>
-					</td>
-				</tr>
-			</table>
-		</div>
-	</div>
+	#OPEN#
 	
-	<div class='rooterPageContent' id="block2">
-		<div class='rooterPageHead'>
-			<div class="rooterHeadTitle"> Bandwidth Usage</div>
-		</div>
-		
-		<div>
-			<table width="100%" height="100%" border="0" id="apply5" >
-				<tr>
-					<td align="middle">
-						<div id="rooterItems" >
-							<a><iframe id="apply6" src="luci-static/iframe.html" width="600" height="750" style="border:8px groove black;border-radius: 10px;" title="OpenSpeedTest"></iframe></a>
-						</div>
-					</td>
-				</tr>
-			</table>
-		</div>
-	</div>
+	#BWMON#
 	
 </body>
 </html>

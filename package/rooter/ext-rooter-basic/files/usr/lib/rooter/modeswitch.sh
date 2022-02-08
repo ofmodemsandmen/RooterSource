@@ -185,15 +185,21 @@ if [ "$ACTION" = add ]; then
 #
 # Ignore Ethernet adapters
 #
-	if [ $idV = 13b1 -a $idP = 0041 ]; then
+	if [ $uVid = 13b1 -a $uPid = 0041 ]; then
 		exit 0
-	elif [ $idV = 2357 -a $idP = 0601 ]; then
+	elif [ $uVid = 2357 -a $uPid = 0601 ]; then
 		exit 0
-	elif [ $idV = 0b95 -a $idP = 772b ]; then
+	elif [ $uVid = 0b95 -a $uPid = 772b ]; then
 		exit 0
-	elif [ $idV = 0b95 -a $idP = 1790 ]; then
+	elif [ $uVid = 0b95 -a $uPid = 1790 ]; then
 		exit 0
-	elif [ $idV = 0bda -a $idP = 8152 ]; then
+	elif [ $uVid = 0bda -a $uPid = 8152 ]; then
+		exit 0
+	fi
+
+# Ignore USB-Serial adapters
+
+	if [ $uVid = 050d -a $uPid = 0109 ]; then
 		exit 0
 	fi
 
@@ -287,9 +293,6 @@ if [ "$ACTION" = add ]; then
 	if [ $reinsert = 0 ]; then
 		CURRMODEM=$MODSTART
 	fi
-
-	idV=$uVid
-	idP=$uPid
 
 	FILEN=$uVid:$uPid
 	display_top; display "Start of Modem Detection and Connection Information"

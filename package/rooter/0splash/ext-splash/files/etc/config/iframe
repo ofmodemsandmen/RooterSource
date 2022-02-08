@@ -1,11 +1,16 @@
+
 config iframe 'iframe'
-	option splashpage '0'
-	option splashtitle 'ROOter Status'
-	
+	option splashpage '1'
+	option splashtitle 'ROOter'
+	option dual '1'
+	option speed '0'
+	option band '0'
+
 config login 'login'
 	option logframe '0'
-	option logtype '1'
+	option logtype '3'
 	option logimage 'open.png'
 	option logimageheight '300'
 	option logimagewidth '300'
 	option logimagepos 'absmiddle'
+
