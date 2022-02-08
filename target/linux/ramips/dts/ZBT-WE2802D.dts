@@ -1,22 +1,23 @@
 /dts-v1/;
-#include <dt-bindings/input/input.h>
-#include <dt-bindings/gpio/gpio.h>
 
 #include "mt7628an.dtsi"
 
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+
 / {
 	compatible = "zbtlink,zbt-we2802d", "mediatek,mt7628an-soc";
-	model = "Zbtlink ZBT-WE2802d";
+	model = "Zbtlink ZBT-WE2802D";
 
 	aliases {
-		led-boot = &led_sys;
-		led-failsafe = &led_sys;
-		led-running = &led_sys;
-		led-upgrade = &led_sys;
+		led-boot = &sys;
+		led-failsafe = &sys;
+		led-running = &sys;
+		led-upgrade = &sys;
 	};
 
 	chosen {
-		bootargs = "console=ttyS1,115200";
+		bootargs = "console=ttyS0,115200";
 	};
 
 	keys {
@@ -33,39 +34,58 @@
 	leds {
 		compatible = "gpio-leds";
 
-		led_sys: sys {
-			label = "zbt-we2802d:green:sys";
-			gpios = <&gpio0 4 GPIO_ACTIVE_LOW>;
-		};
-
-		led_wan: wan {
-			label = "zbt-we2802d:green:wan";
+		rssi1: rssi1 {
+			label = "green:rssi1";
 			gpios = <&gpio0 5 GPIO_ACTIVE_LOW>;
 		};
 
-		led_lan: lan {
-			label = "zbt-we2802d:green:lan";
+		rssi2: rssi2 {
+			label = "green:rssi2";
 			gpios = <&gpio0 11 GPIO_ACTIVE_LOW>;
 		};
 
-		led_wlan: wlan {
-			label = "zbt-we2802d:green:wlan";
+		sys: sys {
+			label = "green:sys";
+			gpios = <&gpio0 4 GPIO_ACTIVE_LOW>;
+		};
+
+		wlan: wlan {
+			label = "green:wlan";
 			gpios = <&gpio1 12 GPIO_ACTIVE_LOW>;
 		};
 
-		led_hwdt: hwdt {
-			label = "zbt-we2802d:green:hwdt";
+		hwdt: hwdt {
+			label = "green:hwdt";
 			gpios = <&gpio1 5 GPIO_ACTIVE_LOW>;
 			linux,default-trigger = "timer";
-	        };
+		};
 	};
-};
 
-&pinctrl {
-	state_default: pinctrl0 {
-		gpio {
-			ralink,group = "p0led_an", "p1led_an", "p4led_an", "wdt", "wled_an";
-			ralink,function = "gpio";
+	gpio_export {
+		compatible = "gpio-export";
+
+		gpio0 {
+			gpio-export,name = "gpio0";
+			gpio-export,output = <0>;
+			gpios = <&gpio0 0 GPIO_ACTIVE_HIGH>;
+		};
+
+		gpio2 {
+			gpio-export,name = "gpio2";
+			gpio-export,output = <0>;
+			gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
+		};
+
+		gpio3 {
+			gpio-export,name = "gpio3";
+			gpio-export,output = <0>;
+			gpios = <&gpio0 3 GPIO_ACTIVE_HIGH>;
+		};
+
+		rs485 {
+			gpio-export,name = "rs485";
+			gpio-export,output = <0>;
+			gpios = <&gpio1 8 GPIO_ACTIVE_HIGH>;
 		};
 	};
 };
@@ -76,7 +96,7 @@
 	m25p80@0 {
 		compatible = "jedec,spi-nor";
 		reg = <0>;
-		spi-max-frequency = <10000000>;//may be increased upto 24MHz?
+		spi-max-frequency = <10000000>;
 
 		partitions {
 			compatible = "fixed-partitions";
@@ -104,18 +124,27 @@
 			partition@50000 {
 				compatible = "denx,uimage";
 				label = "firmware";
-				reg = <0x50000 0xfb0000>;//fb0000 for 16 Mib was 7b0000 for 8MiB
+				reg = <0x50000 0xfb0000>;
 			};
 		};
 	};
 };
 
-&wmac {
-	status = "okay";
-	ralink,mtd-eeprom = <&factory 0x4>;//was 0x0
+&ethernet {
+	mtd-mac-address = <&factory 0x28>;
 };
 
-&ethernet {
-	mtd-mac-address = <&factory 0x2e>;
-	mediatek,portmap = "llllw";
+&wmac {
+	status = "okay";
+	ralink,mtd-eeprom = <&factory 0x4>;
 };
+
+&pinctrl {
+	state_default: pinctrl0 {
+		gpio {
+			ralink,group = "wdt", "refclk", "wled_an", "gpio", "i2s", "i2c", "p3led_an";
+			ralink,function = "gpio";
+		};
+	};
+};
+

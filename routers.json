@@ -1672,5 +1672,15 @@
 		"mod": "O2-Box-6431",
 		"ext": "-upgrade.bin",
 		"addons": ["readme.pdf", "O2-Box-6431-factory.bin"]
+	},
+	"WE2802D": {
+			"details": "ZBT WE2802D",
+			"type": "1",
+			"config": ".config_we2802d",
+			"image": "openwrt-ramips-mt76x8-zbt-we2802d-squashfs-sysupgrade.bin",
+			"imagepath": "/ramips/mt76x8/",
+			"mod": "ZBT-WE2802D",
+			"ext": "-upgrade.bin",
+			"addons": ["readme.pdf", "readmerecovery.txt"]
 	}
 }

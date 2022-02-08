@@ -432,15 +432,26 @@ else
 		DELAY=5
 	fi
 
-#
-# QMI, NCM and MBIM use cdc-wdm
-#
-
 rm -f /tmp/usbwait
 
 MATCH="$(uci get modem.modem$CURRMODEM.maxcontrol | cut -d/ -f3- | xargs dirname)"
 
 case $PROT in
+	# Sierra Direct-IP data interface
+	
+	"1" )
+	OX="$(for a in /sys/class/net/*; do readlink $a; done | grep "$MATCH")"
+	ifname=$(basename $OX)
+	WWANX=$(echo $ifname | grep -o "[[:digit:]]")
+	log "Modem $CURRMODEM Sierra Direct-IP Device : $ifname"
+	
+	uci set modem.modem$CURRMODEM.wwan=$WWANX
+	uci set modem.modem$CURRMODEM.interface=$ifname
+	uci commit modem
+	;;
+
+	# QMI, NCM and MBIM use cdc-wdm
+
 	"2"|"3"|"30"|"4"|"6"|"7" )
 	OX="$(for a in /sys/class/usbmisc/*; do readlink $a; done | grep "$MATCH")"
 	devname=$(basename $OX)
@@ -906,7 +917,7 @@ while [ 1 -lt 6 ]; do
 			fi
 			M7=$(echo "$OX" | sed -e "s/SCACT:/SCACT: /;s!  ! !g")
 			SCACT="!SCACT: 1,1"
-			if `echo $M7 | grep "$SCACT" 1>/dev/null 2>&1`
+			if `echo ${M7} | grep "$SCACT" 1>/dev/null 2>&1`
 			then
 				BRK=0
 				ifup wan$INTER

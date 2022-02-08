@@ -201,6 +201,12 @@ if [ "$ACTION" = add ]; then
 
 	if [ $uVid = 050d -a $uPid = 0109 ]; then
 		exit 0
+	elif [ $uVid = 067b -a $uPid = 2303 ]; then
+		exit 0
+	elif [ $uVid = 0403 -a $uPid = 6001 ]; then
+		exit 0
+	elif [ $uVid = 10c4 -a $uPid = ea60 ]; then
+		exit 0
 	fi
 
 	cat /sys/kernel/debug/usb/devices > /tmp/wdrv
