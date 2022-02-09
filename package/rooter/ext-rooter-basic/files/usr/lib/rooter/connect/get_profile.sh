@@ -208,7 +208,7 @@ do_custom() {
 					if [ -z $ttl ]; then
 						ttl="0"
 					fi
-					$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl"
+					uci set modem.modeminfo$CURRMODEM.ttl=$ttl
 
 					[ -n "$apn" ] || log "This profile has no APN configured !!!"
 
@@ -311,7 +311,7 @@ if [ $MATCH = 0 ]; then
 	if [ -z $ttl ]; then
 		ttl="0"
 	fi
-	$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl"
+	uci set modem.modeminfo$CURRMODEM.ttl=$ttl
 
 	alive=$(uci get profile.default.alive)
 	uci delete modem.pinginfo$CURRMODEM
