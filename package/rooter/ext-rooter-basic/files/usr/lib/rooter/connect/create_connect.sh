@@ -124,7 +124,6 @@ set_dns2() {
 	uci set network.wan$INTER.dns="$bDNS"
 }
 
-
 check_apn() {
 	IPVAR="IP"
 	local COMMPORT="/dev/ttyUSB"$CPORT
@@ -811,6 +810,7 @@ if [ -n "$CHKPORT" ]; then
 	export SETPASS=$NPASS
 	export SETAUTH=$NAUTH
 	export PINCODE=$PINC
+
 	if [ $idV = 12d1 ]; then
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "curc.gcom" "$CURRMODEM")
 		log "Huawei Unsolicited Responses Disabled"
@@ -1037,9 +1037,6 @@ while [ 1 -lt 6 ]; do
 # Fibocom NCM connect
 #
 	"28" )
-		. /lib/functions.sh
-		. /lib/netifd/netifd-proto.sh
-		MATCH="$(uci get modem.modem$CURRMODEM.maxcontrol | cut -d/ -f3- | xargs dirname)"
 		OX="$(for a in /sys/class/net/*; do readlink $a; done | grep "$MATCH" | grep ".6/net/")"
 		ifname=$(basename $OX)
 		log "Modem $CURRMODEM Fibocom NCM Data Port : $ifname"

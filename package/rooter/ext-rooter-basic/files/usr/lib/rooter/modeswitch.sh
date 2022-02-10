@@ -197,17 +197,11 @@ if [ "$ACTION" = add ]; then
 		exit 0
 	fi
 
-# Ignore USB-Serial adapters
+	bNumConfs=$(cat /sys/bus/usb/devices/$DEVICENAME/bNumConfigurations)
+	bNumIfs=$(cat /sys/bus/usb/devices/$DEVICENAME/bNumInterfaces)
 
-	if [ $uVid = 050d -a $uPid = 0109 ]; then
-		exit 0
-	elif [ $uVid = 067b -a $uPid = 2303 ]; then
-		exit 0
-	elif [ $uVid = 0403 -a $uPid = 6001 ]; then
-		exit 0
-	elif [ $uVid = 10c4 -a $uPid = ea60 ]; then
-		exit 0
-	fi
+	# Uncomment the next line to ignore USB-Serial adapters and similar single-port devices
+	# if [ $bNumConfs = 1 -a $bNumIfs = 1 ] && exit 0		
 
 	cat /sys/kernel/debug/usb/devices > /tmp/wdrv
 	lua $ROOTER/protofind.lua $uVid $uPid 0
@@ -313,7 +307,6 @@ if [ "$ACTION" = add ]; then
 
 	while : ; do
 		bConfig=$(cat /sys/bus/usb/devices/$DEVICENAME/bConfigurationValue)
-		bNumConfs=$(cat /sys/bus/usb/devices/$DEVICENAME/bNumConfigurations)
 		if [ -n "$bConfig" -a -n "$bNumConfs" ]; then
 			log "Found Modem at $DEVICENAME in Cfg#= $bConfig from $bNumConfs available"
 			break
@@ -343,7 +336,6 @@ if [ "$ACTION" = add ]; then
 					change_bconf $DEVICENAME $bestcfg QMI
 					;;
 				"2" )
-					bNumIfs=$(cat /sys/bus/usb/devices/$DEVICENAME/bNumInterfaces)
 					if [ $bNumIfs -lt 4 ]; then
 						change_bconf $DEVICENAME $bestcfg QMI
 					fi

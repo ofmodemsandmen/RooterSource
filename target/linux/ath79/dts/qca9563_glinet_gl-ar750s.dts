@@ -59,17 +59,15 @@
 		};
 	};
 
-	usb_vbus: regulator-usb-vbus {
-		compatible = "regulator-fixed";
+	gpio-export {
+		compatible = "gpio-export";
+		#size-cells = <0>;
 
-		regulator-name = "USB_VBUS";
-
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		regulator-always-on;
-
-		gpio = <&gpio 7 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
+		usb_vbus {
+			gpio-export,name = "usb-vbus";
+			gpio-export,output = <1>;
+			gpios = <&gpio 7 GPIO_ACTIVE_HIGH>;
+		};
 	};
 };
 
@@ -123,7 +121,6 @@
 
 &usb0 {
 	status = "okay";
-	vbus-supply = <&usb_vbus>;
 };
 
 &usb_phy0 {
