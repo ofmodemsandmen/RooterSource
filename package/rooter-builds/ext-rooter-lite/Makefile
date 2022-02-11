@@ -26,7 +26,7 @@ define Package/ext-rooter-lite
 		+openvpn-easy-rsa +openvpn-openssl \
 		+ext-extra +luci-app-hotspot +luci-app-wol \
 		+usbmuxd +libusbmuxd-utils +libimobiledevice-utils +kmod-usb-net-ipheth \
-		+nano +picocom +wpad +wget +qfirehose +luci-app-vpnbypasss 
+		+nano +picocom +wpad +wget +qfirehose +luci-app-vpnbypass
   TITLE:=ROOter support w/o MWan3 for 16meg and larger routers w/o MWan3
   PKGARCH:=all
 endef
