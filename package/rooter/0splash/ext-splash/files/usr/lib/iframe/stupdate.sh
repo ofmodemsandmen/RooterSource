@@ -191,7 +191,7 @@ if [ $splash = "1" ]; then
 	button="<div class='rooterPageContentBut'><div class="" id=\"rooterItems\"><a href='cgi-bin/luci'><div class=\"rooterItem\" id=\"rooterItem1\"><div class=\"rooterItemTitle\"><i class='icon icon-cog'></i> Click for Router Login</div><div class=\"rooterItemTitle\">to the Web GUI.</div></div></a></div></div>"
 	sed -i -e "s!#BUTTON#!$button!g" $STEMP
 	sed -i -e "s!#LUCIS#!luci-static/!g" $STEMP
-	titlebar="<div class='rooterPageHead'><a  href='http://www.ofmodemsandmen.com'><div class=\"rooterHeadTitle\"> #TITLE#</div></a></div>"
+	titlebar="<div class='rooterPageHead'><a  href='http://www.4gaccess.com'><div class=\"rooterHeadTitle\"> #TITLE#</div></a></div>"
 	sed -i -e "s!#TITLEBAR#!$titlebar!g" $STEMP
 	title=$(uci -q get iframe.iframe.splashtitle)
 	sed -i -e "s!#TITLE#!$title!g" $STEMP
@@ -233,6 +233,8 @@ if [ $splash = "1" ]; then
 
 	level2txt "$modem" "single"
 	sed -i -e "s!#MODEM#!$namev!g" $STEMP
+	level2txt "$cops" "single"
+	sed -i -e "s!#PROVIDER#!$namev!g" $STEMP
 	level2txt "$proto" "single"
 	sed -i -e "s!#PROTO#!$namev!g" $STEMP
 	level2txt "$port" "single"
@@ -284,6 +286,8 @@ if [ $splash = "1" ]; then
 
 		level2txt "$modem" "single"
 		sed -i -e "s!#MODEM#!$namev!g" $STEMP2
+		level2txt "$cops" "single"
+		sed -i -e "s!#MODEMN#!$namev!g" $STEMP2
 		level2txt "$proto" "single"
 		sed -i -e "s!#PROTO#!$namev!g" $STEMP2
 		level2txt "$port" "single"

@@ -22,7 +22,7 @@
     window.onload = startInterval;
     function startInterval()
     {
-        setInterval("startTime();",5000);
+        setInterval("startTime();",1000);
 		setInterval("bandTime();",600000);
     }
     
@@ -40,9 +40,7 @@
 <body id='rooterSplashStatus' class='rooterSplash' >
 	#TITLEBAR#
 	#BUTTON#
-	<div class='rooterPageContent' id='blank"></div>
 	<div class='rooterPageContent' id="modem">
-
 		<h2><i class="icon icon-signal"></i> Modem 1 <span class="msCell" id='msCell_conntype'><span></span></span></h2>
 		<div class='modemStatusRow modemStatusRow1'>
 				<div class='msCell' id='msCell_per'>
@@ -69,7 +67,7 @@
 					<div class='msTitle'>SINR (dB)</div>
 					<span>#SINR#</span>
 				</div>
-			</div>
+		</div>
 			
 		<div>
 			<h3><i class="icon icon-podcast"></i> Network <span class="msCell" id='msCell_cops'><span></span></span></h3>
@@ -117,6 +115,10 @@
 				<div class='msCell' id='msCell_modem'>
 					<div class='msTitle'>Modem</div>
 					<span>#MODEM#</span>
+				</div>
+				<div class='msCell' id='msCell_cops'>
+					<div class='msTitle'>Provider</div>
+					<span>#PROVIDER#</span>
 				</div>
 				<div class='msCell' id='msCell_proto'>
 					<div class='msTitle'>Protocol</div>
