@@ -291,5 +291,5 @@ chmod 644 /etc/dropbear/authorized_keys 2>/dev/null
 
 if [ ! -z $tone ]; then
 	[ -e /etc/newstyle ] || touch /etc/newstyle
-	reboot -f
+	#reboot -f
 fi
