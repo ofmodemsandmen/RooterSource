@@ -10,7 +10,7 @@ namesper="Perfect,Excellent,Good,Medium,Low,Bad,Dead"
 levelsrssi="113,119,100,90,70,0"
 namesrssi="None,Bad,Poor,Medium,High"
 levelsrscp="140,136,112,100,90,70,50,0"
-namesrscp="None,None (3G) : Poor (4G),Weak (3G) : Medium (4G),Poor (3G) : Good (4G),Medium (3G) : High (4G),High (3G) :High (4G)"
+namesrscp='None,None (3G) : Poor (4G),Weak (3G) : Medium (4G),Poor (3G) : Good (4G),Medium (3G) : High (4G),High (3G) :High (4G)'
 
 level2txt() {
 	tmp="$1"
@@ -24,7 +24,7 @@ level2txt() {
 	if [ $key = "per" ]; then
 		tmp=$(echo "$tmp" | sed -e "s/%//g")
 		level=$levelsper
-		name=$namesper
+		namev=$namesper
 	fi
 	if [ $key = "rssi" ]; then
 		front="-"
@@ -32,15 +32,16 @@ level2txt() {
 		tmp=$(echo "$tmp" | sed -e "s/dBm//g")
 		tmp1="$tmp"" "
 		level=$levelsrssi
-		name=$namesrssi
+		namev=$namesrssi
 	fi
 	if [ $key = "rscp" ]; then
 		front="-"
+		tmp=$(printf %.0f "$tmp")
 		tmp=$(echo "$tmp" | sed -e "s/-//g")
 		tmp=$(echo "$tmp" | sed -e "s/dBm//g")
 		tmp1="$tmp"" "
 		level=$levelsrscp
-		name=$namesrscp
+		namev=$namesrscp
 	fi
 	
 	if [ $key = "single" ]; then
@@ -58,9 +59,11 @@ level2txt() {
 		return
 	fi
 	
+	namez=$namev
 	cindex=1
 	nindex=0
 	namev="-"
+
 	while [ true ]
 	do
 		levelv=$(echo "$level" | cut -d, -f$cindex)
@@ -69,7 +72,7 @@ level2txt() {
 			break
 		fi
 		if [ "$tmp" -ge "$levelv" ]; then
-			namev=$(echo "$name" | cut -d, -f$nindex)
+			namev=$(echo "$namez" | cut -d, -f$nindex)
 			break
 		fi
 		cindex=$((${cindex}+1))
