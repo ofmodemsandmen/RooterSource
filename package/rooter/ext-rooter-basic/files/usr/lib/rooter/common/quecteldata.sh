@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/sh
 
 # /usr/lib/rooter/common/quecteldata.sh
 
@@ -69,7 +69,7 @@ NR_NSA=$(echo $OX | grep -o "+QENG:[ ]\?\"NR5G-NSA\",")
 NR_SA=$(echo $OX | grep -o "+QENG: \"SERVINGCELL\",[^,]\+,\"NR5G-SA\",\"[DFT]\{3\}\",")
 if [ -n "$NR_NSA" ]; then
 	QENG=",,"$(echo $OX" " | grep -o "+QENG: \"LTE\".\+\"NR5G-NSA\"," | tr " " ",")
-	QENG5=$(echo $OX | grep -o "+QENG:[ ]\?\"NR5G-NSA\",[0-9]\{3\},[0-9]\{2,3\},[0-9]\{1,5\},-[0-9]\{2,5\},[-0-9]\{1,3\},-[0-9]\{2,3\},[0-9]\{6,7\},[0-9]\{1,3\}")
+	QENG5=$(echo $OX | grep -o "+QENG:[ ]\?\"NR5G-NSA\",[0-9]\{3\},[0-9]\{2,3\},[0-9]\{1,5\},-[0-9]\{2,5\},[-0-9]\{1,3\},-[0-9]\{2,3\},[0-9]\{6,7\},[0-9]\{1,3\}.\{1,6\}")
 	if [ -z "$QENG5" ]; then
 		QENG5=$(echo $OX | grep -o "+QENG:[ ]\?\"NR5G-NSA\",[0-9]\{3\},[0-9]\{2,3\},[0-9]\{1,5\},-[0-9]\{2,5\},[-0-9]\{1,3\},-[0-9]\{2,3\}")
 		if [ -n "$QENG5" ]; then
@@ -158,8 +158,13 @@ case $RAT in
 				PCI="$PCI, "$(echo $QENG5 | cut -d, -f4)
 				SCHV=$(echo $QENG5 | cut -d, -f8)
 				SLBV=$(echo $QENG5 | cut -d, -f9)
+				BW=$(echo $QENG5 | cut -d, -f10 | grep -o "[0-9]\{1,3\}")
 				if [ -n "$SLBV" ]; then
 					LBAND=$LBAND"<br />n"$SLBV
+					if [ -n "$BW" ]; then
+						nr_bw
+						LBAND=$LBAND" (Bandwidth $BW MHz)"
+					fi
 					CHANNEL=$CHANNEL", "$SCHV
 				else
 					LBAND=$LBAND"<br />nxx (unknown NR5G band)"
