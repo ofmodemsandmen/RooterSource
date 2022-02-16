@@ -61,7 +61,7 @@ if [ $logtype = "2" ]; then
 	mv $STEMP $IFSTATUS
 fi
 
-if [ $logtype = "3" ]; then
+if [ $logtype = "4" ]; then
 	STEMP="/tmp/www/itemp.html"
 	STATUS="/usr/lib/iframe/speed.html"
 	IFSTATUS="/tmp/www/display.html"
@@ -69,5 +69,25 @@ if [ $logtype = "3" ]; then
 	rm -f $STEMP
 	cp $STATUS $STEMP
 	
+	mv $STEMP $IFSTATUS
+fi
+
+if [ $logtype = "3" ]; then
+	STEMP="/tmp/www/itemp.html"
+	STATUS="/usr/lib/iframe/zerotier.html"
+	IFSTATUS="/tmp/www/display.html"
+	
+	rm -f $STEMP
+	cp $STATUS $STEMP
+	
+	ID=$(uci -q get zerotier.zerotier.secret)
+	if [ -z $ID ]; then
+		ID="xxxxxxxxxx"
+	else
+		ID=${ID:0:10}
+	fi
+	
+	sed -i -e "s!#ID#!$ID!g" $STEMP
+		
 	mv $STEMP $IFSTATUS
 fi

@@ -397,7 +397,7 @@ hr {
 }
 
 .login-page .login-iframe {
-	height: 45vh;
+	height: 8vh;
 	position: absolute;
 	top: 52vh;
 	left: 0;
@@ -406,10 +406,10 @@ hr {
 	-webkit-box-pack: center;
 	justify-content: center;
 	align-items: flex-start;
-	min-height: 45vh;
+	min-height: 15vh;
 	z-index: 2;
-	width: 24vw;
-	margin-left: 20vw;
+	width: 18vw;
+	margin-left: 1vw;
 	background: transparent;
 }
 .login-page .login-iframe .login-iform {
@@ -420,7 +420,7 @@ hr {
 	position: absolute;
 	top: 0px;
 	width: 100%;
-	min-height: 45vh;
+	min-height: 8vh;
 	max-width: 100%;
 }
 
