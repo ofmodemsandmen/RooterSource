@@ -210,7 +210,7 @@ if [ $splash = "1" ]; then
 	sed -i -e "s!#RSCP#!$namev!g" $STEMP
 	level2txt "$ecio" "single" 1
 	sed -i -e "s!#RSRQ#!$namev!g" $STEMP
-	level2txt "$sinr" "single" 1
+	level2txt "$sinr" "single" 
 	sed -i -e "s!#SINR#!$namev!g" $STEMP
 
 	level2txt "$mode" "single"
