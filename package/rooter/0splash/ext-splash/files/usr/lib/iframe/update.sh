@@ -88,6 +88,8 @@ if [ $logtype = "3" ]; then
 	fi
 	
 	sed -i -e "s!#ID#!$ID!g" $STEMP
+	source /etc/openwrt_release
+	sed -i -e "s!#VER#!$DISTRIB_DESCRIPTION!g" $STEMP
 		
 	mv $STEMP $IFSTATUS
 fi
