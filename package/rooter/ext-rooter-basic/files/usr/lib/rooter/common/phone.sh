@@ -18,6 +18,7 @@ log "Change Modem $CURRMODEM SIM phone number to $PHONE, name to $NAME"
 INTER=${PHONE:0:1}
 if [ $INTER = "+" ]; then
 	TON="145"
+	PHONE=${PHONE:1}
 else
 	TON="129"
 fi
@@ -33,9 +34,15 @@ if [ "$ON" = "\"ON\"" ]; then
 	ATCMDD="AT+CNUM"
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	OX=$($ROOTER/common/processat.sh "$OX")
-	M2=$(echo "$OX" | grep -o "+CNUM:[^,]\+,[^,]\+,")
-	CNUM=$(echo "$M2" | cut -d\" -f4)
-	CNUMx=$(echo "$M2" | cut -d\" -f2)
+	M2=$(echo "$OX" | grep -o "+CNUM:[^,]*,[^,]*,[0-9]\{3\}")","
+	M2=${M2:6}
+	CNUMx=$(echo "$M2" | cut -d, -f1 | cut -d\" -f2)
+	CNUMx=$(echo $CNUMx)
+	CNUM=$(echo "$M2" | cut -d, -f2 | cut -d\" -f2)
+	CNUMtype=$(echo "$M2" | cut -d, -f3)
+	if [ "${CNUM:0:1}" != "+" -a "$CNUMtype" == "145" ]; then
+		CNUM="+"$CNUM
+	fi
 	if [ -z "$CNUM" ]; then
 		CNUM="*"
 	fi

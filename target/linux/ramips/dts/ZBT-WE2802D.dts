@@ -60,34 +60,6 @@
 			linux,default-trigger = "timer";
 		};
 	};
-
-	gpio_export {
-		compatible = "gpio-export";
-
-		gpio0 {
-			gpio-export,name = "gpio0";
-			gpio-export,output = <0>;
-			gpios = <&gpio0 0 GPIO_ACTIVE_HIGH>;
-		};
-
-		gpio2 {
-			gpio-export,name = "gpio2";
-			gpio-export,output = <0>;
-			gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
-		};
-
-		gpio3 {
-			gpio-export,name = "gpio3";
-			gpio-export,output = <0>;
-			gpios = <&gpio0 3 GPIO_ACTIVE_HIGH>;
-		};
-
-		rs485 {
-			gpio-export,name = "rs485";
-			gpio-export,output = <0>;
-			gpios = <&gpio1 8 GPIO_ACTIVE_HIGH>;
-		};
-	};
 };
 
 &spi0 {

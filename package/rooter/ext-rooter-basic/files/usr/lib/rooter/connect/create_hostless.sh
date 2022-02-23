@@ -121,7 +121,7 @@ get_tty_fix() {
 get_ip() {
 	ATCMDD="AT+CGPIAF=1,1,1,0;+CGPADDR"
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	OX=$(echo "$OX" | grep "^+CGPADDR: 1," | cut -d'"' -f2)
+	OX=$(echo "$OX" | grep "^+CGPADDR: $CID," | cut -d'"' -f2)
 	ip4=$(echo $OX | cut -d, -f1 | grep "\.")
 	ip6=$(echo $OX | cut -d, -f2 | grep ":")
 	log "IP address(es) obtained: $ip4 $ip6"
@@ -254,12 +254,6 @@ if [ $SP -gt 0 ]; then
 	fi
 
 	if [ $SP = 5 ]; then
-		ATCMDD="AT+QINDCFG=\"smsincoming\""
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		if `echo $OX | grep -o ",1" >/dev/null 2>&1`; then
-			ATCMDD="AT+QINDCFG=\"smsincoming\",0,1"
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		fi
 		clck=$(uci -q get custom.bandlock.cenable)
 		if [ $clck = "1" ]; then
 			ear=$(uci -q get custom.bandlock.earfcn)
@@ -333,6 +327,14 @@ uci set modem.modem$CURRMODEM.inter=$INTER
 uci commit modem
 log "Modem $CURRMODEM is using WAN$INTER"
 
+if [ -s /tmp/wan$INTER.cid ]; then
+	CID=$(cat /tmp/wan$INTER.cid 2>/dev/null)
+	CID=$(echo $CID | grep -o "[[:digit:]]")
+	[ -n "$CID" ] && log "User selected PDP Context $CID"
+fi
+
+[ -z "$CID" ] && CID=1
+
 log "Checking Network Interface"
 ifname="$(if [ "$MATCH" ]; then for a in /sys/class/net/*; do readlink $a; done | grep "$MATCH"; fi | xargs -r basename)"
 
@@ -397,28 +399,35 @@ if [ $SP = 5 ]; then
 	get_connect
 	if [ -n "$NAPN" ]; then
 		$ROOTER/common/lockchk.sh $CURRMODEM
-		IPVAR="IP"
-		ATCMDD="AT+CGDCONT=?"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		[ "$PDPT" = "0" ] && PDPT=""
-		for PDP in "$PDPT" IPV4V6; do
-			if [[ "$(echo $OX | grep -o "$PDP")" ]]; then
-				IPVAR="$PDP"
-				break
-			fi
-		done
-		uci set modem.modem$CURRMODEM.pdptype=$IPVAR
-		uci commit modem
-		log "PDP Type selected in the Connection Profile: \"$PDPT\", active: \"$IPVAR\""
-		ATCMDD="AT+CGDCONT?"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		CGDCONT=$(echo $OX | grep -o "1,[^,]\+,[^,]\+,[^,]\+,0,0,1")
-		IPCG=$(echo $CGDCONT | cut -d, -f4)
-		if [ "$CGDCONT" != "1,\"$IPVAR\",\"$NAPN\",$IPCG,0,0,1" ]; then
-			ATCMDD="AT+CGDCONT=1,\"$IPVAR\",\"$NAPN\",,0,0,1"
+		if [ idP = 6026 ]; then
+			IPN=1
+			case "$PDPT" in
+			"IPV6" )
+				IPN=2
+				;;
+			"IPV4V6" )
+				IPN=3
+				;;
+			esac
+			ATCMDD="AT+QICSGP=$CID,$IPN,\"$NAPN\""
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=0")
-			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")
+			ATCMDD="AT+QNETDEVCTL=2,$CID,1"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		else
+			IPVAR="IP"
+			ATCMDD="AT+CGDCONT=?"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			if `echo ${OX} | grep "IPV4V6" 1>/dev/null 2>&1`; then
+				IPVAR="IPV4V6"
+			fi
+			ATCMDD="AT+CGDCONT?"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			CGDCONT=$(echo $OX | grep -o "$CID,[^,]\+,[^,]\+,[^,]\+,0,0,1")
+			IPCG=$(echo $CGDCONT | cut -d, -f4)
+			if [ "$CGDCONT" != "$CID,\"$IPVAR\",\"$NAPN\",$IPCG,0,0,1" ]; then
+				ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\",,0,0,1"
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			fi
 		fi
 	fi
 	ATCMDD="AT+CNMI?"
@@ -426,8 +435,12 @@ if [ $SP = 5 ]; then
 	if `echo $OX | grep -o "+CNMI: [0-3],2," >/dev/null 2>&1`; then
 		ATCMDD="AT+CNMI=0,0,0,0,0"
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=0")
-		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")
+	fi
+	ATCMDD="AT+QINDCFG=\"smsincoming\""
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	if `echo $OX | grep -o ",1" >/dev/null 2>&1`; then
+		ATCMDD="AT+QINDCFG=\"smsincoming\",0,1"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	fi
 	ATCMDD="AT+QINDCFG=\"all\""
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
@@ -474,7 +487,7 @@ if [ $SP -eq 7 ]; then
 
 	if [ -n "$NAPN" ]; then
 		IPVAR="$PDPT"
-		ATCMDD="AT+CGDCONT=1,\"$IPVAR\",\"$NAPN\",,0,0,1"
+		ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\",,0,0,1"
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	fi
 
@@ -548,20 +561,6 @@ uci set modem.modem$CURRMODEM.connected=1
 uci commit modem
 
 if [ $SP -gt 0 ]; then
-	if [ $(uci -q get modem.modeminfo$CURRMODEM.at) -eq "1" ]; then
-		ATCMDD=$(uci -q get modem.modeminfo$CURRMODEM.atc)
-		if [ ! -z "$ATCMDD" ]; then
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			OX=$($ROOTER/common/processat.sh "$OX")
-			ERROR="ERROR"
-			if `echo $OX | grep "$ERROR" 1>/dev/null 2>&1`
-			then
-				log "Error sending custom AT command: $ATCMDD with result: $OX"
-			else
-				log "Sent custom AT command: $ATCMDD with result: $OX"
-			fi
-		fi
-	fi
 	if [ -e $ROOTER/connect/postconnect.sh ]; then
 		$ROOTER/connect/postconnect.sh $CURRMODEM
 	fi

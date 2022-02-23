@@ -1059,85 +1059,91 @@ while [ 1 -lt 6 ]; do
 		if [ "$SIMFAIL" = 1 -o "$REGOK" != 1 ]; then
 			BRK=1
 			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
-		elif [[ $(echo "$OX" | grep -q "$ERROR") ]]; then
+		elif `echo "$OX" | grep -q "$ERROR"`; then
 			BRK=1
 			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
 		else
 			ATCMDD="AT+CGCONTRDP=$CID"
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			OX=$(echo "${OX//[\" ]/}")
-			ip=$(echo $OX | cut -d, -f4 | grep -o "[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}")
-			ip=$(echo $ip | cut -d' ' -f1)
-			DNS1=$(echo $OX | cut -d, -f6)
-			DNS2=$(echo $OX | cut -d, -f7)
-			OX6=$(echo $OX | grep -o "+CGCONTRDP:$CID,[0-9]\+,[^,]\+,[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}.\+")
-			ip6=$(echo $OX6 | grep -o "[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}")
-			ip6=$(echo $ip6 | cut -d' ' -f1)
-			DNS3=$(echo "$OX6" | cut -d, -f6)
-			DNS4=$(echo "$OX6" | cut -d, -f7)
-
-			log "IP address(es): $ip $ip6"
-			log "DNS servers 1&2: $DNS1 $DNS2"
-			log "DNS servers 3&4: $DNS3 $DNS4"
-
-			if [[ $(echo "$ip6" | grep -o "^[23]") ]]; then
-				# Global unicast IP acquired
-				v6cap=1
-			elif [[ $(echo "$ip6" | grep -o "^[0-9a-fA-F]\{1,4\}:") ]]; then
-				# non-routable address
-				v6cap=2
-			else
-				v6cap=0
-			fi
-
-			if [ -n "$ip6" -a -z "$ip" ]; then
-				log "Running IPv6-only mode"
-				nat46=1
-			fi
-
-			ATCMDD="AT+XDATACHANNEL=1,1,\"/USBCDC/2\",\"/USBHS/NCM/0\",2,$CID"
-			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			RDNS=$(uci -q get network.wan$INTER.dns)
-
-			log "Applying IP settings to wan$INTER"
-			uci delete network.wan$INTER
-			uci set network.wan$INTER=interface
-			uci set network.wan$INTER.proto=static
-			uci set network.wan$INTER.${ifname1}=$ifname
-			uci set network.wan$INTER.metric=$INTER"0"
-			if [ -n "$ip" ]; then
-				uci set network.wan$INTER.ipaddr=$ip/32
-				uci set network.wan$INTER.gateway='0.0.0.0'
-			fi
-			if [ "$v6cap" -gt 0 ]; then
-				uci set network.wan$INTER.ip6addr=$ip6/128
-			fi
-
-			if [ -n "$RDNS" ]; then
-				uci set network.wan$INTER.dns="$RDNS"
-			else
-				set_dns2
-			fi
-
-			uci commit network
-			uci set modem.modem$CURRMODEM.interface=$ifname
-			uci commit modem
-			ip link set dev $ifname arp off
-			ATCMDD="AT+CGDATA=\"M-RAW_IP\",$CID"
-			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "raw-ip.gcom" "$CURRMODEM" "$ATCMDD")
-			RESP=$(echo $OX | sed "s/AT+CGDATA=\"M-RAW_IP\",$CID //")
-			log "Final Modem $CURRMODEM result code is \"$RESP\""
-			if [ "$RESP" = "OK CONNECT" ]; then
-				ifup wan$INTER
-				if [ -e /sys/class/net/$ifname/cdc_ncm/tx_timer_usecs ]; then
-					echo "0" > /sys/class/net/$ifname/cdc_ncm/tx_timer_usecs
-				fi
-				[ $v6cap = 2 ] && addv6
-				sleep 2
-				BRK=0
-			else
+			if `echo "$OX" | grep -q "$ERROR"`; then
+				log "Failed to get IP information for context $CID"
 				BRK=1
-				$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
+				$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to get IP information : Retrying"
+			else
+				OX=$(echo "${OX//[\" ]/}")
+				ip=$(echo $OX | cut -d, -f4 | grep -o "[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}")
+				ip=$(echo $ip | cut -d' ' -f1)
+				DNS1=$(echo $OX | cut -d, -f6)
+				DNS2=$(echo $OX | cut -d, -f7)
+				OX6=$(echo $OX | grep -o "+CGCONTRDP:$CID,[0-9]\+,[^,]\+,[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}.\+")
+				ip6=$(echo $OX6 | grep -o "[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}:[0-9A-F]\{1,4\}")
+				ip6=$(echo $ip6 | cut -d' ' -f1)
+				DNS3=$(echo "$OX6" | cut -d, -f6)
+				DNS4=$(echo "$OX6" | cut -d, -f7)
+
+				log "IP address(es): $ip $ip6"
+				log "DNS servers 1&2: $DNS1 $DNS2"
+				log "DNS servers 3&4: $DNS3 $DNS4"
+
+				if [[ $(echo "$ip6" | grep -o "^[23]") ]]; then
+					# Global unicast IP acquired
+					v6cap=1
+				elif [[ $(echo "$ip6" | grep -o "^[0-9a-fA-F]\{1,4\}:") ]]; then
+					# non-routable address
+					v6cap=2
+				else
+					v6cap=0
+				fi
+
+				if [ -n "$ip6" -a -z "$ip" ]; then
+					log "Running IPv6-only mode"
+					nat46=1
+				fi
+
+				ATCMDD="AT+XDATACHANNEL=1,1,\"/USBCDC/2\",\"/USBHS/NCM/0\",2,$CID"
+				OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				RDNS=$(uci -q get network.wan$INTER.dns)
+
+				log "Applying IP settings to wan$INTER"
+				uci delete network.wan$INTER
+				uci set network.wan$INTER=interface
+				uci set network.wan$INTER.proto=static
+				uci set network.wan$INTER.${ifname1}=$ifname
+				uci set network.wan$INTER.metric=$INTER"0"
+				if [ -n "$ip" ]; then
+					uci set network.wan$INTER.ipaddr=$ip/32
+					uci set network.wan$INTER.gateway='0.0.0.0'
+				fi
+				if [ "$v6cap" -gt 0 ]; then
+					uci set network.wan$INTER.ip6addr=$ip6/128
+				fi
+
+				if [ -n "$RDNS" ]; then
+					uci set network.wan$INTER.dns="$RDNS"
+				else
+					set_dns2
+				fi
+
+				uci commit network
+				uci set modem.modem$CURRMODEM.interface=$ifname
+				uci commit modem
+				ip link set dev $ifname arp off
+				ATCMDD="AT+CGDATA=\"M-RAW_IP\",$CID"
+				OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "raw-ip.gcom" "$CURRMODEM" "$ATCMDD")
+				RESP=$(echo $OX | sed "s/AT+CGDATA=\"M-RAW_IP\",$CID //")
+				log "Final Modem $CURRMODEM result code is \"$RESP\""
+				if [ "$RESP" = "OK CONNECT" ]; then
+					ifup wan$INTER
+					if [ -e /sys/class/net/$ifname/cdc_ncm/tx_timer_usecs ]; then
+						echo "0" > /sys/class/net/$ifname/cdc_ncm/tx_timer_usecs
+					fi
+					[ $v6cap = 2 ] && addv6
+					sleep 2
+					BRK=0
+				else
+					BRK=1
+					$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
+				fi
 			fi
 		fi
 		;;
