@@ -6,7 +6,7 @@ log() {
 }
 
 checktime() {
-	SHOUR=$(uci -q get custom.bwallocate.time)
+	SHOUR=$(uci -q get custom.texting.time)
 	EHOUR=`expr $SHOUR + 1`
 	if [ $EHOUR -gt 95 ]; then
 		EHOUR=0
@@ -59,14 +59,55 @@ checktime() {
 	echo $flag
 }
 
+getbw() {
+	alloc=$(uci -q get custom.bwallocate.allocate)"000000"
+	if [ -e /tmp/bwdata ]; then
+		while IFS= read -r line; do
+			days=$line
+			if [ $days = '0' ]; then
+				used="0"
+				return
+			fi
+			read -r line
+			used=$line
+			return
+		done < /tmp/bwdata
+	else
+		used="0"
+	fi
+}
+
+checkamt() {
+	istime=$(checktime)
+	if [ $istime = '1' ]; then
+		prev=$(uci -q get custom.texting.used)
+		incr=$(uci -q get custom.texting.increment)
+		getbw
+		let "TMP = $prev + $incr"
+	fi
+	echo "0"
+}
+
 delay=900
 while true
 do
 	EN=$(uci -q get custom.bwallocate.enabled)
 	if [ $EN = "1" ]; then
-		running=$(checktime)
+		MT=$(uci -q get custom.texting.method)
+		if [ $MT = '0' ]; then
+			days=$(uci -q get custom.texting.days)
+			daysdate=$( date +%d )
+			remain=$((daysdate % days))
+			if [ $remain -eq 0 ]; then
+				running=$(checktime)
+			else
+				running="0"
+			fi
+		else
+			running=$(checkamt)
+		fi
 		if [ $running = "1" ]; then
-			EN=$(uci -q get custom.bwallocate.text)
+			EN=$(uci -q get custom.texting.text)
 			if [ $EN = "1" ]; then
 				/usr/lib/bwmon/dotext.sh
 				sleep $delay

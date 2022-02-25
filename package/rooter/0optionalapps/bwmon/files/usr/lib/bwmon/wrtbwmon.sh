@@ -429,6 +429,8 @@ checkTime()
 			monthlyUsageDB="$dataPath$cYear-$cMonth-mac_data.js"
 			monthlyUsageBack="$backPath$cYear-$cMonth-mac_data.js"
 			touch $monthlyUsageDB
+			uci set custom.texting.used='0'
+			uci commit custom
 		fi
 		rm -f $dailyUsageDB
 		rm -f $dailyUsageBack

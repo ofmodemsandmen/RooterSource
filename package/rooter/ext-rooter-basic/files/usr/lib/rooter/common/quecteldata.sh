@@ -136,6 +136,7 @@ case $RAT in
 		RSRP=$(echo $QENG | cut -d, -f15 | grep -o "[0-9]\{1,3\}")
 		if [ -n "$RSRP" ]; then
 			RSCP="-"$RSRP
+			RSRPLTE=$RSCP
 		fi
 		RSRQ=$(echo $QENG | cut -d, -f16 | grep -o "[0-9]\{1,3\}")
 		if [ -n "$RSRQ" ]; then
@@ -174,7 +175,7 @@ case $RAT in
 				SINRR=$(echo $QENG5 | cut -d, -f6 | grep -o "[0-9]\{1,3\}")
 				if [ -n "$SINRR" ]; then
 					if [ $SINRR -le 30 ]; then
-						SINR=$SINR" dB<br />"$((($(echo $SINRR) * 2) -20))" dB"
+						SINR=$SINR"<br />"$((($(echo $SINRR) * 2) -20))" dB"
 					fi
 				fi
 				ECIO=$ECIO" dB<br />"$(echo $QENG5 | cut -d, -f7)
@@ -250,22 +251,43 @@ case $RAT in
 		fi
 		;;
 esac
-
-QRSRP=$(echo "$OX" | grep -o "+QRSRP:[^,]\+,-[0-9]\{1,3\},-[0-9]\{1,3\},-[0-9]\{1,3\}")
+QRSRP=$(echo "$OX" | grep -o "+QRSRP:[^,]\+,-[0-9]\{1,5\},-[0-9]\{1,5\},-[0-9]\{1,5\}[^ ]*")
 if [ -n "$QRSRP" ] && [ "$RAT" != "WCDMA" ]; then
-	RSCP=$(echo $QRSRP | cut -d, -f1 | grep -o "[-0-9]\+")
-	RSRP2=$(echo $QRSRP | cut -d, -f2)
-	RSRP3=$(echo $QRSRP | cut -d, -f3)
-	RSRP4=$(echo $QRSRP | cut -d, -f4)
-	if [ "$RSRP2$RSRP3$RSRP4" != "-44-44-44" ]; then
-		if [ "$RSRP3$RSRP4" == "-140-140" -o "$RSRP3$RSRP4" == "-44-44" ]; then
+	QRSRP1=$(echo $QRSRP | cut -d, -f1 | grep -o "[-0-9]\+")
+	QRSRP2=$(echo $QRSRP | cut -d, -f2)
+	QRSRP3=$(echo $QRSRP | cut -d, -f3)
+	QRSRP4=$(echo $QRSRP | cut -d, -f4)
+	QRSRPtype=$(echo $QRSRP | cut -d, -f5)
+	if [ "$QRSRPtype" == "NR5G" ]; then
+		if [ -n "$NR_SA" ]; then
+			RSCP=$QRSRP1
+			if [ -n "$QRPRP2" -a "$QRSRP2" != "-32768" ]; then
+				RSCP1="RxD "$QRSRP2
+			fi
+			if [ -n "$QRSRP3" -a "$QRSRP3" != "-32768" ]; then
+				RSCP=$RSCP" dBm<br />"$QRSRP3
+			fi
+			if [ -n "$QRSRP4" -a "$QRSRP4" != "-32768" ]; then
+				RSCP1="RxD "$QRSRP4
+			fi
+		else
+			RSCP=$RSRPLTE
+			if [ -n "$QRSRP1" -a "$QRSRP1" != "-32768" ]; then
+				RSCP=$RSCP" dBm<br />"$QRSRP1
+			fi
+			if [ -n "$QRSRP2" -a "$QRSRP2" != "-32768" ]; then
+				RSCP1="RxD "$QRSRP2
+			fi
+		fi
+	elif [ "$QRSRP2$QRSRP3$QRSRP4" != "-44-44-44" -a -z "$QENG5" ]; then
+		RSCP=$QRSRP1
+		if [ "$QRSRP3$QRSRP4" == "-140-140" -o "$QRSRP3$QRSRP4" == "-44-44" ]; then
 			RSCP1="RxD "$(echo $QRSRP | cut -d, -f2)
 		else
-			RSCP=$RSCP" dBm (RxD "$RSRP2" dBm)<br />"$RSRP3
-			RSCP1="RxD "$RSRP4
+			RSCP=$RSCP" dBm (RxD "$QRSRP2" dBm)<br />"$QRSRP3
+			RSCP1="RxD "$QRSRP4
 		fi
 	fi
-
 fi
 
 QNSM=$(echo "$QNSM" | grep -o "[0-9]")

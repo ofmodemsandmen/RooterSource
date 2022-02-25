@@ -6,7 +6,7 @@ m.on_after_save = function(self)
 	luci.sys.call("/usr/lib/bwmon/allocate.sh 0 &")
 end
 
-s = m:section(TypedSection, "bwallocate", " ")
+s = m:section(TypedSection, "bwallocate", "Allocation Settings")
 s.anonymous = true
 s.addremove = false
 
@@ -70,11 +70,22 @@ up.datatype = "and(uinteger,min(1),max(999))"
 up:depends("action", "1")
 up.default = "2"
 
+s = m:section(TypedSection, "texting", "Texting Settings")
+s.anonymous = true
+s.addremove = false
+
 aact = s:option(ListValue, "text", translate("Text Usage : "), translate("Text usage to a phone"))
 aact.rmempty = true
 aact:value("0", "No")
 aact:value("1", "Yes")
 aact.default = "0"
+
+
+pph = s:option(Value, "ident", "Identifier :");
+pph.optional=false; 
+pph.rmempty = true;
+pph:depends("text", "1")
+pph.default = "xxx"
 
 ph = s:option(Value, "phone", "Phone Number :");
 ph.optional=false; 
@@ -82,6 +93,13 @@ ph.rmempty = true;
 ph.datatype = "phonedigit"
 ph:depends("text", "1")
 ph.default = "0"
+
+ct = s:option(ListValue, "method", translate("Method : "), translate("Method used to determine when to text"))
+ct.rmempty = true
+ct:value("0", "By Specified Time")
+ct:value("1", "By Amount Used")
+ct.default = "0"
+ct:depends("text", "1")
 
 sdhour = s:option(ListValue, "time", translate("Texting Time :"), translate("Time to send text"))
 sdhour.rmempty = true
@@ -184,10 +202,22 @@ sdhour:value("95", "11:45 PM")
 sdhour:depends("text", "1")
 sdhour.default = "48"
 
-pph = s:option(Value, "ident", "Identifier :");
-pph.optional=false; 
-pph.rmempty = true;
-pph:depends("text", "1")
-pph.default = "xxx"
+xct = s:option(ListValue, "days", translate("Interval : "), translate("Number of days between texts"))
+xct.rmempty = true
+xct:value("1", "Every Day")
+xct:value("2", "Every 2 Days")
+xct:value("5", "Every 5 Days")
+xct:value("10", "Every 10 Days")
+xct:value("15", "Every 15 Days")
+xct.default = "5"
+xct:depends("method", "0")
+
+xxct = s:option(ListValue, "increment", translate("Increment : "), translate("Amount Used between texts"))
+xxct.rmempty = true
+xxct:value("50", "Every 50 GB")
+xxct:value("75", "Every 75 GB")
+xxct:value("100", "Every 100 GB")
+xxct.default = "50"
+xxct:depends("method", "1")
 
 return m
