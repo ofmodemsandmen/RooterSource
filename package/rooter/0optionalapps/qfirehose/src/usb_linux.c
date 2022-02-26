@@ -29,6 +29,7 @@
 #include <poll.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
+#include <sys/utsname.h>
 #include <netinet/in.h>
 #include <linux/un.h>
 #include <linux/usbdevice_fs.h>
@@ -40,6 +41,7 @@
 #endif
 #include <sys/time.h>
 #include <stdarg.h>
+#include <sys/sysmacros.h>
 #include "usb_linux.h"
 
 int edl_pcie_mhifd = -1;
@@ -49,7 +51,7 @@ extern uint32_t      inet_addr(const char *);
 
 #define MAX_USBFS_BULK_IN_SIZE (4 * 1024)
 #define MAX_USBFS_BULK_OUT_SIZE (16 * 1024)
-#define EC20_MAX_INF 1
+#define EC20_MAX_INF 4
 #define MKDEV(__ma, __mi) (((__ma & 0xfff) << 8) | (__mi & 0xff) | ((__mi & 0xfff00) << 12))
 
 struct quectel_usb_device {
@@ -68,6 +70,7 @@ struct quectel_usb_device {
 
 static struct quectel_usb_device quectel_9x07;
 static int tcp_socket_fd = -1;
+static int usb_dm_interface = 0;
 
 static int strStartsWith(const char *line, const char *prefix)
 {
@@ -100,13 +103,14 @@ static int quectel_get_sysinfo_by_uevent(const char *uevent, MODULE_SYS_INFO *pS
 
         //dbg_time("%s\n", line);
         if (strStartsWith(line, "MAJOR=")) {
-            pSysInfo->MAJOR = atoi(&line[strlen("MAJOR=")]);
+            	pSysInfo->MAJOR = atoi(&line[strlen("MAJOR=")]);
         }
         else if (strStartsWith(line, "MINOR=")) {
-            pSysInfo->MINOR = atoi(&line[strlen("MINOR=")]);
+            	pSysInfo->MINOR = atoi(&line[strlen("MINOR=")]);
         }
         else if (strStartsWith(line, "DEVNAME=")) {
-            strncpy(pSysInfo->DEVNAME, &line[strlen("DEVNAME=")], sizeof(pSysInfo->DEVNAME));
+            if(pSysInfo)
+            	strncpy(pSysInfo->DEVNAME, &line[strlen("DEVNAME=")], sizeof(pSysInfo->DEVNAME));
         }
         else if (strStartsWith(line, "DEVTYPE=")) {
             strncpy(pSysInfo->DEVTYPE, &line[strlen("DEVTYPE=")], sizeof(pSysInfo->DEVTYPE));
@@ -134,12 +138,12 @@ int auto_find_quectel_modules(char *module_sys_path, unsigned size)
         return -1;
 
     while ((de = readdir(busdir))) {
-        static char uevent[MAX_PATH+9];
+        static char uevent[MAX_PATH];
         static MODULE_SYS_INFO sysinfo;
 
         if (!isdigit(de->d_name[0])) continue;
 
-        snprintf(uevent, sizeof(uevent), "%s/%s/uevent", base, de->d_name);
+        snprintf(uevent, sizeof(uevent), "%s/%.16s/uevent", base, de->d_name);
         if (!quectel_get_sysinfo_by_uevent(uevent, &sysinfo))
             continue;
 
@@ -152,7 +156,15 @@ int auto_find_quectel_modules(char *module_sys_path, unsigned size)
         if (sysinfo.DEVTYPE[0] == '\0' || strStartsWith(sysinfo.DEVTYPE, "usb_device") == 0)
             continue;
 
-        if (sysinfo.PRODUCT[0] == '\0' || (strStartsWith(sysinfo.PRODUCT, "2c7c/") == 0 && strStartsWith(sysinfo.PRODUCT, "5c6/9008") == 0)) {
+        if (sysinfo.PRODUCT[0] == '\0') {
+            continue;
+        }
+        
+        if (!(strStartsWith(sysinfo.PRODUCT, "2c7c/")
+            || strStartsWith(sysinfo.PRODUCT, "5c6/9008")
+            || strStartsWith(sysinfo.PRODUCT, "5c6/901f")
+            || strStartsWith(sysinfo.PRODUCT, "5c6/9091")
+            || strStartsWith(sysinfo.PRODUCT, "3763/3c93/318"))) {
             continue;
         }
 
@@ -177,7 +189,7 @@ void quectel_get_ttyport_by_syspath(const char *module_sys_path, char *module_po
 
     module_port_name[0] = '\0';
 
-    sprintf(infname, "%s%s", module_sys_path, ":1.0");
+    sprintf(infname, "%s:1.%d", module_sys_path, usb_dm_interface);
     infdir = opendir(infname);
     if (infdir == NULL)
         return;
@@ -188,7 +200,7 @@ void quectel_get_ttyport_by_syspath(const char *module_sys_path, char *module_po
             break;
         }
         else if (!strncmp(de->d_name, "tty", strlen("tty"))) {
-            sprintf(infname, "%s%s/tty", module_sys_path, ":1.0");
+            sprintf(infname, "%s:1.%d/tty", module_sys_path, usb_dm_interface);
             closedir(infdir);
             infdir = opendir(infname);
             if (infdir == NULL)
@@ -199,21 +211,63 @@ void quectel_get_ttyport_by_syspath(const char *module_sys_path, char *module_po
     if (infdir) closedir(infdir);
 }
 
+static void quectel_fixup_sysport(const char *module_port_name, char *sysport, unsigned size) {
+    char syspath[MAX_PATH+16];
+    const char *sys_base = "/sys/class/tty";
+    DIR *sys_dir = NULL;
+    struct dirent *dev = NULL;
+
+    sysport[0] = '\0';
+    sys_dir = opendir(sys_base);
+    if (!sys_dir) {
+        dbg_time("fail to opendir('%s'), errno: %d (%s)\n", sys_base, errno, strerror(errno));
+        return;
+    }
+
+    while (NULL != (dev = readdir(sys_dir)))
+    {
+        if (!strncasecmp("ttyUSB", dev->d_name, strlen("ttyUSB"))) {
+            MODULE_SYS_INFO sysinfo;
+
+            snprintf(syspath, sizeof(syspath), "%s/%.16s/uevent", sys_base, dev->d_name);
+            if (quectel_get_sysinfo_by_uevent(syspath, &sysinfo)) {
+                struct stat buf;
+                dev_t devt;
+
+                devt = makedev(sysinfo.MAJOR, sysinfo.MINOR);
+                if(!stat(module_port_name, &buf) && buf.st_rdev == devt) {
+                	snprintf(sysport, size, "/sys/class/tty/%.16s", dev->d_name);
+            		break;
+                }
+            }
+        }
+    }
+    closedir(sys_dir);
+}
+
+
 void quectel_get_syspath_name_by_ttyport(const char *module_port_name, char *module_sys_path, unsigned size) {
     char syspath[MAX_PATH];
     char sysport[64];
     int count;
     char *pchar = NULL;
+    char dm_tty[16];
 
+    snprintf(dm_tty, sizeof(dm_tty), ":1.%d/tty", usb_dm_interface);
     module_sys_path[0] = '\0';
 
     snprintf(sysport, sizeof(sysport), "/sys/class/tty/%s", &module_port_name[strlen("/dev/")]);
+    if(access(sysport, F_OK) && errno == ENOENT) {
+		quectel_fixup_sysport(module_port_name, sysport, sizeof(sysport));//query real name
+    }
+    if(access(sysport, F_OK) && errno == ENOENT)
+    	return;
     count = readlink(sysport, syspath, sizeof(syspath) - 1);
-    if (count < (int)strlen(":1.0/tty"))
+    if (count < (int)strlen(dm_tty))
         return;
 
 //ttyUSB0 -> ../../devices/soc0/soc/2100000.aips-bus/2184200.usb/ci_hdrc.1/usb1/1-1/1-1:1.0/ttyUSB0/tty/ttyUSB0
-    pchar = strstr(syspath, ":1.0/tty");
+    pchar = strstr(syspath, dm_tty);
     if (pchar == NULL)
         return;
 
@@ -285,12 +339,8 @@ static void quectel_get_usb_device_info(const char *module_sys_path, struct quec
         if (h->bLength == sizeof(struct usb_device_descriptor) && h->bDescriptorType == USB_DT_DEVICE) {
             struct usb_device_descriptor *device = (struct usb_device_descriptor *)h;
 
-            if (device->idVendor == 0x2c7c || (device->idVendor == 0x05c6 && device->idProduct == 0x9008)) {
-                udev->idVendor = device->idVendor;
-                udev->idProduct = device->idProduct;
-            } else {
-                break;
-            }
+            udev->idVendor = device->idVendor;
+            udev->idProduct = device->idProduct;
             dbg_time("P: %s idVendor=%04x idProduct=%04x\n", devname, device->idVendor, device->idProduct);
         }
         else if (h->bLength == sizeof(struct usb_config_descriptor) && h->bDescriptorType == USB_DT_CONFIG) {
@@ -334,13 +384,18 @@ static void quectel_get_usb_device_info(const char *module_sys_path, struct quec
         strcpy(udev->devname, devname);
         udev->desc = desc_fd;
     }
+
+    usb_dm_interface = 0;
+    if ((udev->bulk_ep_in[usb_dm_interface] == 0 && udev->bulk_ep_in[usb_dm_interface] == 0)
+        || (udev->idVendor == 0x2c7c && udev->idProduct == 0x0127))
+        usb_dm_interface = 3;
 }
 
 static int usbfs_bulk_write(struct quectel_usb_device *udev, const void *data, int len, int timeout_msec, int need_zlp) {
     struct usbdevfs_urb bulk;
     struct usbdevfs_urb *urb = &bulk;
     int n = -1;
-    int bInterfaceNumber = 0;
+    int bInterfaceNumber = usb_dm_interface;
 
     (void)timeout_msec;
     //if (urb->type == 0)
@@ -393,19 +448,19 @@ static int usbfs_bulk_write(struct quectel_usb_device *udev, const void *data, i
 
 static int poll_wait(int poll_fd, short events, int timeout_msec) {
     struct pollfd pollfds[] = {{poll_fd, events, 0}};
-    int ret = poll(pollfds, 1, timeout_msec);
+    int ret; 
+    
+    do {
+        ret = poll(pollfds, 1, timeout_msec);
+    } while(ret == -1 && errno == EINTR);
 
-    if (ret == 0) {//timeout
+    if (ret == 1 && (pollfds[0].revents & (events)))
+        return 0;
+    else if (ret == 0) {//timeout
         dbg_time("poll_wait events=%s msec=%d timeout\n",
             (events & POLLIN) ? "POLLIN" : "POLLOUT", timeout_msec);
         return ETIMEDOUT;
     }
-    else if (pollfds[0].revents & (POLLERR | POLLHUP | POLLNVAL))
-        return EIO;
-    else if (pollfds[0].revents & (events))
-        return 0;
-    else
-        return EIO;
 
     return EIO;
 }
@@ -413,7 +468,7 @@ static int poll_wait(int poll_fd, short events, int timeout_msec) {
 static int usbfs_bulk_read(struct quectel_usb_device *udev, void *pbuf, int len, int timeout) {
     struct usbdevfs_bulktransfer bulk;
     int n = -1;
-    int bInterfaceNumber = 0;
+    int bInterfaceNumber = usb_dm_interface;
 
     if (len < 512) {
         dbg_time("%s len=%d is too short\n", __func__, len);
@@ -475,7 +530,7 @@ static int qtcp_connect(const char *port_name, int *idVendor, int *idProduct, in
 
     //block read, untill usb2tcp tell me the usb device information
     memset(&tlv_usb, 0x00, sizeof(tlv_usb));
-    read(fd, &tlv_usb, sizeof(tlv_usb));
+    if (read(fd, &tlv_usb, sizeof(tlv_usb)) == -1) { };
     *idVendor = tlv_usb.idVendor;
     *idProduct = tlv_usb.idProduct;
     *interfaceNum = tlv_usb.interfaceNum;
@@ -603,6 +658,51 @@ void usbfs_detach_kernel_driver(int fd, int ifnum)
     }
 }
 
+#define KVERSION(j,n,p)	((j)*1000000 + (n)*1000 + (p))
+static struct utsname utsname;	/* for the kernel version */
+static int ql_get_kernel_version(void)  
+{
+    int osmaj, osmin, ospatch;
+    int kernel_version;
+
+    uname(&utsname);
+    osmaj = osmin = ospatch = 0;
+    sscanf(utsname.release, "%d.%d.%d", &osmaj, &osmin, &ospatch);
+    kernel_version = KVERSION(osmaj, osmin, ospatch);
+
+    return kernel_version;
+}
+
+static int detect_xhci_usb_zero_packet_bug_not_fix(const char *module_sys_path) {
+    char buf[256];
+    int tmp;
+    char *driver;
+
+    tmp = snprintf(buf, sizeof(buf), "/sys/bus/usb/devices/usb%c/../driver", module_sys_path[strlen("/sys/bus/usb/devices/")]);
+    driver = buf + (++tmp);
+    *driver = '\0';
+
+    tmp = readlink(buf, driver, sizeof(buf) - tmp);
+    dbg_time("tmp=%s, driver=%s\n", buf, driver);
+    if (tmp <= 0)
+        return 0;
+
+    if (!strstr(driver, "xhci"))
+        return 0;
+
+    tmp = ql_get_kernel_version();
+    if (tmp >= KVERSION(4,3,0))
+        return 0;
+
+    dbg_time("WARNNING ON File:%s Function:%s Line:%d\n", __FILE__, __func__, __LINE__);
+    dbg_time("The module attach to XHCI controller, but your kernel verison less than V4.3.0\n");
+    dbg_time("Please make sure your kernel had apply patch 'usb: xhci: Add support for URB_ZERO_PACKET to bulk/sg transfers'\n");
+    dbg_time("https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/drivers/usb/host/xhci-ring.c?id=4758dcd19a7d9ba9610b38fecb93f65f56f86346\n");
+    sleep(2); //sleep 2 seconds, make sure FAE/customers can notice this warnning.
+
+    return 1;
+}
+
 void *qusb_noblock_open(const char *module_sys_path, int *idVendor, int *idProduct, int *interfaceNum) {
     struct termios ios;
     int retval;
@@ -620,12 +720,13 @@ void *qusb_noblock_open(const char *module_sys_path, int *idVendor, int *idProdu
         if (udev->desc <= 0)
             return NULL;
         quectel_get_ttyport_by_syspath(module_sys_path, port_name, sizeof(port_name));
+        detect_xhci_usb_zero_packet_bug_not_fix(module_sys_path);
 
         *idVendor = udev->idVendor;
         *idProduct = udev->idProduct;
         *interfaceNum = udev->bNumInterfaces;
 
-        if (port_name[0] == '\0' || (udev->idVendor == 0x05c6 && udev->idProduct == 0x9008)) {
+        if (port_name[0] == '\0' || (port_name[0] != '\0' && access(port_name, R_OK)) || (udev->idVendor == 0x05c6 && udev->idProduct == 0x9008)) {
             int bInterfaceNumber = 0;
 
             if (usbfs_is_kernel_driver_alive(udev->desc, bInterfaceNumber)) {
@@ -644,7 +745,7 @@ void *qusb_noblock_open(const char *module_sys_path, int *idVendor, int *idProdu
                     
                     pl = (typeof(pl)) malloc(sizeof(*pl));
 
-                    snprintf(pl->infname, sizeof(pl->infname), "%s%s/driver", module_sys_path, ":1.0");
+                    snprintf(pl->infname, sizeof(pl->infname), "%s:1.%d/driver", module_sys_path, usb_dm_interface);
                     n = readlink(pl->infname, pl->driver, sizeof(pl->driver));
                     if (n > 0) {
                         pl->driver[n] = '\0';
@@ -744,6 +845,7 @@ int qusb_use_usbfs_interface(const void *handle) {
 int qusb_noblock_read(const void *handle, void *pbuf, int max_size, int min_size, int timeout_msec) {
     struct quectel_usb_device *udev = &quectel_9x07;
     int cur = 0;
+    int poll_ret = 0;
 
     if (min_size == 0)
         min_size = 1;
@@ -761,12 +863,12 @@ int qusb_noblock_read(const void *handle, void *pbuf, int max_size, int min_size
         int len = 0;
 
         if (handle == &tcp_socket_fd) {
-            if (poll_wait(tcp_socket_fd, POLLIN, timeout_msec))
+            if ((poll_ret = poll_wait(tcp_socket_fd, POLLIN, timeout_msec)))
                 break;
             len = qtcp_read(tcp_socket_fd, (uint8_t *)pbuf+cur, max_size-cur, timeout_msec);
         }
         else if (handle == udev && udev->ttyfd > 0) {
-            if (poll_wait(udev->ttyfd, POLLIN, timeout_msec))
+            if ((poll_ret = poll_wait(udev->ttyfd, POLLIN, timeout_msec)))
                 break;
             len = read(udev->ttyfd, (uint8_t *)pbuf+cur, max_size-cur);
         }
@@ -774,7 +876,7 @@ int qusb_noblock_read(const void *handle, void *pbuf, int max_size, int min_size
             len = usbfs_bulk_read(udev, (uint8_t *)pbuf+cur, max_size-cur, timeout_msec);
         }
         else if (handle == &edl_pcie_mhifd && edl_pcie_mhifd > 0) {
-            if (poll_wait(edl_pcie_mhifd, POLLIN, timeout_msec))
+            if ((poll_ret = poll_wait(edl_pcie_mhifd, POLLIN, timeout_msec)))
                 break;
             len = read(edl_pcie_mhifd, (uint8_t *)pbuf+cur, max_size-cur);
         }
@@ -789,6 +891,11 @@ int qusb_noblock_read(const void *handle, void *pbuf, int max_size, int min_size
             break;
         }
     }
+
+    if (poll_ret == EIO)
+        return -1;
+    else if (poll_ret == ETIMEDOUT)
+        return cur;
 
     if (cur < min_size) {
         dbg_time("%s cur=%d, min_size=%d\n", __func__, cur, min_size);
@@ -861,7 +968,7 @@ int qfile_find_xmlfile(const char *dir, const char *prefix, char** xmlfile) {
     {
         while((ent = readdir(pdir)) != NULL)
         {
-            if(!strncmp(ent->d_name, prefix, strlen(prefix)))
+            if(!strncmp(ent->d_name, prefix, strlen(prefix)) && strncmp(ent->d_name, "rawprogram0.xml.bak", 15))
             {
                 dbg_time("d_name=%s\n", ent->d_name);
                 *xmlfile = strdup(ent->d_name);
@@ -931,7 +1038,7 @@ int qpcie_open(const char *firehose_dir) {
 
     filebuf = malloc(sizeof(filesize)+filesize);
     memcpy(filebuf, &filesize, sizeof(filesize));
-    fread((uint8_t *)filebuf+sizeof(filesize), 1, filesize, fp);
+    if (fread((uint8_t *)filebuf+sizeof(filesize), 1, filesize, fp) == -1) { };
     fclose(fp);
 
     diagfd = open("/dev/mhi_DIAG", O_RDWR | O_NOCTTY);
@@ -999,23 +1106,21 @@ int usbmon_logfile_fd = -1;
 void *catch_log(void *arg)
 {
     int nreads = 0;
-    char buff[256-32], tbuff[256];
-    time_t t;
-    struct tm *tm;
+    char tbuff[256];
+    size_t off = strlen("[999.999] ");
 
+    tbuff[off - 1] = ' ';
     while(1) {
-        nreads = read(usbmon_fd, buff, sizeof(buff));
+        nreads = read(usbmon_fd, tbuff + off, sizeof(tbuff) - off);
+        if (nreads == -1 && errno == EINTR)
+            continue;
         if (nreads <= 0)
-			break;
+            break;
 
-        buff[nreads] = '\0';
+        tbuff[off + nreads] = '\0';
+        memcpy(tbuff, firehose_get_time(), off - 1);
 
-        time(&t);
-        tm = localtime(&t);
-        sprintf(tbuff, "%04d/%02d/%02d_%02d:%02d:%02d %s",
-                tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec, buff);
-
-        write(usbmon_logfile_fd, tbuff, strlen(tbuff));
+        if (write(usbmon_logfile_fd, tbuff, strlen(tbuff)) == -1) { };
     }
 
     return NULL;

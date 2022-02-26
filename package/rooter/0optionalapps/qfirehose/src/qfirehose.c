@@ -99,6 +99,8 @@ static void usage(int status, const char *program_name)
         dbg_time("    -s [/sys/bus/usb/devices/xx]   When multiple modules exist on the board, use -s specify which module you want to upgrade\n");
         dbg_time("    -e                             Erase All Before Download (will Erase calibration data, careful to USE)\n");
         dbg_time("    -l [dir_name]                  Sync log into a file(will create qfirehose_timestamp.log)\n");
+        dbg_time("    -u [usbmon_log]                Catch usbmon log and save to file (need debugfs and usbmon driver)\n");
+        dbg_time("    -n                             Skip MD5 check\n");
     }
     exit(status);
 }
@@ -118,8 +120,13 @@ static int system_ready(char** dirhose_dir)
     {
         //set_transfer_allbytes(calc_filesizes(*dirhose_dir));
         sprintf(temp, "%s/update/firehose", *dirhose_dir);
-        if(access(temp, R_OK))
+        if (access(temp, R_OK))
+        {
+            if (strstr(*dirhose_dir, "SC600Y") || strstr(*dirhose_dir, "SC60"))
+                return 0;
+
             error_return();
+        }
         free(*dirhose_dir);
         *dirhose_dir = strdup(temp);
         return 0;
@@ -174,14 +181,14 @@ int main(int argc, char* argv[])
     int xhci_usb3_to_usb2_cause_syspatch_chage = 1;
     int usb2tcp_port = 0;
     char filename[128] = {'\0'};
-	const char *usbmon_logfile = NULL;
+    const char *usbmon_logfile = NULL;
 
     firehose_dir[0] = module_port_name[0] = module_sys_path[0] = '\0';
 
     /* set file priviledge mask 0 */
     umask(0);
     /*build V1.0.8*/
-    dbg_time("QFirehose Version: Quectel_LTE&5G_QFirehose_Linux&Android_V1.4\n"); //when release, rename to V1.X
+    dbg_time("Version: QFirehose_Linux_Android_V1.4.8\n"); //when release, rename to V1.X
 #ifndef __clang__
     dbg_time("Builded: %s %s\n", __DATE__,__TIME__);
 #endif
@@ -235,8 +242,8 @@ int main(int argc, char* argv[])
             case 'e':    
                 q_erase_all_before_download = 1;
                 break;
-			case 'u':
-				usbmon_logfile = strdup(optarg);
+                case 'u':
+                    usbmon_logfile = strdup(optarg);
                 break;
             case 'h':
                 usage(EXIT_SUCCESS, argv[0]);
@@ -270,6 +277,9 @@ int main(int argc, char* argv[])
         firehose_dir[opt-1] = '\0';
     }
     
+    if (strstr(firehose_dir, "SC600Y") || strstr(firehose_dir, "SC60"))
+        check_hash = 0;
+	
     if (!g_part_upgrade) {
         struct stat st;
         const char *update_dir = "/update/";
@@ -418,7 +428,7 @@ __edl_retry:
             sleep(1);
             stream_download(firehose_dir, usb_handle, qusb_zlp_mode);
             qusb_noblock_close(usb_handle);
-            sleep(1);
+            sleep(10);      //EM05-G switching to download mode is slow and increases the waiting time to 10 seconds
             goto __edl_retry;
         }
 

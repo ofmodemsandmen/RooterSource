@@ -276,13 +276,13 @@ int md5sum(char *file, void *md5_buf) {
 int md5_check(const char *firehose_dir)
 {
 	FILE *fp = NULL;
-	char md5_file_path[128], buff[256], file_name[64], file_full_path[128], file_md5_value[33];
+	char md5_file_path[256], buff[256], file_name[128], file_full_path[256], file_md5_value[64];
 	char *ps = NULL, *pe = NULL;
 	unsigned char compute_md5_buff[16];
 	char convert_md5_buff[33];
 	int i, file_count = 0, fail_count = 0;
 
-	sprintf(md5_file_path, "%s/md5.txt", firehose_dir);
+	snprintf(md5_file_path, sizeof(md5_file_path), "%s/md5.txt", firehose_dir);
 	if (access(md5_file_path, R_OK)) {
 		dbg_time("Cann't find md5.txt in %s, Please check it!\n", firehose_dir);
 		return -1;
@@ -317,7 +317,7 @@ int md5_check(const char *firehose_dir)
 
 		memcpy(file_md5_value, pe + 1, 32);
 		file_md5_value[32] = '\0';
-		sprintf(file_full_path, "%s%s", firehose_dir, file_name);
+		snprintf(file_full_path, sizeof(file_full_path), "%s%s", firehose_dir, file_name);
 		
 		md5sum(file_full_path, compute_md5_buff);
 		

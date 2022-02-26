@@ -243,7 +243,7 @@ int usb2tcp_main(const void *usb_handle, int tcp_port, unsigned qusb_zlp_mode) {
     tlv_usb.idVendor = cpu_to_le32(0x05c6);
     tlv_usb.idProduct = cpu_to_le32(0x9008);
     tlv_usb.interfaceNum = cpu_to_le32(1);
-    write(client_fd, &tlv_usb, sizeof(tlv_usb));
+    if (write(client_fd, &tlv_usb, sizeof(tlv_usb)) == -1) {};
 
     fcntl(usb_fd, F_SETFL, fcntl(usb_fd,F_GETFL) | O_NONBLOCK);
     fcntl(client_fd, F_SETFL, fcntl(client_fd,F_GETFL) | O_NONBLOCK);
@@ -287,7 +287,7 @@ int usb2tcp_main(const void *usb_handle, int tcp_port, unsigned qusb_zlp_mode) {
                     dprintf("usb_fd=%d read=%d, errno: %d (%s)\n", fd, size, errno, strerror(errno));
                     goto _hangup;;
                 }
-                write(usb_fd, pbuf, 1); //wakeup usb_bulk_read_thread
+                if (write(usb_fd, pbuf, 1) == -1) {}; //wakeup usb_bulk_read_thread
 
                 tlv.tag = cpu_to_le32(Q_USB2TCP_VERSION);
                 tlv.length = cpu_to_le32(size);

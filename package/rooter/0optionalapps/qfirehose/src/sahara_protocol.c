@@ -16,6 +16,8 @@
 #include "usb_linux.h"
 #include "sahara_protocol.h"
 
+int g_is_sc600y_chip = 0;
+
 static uint32_t le_uint32(uint32_t v32) {
     const int is_bigendian = 1;
     uint32_t tmp = v32;
@@ -290,6 +292,8 @@ static int sahara_start(void *usb_handle, void *tx_buffer, void *rx_buffer, FILE
             return 1;
         if (image_id == 7) //NPRG9x55.mbn
             return 1;
+        if (image_id == 21) //sbl1.mbn, October 22 2020 2:12 PM, AG35CEVAR05A07T4G 
+            return 1;
       }
       else if (SAHARA_MODE_IMAGE_TX_COMPLETE == le_uint32(sahara_done_resp->image_tx_status)) {
         dbg(LOG_EVENT,"Successfully uploaded all images");
@@ -313,12 +317,15 @@ int sahara_main(const char *firehose_dir, void *usb_handle, int edl_mode_05c6900
     void *rx_buffer;
 
     if (edl_mode_05c69008) {
-    if(qfile_find_xmlfile(firehose_dir, "prog_nand_firehose", &prog_nand_firehose_filename) != 0
+    if(qfile_find_xmlfile(firehose_dir, "prog", &prog_nand_firehose_filename) != 0
         && qfile_find_xmlfile(firehose_dir, "prog_firehose", &prog_nand_firehose_filename) != 0) {
         dbg(LOG_ERROR, "retrieve prog nand firehose failed.");
         return ENOENT;
     }
     dbg(LOG_INFO, "prog_nand_firehose_filename = %s", prog_nand_firehose_filename);
+
+    if (!strncmp(prog_nand_firehose_filename, "prog_emmc_firehose_8953_ddr.mbn", strlen(prog_nand_firehose_filename)))
+        g_is_sc600y_chip = 1;
 
     snprintf(full_path, sizeof(full_path), "%s/%s", firehose_dir, prog_nand_firehose_filename);
     }
