@@ -241,10 +241,15 @@ if [ $splash = "1" ]; then
 	level2txt "$lband" "single"
 	sed -i -e "s!#BAND#!$namev!g" $STEMP
 
+	if [ -e /etc/custom
+		mod="/etc/custom"
+	else
+		mod="/tmp/sysinfo/model"
+	fi
 	while IFS= read -r line; do
 		ROUTER=$line
 		break
-	done < /etc/custom
+	done < $mod
 	level2txt "$ROUTER" "single"
 	sed -i -e "s!#ROUTER#!$ROUTER!g" $STEMP
 	level2txt "$modem" "single"
