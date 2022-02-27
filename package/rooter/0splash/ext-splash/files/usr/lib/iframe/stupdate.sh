@@ -5,11 +5,11 @@ log() {
 	logger -t "Status Update" "$@"
 }
 
-levelsper="101,85,70,55,40,25,10,0"
+levelsper="101,85,70,55,40,25,10,1,0"
 namesper="Perfect,Excellent,Good,Medium,Low,Bad,Dead"
-levelsrssi="113,119,100,90,70,0"
-namesrssi="None,Bad,Poor,Medium,High"
-levelsrscp="140,136,112,100,90,70,50,0"
+levelsrssi="113,119,100,90,70,1,0"
+namesrssi="None,Bad,Poor,Medium,High,Perfect"
+levelsrscp="140,136,112,100,90,70,50,1,0"
 namesrscp='None,None (3G) : Poor (4G),Weak (3G) : Medium (4G),Poor (3G) : Good (4G),Medium (3G) : High (4G),High (3G) :High (4G)'
 
 level2txt() {
@@ -35,11 +35,13 @@ level2txt() {
 		namev=$namesrssi
 	fi
 	if [ $key = "rscp" ]; then
-		front="-"
-		tmp=$(printf %.0f "$tmp")
-		tmp=$(echo "$tmp" | sed -e "s/-//g")
+		front=""
 		tmp=$(echo "$tmp" | sed -e "s/dBm//g")
+		tmp=$(echo "$tmp" | sed -e "s/([^)]*)//g")
 		tmp1="$tmp"" "
+		tmp=$(echo "$tmp" | sed -e "s/-//g")
+		tmp=$(echo "$tmp" | tr " " "," | cut -d, -f1 )
+		tmp=$(printf %.0f "$tmp")
 		level=$levelsrscp
 		namev=$namesrscp
 	fi
@@ -191,10 +193,15 @@ if [ $splash = "1" ]; then
 	SPSTATUS="/tmp/www/splash.html"
 	rm -f $STEMP
 	cp $STATUS $STEMP
-	button="<div class='rooterPageContentBW'><div class="" id=\"rooterItems\"><a href='cgi-bin/luci'><div class=\"rooterItem\" id=\"rooterItem1\"><div class=\"rooterItemTitle\"><i class='icon icon-cog'></i> Click for Router Login</div><div class=\"rooterItemTitle\">to the Web GUI.</div></div></a></div></div>"
+	button="<div class='rooterPageContentBW'><div class="" id=\"rooterItems\"><a href='cgi-bin/luci'><div class=\"rooterItem\" id=\"rooterItem1\"><div class=\"rooterItemTitle\"><i class='icon icon-cog'></i> Router Login</div><div class=\"rooterItemTitle\"></div></div></a></div></div>"
 	sed -i -e "s!#BUTTON#!$button!g" $STEMP
 	sed -i -e "s!#LUCIS#!luci-static/!g" $STEMP
-	titlebar="<div class='rooterPageHead'><a  href='http://www.ofmodemsandmen.com'><div class=\"rooterHeadTitle\"> #TITLE#</div></a></div>"
+	titlebar="<div class='rooterPageHead'><a  href='http://#URL#'><div class=\"rooterHeadTitle\"> #TITLE#</div></a></div>"
+	url=$(uci -q get iframe.iframe.url)
+	if [ -z $url ]; then
+		url="www.ofmodemsandmen.com"
+	fi
+	titlebar=$(echo "$titlebar" | sed -e "s!#URL#!$url!g")
 	sed -i -e "s!#TITLEBAR#!$titlebar!g" $STEMP
 	title=$(uci -q get iframe.iframe.splashtitle)
 	sed -i -e "s!#TITLE#!$title!g" $STEMP
@@ -210,7 +217,7 @@ if [ $splash = "1" ]; then
 	sed -i -e "s!#RSCP#!$namev!g" $STEMP
 	level2txt "$ecio" "single" 1
 	sed -i -e "s!#RSRQ#!$namev!g" $STEMP
-	level2txt "$sinr" "single" 1
+	level2txt "$sinr" "single" 0
 	sed -i -e "s!#SINR#!$namev!g" $STEMP
 
 	level2txt "$mode" "single"
@@ -234,9 +241,16 @@ if [ $splash = "1" ]; then
 	level2txt "$lband" "single"
 	sed -i -e "s!#BAND#!$namev!g" $STEMP
 
+	while IFS= read -r line; do
+		ROUTER=$line
+		break
+	done < /etc/custom
+	level2txt "$ROUTER" "single"
+	sed -i -e "s!#ROUTER#!$ROUTER!g" $STEMP
 	level2txt "$modem" "single"
 	sed -i -e "s!#MODEM#!$namev!g" $STEMP
 	level2txt "$cops" "single"
+	namev=$(echo "$namev" | tr "&" "+")
 	sed -i -e "s!#PROVIDER#!$namev!g" $STEMP
 	level2txt "$proto" "single"
 	sed -i -e "s!#PROTO#!$namev!g" $STEMP
@@ -263,7 +277,7 @@ if [ $splash = "1" ]; then
 		sed -i -e "s!#RSCP#!$namev!g" $STEMP2
 		level2txt "$ecio" "single" 1
 		sed -i -e "s!#RSRQ#!$namev!g" $STEMP2
-		level2txt "$sinr" "single" 1
+		level2txt "$sinr" "single" 0
 		sed -i -e "s!#SINR#!$namev!g" $STEMP2
 
 		level2txt "$mode" "single"
@@ -290,6 +304,7 @@ if [ $splash = "1" ]; then
 		level2txt "$modem" "single"
 		sed -i -e "s!#MODEM#!$namev!g" $STEMP2
 		level2txt "$cops" "single"
+		namev=$(echo "$namev" | tr "&" "+")
 		sed -i -e "s!#MODEMN#!$namev!g" $STEMP2
 		level2txt "$proto" "single"
 		sed -i -e "s!#PROTO#!$namev!g" $STEMP2
