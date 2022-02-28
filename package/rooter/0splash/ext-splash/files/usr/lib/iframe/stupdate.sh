@@ -241,7 +241,7 @@ if [ $splash = "1" ]; then
 	level2txt "$lband" "single"
 	sed -i -e "s!#BAND#!$namev!g" $STEMP
 
-	if [ -e /etc/custom
+	if [ -e /etc/custom ]; then
 		mod="/etc/custom"
 	else
 		mod="/tmp/sysinfo/model"
