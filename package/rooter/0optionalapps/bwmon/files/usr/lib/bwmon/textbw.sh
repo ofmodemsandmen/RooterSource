@@ -83,9 +83,14 @@ checkamt() {
 		prev=$(uci -q get custom.texting.used)
 		incr=$(uci -q get custom.texting.increment)
 		getbw
-		let "TMP = $prev + $incr"
+		/usr/lib/bwmon/datainc.lua $prev $incr $used
+		source /tmp/bwinc
+		uci set custom.texting.used=$prev
+		uci commit custom
+		echo $runn
+	else
+		echo "0"
 	fi
-	echo "0"
 }
 
 delay=900
