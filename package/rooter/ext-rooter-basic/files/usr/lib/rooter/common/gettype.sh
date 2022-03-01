@@ -122,6 +122,8 @@ echo 'NLEN="'"$NLEN"'"' > /tmp/namelen$CURRMODEM
 
 ATCMDD="ATE1"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+ATCMDD="AT+CTZU=1"
+OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 ATCMDD="AT\$QCPBMPREF?"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 PBzero=$(echo "$OX" | grep "0")
