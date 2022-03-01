@@ -267,6 +267,7 @@ fi
 
 WWANX=$(uci get modem.modem$CURRMODEM.interface)
 OPER=$(cat /sys/class/net/$WWANX/operstate 2>/dev/null)
+rm -f "/tmp/connstat"$CURRMODEM
 
 if [ ! "$OPER" ]; then
 	exit 0
