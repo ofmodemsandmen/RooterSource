@@ -723,6 +723,12 @@ fi
 if [ $idV = "2cb7" -o $idV = "8087" ]; then
 	$ROOTER/connect/bandmask $CURRMODEM 2
 fi
+
+chkT77
+if [ $T77 -eq 1 ]; then
+	$ROOTER/connect/bandmask $CURRMODEM 3
+fi
+
 CHKPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 if [ -n "$CHKPORT" ]; then
 	if [ -e $ROOTER/simlock.sh ]; then

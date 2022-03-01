@@ -8,6 +8,32 @@ NEWMOD=$1
 	logger -t "ProtoChange" "$@"
  }
  
+ change_bconf() {
+	local devname=$1
+	local conf=$2
+	local mode=$3
+	local unconf=0
+	log "Switching Modem at $devname to $mode by selecting Cfg# $conf"
+	echo $unconf >/sys/bus/usb/devices/$devname/bConfigurationValue
+	sleep 1
+	echo $conf >/sys/bus/usb/devices/$devname/bConfigurationValue
+}
+ 
+ chkT77() {
+	T77=0
+	if [ $idV = 413c -a $idP = 81d7 ]; then
+		T77=1
+	elif [ $idV = 413c -a $idP = 81d8 ]; then
+		T77=1
+	elif [ $idV = 0489 -a $idP = e0b4 ]; then
+		T77=1
+	elif [ $idV = 0489 -a $idP = e0b5 ]; then
+		T77=1
+	elif [ $idV = 1bc7 -a $idP = 1910 ]; then
+		T77=1
+	fi
+}
+ 
  chksierra() {
 	SIERRAID=0
 	if [ $idV = 1199 ]; then
@@ -106,6 +132,17 @@ fi
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	ATCMDD='AT!ENTERCND="AWRONG"'
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+ fi
+ 
+ chkT77
+ if [ $T77 = "1" ]; then
+	DEVICE=$(uci get modem.modem$CURRMODEM.device)
+	if [ $NEWMOD = "1" ]; then
+		change_bconf $DEVICE 1 QMI
+	else
+		change_bconf $DEVICE 2 MBIM
+	fi
+	log "T77 $NEWMOD $DEVICE"
  fi
 
 ATCMDD="AT+CFUN=1,1"

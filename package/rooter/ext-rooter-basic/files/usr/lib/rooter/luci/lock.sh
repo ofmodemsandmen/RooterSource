@@ -65,6 +65,10 @@ fibdecode() {
 		sep=":"
 		hun=1
 	fi
+	if [ $mod = "2" ]; then
+		sep=","
+		hun=1
+	fi
 	while [ $ii -lt $len ]
 	do
 		bnd=${str:$ii:1}
@@ -313,6 +317,28 @@ case $uVid in
 			ATCMDD="AT+CFUN=1,1"
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		fi
+	;;
+	"413c" )
+		case $uPid in
+
+			"81d7"|"81d8"|"e0b4" |"e0b5"|"1910")
+				if [ ! -z $mask ]; then
+					fibdecode $mask 1 2
+					ATCMDD="AT^SLBAND=LTE,2,""$lst"
+					log "$ATCMDD"
+				else
+					exit 0
+				fi
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				log " "
+				log "Lock Response : $OX"
+				log " "
+				if [ $RESTART = "1" ]; then
+					ATCMDD="AT+CFUN=1,1"
+					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				fi
+			;;
+		esac
 	;;
 	* )
 		exit 0

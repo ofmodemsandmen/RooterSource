@@ -303,6 +303,45 @@ fibomask() {
 	fi
 }
 
+t77mask() {
+	enb=$(uci -q get custom.bandlock.enabled)
+	ATCMDD='AT^SLBAND?'
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	if [ $enb == "1" ]; then
+		log " "
+		log "T77 Response : $OX"
+		log " "
+	fi
+	lte=$(echo $OX" " | tr "," ":" | tr " " ",")
+	if [ $enb == "1" ]; then
+		log " "
+		log "T77 Response : $lte"
+		log " "
+	fi
+	qm=$(echo $lte | cut -d, -f5)
+	log "$qm"
+	bd=3
+	msk=""
+	L1=$(echo $qm | cut -d: -f"$bd")
+	while [ $L1 != "OK" ]
+	do
+		msk=$msk$L1" "
+		bd=$((bd+1))
+		L1=$(echo $qm | cut -d: -f"$bd")
+	done
+	L1=$(encodemask $msk)
+	if [ -z "$L1" ]; then
+		L1="0"
+	fi
+	if [ $enb == "1" ]; then
+		log " "
+		log "LTE Band Mask : $L1"
+		log " "
+	fi
+	uci set modem.modem$CURRMODEM.L1="0x$L1"
+	uci commit modem
+}
+
 case $MODTYPE in
 	"0" )
 		sierrabandmask
@@ -312,6 +351,9 @@ case $MODTYPE in
 	;;
 	"2" )
 		fibomask
+	;;
+	"3" )
+		t77mask
 	;;
 esac
 

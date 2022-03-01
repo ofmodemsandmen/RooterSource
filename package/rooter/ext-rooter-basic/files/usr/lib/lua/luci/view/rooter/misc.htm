@@ -58,6 +58,32 @@ end
 	var cenable;
 	var modtype;
 	
+	function T77(uVid, uPid)
+	{
+		return 0
+		if ( uVid == "413c" && uPid == "81d7" )
+		{
+			return 1
+		}
+		if ( uVid == "413c" && uPid == "81d8" )
+		{
+			return 1
+		}
+		if ( uVid == "0489" && uPid == "e0b4" )
+		{
+			return 1
+		}
+		if ( uVid == "0489" && uPid == "e0b5" )
+		{
+			return 1
+		}
+		if ( uVid == "1bc7" && uPid == "1910" )
+		{
+			return 1
+		}
+		return 0
+	}
+	
 	function num2pro(pro, mod)
 	{
 		if ( mod == "1" )
@@ -533,7 +559,7 @@ end
 			}
 			else
 			{
-				if ( uVid == "1199" )
+				if ( uVid == "1199" || T77(uVid, uPid) == 1 )
 				{
 					document.getElementById("modpro").style.display = "block";
 					document.getElementById("modpro").innerHTML = num2pro(rv.proto, "2");
