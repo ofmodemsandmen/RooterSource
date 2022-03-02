@@ -633,6 +633,7 @@ cb2:depends("alive", "2")
 cb2:depends("alive", "3")
 cb2:depends("alive", "4")
 cb2.optional=false;
+cb2.default="8.8.8.8"
 
 return m
 
