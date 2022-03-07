@@ -1682,5 +1682,18 @@
 			"mod": "ZBT-WE2802D",
 			"ext": "-upgrade.bin",
 			"addons": ["readme.pdf", "readmerecovery.txt"]
+	},	
+	"DIR835": {
+		"details": "D-Link DIR-835 A1",
+		"type": "2",
+		"build": "1907",
+		"config": ".config_dir835",
+		"image1": "openwrt-ath79-generic-dlink_dir-835-a1-squashfs-sysupgrade.bin",
+		"image2": "openwrt-ath79-generic-dlink_dir-835-a1-squashfs-factory.bin",
+		"imagepath": "/ath79/generic/",
+		"mod": "D-Link-DIR-835-A1",
+		"ext1": "-upgrade.bin",
+		"ext2": "-factory.bin",
+		"addons": ["readme.pdf"]
 	}
 }
