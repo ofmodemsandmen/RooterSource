@@ -18,7 +18,7 @@ define Package/ext-rooterbcm16
 		+luci-app-rootervpn +ext-wireguard \
 		+webconsole +bwmon +464xlat \
 		+ext-theme +luci-theme-argon +argon-config \
-		+luci-theme-tomato +ext-material +ext-login \
+		+luci-theme-tomato +ext-login \
 		+ca-bundle +ca-certificates +libustream-openssl \
 		+luci-app-ksmbd +usb-storage \
 		+ext-p910nd +luci-app-sqm +kmod-sched-cake +luci-app-nft-qos \

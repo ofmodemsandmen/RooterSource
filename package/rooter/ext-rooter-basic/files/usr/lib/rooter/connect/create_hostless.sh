@@ -224,7 +224,7 @@ if [ $SP -gt 0 ]; then
 	elif [ $SP -eq 4 ]; then
 		PORTN=2
 	elif [ $SP -eq 5 ]; then
-		PORTN=2
+		[ $idP = 6026 ] && PORTN=1 || PORTN=2
 	elif [ $SP -eq 6 ]; then
 		PORTN=2
 	elif [ $SP -eq 7 ]; then
@@ -399,7 +399,7 @@ if [ $SP = 5 ]; then
 	get_connect
 	if [ -n "$NAPN" ]; then
 		$ROOTER/common/lockchk.sh $CURRMODEM
-		if [ idP = 6026 ]; then
+		if [ $idP = 6026 ]; then
 			IPN=1
 			case "$PDPT" in
 			"IPV6" )
