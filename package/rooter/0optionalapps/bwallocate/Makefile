@@ -14,7 +14,7 @@ define Package/bwallocate
   SECTION:=utils
   CATEGORY:=ROOter
   SUBMENU:=Optional Applications
-  DEPENDS:=+ext-throttle
+  DEPENDS:=+ext-throttle +msmtp
   TITLE:=Install scripts for Bandwidth Allocation
   PKGARCH:=all
 endef
