@@ -9,11 +9,11 @@ WG=$1
 
 do_dns() {
 	cdns=$1
-	ldns=$(uci -q get network.lan.dns)
+	ldns=$(uci -q get network.wg0.dns)
 	ex=$(echo "$ldns" | grep "$cdns")
 	if [ -z $ex ]; then
-		log "Add DNS $cdns to Lan"
-		uci add_list network.lan.dns="$cdns"
+		log "Add DNS $cdns to WG0"
+		uci add_list network.wg0.dns="$cdns"
 		uci commit network
 		/etc/init.d/network reload
 	fi
