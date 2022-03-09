@@ -15,6 +15,7 @@ config texting 'texting'
 	option days '1'
 	option increment '50'
 	option used '0'
+	option tore '0'
 	
 config menu 'menu'
 	option password '1234'

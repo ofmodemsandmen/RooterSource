@@ -102,6 +102,7 @@ do
 		if [ $MT = '0' ]; then
 			days=$(uci -q get custom.texting.days)
 			daysdate=$( date +%d )
+			daysdate="${daysdate#"${daysdate%%[!0]*}"}"
 			remain=$((daysdate % days))
 			if [ $remain -eq 0 ]; then
 				running=$(checktime)

@@ -70,11 +70,11 @@ up.datatype = "and(uinteger,min(1),max(999))"
 up:depends("action", "1")
 up.default = "2"
 
-s = m:section(TypedSection, "texting", "Texting Settings")
+s = m:section(TypedSection, "texting", "Text/Email Settings")
 s.anonymous = true
 s.addremove = false
 
-aact = s:option(ListValue, "text", translate("Text Usage : "), translate("Text usage to a phone"))
+aact = s:option(ListValue, "text", translate("Enable : "), translate("Enable Sending Text or Email Information"))
 aact.rmempty = true
 aact:value("0", "No")
 aact:value("1", "Yes")
@@ -87,21 +87,16 @@ pph.rmempty = true;
 pph:depends("text", "1")
 pph.default = "xxx"
 
-ph = s:option(Value, "phone", "Phone Number :");
-ph.optional=false; 
-ph.rmempty = true;
-ph.datatype = "phonedigit"
-ph:depends("text", "1")
-ph.default = "0"
 
-ct = s:option(ListValue, "method", translate("Method : "), translate("Method used to determine when to text"))
+
+ct = s:option(ListValue, "method", translate("Criteria : "), translate("Criteria used to determine when to send information"))
 ct.rmempty = true
-ct:value("0", "By Specified Time")
+ct:value("0", "By Specified Time Interval")
 ct:value("1", "By Amount Used")
 ct.default = "0"
 ct:depends("text", "1")
 
-sdhour = s:option(ListValue, "time", translate("Texting Time :"), translate("Time to send text"))
+sdhour = s:option(ListValue, "time", translate("Sending Time :"), translate("Time to send information"))
 sdhour.rmempty = true
 sdhour:value("0", "12:00 AM")
 sdhour:value("1", "12:15 AM")
@@ -202,7 +197,7 @@ sdhour:value("95", "11:45 PM")
 sdhour:depends("text", "1")
 sdhour.default = "48"
 
-xct = s:option(ListValue, "days", translate("Interval : "), translate("Number of days between texts"))
+xct = s:option(ListValue, "days", translate("Interval : "), translate("Number of days between sending information"))
 xct.rmempty = true
 xct:value("1", "Every Day")
 xct:value("2", "Every 2 Days")
@@ -212,12 +207,33 @@ xct:value("15", "Every 15 Days")
 xct.default = "5"
 xct:depends("method", "0")
 
-xxct = s:option(ListValue, "increment", translate("Increment : "), translate("Amount Used between texts"))
+xxct = s:option(ListValue, "increment", translate("Increment : "), translate("Amount Used between sending information"))
 xxct.rmempty = true
 xxct:value("50", "Every 50 GB")
 xxct:value("75", "Every 75 GB")
 xxct:value("100", "Every 100 GB")
 xxct.default = "50"
 xxct:depends("method", "1")
+
+
+ct = s:option(ListValue, "tore", translate("Sending Method : "), translate("Method used to send information"))
+ct.rmempty = true
+ct:value("0", "By Text")
+ct:value("1", "By Email")
+ct.default = "0"
+ct:depends("text", "1")
+
+ph = s:option(Value, "phone", "Phone Number :");
+ph.optional=false; 
+ph.rmempty = true;
+ph.datatype = "phonedigit"
+ph:depends("tore", "0")
+ph.default = "0"
+
+ph1 = s:option(Value, "email", "Email Address :");
+ph1.optional=false; 
+ph1.rmempty = true;
+ph1:depends("tore", "1")
+ph1.default = "JDoe@domain.com"
 
 return m
