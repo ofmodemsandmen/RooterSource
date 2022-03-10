@@ -236,4 +236,13 @@ ph1.rmempty = true;
 ph1:depends("tore", "1")
 ph1.default = "JDoe@domain.com"
 
+b3 = s:option(DummyValue, "blank", " ");
+
+btn = s:option(Button, "_btn", translate(" "), translate("Test by sending a text or email right now"))
+btn.inputtitle = translate("Send Test of Text or Email")
+btn.inputstyle = "apply"
+function btn.write()
+	luci.sys.call("/usr/lib/bwmon/dotext.sh")
+end
+
 return m
