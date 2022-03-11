@@ -131,7 +131,15 @@ if [ -n "$PBzero" ]; then
 	ATCMDD="AT\$QCPBMPREF=1"
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 fi
-
+if [ "$IDV" == "2c7c" ]; then
+	ATCMDD="AT+QLWCFG=\"startup\""
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	LWon=$(echo "$OX" | grep "1")
+	if [ -n "$LWon" ]; then
+		ATCMDD="AT+QLWCFG=\"startup\",0"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	fi
+fi
 ATCMDD="AT+CIMI"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 OX=$($ROOTER/common/processat.sh "$OX")
