@@ -1,5 +1,9 @@
 #!/bin/sh
 
+log() {
+	logger -t "NITZ set time" "$@"
+}
+
 CURRMODEM=$(uci -q get modem.general.modemnum)
 COMMPORT="/dev/ttyUSB"$(uci -q get modem.modem$CURRMODEM.commport)
 ROOTER=/usr/lib/rooter
@@ -17,7 +21,8 @@ if [ -n "$NITZstat" ]; then
 	DTGtz=$(echo "$DTG" | grep -o "[-+][0-9]\{1,2\}")
 	if [ -n "$DTGtz" ]; then
 		DTGif=$(date +%s -u -s "$DTGyymmdd $DTGhhmmss")
-		date -s @$DTGif
+		OX=$(date -s @$DTGif)
+		log "$OX"
 		SUCCESS=0
 	fi
 fi

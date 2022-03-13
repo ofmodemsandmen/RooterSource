@@ -159,6 +159,8 @@ do_custom() {
 					fi
 					uci set modem.modeminfo$CURRMODEM.apn=$apn
 					uci set modem.modeminfo$CURRMODEM.apn2=$apn2
+					config_get mtu $1 mtu
+					uci set modem.modeminfo$CURRMODEM.mtu=$mtu
 					config_get user $1 user
 					uci set modem.modeminfo$CURRMODEM.user=$user
 					config_get passw $1 passw
@@ -301,6 +303,7 @@ if [ $MATCH = 0 ]; then
 	uci set modem.modeminfo$CURRMODEM.at=$(uci -q get profile.default.at)
 	uci set modem.modeminfo$CURRMODEM.atc=$(uci -q get profile.default.atc)
 	uci set modem.modeminfo$CURRMODEM.tzone=$(uci -q get profile.default.tzone)
+	uci set modem.modeminfo$CURRMODEM.mtu=$(uci -q get profile.default.mtu)	
 	uci set modem.modeminfo$CURRMODEM.nodhcp=$(uci -q get profile.default.nodhcp)
 	pdp=$(uci -q get profile.default.pdptype)
 	if [ $pdp = "0" ]; then

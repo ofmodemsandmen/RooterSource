@@ -1,28 +1,23 @@
 #!/bin/sh
-
 #
 # /etc/hotplug.d/iface/19-rooter
 #
+for I in `seq 1 $(uci get modem.general.modemnum)`
+do
+	IFACE="wan"$I
 
-IFACE="wan1"
+	[ "$ACTION" = ifup -o "$ACTION" = ifupdate ] || exit 0
 
-[ "$ACTION" = ifup -o "$ACTION" = ifupdate ] || exit 0
-
-if [ ${INTERFACE} = "$IFACE" ]; then
-	if [ ${ACTION} = "ifup" ]; then
-
-# configure custom MTU value in 'System - Startup - Local Startup' by using "echo 1500 > /tmp/wan1.mtu"
-
-		if [ -s /tmp/$IFACE.mtu ]; then
-			MTU=$(cat /tmp/$IFACE.mtu 2>/dev/null)
-			MTU=$(echo $MTU | grep -o "[[:digit:]]\{3,4\}")
+	if [ ${INTERFACE} = "$IFACE" ]; then
+		if [ ${ACTION} = "ifup" ]; then
+			MTU=$(uci get modem.modeminfo$I.mtu)
+			if [ -z $MTU ]; then
+				MTU=1500
+			fi
 			if [ -n "$MTU" ]; then
 				ip link set mtu $MTU dev $DEVICE
-				logger -t "MTU adjustment" MTU size on $DEVICE set to $MTU
+				logger -t "Custom MTU" $DEVICE set to $MTU
 			fi
 		fi
 	fi
-fi
-
-
-		
+done

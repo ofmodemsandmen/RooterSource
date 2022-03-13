@@ -4,6 +4,7 @@ m = Map("custom", translate("Bandwidth Allocation"), translate("Set Maximum Band
 
 m.on_after_save = function(self)
 	luci.sys.call("/usr/lib/bwmon/allocate.sh 0 &")
+	luci.sys.call("/usr/lib/bwmon/editemail.sh &")
 end
 
 s = m:section(TypedSection, "bwallocate", "Allocation Settings")
@@ -215,6 +216,16 @@ xxct:value("100", "Every 100 GB")
 xxct.default = "50"
 xxct:depends("method", "1")
 
+--b3 = s:option(DummyValue, "blank", " ");
+
+btn = s:option(Button, "_btn", translate(" "))
+btn.inputtitle = translate("Send Test of Text or Email")
+btn.inputstyle = "apply"
+function btn.write()
+	luci.sys.call("/usr/lib/bwmon/dotext.sh")
+end
+
+b4 = s:option(DummyValue, "blank", " ");
 
 ct = s:option(ListValue, "tore", translate("Sending Method : "), translate("Method used to send information"))
 ct.rmempty = true
@@ -228,21 +239,41 @@ ph.optional=false;
 ph.rmempty = true;
 ph.datatype = "phonedigit"
 ph:depends("tore", "0")
-ph.default = "0"
+ph.default = "12223334444"
 
 ph1 = s:option(Value, "email", "Email Address :");
 ph1.optional=false; 
 ph1.rmempty = true;
 ph1:depends("tore", "1")
-ph1.default = "JDoe@domain.com"
+ph1.default = "jdoe@domain.com"
 
-b3 = s:option(DummyValue, "blank", " ");
 
-btn = s:option(Button, "_btn", translate(" "), translate("Test by sending a text or email right now"))
-btn.inputtitle = translate("Send Test of Text or Email")
-btn.inputstyle = "apply"
-function btn.write()
-	luci.sys.call("/usr/lib/bwmon/dotext.sh")
-end
+
+ct1 = s:option(ListValue, "eedit", translate("Edit Email Account : "), translate("Change information about email account"))
+ct.rmempty = true
+ct1:value("0", "No")
+ct1:value("1", "Yes")
+ct1.default = "0"
+ct1:depends("tore", "1")
+
+ph2 = s:option(Value, "smtp", "SMTP Host :");
+ph2.optional=false; 
+ph2.rmempty = true;
+ph2:depends("eedit", "1")
+ph2.default = "smtp.gmail.com"
+
+ph3 = s:option(Value, "euser", "User Name :");
+ph3.optional=false; 
+ph3.rmempty = true;
+ph3:depends("eedit", "1")
+ph3.default = "user@gmail.com"
+
+ph4 = s:option(Value, "epass", "Password :");
+ph4.optional=false; 
+ph4.rmempty = true;
+ph4:depends("eedit", "1")
+ph4.default = "xxxxxxxxxxxxxxxx"
+
+
 
 return m
