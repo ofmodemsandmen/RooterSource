@@ -8,6 +8,11 @@ NEWMOD=$1
 	logger -t "ProtoChange" "$@"
  }
  
+ifname1="ifname"
+if [ -e /etc/newstyle ]; then
+	ifname1="device"
+fi
+ 
  change_bconf() {
 	local devname=$1
 	local conf=$2

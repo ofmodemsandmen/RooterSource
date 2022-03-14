@@ -20,7 +20,15 @@ TTL="$2"
 IFACE=$(uci get modem.modem$CURRMODEM.interface)
 
 if [ "$TTL" = "0" ]; then
-	exit 0
+	ENB=$(uci get ttl.ttl.enabled)
+	if [ $ENB = "1" ]; then
+		TTL=$(uci get ttl.ttl.value)
+		if [ -z $TTL ]; then
+			TTL=65
+		fi
+	else
+		exit 0
+	fi
 fi
 
 if [ "$TTL" = "1" ]; then
