@@ -221,6 +221,7 @@ xxct:depends("method", "1")
 btn = s:option(Button, "_btn", translate(" "))
 btn.inputtitle = translate("Send Test of Text or Email")
 btn.inputstyle = "apply"
+btn:depends("text", "1")
 function btn.write()
 	luci.sys.call("/usr/lib/bwmon/dotext.sh")
 end
