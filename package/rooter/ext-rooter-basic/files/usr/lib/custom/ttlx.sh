@@ -9,7 +9,7 @@ ENB=$(uci get ttl.ttl.enabled)
 CURRMODEM=1
 IFACE=$(uci get modem.modem$CURRMODEM.interface)
 FLG=0
-
+log "$ENB $IFACE"
 exst=$(cat /etc/firewall.user | grep "#startTTL")
 if [ ! -z "$exst" ]; then
 	cp -f /etc/firewall.user /etc/firewall.user.bk
@@ -23,7 +23,7 @@ if [ $ENB -eq 1 ]; then
 		VALUE=65
 	fi
 	echo "#startTTL" >> /etc/firewall.user
-	log Setting TTL on interface $IFACE
+	log "Setting TTL $VALUE on interface $IFACE"
 	
 	if [ $VALUE = 0 ]; then
 		echo "iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-inc 1" >> /etc/firewall.user
@@ -40,5 +40,5 @@ if [ $ENB -eq 1 ]; then
 	FLG=1
 fi
 if [ $FLG -eq 1 ]; then
-	/etc/init.d/firewall restart
+	/etc/init.d/firewall restart 2> /dev/null
 fi

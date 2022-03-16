@@ -2,12 +2,16 @@
 #
 # /etc/hotplug.d/iface/19-rooter
 #
+
+log() {
+	logger -t "19-ROOTER" "$@"
+}
+
 for I in `seq 1 $(uci get modem.general.modemnum)`
 do
 	IFACE="wan"$I
 
 	[ "$ACTION" = ifup -o "$ACTION" = ifupdate ] || exit 0
-	
 	if [ ${INTERFACE} = "$IFACE" ]; then
 		if [ ${ACTION} = "ifup" ]; then
 			# TTL fix
@@ -18,8 +22,9 @@ do
 			if [ $ttl -eq 0 ]; then
 				ENB=$(uci get ttl.ttl.enabled)
 				if [ ! -z "$ENB" ]; then
-					exst=$(cat /etc/firewall.user | grep " mangle .* $DEVICE " | wc -l)
-					[ "$exst" -eq 4 ] || /usr/lib/custom/ttlx.sh
+					#exst=$(cat /etc/firewall.user | grep " mangle .* $DEVICE " | wc -l)
+					#[ "$exst" -eq 4 ] || /usr/lib/custom/ttlx.sh
+					/usr/lib/custom/ttlx.sh
 				fi
 			fi
 			MTU=$(uci get modem.modeminfo$I.mtu)

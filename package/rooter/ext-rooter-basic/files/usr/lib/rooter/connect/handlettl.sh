@@ -47,7 +47,7 @@ fi
 delTTL
 VALUE="$TTL"
 echo "#startTTL" >> /etc/firewall.user
-log "Setting TTL on interface $IFACE"
+log "Setting TTL $VALUE on interface $IFACE"
 
 if [ $VALUE = "0" ]; then
 	echo "iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-inc 1" >> /etc/firewall.user
