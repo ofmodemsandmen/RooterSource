@@ -1695,5 +1695,16 @@
 		"ext1": "-upgrade.bin",
 		"ext2": "-factory.bin",
 		"addons": ["readme.pdf"]
+	},
+	"ORANGEP": {
+		"details": "OrangePi Plus",
+		"type": "4",
+		"build": "1907",
+		"config": ".config_orangep",
+		"image1": "openwrt-sunxi-cortexa7-sun8i-h3-orangepi-plus-ext4-sdcard.img.gz",
+		"image2": "openwrt-sunxi-cortexa7-sun8i-h3-orangepi-plus-ext4-sdcard.img",
+		"imagepath": "/sunxi/cortexa7/",
+		"mod": "OrangePi-Plus",
+		"addons": ["readme.pdf"]
 	}
 }

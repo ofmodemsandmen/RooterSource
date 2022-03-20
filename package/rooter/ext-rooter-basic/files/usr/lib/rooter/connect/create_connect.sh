@@ -806,9 +806,9 @@ if [ -n "$CHKPORT" ]; then
 	if [ -z $ttl ]; then
 		ttl=0
 	fi
-	if [ $ttl -ne 0 ]; then
+	#if [ $ttl -ne 0 ]; then
 		$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl"
-	fi
+	#fi
 
 	if [ -e $ROOTER/changedevice.sh ]; then
 		$ROOTER/changedevice.sh $ifname

@@ -4,7 +4,7 @@ opengt
  set senddelay 0.05
  waitquiet 1 0.2
 :start
-let f=75
+let f=20
 let $x=$env("ATCMD")
 send $x+"^m"
 waitfor 2 "OK"

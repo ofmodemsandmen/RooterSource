@@ -16,6 +16,7 @@ O=$($ROOTER/common/processat.sh "$OX")
 O=$(echo $O)
 
 REGXca="BAND:[0-9]\{1,3\} BW:[0-9.]\+MHZ EARFCN:[0-9]\+ PCI:[0-9]\+ RSRP:[^R]\+RSRQ:[^R]\+RSSI:[^S]\+SNR[^D]\+"
+REGXrxd="RX_DIVERSITY:[^(]\+([^)]\+"
 
 RSRP=""
 RSRQ=""
@@ -82,6 +83,20 @@ if [ -n "$TECH" ]; then
 			DEBUGv2=$(echo $O | grep -o "LTE ENGINEERING")
 			if [ -n "$DEBUGv1" ]; then
 				RSCP=$(echo $O | grep -o "[^G] RSRP: [^D]\+D" | grep -o "[-0-9\.]\+")
+				RSRPlist=$(echo $OX | grep -o "$REGXrxd" | grep -o "\-[.0-9]\{4,5\}" | tr "\n" ",")
+				if [ -n "$RSRPlist" ]; then
+					RSCP=$(echo $RSRPlist | cut -d, -f1)
+					MIMO=$(echo $OX | grep -o "$REGXrxd" | cut -d" " -f2)
+					if [ "$MIMO" == "3" ]; then
+						RSCP="(2xMIMO) $RSCP"
+					fi
+					for IDX in 2 3 4; do
+						RSCPval=$(echo $RSRPlist | cut -d, -f$IDX)
+						if [ -n "$RSCPval" -a "$RSCPval" != "-256.0" ]; then
+							RSCP="$RSCP dBm, $RSCPval"
+						fi
+					done
+				fi
 				CHANNEL=$(echo $O | grep -o " EARFCN(DL/UL): [0-9]\+" | grep -o "[0-9]\+")
 				BWD=$(echo $O | grep -o " BW: [0-9\.]\+ MHZ" | grep -o "[0-9\.]\+")
 				if [ "$BWD" != "1.4" ]; then

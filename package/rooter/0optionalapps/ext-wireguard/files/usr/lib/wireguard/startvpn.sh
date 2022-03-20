@@ -206,6 +206,7 @@ handle_client() {
 			break
 		fi
 	done
+	uci add_list network.wg0.addresses="::/0"
 	
 	create_cpeer $WG
 	

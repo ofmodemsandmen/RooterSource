@@ -5,7 +5,7 @@ m = Map("ttl", "Firewall - Custom TTL Settings",
 	translate("Enable and use a custom TTL value with modems"))
 
 m.on_after_save = function(self)
-	luci.sys.call("/usr/lib/custom/ttlx.sh &")
+	--luci.sys.call("/usr/lib/custom/ttlx.sh &")
 end
 
 gw = m:section(TypedSection, "ttl", translate("Settings"))
