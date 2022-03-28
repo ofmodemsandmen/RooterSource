@@ -137,7 +137,7 @@ end
 			if ( stat == "0" )
 			{
 				bnds = "0" ;
-				document.getElementById("active").innerHTML="No Modem Present";
+				document.getElementById("active").innerHTML="<%:No Modem Present%>";
 				document.getElementById("conn").disabled=true;
 				document.getElementById("disconn").disabled=true;
 				document.getElementById("sendcmdat").disabled=true;
@@ -192,7 +192,7 @@ end
 					{
 						x = document.getElementById("drop1");
 						option = document.createElement("option");
-						option.text = "Wait for Modem";
+						option.text = "<%:Wait for Modem:%>";
 						x.add(option);
 					}
 					
@@ -217,7 +217,7 @@ end
 			}
 			if ( stat == "1" )
 			{
-				document.getElementById("active").innerHTML="Modem Present/Not Connected";
+				document.getElementById("active").innerHTML="<%:Modem Present/Not Connected%>";
 				document.getElementById("conn").disabled=false;
 				document.getElementById("disconn").disabled=true;
 				document.getElementById("sendcmdat").disabled=false;
@@ -292,7 +292,7 @@ end
 					if ( usb == "1" )
 					{
 						document.getElementById("pwrtoggle").style.display="block";
-						document.getElementById("pwrtoggle").value="Reset USB 1";
+						document.getElementById("pwrtoggle").value="<%:Reset USB 1%>";
 						document.getElementById("pwrtoggle").disabled=false;
 						document.getElementById("pwrtoggle").style.visibility="visible";
 						document.getElementById("pwrtoggle1").style.display="none";
@@ -300,11 +300,11 @@ end
 					if ( usb == "2" )
 					{
 						document.getElementById("pwrtoggle").style.display="block";
-						document.getElementById("pwrtoggle").value="Reset USB 1";
+						document.getElementById("pwrtoggle").value="<%:Reset USB 1%>";
 						document.getElementById("pwrtoggle").disabled=false;
 						document.getElementById("pwrtoggle").style.visibility="visible";
 						document.getElementById("pwrtoggle1").style.display="block";
-						document.getElementById("pwrtoggle1").value="Reset USB 2";
+						document.getElementById("pwrtoggle1").value="<%:Reset USB 2%>";
 						document.getElementById("pwrtoggle1").disabled=false;
 						document.getElementById("pwrtoggle1").style.visibility="visible";
 					}
@@ -312,7 +312,7 @@ end
 				if ( gpio == "1" )
 				{
 					document.getElementById("pwrtoggle").style.display="block";
-					document.getElementById("pwrtoggle").value="Power Toggle USB 1";
+					document.getElementById("pwrtoggle").value="<%:Power Toggle USB 1%>";
 					document.getElementById("pwrtoggle").disabled=false;
 					document.getElementById("pwrtoggle").style.visibility="visible";
 					document.getElementById("pwrtoggle1").style.display="none";
@@ -320,18 +320,18 @@ end
 				if ( gpio == "2" )
 				{
 					document.getElementById("pwrtoggle").style.display="block";
-					document.getElementById("pwrtoggle").value="Power Toggle USB 1";
+					document.getElementById("pwrtoggle").value="<%:Power Toggle USB 1%>";
 					document.getElementById("pwrtoggle").disabled=false;
 					document.getElementById("pwrtoggle").style.visibility="visible";
 					document.getElementById("pwrtoggle1").style.display="block";
-					document.getElementById("pwrtoggle1").value="Power Toggle USB 2";
+					document.getElementById("pwrtoggle1").value="<%:Power Toggle USB 2%>";
 					document.getElementById("pwrtoggle1").disabled=false;
 					document.getElementById("pwrtoggle1").style.visibility="visible";
 				}
 			}
 			if ( stat == "2" )
 			{
-				document.getElementById("active").innerHTML="Modem Connected";
+				document.getElementById("active").innerHTML="<%:Modem Connected%>";
 				document.getElementById("conn").disabled=true;
 				document.getElementById("disconn").disabled=false;
 				document.getElementById("apply1").disabled=false;
@@ -399,7 +399,7 @@ end
 					if ( usb == "1" )
 					{
 						document.getElementById("pwrtoggle").style.display="block";
-						document.getElementById("pwrtoggle").value="Reset USB 1";
+						document.getElementById("pwrtoggle").value="<%:Reset USB 1%>";
 						document.getElementById("pwrtoggle").disabled=false;
 						document.getElementById("pwrtoggle").style.visibility="visible";
 						document.getElementById("pwrtoggle1").style.display="none";
@@ -407,11 +407,11 @@ end
 					if ( usb == "2" )
 					{
 						document.getElementById("pwrtoggle").style.display="block";
-						document.getElementById("pwrtoggle").value="Reset USB 1";
+						document.getElementById("pwrtoggle").value="<%:Reset USB 1%>";
 						document.getElementById("pwrtoggle").disabled=false;
 						document.getElementById("pwrtoggle").style.visibility="visible";
 						document.getElementById("pwrtoggle1").style.display="block";
-						document.getElementById("pwrtoggle1").value="Reset USB 2";
+						document.getElementById("pwrtoggle1").value="<%:Reset USB 2%>";
 						document.getElementById("pwrtoggle1").disabled=false;
 						document.getElementById("pwrtoggle1").style.visibility="visible";
 					}
@@ -419,7 +419,7 @@ end
 				if ( gpio == "1" )
 				{
 					document.getElementById("pwrtoggle").style.display="block";
-					document.getElementById("pwrtoggle").value="Power Toggle USB 1";
+					document.getElementById("pwrtoggle").value="<%:Power Toggle USB 1%>";
 					document.getElementById("pwrtoggle").disabled=false;
 					document.getElementById("pwrtoggle").style.visibility="visible";
 					document.getElementById("pwrtoggle1").style.display="none";
@@ -427,11 +427,11 @@ end
 				if ( gpio == "2" )
 				{
 					document.getElementById("pwrtoggle").style.display="block";
-					document.getElementById("pwrtoggle").value="Power Toggle USB 1";
+					document.getElementById("pwrtoggle").value="<%:Power Toggle USB 1%>";
 					document.getElementById("pwrtoggle").disabled=false;
 					document.getElementById("pwrtoggle").style.visibility="visible";
 					document.getElementById("pwrtoggle1").style.display="block";
-					document.getElementById("pwrtoggle1").value="Power Toggle USB 2";
+					document.getElementById("pwrtoggle1").value="<%:Power Toggle USB 2%>";
 					document.getElementById("pwrtoggle1").disabled=false;
 					document.getElementById("pwrtoggle1").style.visibility="visible";
 				}
@@ -449,38 +449,38 @@ end
 			switch(netm)
 			{
 				case "0":
-					mode = "Unknown";
+					mode = "<%:Unknown%>";
 				break;
 				case "1":
-					mode = "Automatic";
+					mode = "<%:Automatic%>";
 				break;
 				case "2":
-					mode = "2G Preferred";
+					mode = "<%:2G Preferred%>";
 				break;
 				case "3":
-					mode = "2G Only";
+					mode = "<%:2G Only%>";
 				break;
 				case "4":
-					mode = "3G Preferred";
+					mode = "<%:3G Preferred%>";
 				break;
 				case "5":
-					mode = "3G Only";
+					mode = "<%:3G Only%>";
 				break;
 				case "6":
-					mode = "4G Preferred";
+					mode = "<%:4G Preferred%>";
 				break;
 				case "7":
-					mode = "4G Only";
+					mode = "<%:4G Only%>";
 				break;
 				case "8":
-					mode = "4G & 5G Dual Mode";
+					mode = "<%:4G & 5G Dual Mode%>";
 				break;
 				case "9":
-					mode = "5G Only";
+					mode = "<%:5G Only%>";
 				break;
 				case "10":
-					mode = "Changing Mode ...";
-					document.getElementById("apply1").value="Applying Change";
+					mode = "<%:Changing Mode ...%>";
+					document.getElementById("apply1").value="<%:Applying Change%>";
 					document.getElementById("apply1").disabled=true;
 				break;
 
@@ -601,38 +601,38 @@ end
 					document.getElementById("mdl").style.color = "inherit";
 					if ( netm == nsa )
 					{
-						model = rv.model + " NSA Mode";
+						model = rv.model + "<%: NSA Mode%>";
 						modelx = model ;
 						if ( bxs == 0 )
 						{
-							model = modelx + " ***No LTE Bands selected - will not connect***";
+							model = modelx + "<%: ***No LTE Bands selected - will not connect***%>";
 							document.getElementById("mdl").style.color = "red";
 						}
 						if ( bxs5g == 0 )
 						{
-							model = modelx + " ***No 5G Bands selected - will not connect***";
+							model = modelx + "<%: ***No 5G Bands selected - will not connect***%>";
 							document.getElementById("mdl").style.color = "red";
 						}
-						document.getElementById("5gbnd").innerHTML="5G NSA Bands";
+						document.getElementById("5gbnd").innerHTML="<%:5G NSA Bands%>";
 						document.getElementById("5gbnd").style.fontWeight = "bold" ;
 					}
 					else
 					{
 						if ( netm == nsan )
 						{
-							model = rv.model + " SA Mode";
+							model = rv.model + "<%: SA Mode%>";
 							if ( bxs5g == 0 )
 							{
-								model = model + " ***No 5G Bands selected - will not connect***";
+								model = model + "<%: ***No 5G Bands selected - will not connect***%>";
 								document.getElementById("mdl").style.color = "red";
 							}
-							document.getElementById("5gbnd").innerHTML="5G SA Bands";
+							document.getElementById("5gbnd").innerHTML="<%:5G SA Bands%>";
 							document.getElementById("5gbnd").style.fontWeight = "bold" ;
 						}
 					}
 				}
 			}
-			document.getElementById("mdl").innerHTML="Modem : " + model;
+			document.getElementById("mdl").innerHTML="<%:Modem : %>" + model;
 			document.getElementById("mdl").style.fontWeight = "bold" ;
 
 			//
@@ -675,8 +675,8 @@ end
 						document.getElementById("cellbtn").disabled=false;
 						if ( cenable == "0" )
 						{
-							document.getElementById('cellbtn').value="Enable Cell Lock";
-							document.getElementById("cstatus").innerHTML="Not Locked to Cell";
+							document.getElementById('cellbtn').value="<%:Enable Cell Lock%>";
+							document.getElementById("cstatus").innerHTML="<%:Not Locked to Cell%>";
 							document.getElementById("earfcn").disabled=false;
 							document.getElementById("pci").disabled=false;
 							document.getElementById("earfcn1").disabled=false;
@@ -684,8 +684,8 @@ end
 						}
 						else
 						{
-							document.getElementById('cellbtn').value="Disable Cell Lock";
-							document.getElementById("cstatus").innerHTML="Locked to Cell";
+							document.getElementById('cellbtn').value="<%:Disable Cell Lock%>";
+							document.getElementById("cstatus").innerHTML="<%:Locked to Cell%>";
 							document.getElementById("earfcn").disabled=true;
 							document.getElementById("pci").disabled=true;
 							document.getElementById("earfcn1").disabled=true;
@@ -1170,11 +1170,11 @@ end
 			var s = document.getElementById("atcmd").value;
 			if ( s.length == 0 )
 			{
-				alert("You must enter an AT-Command!!");
+				alert('<%:You must enter an AT-Command!!%>');
 				return false;
 			}
 			atsend=1;
-			document.getElementById("attxt").value="Waiting for a Response";
+			document.getElementById("attxt").value='<%:Waiting for a Response%>';
 			XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "send_atcmd")%>',
 				{ set: s },
 				function(x, rv)
@@ -1193,11 +1193,11 @@ end
 		var s = document.getElementById("atcmd").value;
 		if ( s.length == 0 )
 		{
-			alert("You must enter an AT-Command!!");
+			alert("<%:You must enter an AT-Command!!%>");
 			return false;
 		}
 		atsend=1;
-		document.getElementById("attxt").value="Waiting for a Response";
+		document.getElementById("attxt").value="<%:Waiting for a Response%>";
 		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "send_atcmd")%>',
 			{ set: s },
 			function(x, rv)
@@ -1227,10 +1227,10 @@ end
 		{
 			return false;
 		}
-		if ( confirm("Modem will be restarted after Protocol change\nContinue?") )
+		if ( confirm("<%:Modem will be restarted after Protocol change\nContinue?%>") )
 		{
-			document.getElementById("modpro").innerHTML = "Changing Protocol ...";
-			document.getElementById("probutton").value="Applying Change";
+			document.getElementById("modpro").innerHTML = "<%:Changing Protocol ...%>";
+			document.getElementById("probutton").value="<%:Applying Change%>";
 			document.getElementById("probutton").disabled=true;
 			
 			XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "change_proto")%>',
@@ -1274,8 +1274,8 @@ end
 				nmode=document.getElementById("net4").value;
 				break;
 		}
-		document.getElementById("netmode").innerHTML = "Changing Mode ...";
-		document.getElementById("apply1").value="Applying Change";
+		document.getElementById("netmode").innerHTML = "<%:Changing Mode ...%>";
+		document.getElementById("apply1").value="<%:Applying Change%>";
 		document.getElementById("apply1").disabled=true;
 
 		var modemtype = 0;
@@ -1386,7 +1386,7 @@ end
 	function scanbnd()
 	{
 		s = " " ;
-		document.getElementById("bndtxt").value="Cell Scanner Start ...";
+		document.getElementById("bndtxt").value="<%:Cell Scanner Start ...%>";
 		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "send_scancmd")%>',
 			{ set: s },
 			function(x, rv)
@@ -1413,7 +1413,7 @@ end
 			rstr = rstr + ',' + rstr5g ;
 		}
 
-		if ( confirm("Modem will be locked to selected bands.\nContinue?") )
+		if ( confirm("<%:Modem will be locked to selected bands.\nContinue?%>") )
 		{
 			s = rstr ;
 			XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "send_lockcmd")%>',
@@ -1519,7 +1519,7 @@ end
 		document.getElementById("attxt").value=index;
 		
 		atsend=1;
-		document.getElementById("attxt").value="Waiting for a Response";
+		document.getElementById("attxt").value="<%:Waiting for a Response%>";
 		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "send_atcmd")%>',
 			{ set: index },
 			function(x, rv)
@@ -1602,11 +1602,11 @@ end
 			var s = document.getElementById("atcmdlck").value;
 			if ( s.length == 0 )
 			{
-				alert("You must enter an AT-Command!!");
+				alert("<%:You must enter an AT-Command!!%>");
 				return false;
 			}
 			atsend=1;
-			document.getElementById("attxt").value="Waiting for a Response";
+			document.getElementById("attxt").value="<%:Waiting for a Response%>";
 			XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "send_atcmd")%>',
 				{ set: s },
 				function(x, rv)
@@ -1625,7 +1625,7 @@ end
 		var s = document.getElementById("atcmdlck").value;
 		if ( s.length == 0 )
 		{
-			alert("You must enter an AT-Command!!");
+			alert("<%:You must enter an AT-Command!!%>");
 			return false;
 		}
 		atsend=1;
@@ -1654,12 +1654,12 @@ end
 			var pc1 = document.getElementById("pci1").value;
 			if ( ear.length == 0 )
 			{
-				alert("You must enter an EARFCN Number!!");
+				alert("<%:You must enter an EARFCN Number!!%>");
 				return false;
 			}
 			if ( pc.length == 0 )
 			{
-				alert("You must enter a PCI Number!!");
+				alert("<%:You must enter a PCI Number!!%>");
 				return false;
 			}
 			if ( ear1.length == 0 )
@@ -1678,7 +1678,7 @@ end
 			st = "0|0|0";
 			cenable = "0";
 		}
-		if ( confirm("Modem will be restarted after change in cell lock status.\nContinue?") )
+		if ( confirm("<%:Modem will be restarted after change in cell lock status.\nContinue?%>") )
 		{
 			document.getElementById("earfcn").disabled=true;
 			document.getElementById("pci").disabled=true;
@@ -1699,8 +1699,8 @@ end
 
 <form method="post" action="<%=REQUEST_URI%>">
 <div class="cbi-map" id="cbi-misc">
-<h2><a id="content" name="content">Miscellaneous Modem Features</a></h2>
-<div class="cbi-map-descr">A Collection of Modem Features</div>
+<h2><a id="content" name="content"><%:Miscellaneous Modem Features%></a></h2>
+<div class="cbi-map-descr"><%:A Collection of Modem Features%></div>
 <head>
      <style>
       input {
@@ -1725,7 +1725,7 @@ end
     </style>
 </head>
 <fieldset class="cbi-section" id="cbi-modi">
-	<legend>Current Modem</legend>
+	<legend><%:Current Modem%></legend>
 	<table width="550"  border="0">
   	<tr>
     		<td width="40%"><ul id="active"></ul></td>
@@ -1766,7 +1766,7 @@ end
 	<div id="popup">
 		<table width="500" border="0">
 			<tr>
-				<td width="50px"><div>Enter Password to Unlock Full Terminal</div></td>
+				<td width="50px"><div><%:Enter Password to Unlock Full Terminal%></div></td>
 			</tr>
 			<tr>
 				<td width="200px"><input id="pass" type="password"/></td>
@@ -1779,7 +1779,7 @@ end
 	
 	<table width="700" border="0" id="droptxt">
 	<tr>
-		<td width="10%"><div align="right">AT-Command : </div></td>
+		<td width="10%"><div align="right"><%:AT-Command : %></div></td>
 		<td width="15%">
 			<select style="width:200px" name="atdrop" id="drop1">
 			</select>
@@ -1805,7 +1805,7 @@ end
 	
 	<table width="700" border="0" id="linetxt">
 	<tr>
-		<td width="5%"><div align="right">AT-Command : </div></td>
+		<td width="5%"><div align="right"><%:AT-Command : %></div></td>
 		<td width="20%"><input type="text" name="atcmd" id="atcmd" class="cbi-input-text" style="width: 350px;" maxlength="500"  onkeydown="sndcmd(event)" ></input></td>
 		<td width="75%">&nbsp;</td>
 	</tr>
