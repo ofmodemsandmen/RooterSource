@@ -238,8 +238,10 @@ while [ 1 = 1 ]; do
 			LBAND="-"
 			TEMP="-"
 			SINR="-"
-			source /tmp/signal$CURRMODEM.file
-			rm -f /tmp/signal$CURRMODEM.file
+			if [ -e /tmp/signal$CURRMODEM.file ]; then
+				source /tmp/signal$CURRMODEM.file
+				rm -f /tmp/signal$CURRMODEM.file
+			fi
 			if [ -e /tmp/phonenumber$CURRMODEM ]; then
 				source /tmp/phonenumber$CURRMODEM
 				rm -f /tmp/phonenumber$CURRMODEM
