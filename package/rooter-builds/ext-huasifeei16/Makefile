@@ -13,7 +13,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/ext-huasifei16
   SECTION:=utils
   CATEGORY:=ROOter
-  DEPENDS:=+luci +ext-rooter-basic +pingtest \
+  DEPENDS:=+luci +ext-rooter-basic +pingtest +ext-blacklist +ext-blockport \
   		+extramenu +bwallocate +ext-domain +ext-zerotier \
   		+luci-app-mwan3 +luci-app-dnsmasq-ipset \
 		+luci-app-ddns +ddns-scripts \
