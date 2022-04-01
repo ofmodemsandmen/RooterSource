@@ -1,0 +1,12 @@
+/dts-v1/;
+
+#include "Huasifei-WS1208V2.dtsi"
+
+/ {
+	compatible = "huasifei,huasifei-ws1208v2", "huasifei,huasifei-ws1208v2", "mediatek,mt7621-soc";
+	model = "Huasifei-WS1208V2";
+};
+
+&firmware {
+	reg = <0x50000 0xfb0000>;
+};

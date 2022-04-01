@@ -455,6 +455,11 @@ youku-yk1)
 	set_wifi_led "$boardname:blue:air"
 	ucidef_set_led_switch "wan" "wan" "$boardname:blue:wan" "switch0" "0x10"
 	;;
+huasifei,huasifei-ws1208v2)
+	ucidef_set_led_wlan "wlan2g" "wlan2g" "$boardname:wifi24" "phy0tpt"
+	ucidef_set_led_netdev "wwan0" "wwan0" "$boardname:green:4g5g" "wwan0" "link tx rx"
+	ucidef_set_led_usbport "usb" "USB" "$boardname:usb" "usb1-port1"
+	;;
 esac
 
 board_config_flush

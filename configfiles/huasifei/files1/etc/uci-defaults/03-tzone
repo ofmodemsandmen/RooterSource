@@ -1,0 +1,5 @@
+#!/bin/sh
+
+uci set system.@system[0].hostname='Huasifei'
+uci commit system
+/etc/init.d/system restart

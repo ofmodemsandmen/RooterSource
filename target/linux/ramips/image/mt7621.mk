@@ -762,6 +762,18 @@ define Device/zbt-wg1602-16M
 endef
 TARGET_DEVICES += zbt-wg1602-16M
 
+define Device/huasifei-ws1208v2
+  DTS := Huasifei-WS1208V2
+  IMAGE_SIZE := $(ralink_default_fw_size_16M)
+  SUPPORTED_DEVICES += huasifei-ws1208v2
+  DEVICE_TITLE := Huasifei-WS1208V2
+  DEVICE_PACKAGES := \
+	kmod-ata-core kmod-ata-ahci kmod-sdhci-mt7620 kmod-mt7603 kmod-mt76x2 \
+	kmod-usb3 kmod-usb-ledtrig-usbport wpad-basic
+endef
+TARGET_DEVICES += huasifei-ws1208v2
+
+
 define Device/zbt-wg3526-32M
   DTS := ZBT-WG3526-32M
   IMAGE_SIZE := $(ralink_default_fw_size_32M)

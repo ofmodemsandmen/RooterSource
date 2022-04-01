@@ -1,0 +1,11 @@
+config iframe 'iframe'
+	option splashpage '1'
+	option splashtitle 'WS1208'
+	
+config login 'login'
+	option logframe '1'
+	option logtype '2'
+	option logimage 'haul.jpg'
+	option logimageheight '300'
+	option logimagewidth '300'
+	option logimagepos 'absmiddle'

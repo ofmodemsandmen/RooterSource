@@ -141,6 +141,7 @@ ramips_setup_interfaces()
 	zbt-wg3526-32M|\
 	zbt-wg209-16M|\
 	zbt-wg1602-16M|\
+	huasifei-ws1208v2\
 	zbt-wr8305rt)
 		ucidef_add_switch "switch0" \
 			"0:lan" "1:lan" "2:lan" "3:lan" "4:wan" "6@eth0"

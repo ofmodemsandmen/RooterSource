@@ -700,6 +700,9 @@ ramips_board_detect() {
 	*"ZBT-WE2802D")
         name="zbt-we2802d"
         ;;
+        *"Huasifei-WS1208V2")
+		name="huasifei-ws1208v2"
+		;;
 	*"ZyXEL Keenetic")
 		name="kn"
 		;;
