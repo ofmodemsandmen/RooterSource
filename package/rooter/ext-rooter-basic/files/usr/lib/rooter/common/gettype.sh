@@ -139,6 +139,13 @@ if [ "$IDV" == "2c7c" ]; then
 		ATCMDD="AT+QLWCFG=\"startup\",0"
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	fi
+	ATCMDD="AT+QCFG=\"ims\""
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	IMSon=$(echo "$OX" | grep "1")
+	if [ -z "$IMSon" ]; then
+		ATCMDD="AT+QCFG=\"ims\",1"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	fi
 fi
 ATCMDD="AT+CIMI"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")

@@ -351,12 +351,9 @@ fi
 uci commit modem
 
 ttl=$(uci -q get modem.modeminfo$CURRMODEM.ttl)
-if [ -z $ttl ]; then
-	ttl=0
-fi
-#if [ $ttl -ne 0 ]; then
+if [ $ttl -ne 0 ]; then
 	$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl"
-#fi
+fi
 
 if [ $SP -eq 2 ]; then
 	get_connect
@@ -573,6 +570,21 @@ if [ $SP -gt 0 ]; then
 		if [ "$TZ" = "1" ]; then
 			log "Set TimeZone"
 			$ROOTER/timezone.sh &
+		fi
+	fi
+fi
+
+if [ $(uci -q get modem.modeminfo$CURRMODEM.at) -eq "1" ]; then
+	ATCMDD=$(uci -q get modem.modeminfo$CURRMODEM.atc)
+	if [ ! -z "$ATCMDD" ]; then
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		OX=$($ROOTER/common/processat.sh "$OX")
+		ERROR="ERROR"
+		if `echo $OX | grep "$ERROR" 1>/dev/null 2>&1`
+		then
+			log "Error sending custom AT command: $ATCMDD with result: $OX"
+		else
+			log "Sent custom AT command: $ATCMDD with result: $OX"
 		fi
 	fi
 fi
