@@ -5534,8 +5534,10 @@ CONFIG_PACKAGE_ext-blacklist=y
 # CONFIG_PACKAGE_we826q is not set
 # CONFIG_PACKAGE_wg1608 is not set
 # CONFIG_PACKAGE_wg209 is not set
+CONFIG_PACKAGE_wg3526=y
 # CONFIG_PACKAGE_wrt1900 is not set
 # CONFIG_PACKAGE_ws1208v2 is not set
+# CONFIG_PACKAGE_x750 is not set
 
 #
 # Splash Screens
