@@ -259,7 +259,7 @@ f_main()
                             		ubus call network.interface.wwan up
                             		ubus call network reload
                             		f_log "info " "main    ::: wwan interface connected to uplink ${ssid}"
-						sleep 5						
+						sleep 10					
 						f_check "sta"
     						if [ "${trm_ifstatus}" = "true" ]
    						 then

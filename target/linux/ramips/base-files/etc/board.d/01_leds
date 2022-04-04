@@ -432,7 +432,7 @@ zbt-we826-32M)
 	ucidef_set_led_switch "lan2" "lan2" "zbt-we826:green:lan2" "switch0" "0x04"
 	ucidef_set_led_switch "lan3" "lan3" "zbt-we826:green:lan3" "switch0" "0x02"
 	ucidef_set_led_switch "lan4" "lan4" "zbt-we826:green:lan4" "switch0" "0x01"
-	ucidef_set_led_switch "wan" "wan" "zbt-we826:green:wan" "switch0" "0x10"
+	ucidef_set_led_netdev "wan" "wan" "zbt-we826:green:wan" "wwan0" "link tx rx"
 	;;
 zbtlink,zbt-we1226)
 	set_wifi_led "$boardname:green:wlan"
