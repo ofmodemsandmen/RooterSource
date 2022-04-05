@@ -296,6 +296,9 @@ if [ $SP -gt 0 ]; then
 	fi
 fi
 $ROOTER/connect/get_profile.sh $CURRMODEM
+if [ -e $ROOTER/simlockc.sh ]; then
+	$ROOTER/simlockc.sh $CURRMODEM
+fi
 
 INTER=$(uci get modem.modeminfo$CURRMODEM.inter)
 if [ -z $INTER ]; then

@@ -482,6 +482,15 @@ function action_get_csq()
 		rv["phonen"] = file:read("*line")
 		file:close()
 	end
+	
+	stat = "/tmp/simpin" .. modnum
+	file = io.open(stat, "r")
+	if file == nil then
+		rv["simerr"] = "0"
+	else
+		rv["simerr"] = "1"
+		file:close()
+	end
 
 	luci.http.prepare_content("application/json")
 	luci.http.write_json(rv)

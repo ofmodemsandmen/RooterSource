@@ -69,6 +69,17 @@ end
 				document.getElementById("phonen").disabled=true;
 				phonenx = "";
 			}
+			
+			simerr = rv.simerr;
+			if (simerr == "1")
+			{
+				document.getElementById("simwarn").style.display="block";
+				document.getElementById("simsg").style.color = "red";
+			}
+			else
+			{
+				document.getElementById("simwarn").style.display="none";
+			}
 
 			reslt=rv.result
 
@@ -271,6 +282,17 @@ end
 <div class="cbi-map" id="cbi-modem">
 <h2><a id="content" name="content"><%:Signal/Cell Information%></a></h2>
 <div class="cbi-map-descr">Current Connection</div>
+
+<fieldset class="cbi-section" id="simwarn" style="display:none;">
+	<legend><%:SIM WARNING%></legend>
+	<table width="550"  border="1">
+		<tr>
+    		<td width="60%"><div align="right" id="simsg" style="font-size:1.875em"><strong><%:SIM is locked with no SIM Pin entered in Profile!!%></strong></div></td>
+			<td width="40%"></td>
+		</tr>
+	</table>
+	
+</fieldset>
 
 <fieldset class="cbi-section" id="cbi-mod">
 	<legend><%:General Information%></legend>

@@ -731,11 +731,11 @@ fi
 
 CHKPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 if [ -n "$CHKPORT" ]; then
-	if [ -e $ROOTER/simlock.sh ]; then
-		$ROOTER/simlock.sh $CURRMODEM
-	fi
 	$ROOTER/common/gettype.sh $CURRMODEM
 	$ROOTER/connect/get_profile.sh $CURRMODEM
+	if [ -e $ROOTER/simlockc.sh ]; then
+		$ROOTER/simlockc.sh $CURRMODEM
+	fi
 	INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
 	[ $INTER = 3 ] && log "Modem $CURRMODEM disabled in Connection Profile" && exit 1
 	$ROOTER/sms/check_sms.sh $CURRMODEM &
