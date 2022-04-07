@@ -989,15 +989,20 @@ while [ 1 -lt 6 ]; do
 		else
 			OX=$($ROOTER/gcom/gcom-locked "/dev/cdc-wdm$WDMNX" "connect-ncm.gcom" "$CURRMODEM")
 			chcklog "$OX"
-			ERROR="ERROR"
-			if `echo $OX | grep "$ERROR" 1>/dev/null 2>&1`
-			then
+			ERROR=$(echo $OX | grep "ERROR")
+			ERROR1=$(echo $OX | grep "Can't open device")
+			if [ "$ERROR" ]; then
 				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-ncm.gcom" "$CURRMODEM")
 				chcklog "$OX"
+			else
+				if [ "$ERROR1" ]; then
+					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-ncm.gcom" "$CURRMODEM")
+					chcklog "$OX"
+				fi
 			fi
-			ERROR="ERROR"
-			if `echo $OX | grep "$ERROR" 1>/dev/null 2>&1`
-			then
+			ERROR=$(echo $OX | grep "ERROR")
+			ERROR1=$(echo $OX | grep "Can't open device")
+			if [ "$ERROR" -o "$ERROR1" ]; then
 				BRK=1
 				$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
 			else
