@@ -36,6 +36,55 @@ handle_timeout(){
 	fi
 }
 
+check_apn() {
+	IPVAR="IP"
+	local COMMPORT="/dev/ttyUSB"$CPORT
+	if [ -e /etc/nocops ]; then
+		echo "0" > /tmp/block
+	fi
+	ATCMDD="AT+CGDCONT=?"
+	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+
+	[ "$PDPT" = "0" ] && PDPT=""
+	for PDP in "$PDPT" IPV4V6; do
+		if [[ "$(echo $OX | grep -o "$PDP")" ]]; then
+			IPVAR="$PDP"
+			break
+		fi
+	done
+
+	uci set modem.modem$CURRMODEM.pdptype=$IPVAR
+	uci commit modem
+
+	log "PDP Type selected in the Connection Profile: \"$PDPT\", active: \"$IPVAR\""
+
+	if [ "$idV" = "12d1" ]; then
+		CFUNOFF="0"
+	else
+		CFUNOFF="4"
+	fi
+	ATCMDD="AT+CGDCONT?;+CFUN?"
+	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	CGDCONT2=$(echo $OX | grep "+CGDCONT: 2,")
+	if [ -z "$CGDCONT2" ]; then
+		ATCMDD="AT+CGDCONT=2,\"$IPVAR\",\"ims\""
+		OXy=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	fi
+	CGDCONT=$(echo $OX | grep -o "$CID,[^,]\+,[^,]\+,[^,]\+,0,0,1")
+	IPCG=$(echo $CGDCONT | cut -d, -f4)
+	if [ "$CGDCONT" == "$CID,\"$IPVAR\",\"$NAPN\",$IPCG,0,0,1" ]; then
+		if [ -z "$(echo $OX | grep -o "+CFUN: 1")" ]; then
+			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")
+		fi
+	else
+		ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\",,0,0,1"
+		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=$CFUNOFF")
+		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")
+		sleep 5
+	fi
+}
+
 set_dns() {
 	local pDNS1=$(uci -q get modem.modeminfo$CURRMODEM.dns1)
 	local pDNS2=$(uci -q get modem.modeminfo$CURRMODEM.dns2)
@@ -417,20 +466,7 @@ if [ $SP = 5 ]; then
 			ATCMDD="AT+QNETDEVCTL=2,$CID,1"
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		else
-			IPVAR="IP"
-			ATCMDD="AT+CGDCONT=?"
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			if `echo ${OX} | grep "IPV4V6" 1>/dev/null 2>&1`; then
-				IPVAR="IPV4V6"
-			fi
-			ATCMDD="AT+CGDCONT?"
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			CGDCONT=$(echo $OX | grep -o "$CID,[^,]\+,[^,]\+,[^,]\+,0,0,1")
-			IPCG=$(echo $CGDCONT | cut -d, -f4)
-			if [ "$CGDCONT" != "$CID,\"$IPVAR\",\"$NAPN\",$IPCG,0,0,1" ]; then
-				ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\",,0,0,1"
-				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			fi
+			check_apn
 		fi
 	fi
 	ATCMDD="AT+CNMI?"
@@ -489,9 +525,7 @@ if [ $SP -eq 7 ]; then
 	BRK=1
 
 	if [ -n "$NAPN" ]; then
-		IPVAR="$PDPT"
-		ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\",,0,0,1"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		check_apn
 	fi
 
 	while [ $BRK -eq 1 ]; do
@@ -567,27 +601,26 @@ if [ $SP -gt 0 ]; then
 	if [ -e $ROOTER/connect/postconnect.sh ]; then
 		$ROOTER/connect/postconnect.sh $CURRMODEM
 	fi
+	if [ $(uci -q get modem.modeminfo$CURRMODEM.at) -eq "1" ]; then
+		ATCMDD=$(uci -q get modem.modeminfo$CURRMODEM.atc)
+		if [ -n "$ATCMDD" ]; then
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			OX=$($ROOTER/common/processat.sh "$OX")
+			ERROR="ERROR"
+			if `echo $OX | grep "$ERROR" 1>/dev/null 2>&1`
+			then
+				log "Error sending custom AT command: $ATCMDD with result: $OX"
+			else
+				log "Sent custom AT command: $ATCMDD with result: $OX"
+			fi
+		fi
+	fi
 
 	if [ -e $ROOTER/timezone.sh ]; then
 		TZ=$(uci -q get modem.modeminfo$CURRMODEM.tzone)
 		if [ "$TZ" = "1" ]; then
 			log "Set TimeZone"
 			$ROOTER/timezone.sh &
-		fi
-	fi
-fi
-
-if [ $(uci -q get modem.modeminfo$CURRMODEM.at) -eq "1" ]; then
-	ATCMDD=$(uci -q get modem.modeminfo$CURRMODEM.atc)
-	if [ ! -z "$ATCMDD" ]; then
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		OX=$($ROOTER/common/processat.sh "$OX")
-		ERROR="ERROR"
-		if `echo $OX | grep "$ERROR" 1>/dev/null 2>&1`
-		then
-			log "Error sending custom AT command: $ATCMDD with result: $OX"
-		else
-			log "Sent custom AT command: $ATCMDD with result: $OX"
 		fi
 	fi
 fi

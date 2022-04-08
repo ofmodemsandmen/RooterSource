@@ -154,6 +154,11 @@ check_apn() {
 
 	ATCMDD="AT+CGDCONT?;+CFUN?"
 	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	CGDCONT2=$(echo $OX | grep "+CGDCONT: 2,")
+	if [ -z "$CGDCONT2" ]; then
+		ATCMDD="AT+CGDCONT=2,\"$IPVAR\",\"ims\""
+		OXy=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	fi
 	if `echo $OX | grep "+CGDCONT: $CID,\"$IPVAR\",\"$NAPN\"," 1>/dev/null 2>&1`
 	then
 		if [ -z "$(echo $OX | grep -o "+CFUN: 1")" ]; then
@@ -437,13 +442,13 @@ MATCH="$(uci get modem.modem$CURRMODEM.maxcontrol | cut -d/ -f3- | xargs dirname
 
 case $PROT in
 	# Sierra Direct-IP data interface
-	
+
 	"1" )
 	OX="$(for a in /sys/class/net/*; do readlink $a; done | grep "$MATCH")"
 	ifname=$(basename $OX)
 	WWANX=$(echo $ifname | grep -o "[[:digit:]]")
 	log "Modem $CURRMODEM Sierra Direct-IP Device : $ifname"
-	
+
 	uci set modem.modem$CURRMODEM.wwan=$WWANX
 	uci set modem.modem$CURRMODEM.interface=$ifname
 	uci commit modem
@@ -801,7 +806,7 @@ if [ -n "$CHKPORT" ]; then
 	else
 		set_dns
 	fi
-	
+
 	ttl=$(uci -q get modem.modeminfo$CURRMODEM.ttl)
 	if [ -z $ttl ]; then
 		ttl=0

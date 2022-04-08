@@ -1,7 +1,25 @@
 #!/bin/sh
+. /lib/functions.sh
 
 log() {
 	logger -t "excede BW " "$@"
+}
+
+do_throttle() {
+	local config=$1
+	local limit
+
+	config_get name $1 name
+	config_get limit $1 limit
+	config_get throttle $1 throttle
+	let kamt=limit*1000000
+	if [ $amt -gt $kamt ]; then
+		if [ $limit -gt $baselimit ]; then
+			speed=$throttle
+			level=$name
+			baselimit=$limit
+		fi
+	fi
 }
 
 lock=$(uci -q get custom.bwallocate.lock)
@@ -18,32 +36,59 @@ if [ $lock = "1" ]; then
 		if [ ! -e /usr/lib/throttle/throttle.sh ]; then
 			action=0
 		fi
-		if [ $total -gt $allocate ]; then
-			if [ $action = "0" ]; then
-				if [ -e /etc/nodogsplash/control ]; then
-					/etc/nodogsplash/control block
+		if [ $action != "2" ]; then
+			if [ $total -gt $allocate ]; then
+				if [ $action = "0" ]; then
+					if [ -e /etc/nodogsplash/control ]; then
+						/etc/nodogsplash/control block
+					else
+						/usr/lib/bwmon/block 1
+					fi
 				else
-					/usr/lib/bwmon/block 1
+					down=$(uci -q get custom.bwallocate.down)
+					if [ -z $down ]; then
+						down=5
+					fi
+					up=$(uci -q get custom.bwallocate.up)
+					if [ -z $up ]; then
+						up=2
+					fi
+					/usr/lib/throttle/throttle.sh start $down $up
 				fi
 			else
-				down=$(uci -q get custom.bwallocate.down)
-				if [ -z $down ]; then
-					down=5
+				if [ -e /usr/lib/throttle/throttle.sh ]; then
+					/usr/lib/throttle/throttle.sh stop
 				fi
-				up=$(uci -q get custom.bwallocate.up)
-				if [ -z $up ]; then
-					up=2
+				if [ -e /etc/nodogsplash/control ]; then
+					/etc/nodogsplash/control unblock
 				fi
-				/usr/lib/throttle/throttle.sh start $down $up
+				/usr/lib/bwmon/block 0
 			fi
 		else
-			if [ -e /usr/lib/throttle/throttle.sh ]; then
-				/usr/lib/throttle/throttle.sh stop
+			meth=$(uci -q get custom.bwallocate.meth)
+			if [ -z $meth ]; then
+				meth="0"
 			fi
-			if [ -e /etc/nodogsplash/control ]; then
-				/etc/nodogsplash/control unblock
+			if [ $meth = "0" ]; then
+				amt=$total
+			else
+				amt=$3
 			fi
-			/usr/lib/bwmon/block 0
+			speed="0"
+			baselimit="0"
+			config_load custom
+			config_foreach do_throttle throttle
+			if [ $speed != "0" ]; then
+				/usr/lib/bwmon/float.lua "$speed"
+				source /tmp/float
+				/usr/lib/throttle/throttle.sh start $SPEED $SPEED 1
+				log "Throttled to $speed Mbps"
+			else
+				if [ -e /usr/lib/throttle/throttle.sh ]; then
+					/usr/lib/throttle/throttle.sh stop
+				fi
+			fi
+			
 		fi
 	fi
 fi

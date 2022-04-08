@@ -188,5 +188,5 @@ else
 	tfile:close()
 end
 os.execute("rm -f /tmp/lockbw")
-os.execute("/usr/lib/bwmon/excede.sh " .. tostring(total) .. " " .. tostring(allo))
+os.execute("/usr/lib/bwmon/excede.sh " .. tostring(total) .. " " .. tostring(allo) .. " " .. tostring(ptotal))
 os.execute("/usr/lib/bwmon/perday.lua")

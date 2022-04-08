@@ -28,8 +28,14 @@ start_interface() {
 
 cmd=$1
 if [ $cmd = 'start' ]; then
-	down=$2"000"
-	up=$3"000"
+	mult=$4
+	if [ -z $mult ]; then
+		down=$2"000"
+		up=$3"000"
+	else
+		down=$2
+		up=$3
+	fi
 	/etc/init.d/sqm enabled
 	start_interface wan $down $up
 	start_interface wan1 $down $up
