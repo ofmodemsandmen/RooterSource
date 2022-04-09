@@ -16,7 +16,10 @@ s.addremove = false
 o = s:option(ListValue, "_mediaurlbase", translate("Design"))
 for k, v in pairs(conf.themes) do
 	if k:sub(1, 1) ~= "." then
-		o:value(v, k)
+		if string.match(k, "Bootstrap") then
+		else
+			o:value(v, k)
+		end
 	end
 end
 

@@ -62,47 +62,6 @@ o.default = mode
 o.rmempty = false
 o.description = translate('You can choose Theme color mode here')
 
-o = s:option(Value, 'primary', translate('[Light mode] Primary Color'), translate('A HEX Color ; ( Default: #5e72e4 )'))
-o.default = primary
-o.datatype = ufloat
-o.rmempty = false
-
-
-
-o = s:option(ListValue, 'transparency', translate('[Light mode] Login Transparency'), translate('0 transparent - 1 opaque ; ( Suggest: transparent: 0 or translucent preset: 0.5 )'))
-for _, v in ipairs(transparency_sets) do
-    o:value(v)
-end
-o.default = blur_opacity
-o.datatype = ufloat
-o.rmempty = false
-
-o = s:option(Value, 'blur', translate('[Light mode] Login Frosted Glass Radius'), translate('Larger value will more blurred ; ( Suggest:  clear: 1 or blur preset: 10 )'))
-o.default = blur_radius
-o.datatype = ufloat
-o.rmempty = false
-
-o = s:option(Value, 'dark_primary', translate('[Dark mode] Primary Color'), translate('A HEX Color ; ( Default: #483d8b )'))
-o.default = dark_primary
-o.datatype = ufloat
-o.rmempty = false
-
-o = s:option(ListValue, 'transparency_dark', translate('[Dark mode] Login Transparency'), translate('0 transparent - 1 opaque ; ( Suggest: Black translucent preset: 0.5 )'))
-for _, v in ipairs(transparency_sets) do
-    o:value(v)
-end
-o.default = blur_opacity_dark
-o.datatype = ufloat
-o.rmempty = false
-
-o = s:option(Value, 'blur_dark', translate('[Dark mode] Login Frosted Glass Radius'), translate('Larger value will more blurred ; ( Suggest:  clear: 1 or blur preset: 10 )'))
-o.default = blur_radius_dark
-o.datatype = ufloat
-o.rmempty = false
-
-o = s:option(Button, 'save', translate('Save Changes'))
-o.inputstyle = 'reload'
-
 function br.handle(self, state, data)
     if (state == FORM_VALID and data.blur ~= nil and data.blur_dark ~= nil and data.transparency ~= nil and data.transparency_dark ~= nil and data.mode ~= nil) then
         nxfs.writefile('/tmp/aaa', data)
