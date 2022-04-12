@@ -1,15 +1,15 @@
 module("luci.controller.admin.modem", package.seeall) 
+local I18N = require "luci.i18n"
+local translate = I18N.translate
 
 function index()
-	entry({"admin", "modem"}, firstchild(), "Modem", 25).dependent=false
---	entry({"admin", "modem", "cinfo"}, cbi("rooter/connection", {autoapply=true}), "Connection Info", 10)
-	entry({"admin", "modem", "prof"}, cbi("rooter/profiles"), "Connection Profile", 2)
---	entry({"admin", "modem", "conmon"}, cbi("rooter/connmonitor"), "Connection Monitoring", 20)
-	entry({"admin", "modem", "nets"}, template("rooter/net_status"), "Network Status", 30)
-	entry({"admin", "modem", "debug"}, template("rooter/debug"), "Debug Information", 50)
-	entry({"admin", "modem", "cust"}, cbi("rooter/customize"), "Custom Modem Ports", 55)
-	entry({"admin", "modem", "log"}, template("rooter/log"), "Connection Log", 60)
-	entry({"admin", "modem", "misc"}, template("rooter/misc"), "Miscellaneous", 40)
+	entry({"admin", "modem"}, firstchild(), translate("Modem"), 25).dependent=false
+	entry({"admin", "modem", "prof"}, cbi("rooter/profiles"), translate("Connection Profile"), 2)
+	entry({"admin", "modem", "nets"}, template("rooter/net_status"), translate("Network Status"), 30)
+	entry({"admin", "modem", "debug"}, template("rooter/debug"), translate("Debug Information"), 50)
+	entry({"admin", "modem", "cust"}, cbi("rooter/customize"), translate("Custom Modem Ports"), 55)
+	entry({"admin", "modem", "log"}, template("rooter/log"), translate("Connection Log"), 60)
+	entry({"admin", "modem", "misc"}, template("rooter/misc"), translate("Miscellaneous"), 40)
 	
 	entry({"admin", "modem", "block"},
 		template("rooter/bandlock"))
@@ -70,7 +70,7 @@ function action_get_log()
 		rv["log"] = tmp
 		file:close()
 	else
-		rv["log"] = "No entries in log file"
+		rv["log"] = translate("No entries in log file")
 	end
 
 	luci.http.prepare_content("application/json")
@@ -451,9 +451,9 @@ function action_get_csq()
 	end
 
 	if not nixio.fs.access("/etc/netspeed") then
-		rv["crate"] = "Fast (updated every 10 seconds)"
+		rv["crate"] = translate("Fast (updated every 10 seconds)")
 	else
-		rv["crate"] = "Slow (updated every 60 seconds)"
+		rv["crate"] = translate("Slow (updated every 60 seconds)")
 	end
 
 	stat = "/tmp/msimdata" .. modnum
@@ -527,11 +527,11 @@ function action_externalip()
 	os.execute("rm -f /tmp/ipip; wget -O /tmp/ipip http://ipecho.net/plain > /dev/null 2>&1")
 	file = io.open("/tmp/ipip", "r")
 	if file == nil then
-		rv["extip"] = "Not Available"
+		rv["extip"] = translate("Not Available")
 	else
 		rv["extip"] = file:read("*line")
 		if rv["extip"] == nil then
-			rv["extip"] = "Not Available"
+			rv["extip"] = translate("Not Available")
 		end
 		file:close()
 	end
@@ -569,22 +569,22 @@ function action_extping()
 	
 	enable = luci.model.uci.cursor():get("ping", "ping", "enable")
 	if enable == "0" then
-		rv["extping"] = "Not Enabled"
+		rv["extping"] = translate("Not Enabled")
 	else
 		conn = luci.model.uci.cursor():get("ping", "ping", "conn")
 		if conn == "1" then
-			rv["extping"] = "Enabled, Waiting for Modem to Connect"
+			rv["extping"] = translate("Enabled, Waiting for Modem to Connect")
 		else
 			if conn == "2" then
-				rv["extping"] = "Enabled, Ping Test was Good"
+				rv["extping"] = translate("Enabled, Ping Test was Good")
 			else
 				if conn == "3" then
-					rv["extping"] = "Enabled, Ping Test Failed, Restarting Modem, Waiting for Reconnection"
+					rv["extping"] = translate("Enabled, Ping Test Failed, Restarting Modem, Waiting for Reconnection")
 				else
 					if conn == "4" then
-						rv["extping"] = "Enabled, Connected, Waiting for Ping Test"
+						rv["extping"] = translate("Enabled, Connected, Waiting for Ping Test")
 					else
-						rv["extping"] = "Enabled, Unknown State"
+						rv["extping"] = translate("Enabled, Unknown State")
 					end
 				end
 			end

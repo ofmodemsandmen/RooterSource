@@ -3,11 +3,13 @@
 -- Licensed to the public under the Apache License 2.0.
 
 module("luci.controller.openvpn", package.seeall)
+local I18N = require "luci.i18n"
+local translate = I18N.translate
 
 function index()
-	entry({"admin", "vpn"}, firstchild(), "VPN", 30).dependent=false
-	entry( {"admin", "vpn", "openvpn"}, cbi("openvpn"), _("OpenVPN"), 1 )
-	entry( {"admin", "vpn", "openvpn-server"}, cbi("openvpn-server"), _("--OpenVPN Extras"), 2 )
+	entry({"admin", "vpn"}, firstchild(), translate("VPN"), 30).dependent=false
+	entry( {"admin", "vpn", "openvpn"}, cbi("openvpn"), _(translate("OpenVPN")), 1 )
+	entry( {"admin", "vpn", "openvpn-server"}, cbi("openvpn-server"), _(translate("--OpenVPN Extras")), 2 )
 	entry( {"admin", "vpn", "openvpn", "basic"},    cbi("openvpn-basic"),    nil ).leaf = true
 	entry( {"admin", "vpn", "openvpn", "advanced"}, cbi("openvpn-advanced"), nil ).leaf = true
 	entry( {"admin", "vpn", "openvpn", "file"},     form("openvpn-file"),    nil ).leaf = true

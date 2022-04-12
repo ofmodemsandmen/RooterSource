@@ -1,10 +1,12 @@
 module("luci.controller.sms", package.seeall)
+local I18N = require "luci.i18n"
+local translate = I18N.translate
 
 function index()
 	local fs = require "nixio.fs"
 	if not fs.stat("/etc/nosms") then
 		local page
-		page = entry({"admin", "modem", "sms"}, template("rooter/sms"), "SMS Messaging", 35)
+		page = entry({"admin", "modem", "sms"}, template("rooter/sms"), translate("SMS Messaging"), 35)
 		page.dependent = true
 	end
 
@@ -50,7 +52,7 @@ function action_send_sms()
 			k = k + 1
 		until k > 25 or file ~=nil
 		if file == nil then
-			status = 'Sending attempt timed out (fail)'
+			status = translate('Sending attempt timed out (fail)')
 		else
 			status = file:read("*line")
 			file:close()

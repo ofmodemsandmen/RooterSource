@@ -7,7 +7,7 @@ m.on_after_save = function(self)
 	luci.sys.call("/usr/lib/bwmon/editemail.sh &")
 end
 
-s = m:section(TypedSection, "bwallocate", "Allocation Settings")
+s = m:section(TypedSection, "bwallocate", translate("Allocation Settings"))
 s.anonymous = true
 s.addremove = false
 
@@ -57,21 +57,21 @@ act:value("0", "Internet Blocked")
 act:value("1", "Internet Throttled")
 act.default = "0"
 
-down = s:option(Value, "down", "Download Speed in Mbps :");
+down = s:option(Value, "down", translate("Download Speed in Mbps :"));
 down.optional=false; 
 down.rmempty = true;
 down.datatype = "and(uinteger,min(1),max(999))"
 down:depends("action", "1")
 down.default = "5"
 
-up = s:option(Value, "up", "Upload Speed in Mbps :");
+up = s:option(Value, "up", translate("Upload Speed in Mbps :")));
 up.optional=false; 
 up.rmempty = true;
 up.datatype = "and(uinteger,min(1),max(999))"
 up:depends("action", "1")
 up.default = "2"
 
-s = m:section(TypedSection, "texting", "Text/Email Settings")
+s = m:section(TypedSection, "texting", translate("Text/Email Settings"))
 s.anonymous = true
 s.addremove = false
 
@@ -82,7 +82,7 @@ aact:value("1", "Yes")
 aact.default = "0"
 
 
-pph = s:option(Value, "ident", "Identifier :");
+pph = s:option(Value, "ident", translate("Identifier :"));
 pph.optional=false; 
 pph.rmempty = true;
 pph:depends("text", "1")
@@ -92,8 +92,8 @@ pph.default = "xxx"
 
 ct = s:option(ListValue, "method", translate("Criteria : "), translate("Criteria used to determine when to send information"))
 ct.rmempty = true
-ct:value("0", "By Specified Time Interval")
-ct:value("1", "By Amount Used")
+ct:value("0", translate("By Specified Time Interval"))
+ct:value("1", translate("By Amount Used"))
 ct.default = "0"
 ct:depends("text", "1")
 
@@ -200,19 +200,19 @@ sdhour.default = "48"
 
 xct = s:option(ListValue, "days", translate("Interval : "), translate("Number of days between sending information"))
 xct.rmempty = true
-xct:value("1", "Every Day")
-xct:value("2", "Every 2 Days")
-xct:value("5", "Every 5 Days")
-xct:value("10", "Every 10 Days")
-xct:value("15", "Every 15 Days")
+xct:value("1", translate("Every Day"))
+xct:value("2", translate("Every 2 Days"))
+xct:value("5", translate("Every 5 Days"))
+xct:value("10", translate("Every 10 Days"))
+xct:value("15", translate("Every 15 Days"))
 xct.default = "5"
 xct:depends("method", "0")
 
 xxct = s:option(ListValue, "increment", translate("Increment : "), translate("Amount Used between sending information"))
 xxct.rmempty = true
-xxct:value("50", "Every 50 GB")
-xxct:value("75", "Every 75 GB")
-xxct:value("100", "Every 100 GB")
+xxct:value("50", translate("Every 50 GB"))
+xxct:value("75", translate("Every 75 GB"))
+xxct:value("100", translate("Every 100 GB"))
 xxct.default = "50"
 xxct:depends("method", "1")
 
@@ -230,19 +230,19 @@ b4 = s:option(DummyValue, "blank", " ");
 
 ct = s:option(ListValue, "tore", translate("Sending Method : "), translate("Method used to send information"))
 ct.rmempty = true
-ct:value("0", "By Text")
-ct:value("1", "By Email")
+ct:value("0", translate("By Text"))
+ct:value("1", translate("By Email"))
 ct.default = "0"
 ct:depends("text", "1")
 
-ph = s:option(Value, "phone", "Phone Number :");
+ph = s:option(Value, "phone", translate("Phone Number :"));
 ph.optional=false; 
 ph.rmempty = true;
 ph.datatype = "phonedigit"
 ph:depends("tore", "0")
 ph.default = "12223334444"
 
-ph1 = s:option(Value, "email", "Email Address :");
+ph1 = s:option(Value, "email", translate("Email Address :"));
 ph1.optional=false; 
 ph1.rmempty = true;
 ph1:depends("tore", "1")
@@ -257,19 +257,19 @@ ct1:value("1", "Yes")
 ct1.default = "0"
 ct1:depends("tore", "1")
 
-ph2 = s:option(Value, "smtp", "SMTP Host :");
+ph2 = s:option(Value, "smtp", translate("SMTP Host :"));
 ph2.optional=false; 
 ph2.rmempty = true;
 ph2:depends("eedit", "1")
 ph2.default = "smtp.gmail.com"
 
-ph3 = s:option(Value, "euser", "User Name :");
+ph3 = s:option(Value, "euser", translate("User Name :"));
 ph3.optional=false; 
 ph3.rmempty = true;
 ph3:depends("eedit", "1")
 ph3.default = "user@gmail.com"
 
-ph4 = s:option(Value, "epass", "Password :");
+ph4 = s:option(Value, "epass", translate("Password :"));
 ph4.optional=false; 
 ph4.rmempty = true;
 ph4:depends("eedit", "1")

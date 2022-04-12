@@ -34,9 +34,9 @@ port.rmempty = true;
 port.optional=false;
 port.default="51820";
 
-ul = s:option(ListValue, "udptunnel", "Enable UDP over TCP :");
-ul:value("0", "No")
-ul:value("1", "Yes")
+ul = s:option(ListValue, "udptunnel", translate("Enable UDP over TCP :"));
+ul:value("0", translate("No"))
+ul:value("1", translate("Yes"))
 ul.default=0
 
 dns = s:option(Value, "dns", translate("DNS Servers :"), translate("Comma separated list of DNS Servers.")); 
@@ -60,9 +60,9 @@ pkey = s:option(Value, "privatekey", translate("Private Key :"), translate("Priv
 pkey.rmempty = true;
 pkey.optional=false;
 
-bl = s:option(ListValue, "auto", "Start on Boot :");
-bl:value("0", "No")
-bl:value("1", "Yes")
+bl = s:option(ListValue, "auto", translate("Start on Boot :"));
+bl:value("0", translate("No"))
+bl:value("1", translate("Yes"))
 bl.default=0
 
 s = m:section( NamedSection, arg[1], "wireguard", translate("Server") )

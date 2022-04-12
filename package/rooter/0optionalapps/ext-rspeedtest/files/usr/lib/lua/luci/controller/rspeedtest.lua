@@ -1,7 +1,10 @@
 module("luci.controller.rspeedtest", package.seeall)
+local I18N = require "luci.i18n"
+local translate = I18N.translate
+
 function index()
 	local page
-	page = entry({"admin", "speed", "rspeedtest"}, template("speedtest/rspeedtest"), "ROOter SpeedTest", 72)
+	page = entry({"admin", "speed", "rspeedtest"}, template("speedtest/rspeedtest"), translate("ROOter SpeedTest"), 72)
 	page.dependent = true
 	
 	entry({"admin", "speed", "closeserver"}, call("action_closeserver"))

@@ -26,8 +26,8 @@ ma.rmempty = true;
 ma.default = "broadband"
 
 tt = di:taboption(this_tab, ListValue, "ttl", translate("Custom TTL Value :"))
-tt:value("0", "Use Current Value")
-tt:value("1", "No TTL Value")
+tt:value("0", translate("Use Current Value"))
+tt:value("1", translate("No TTL Value"))
 tt:value("63", "TTL 63")
 tt:value("64", "TTL 64")
 tt:value("65", "TTL 65")

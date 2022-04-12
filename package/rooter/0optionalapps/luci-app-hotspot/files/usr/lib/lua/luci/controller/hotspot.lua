@@ -1,8 +1,10 @@
 module("luci.controller.hotspot", package.seeall)
+local I18N = require "luci.i18n"
+local translate = I18N.translate
 
 function index()
 	local page
-	page = entry({"admin", "services", "hotspot"}, template("hotspot/hotspot"), _("Wifi Hotspot Manager"), 34)
+	page = entry({"admin", "services", "hotspot"}, template("hotspot/hotspot"), _(translate("Wifi Hotspot Manager")), 34)
 	page.dependent = true
 
 	entry({"admin", "services", "check_spot"}, call("action_check_spot"))
@@ -51,9 +53,9 @@ function action_check_spot()
 	end
 	encr = luci.model.uci.cursor():get("wireless", "wwan", "encryption")
 	if encr == "none" then
-		rv["encryp"] = "Open"
+		rv["encryp"] = translate("Open")
 	else
-		rv["encryp"] = "Encrypted"
+		rv["encryp"] = translate("Encrypted")
 	end
 	rv["disable"] = luci.model.uci.cursor():get("wireless", "wwan", "disabled")
 	

@@ -1,9 +1,11 @@
 module("luci.controller.bwmon", package.seeall) 
+local I18N = require "luci.i18n"
+local translate = I18N.translate
 
 function index()
 	local page
-	entry({"admin", "nlbw"}, firstchild(), "Bandwidth Monitor", 80).dependent=false
-	page = entry({"admin", "nlbw", "bwmon"}, template("bwmon/bwmon"), "ROOter Bandwidth Monitor", 70)
+	entry({"admin", "nlbw"}, firstchild(), translate("Bandwidth Monitor"), 80).dependent=false
+	page = entry({"admin", "nlbw", "bwmon"}, template("bwmon/bwmon"), translate("ROOter Bandwidth Monitor"), 70)
 	page.dependent = true
 	
 	entry({"admin", "nlbw", "check_bw"}, call("action_check_bw"))

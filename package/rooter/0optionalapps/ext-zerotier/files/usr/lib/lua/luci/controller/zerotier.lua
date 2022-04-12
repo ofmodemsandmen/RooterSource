@@ -1,11 +1,14 @@
 module("luci.controller.zerotier", package.seeall)
+local I18N = require "luci.i18n"
+local translate = I18N.translate
+
 function index()
 	local fs = require "nixio.fs"
 	local lock = luci.model.uci.cursor():get("custom", "menu", "full")
 	if lock == "1" then
 		if fs.stat("/etc/config/zerotier") then
 			local page
-				page = entry({"admin", "adminmenu", "zerotier"}, template("zerotier/zerotier"), "---Router ID", 7)
+				page = entry({"admin", "adminmenu", "zerotier"}, template("zerotier/zerotier"), translate("---Router ID"), 7)
 				page.dependent = true
 		end
 	end

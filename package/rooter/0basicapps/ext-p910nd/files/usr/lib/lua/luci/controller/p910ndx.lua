@@ -2,6 +2,8 @@
 -- Licensed to the public under the Apache License 2.0.
 
 module("luci.controller.p910ndx", package.seeall)
+local I18N = require "luci.i18n"
+local translate = I18N.translate
 
 function index()
 	if not nixio.fs.access("/etc/config/p910nd") then
@@ -10,6 +12,6 @@ function index()
 
 	local page
 
-	page = entry({"admin", "services", "p910ndx"}, cbi("p910ndx"), _("Print Server"), 60)
+	page = entry({"admin", "services", "p910ndx"}, cbi("p910ndx"), _(translate("Print Server")), 60)
 	page.dependent = true
 end

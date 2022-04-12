@@ -26,7 +26,7 @@ ssid.rmempty = true;
 ssid.optional=false;
 ssid.default="Guest";
 
-bl = s:option(ListValue, "freq", "Frequency :");
+bl = s:option(ListValue, "freq", translate("Frequency :"));
 bl:value("0", "2.4Ghz")
 bl.rmempty = true;
 bl.optional=false;
@@ -35,10 +35,10 @@ if wifi5g == "1" then
 	bl:value("1", "5.0Ghz")
 end
 
-el = s:option(ListValue, "encrypted", "Encryption :");
-el:value("0", "None")
-el:value("1", "WPA-PSK (Medium Security)")
-el:value("2", "WPA2-PSK (Strong Security)")
+el = s:option(ListValue, "encrypted", translate("Encryption :"));
+el:value("0", translate("None"))
+el:value("1", translate("WPA-PSK (Medium Security)"))
+el:value("2", translate("WPA2-PSK (Strong Security)"))
 el.default=0
 
 pass = s:option(Value, "password", translate("Password :")); 
@@ -48,18 +48,18 @@ pass.default="";
 pass.datatype="wpakey";
 pass.password = true
 
-ql = s:option(ListValue, "qos", "Bandwidth Limited :");
+ql = s:option(ListValue, "qos", translate("Bandwidth Limited :"));
 ql:value("0", "Disabled")
 ql:value("1", "Enabled")
 ql.default=0
 
-dl = s:option(Value, "dl", "Download Speed (Mbit/s) :");
+dl = s:option(Value, "dl", translate("Download Speed (Mbit/s) :"));
 dl.optional=false; 
 dl.rmempty = true;
 dl.datatype = "and(uinteger,min(1))"
 dl.default=10
 
-ul = s:option(Value, "ul", "Upload Speed (Mbit/s) :");
+ul = s:option(Value, "ul", translate("Upload Speed (Mbit/s) :"));
 ul.optional=false; 
 ul.rmempty = true;
 ul.datatype = "and(uinteger,min(1))"

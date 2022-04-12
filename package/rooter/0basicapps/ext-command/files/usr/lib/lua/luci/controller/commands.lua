@@ -12,12 +12,14 @@ You may obtain a copy of the License at
 ]]--
 
 module("luci.controller.commands", package.seeall)
+local I18N = require "luci.i18n"
+local translate = I18N.translate
 
 function index()
-	entry({"admin", "system", "commands"}, firstchild(), _("Custom Commands"), 80)
-	entry({"admin", "system", "commands", "dashboard"}, template("commands"), _("Dashboard"), 1)
-	entry({"admin", "system", "commands", "config"}, cbi("commands"), _("Configure"), 2)
-	entry({"admin", "system", "commands", "script"}, template("cmdedit"), _("Scripts"), 3)
+	entry({"admin", "system", "commands"}, firstchild(), _(translate("Custom Commands")), 80)
+	entry({"admin", "system", "commands", "dashboard"}, template("commands"), _(translate("Dashboard")), 1)
+	entry({"admin", "system", "commands", "config"}, cbi("commands"), _(translate("Configure")), 2)
+	entry({"admin", "system", "commands", "script"}, template("cmdedit"), _(translate("Scripts")), 3)
 	entry({"admin", "system", "commands", "run"}, call("action_run"), nil, 3).leaf = true
 	entry({"admin", "system", "commands", "download"}, call("action_download"), nil, 3).leaf = true
 
@@ -193,7 +195,7 @@ function action_run(...)
 			binary   = binary
 		})
 	else
-		luci.http.status(404, "No such command")
+		luci.http.status(404, translate("No such command"))
 	end
 end
 
@@ -222,7 +224,7 @@ function action_download(...)
 
 			fd:close()
 		else
-			luci.http.status(500, "Failed to execute command")
+			luci.http.status(500, translate("Failed to execute command"))
 		end
 	else
 		luci.http.status(404, "No such command")
@@ -237,7 +239,7 @@ function action_public(cmdid, args)
 	then
 		action_download(cmdid, args)
 	else
-		luci.http.status(403, "Access to command denied")
+		luci.http.status(403, translate("Access to command denied"))
 	end
 end
 
@@ -252,7 +254,7 @@ function action_load_script()
 		rv["text"] = tmp
 		file:close()
 	else
-		rv["text"] = "No file found"
+		rv["text"] = translate("No file found")
 	end
 
 	luci.http.prepare_content("application/json")

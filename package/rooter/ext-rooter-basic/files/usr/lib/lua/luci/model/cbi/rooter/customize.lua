@@ -114,15 +114,15 @@ end
 -- Vid Pid Dataport Commport
 --
 
-e = m:section(TypedSection, "new", "Modem Ports")   
+e = m:section(TypedSection, "new", translate("Modem Ports")) 
 
-a1 = e:option(Value, "vid", "Switched Vendor ID :"); 
+a1 = e:option(Value, "vid", translate("Switched Vendor ID :")); 
 a1.optional=false;
 
-b1 = e:option(Value, "pid", "Switched Product ID :"); 
+b1 = e:option(Value, "pid", translate("Switched Product ID :")); 
 b1.optional=false; 
 
-p3 = e:option(ListValue, "port", "PPP Modem Data Port :")
+p3 = e:option(ListValue, "port", translate("PPP Modem Data Port :"))
 p3:value("tty", "default")
 p3:value("tty0", "/dev/ttyUSB0")
 p3:value("tty1", "/dev/ttyUSB1")
@@ -132,7 +132,7 @@ p3:value("tty4", "/dev/ttyUSB4")
 p3:value("tty5", "/dev/ttyUSB5")
 p3.default = "tty"
 
-p4 = e:option(ListValue, "comm", "Communication Port :")
+p4 = e:option(ListValue, "comm", translate("Communication Port :"))
 p4:value("tty", "default")
 p4:value("tty0", "/dev/ttyUSB0")
 p4:value("tty1", "/dev/ttyUSB1")

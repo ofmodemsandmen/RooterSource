@@ -1,10 +1,13 @@
 module("luci.controller.fullmenu", package.seeall)
+local I18N = require "luci.i18n"
+local translate = I18N.translate
+
 function index()
 	local page
-	entry({"admin", "adminmenu"}, firstchild(), "Administration", 42).dependent=false
+	entry({"admin", "adminmenu"}, firstchild(), translate("Administration"), 42).dependent=false
 	local df = luci.model.uci.cursor():get("custom", "menu", "default")
 	if df == '0' then
-		page = entry({"admin", "adminmenu", "fullmenu"}, template("fullmenu/fullmenu"), "Unlock / Lock Menus", 5)
+		page = entry({"admin", "adminmenu", "fullmenu"}, template("fullmenu/fullmenu"), translate("Unlock / Lock Menus"), 5)
 		page.dependent = true
 	end
 	

@@ -27,7 +27,7 @@
 				document.getElementById('used').innerHTML="";
 				document.getElementById('mslots').innerHTML="";
 				document.getElementById('menb').checked=false;
-				document.getElementById('supported').innerHTML="SMS Not Supported/No Modem";
+				document.getElementById('supported').innerHTML="<%:SMS Not Supported/No Modem%>";
 			}
 			if ( ss == "1" )
 			{
@@ -37,15 +37,15 @@
 				document.getElementById('used').innerHTML="";
 				document.getElementById('mslots').innerHTML="";
 				document.getElementById('menb').checked=false;
-				document.getElementById('supported').innerHTML="Waiting to Read Messages";
+				document.getElementById('supported').innerHTML="<%:Waiting to Read Messages%>";
 			}
 			if ( ss == "3" )
 			{
-				document.getElementById('supported').innerHTML="Message Read Problem";
+				document.getElementById('supported').innerHTML="<%:Message Read Problem%>";
 			}
 			if ( ss == "2" )
 			{
-				document.getElementById('supported').innerHTML="Messages Present";
+				document.getElementById('supported').innerHTML="<%:Messages Present%>";
 				clearListBox("smsList");
 				document.getElementById('total').innerHTML=rv.max;
 				document.getElementById('used').innerHTML=rv.used;
@@ -75,7 +75,7 @@
 				}
 				if (rv.used == "0")
 				{
-					document.getElementById('supported').innerHTML="No Messages Present on SIM";
+					document.getElementById('supported').innerHTML="<%:No Messages Present on SIM%>";
 				}
 				else
 				{
@@ -180,13 +180,13 @@
 		//document.getElementById('rding').innerHTML=s.length;
 		if ( s.length == 0 )
 		{
-			alert("You must enter a phone number!!");
+			alert("<%:You must enter a phone number!!%>");
 			return false;
 		}
 		s = s.trim();
 		if ( isNaN(s) == true )
 		{
-			alert("Invalid phone number!!");
+			alert("<%:Invalid phone number!!%>");
 			return false;
 		}
 		var num = s.concat("                    ");
@@ -194,7 +194,7 @@
 		var t = document.getElementById("txtmessage").value;
 		if ( t.length == 0 )
 		{
-			alert("Message is blank!!");
+			alert("<%:Message is blank!!%>");
 			return false;
 		}
 		if ( t.length > 160 )
@@ -202,8 +202,8 @@
 			t = t.substr(0, 160);
 		}
 		num = num.concat(t);
-		alert("SMS will be queued for processing.\nA status update will follow.");
-		document.getElementById("sstat").innerHTML="Sending Message. Please Wait";
+		alert("<%:SMS will be queued for processing.\nA status update will follow.%>");
+		document.getElementById("sstat").innerHTML="<%:Sending Message. Please Wait%>";
 		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "send_sms")%>',
 			{ set: num },
 			function(x, rv)
@@ -221,7 +221,7 @@
 		{
 			return false;
 		}
-		var r=confirm("Delete the selected message?");
+		var r=confirm("<%:Delete the selected message?%>");
 		if (r==false)
   		{
   			return false;
@@ -231,7 +231,7 @@
 		dx = dx + 1;
 		clearListBox("smsList");
 		document.getElementById('message').style.color = "red";
-		document.getElementById('message').innerHTML="Message will be deleted. It may take some time before the list is updated.";
+		document.getElementById('message').innerHTML="<%:Message will be deleted. It may take some time before the list is updated.%>";
 		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "del_sms")%>',
 			{ set: dx },
 			function()
@@ -248,15 +248,15 @@
 						document.getElementById('message').innerHTML="";
 						document.getElementById('total').innerHTML="";
 						document.getElementById('used').innerHTML="";
-						document.getElementById('supported').innerHTML="Waiting to Read Messages";
+						document.getElementById('supported').innerHTML="<%:Waiting to Read Messages%>";
 					}
 					if ( ss == "3" )
 					{
-						document.getElementById('supported').innerHTML="Message Read Problem";
+						document.getElementById('supported').innerHTML="<%:Message Read Problem%>";
 					}
 					if ( ss == "2" )
 					{
-						document.getElementById('supported').innerHTML="Messages Present";
+						document.getElementById('supported').innerHTML="<%:Messages Present%>";
 						clearListBox("smsList");
 						document.getElementById('total').innerHTML=rv.max;
 						document.getElementById('used').innerHTML=rv.used;
@@ -393,10 +393,10 @@
 
 <form method="post" action="<%=REQUEST_URI%>">
 <div class="cbi-map" id="cbi-sms">
-<h2><a id="content" name="content">SMS Messaging</a></h2>
-<div class="cbi-map-descr">Send and Receive Text Messages Through Your Modem</div>
+<h2><a id="content" name="content"><%:SMS Messaging%></a></h2>
+<div class="cbi-map-descr"><%:Send and Receive Text Messages Through Your Modem%></div>
 <fieldset class="cbi-section" id="cbi-read">
-	<legend>Modem Information</legend>
+	<legend><%:Modem Information%></legend>
 	<table width="550"  border="0">
   	<tr>
     		<td width="40%"><ul id="supported"></ul></td>
@@ -409,12 +409,12 @@
 		</td>
   	</tr>
 	</table>
-	<legend>Received Messages</legend>
+	<legend><%:Received Messages%></legend>
 
 	<table width="550"  border="0">
   	<tr>
-    		<td width="18%"><div align="center"><strong><u>Total SIM Message Slots</u></strong></div></td>
-    		<td width="18%"><div align="center"><strong><u>Used SIM Message Slots</u></strong></div></td>
+    		<td width="18%"><div align="center"><strong><u><%:Total SIM Message Slots%></u></strong></div></td>
+    		<td width="18%"><div align="center"><strong><u><%:Used SIM Message Slots%></u></strong></div></td>
 		<td width="34%">&nbsp;</td>
   	</tr>
   	<tr>
@@ -427,11 +427,11 @@
 	<table width="550"  border="0">
   	<tr>
 		<td width="3%">&nbsp;</td>
-		<td width="20%"><div align="left">Enable SMS transfer from modem to SIM</div></td>
+		<td width="20%"><div align="left"><%:Enable SMS transfer from modem to SIM%></div></td>
 		<td width="8%">
 			<input type="checkbox" id="menb" onclick="memenable(this)" />
 		</td>
-		<td width="16%"><div align="left"><strong><u>Unread SMS count on modem</u></strong></div></td>
+		<td width="16%"><div align="left"><strong><u><%:Unread SMS count on modem%></u></strong></div></td>
 		<td width="34%">&nbsp;</td>
 	</tr>
   	<tr>
@@ -445,11 +445,11 @@
 
 	<table width="700"  border="0">
 	<tr>
-		<td width="4%"><div align="center"><strong><u>Read</u></strong></div></td>
-		<td width="18%"><div align="left"><strong><u>Sender</u></strong></div></td>
-		<td width="8%"><div align="left"><strong><u>Date</u></strong></div></td>
-		<td width="11%"><div align="left"><strong><u>Time</u></strong></div></td>
-		<td width="35%"><div align="left"><strong><u>Message</u></strong></div></td>
+		<td width="4%"><div align="center"><strong><u><%:Read%></u></strong></div></td>
+		<td width="18%"><div align="left"><strong><u><%:Sender%></u></strong></div></td>
+		<td width="8%"><div align="left"><strong><u><%:Date%></u></strong></div></td>
+		<td width="11%"><div align="left"><strong><u><%:Time%></u></strong></div></td>
+		<td width="35%"><div align="left"><strong><u><%:Message%></u></strong></div></td>
 		<td width="24%"><div align="left"> </div></td>
 
 	</tr>
@@ -466,7 +466,7 @@
 
 	<table width="550"  border="0">
   	<tr>
-    		<td width="15%"><div align="left"><strong>Message :</strong></div></td>
+    		<td width="15%"><div align="left"><strong><%:Message :%></strong></div></td>
     		<td width="70%"><ul id="message"></ul></td>
     		<td width="15%">&nbsp;</td>
   	</tr>
@@ -481,11 +481,11 @@
   	</tr>
 	</table>
 
-	<legend id="sendtitle" style="display:block;">Send Messages</legend>
+	<legend id="sendtitle" style="display:block;"><%:Send Messages%></legend>
 
 	<table id="sendmsg" width="600"  border="0" style="display:table;">
   	<tr>
-    		<td width="15%"><div align="left"><strong>Send To :</strong></div></td>
+    		<td width="15%"><div align="left"><strong><%:Send To :%></strong></div></td>
     		<td width="70%"><input name="sendto" id="sendto" maxlength="20"></input></td>
     		<td width="15%">&nbsp;</td>
   	</tr>
@@ -509,7 +509,7 @@
 
 	<table width="550"  border="0">
   	<tr>
-    		<td width="15%"><div align="left"><strong>Sending Status :</strong></div></td>
+    		<td width="15%"><div align="left"><strong><%:Sending Status :%></strong></div></td>
     		<td width="70%"><ul style="color:red" id="sstat"></ul></td>
     		<td width="15%">&nbsp;</td>
   	</tr>

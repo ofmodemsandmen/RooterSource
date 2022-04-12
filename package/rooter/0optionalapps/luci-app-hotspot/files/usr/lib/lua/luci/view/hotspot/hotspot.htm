@@ -293,7 +293,7 @@ end
 					document.getElementById("modebtn").disabled=true;
 					document.getElementById("manbtn").disabled=true;
 					document.getElementById("disbtn").style.display="none";
-					document.getElementById('ssid').innerHTML="Disconnected";
+					document.getElementById('ssid').innerHTML="<%:Disconnected%>";
 					document.getElementById('encrypted').innerHTML="";
 				}
 				else
@@ -505,7 +505,7 @@ end
 	function disconnect()
 	{
 		inprocess = "1";
-		document.getElementById('ssid').innerHTML="Disconnecting";
+		document.getElementById('ssid').innerHTML="<%:Disconnecting%>";
 		document.getElementById("encrypted").style.display="none";
 		document.getElementById('encrypted').innerHTML="";
 		document.getElementById("disbtn").style.display="none";
@@ -526,7 +526,7 @@ end
 		{
 			dx = 1;
 			document.getElementById("modebtn").disabled=false;
-			document.getElementById('ssid').innerHTML="Connecting";
+			document.getElementById('ssid').innerHTML="<%:Connecting%>";
 			document.getElementById('encrypted').innerHTML="";
 			if ( mode == "1" )
 			{
@@ -541,7 +541,7 @@ end
 		{
 			document.getElementById("modebtn").disabled=true;
 			document.getElementById("disbtn").style.display="none";
-			document.getElementById('ssid').innerHTML="Disconnecting";
+			document.getElementById('ssid').innerHTML="<%:Disconnecting%>";
 			document.getElementById('encrypted').innerHTML="";
 			document.getElementById("manbtn").disabled=true;
 		}
@@ -641,7 +641,7 @@ end
 		clearListBox("hotList");
 		var select = document.getElementById("hotList");
 		select.options[select.options.length] = new Option("  ", 1);
-		select.options[select.options.length] = new Option("Checking Networks Availablity", 2);
+		select.options[select.options.length] = new Option("<%:Checking Networks Availablity%>", 2);
 		document.getElementById('hname').innerHTML=" ";
 		document.getElementById('hcrypt').innerHTML=" ";
 		document.getElementById('htkey').innerHTML=" ";
@@ -668,7 +668,7 @@ end
 		{
 			do
 			{
-				var key = prompt("Please enter Wifi password");
+				var key = prompt("<%:Please enter Wifi password%>");
 				if ( key == null )
 				{
 					return false;
@@ -701,11 +701,11 @@ end
 		if( crypt[selectline] == "No")
 		{
 			tt = ttext[selectline];
-			tt = tt.concat(" is not encrypted");
+			tt = tt.concat("<%: is not encrypted%>");
 			alert(tt);
 			return false;
 		}
-		tt = "Edit Key for "
+		tt = "<%:Edit Key for %>"
 		tt = tt.concat(ttext[selectline]);
 		var r = prompt(tt, hkey[selectline]);
 		if ( r == null )
@@ -780,7 +780,7 @@ end
 		clearListBox("hotList");
 		select = document.getElementById("hotList");
 		select.options[select.options.length] = new Option("  ", 1);
-		select.options[select.options.length] = new Option("Changing Wifi Radio", 2);
+		select.options[select.options.length] = new Option("<%:Changing Wifi Radio%>", 2);
 		document.getElementById('hname').innerHTML=" ";
 		document.getElementById('hcrypt').innerHTML=" ";
 		document.getElementById('htkey').innerHTML=" ";
@@ -791,7 +791,7 @@ end
 		document.getElementById("edbtn").disabled=true;
 		document.getElementById("refbtn").disabled=true;
 		document.getElementById("manbtn").disabled=true;
-		document.getElementById('ssid').innerHTML="Wifi Radio is currently changing";
+		document.getElementById('ssid').innerHTML="<%:Wifi Radio is currently changing%>";
 		document.getElementById('encrypted').innerHTML="";
 		document.getElementById("disbtn").style.display="none";
 
@@ -799,7 +799,7 @@ end
 				{ set: bnd },
 				function(x, rv)
 				{
-					document.getElementById('ssid').innerHTML="Wifi Radio finished changing";
+					document.getElementById('ssid').innerHTML="<%:Wifi Radio finished changing%>";
 					window.location.reload(false);
 				}
 			);

@@ -2,9 +2,11 @@
 -- Licensed to the public under the Apache License 2.0.
 
 module("luci.controller.wireguard", package.seeall)
+local I18N = require "luci.i18n"
+local translate = I18N.translate
 
 function index()
-  entry({"admin", "vpn", "wireguards"}, template("wireguard/wireguard"), _("--WireGuard Status"), 70)
+  entry({"admin", "vpn", "wireguards"}, template("wireguard/wireguard"), _(translate("--WireGuard Status")), 70)
   entry({"admin", "vpn", "wireguard"}, cbi("wireguard"), _("Wireguard"), 63)
   entry( {"admin", "vpn", "wireguard", "client"},    cbi("wireguard-client"),    nil ).leaf = true
   entry( {"admin", "vpn", "wireguard", "server"},    cbi("wireguard-server"),    nil ).leaf = true
