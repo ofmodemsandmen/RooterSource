@@ -1,4 +1,5 @@
 module("luci.controller.fullmenu", package.seeall)
+
 local I18N = require "luci.i18n"
 local translate = I18N.translate
 

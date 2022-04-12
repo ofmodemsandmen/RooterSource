@@ -64,7 +64,7 @@ down.datatype = "and(uinteger,min(1),max(999))"
 down:depends("action", "1")
 down.default = "5"
 
-up = s:option(Value, "up", translate("Upload Speed in Mbps :")));
+up = s:option(Value, "up", translate("Upload Speed in Mbps :"));
 up.optional=false; 
 up.rmempty = true;
 up.datatype = "and(uinteger,min(1),max(999))"

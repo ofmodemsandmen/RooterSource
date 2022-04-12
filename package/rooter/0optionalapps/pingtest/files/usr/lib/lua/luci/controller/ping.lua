@@ -2,8 +2,11 @@
 
 module("luci.controller.ping", package.seeall)
 
+local I18N = require "luci.i18n"
+local translate = I18N.translate
+
 function index()
 	local page
-	page = entry({"admin", "modem", "ping"}, cbi("ping"), _("Custom Ping Test"), 45)
+	page = entry({"admin", "modem", "ping"}, cbi("ping"), _(translate("Custom Ping Test")), 45)
 	page.dependent = true
 end
