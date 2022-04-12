@@ -1,6 +1,7 @@
 module("luci.controller.admin.modem", package.seeall) 
-local I18N = require "luci.i18n"
-local translate = I18N.translate
+
+I18N = require "luci.i18n"
+translate = I18N.translate
 
 function index()
 	entry({"admin", "modem"}, firstchild(), translate("Modem"), 25).dependent=false

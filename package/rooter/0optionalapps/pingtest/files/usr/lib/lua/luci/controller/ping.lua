@@ -2,8 +2,8 @@
 
 module("luci.controller.ping", package.seeall)
 
-local I18N = require "luci.i18n"
-local translate = I18N.translate
+I18N = require "luci.i18n"
+translate = I18N.translate
 
 function index()
 	local page

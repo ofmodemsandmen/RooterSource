@@ -3,8 +3,9 @@
 -- Licensed to the public under the Apache License 2.0.
 
 module("luci.controller.openvpn", package.seeall)
-local I18N = require "luci.i18n"
-local translate = I18N.translate
+
+I18N = require "luci.i18n"
+translate = I18N.translate
 
 function index()
 	entry({"admin", "vpn"}, firstchild(), translate("VPN"), 30).dependent=false

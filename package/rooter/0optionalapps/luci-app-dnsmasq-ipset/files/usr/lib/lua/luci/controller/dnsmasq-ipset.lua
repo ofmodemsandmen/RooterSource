@@ -2,8 +2,9 @@
 -- Auther Qier LU <lvqier@gmail.com>
 
 module("luci.controller.dnsmasq-ipset", package.seeall)
-local I18N = require "luci.i18n"
-local translate = I18N.translate
+
+I18N = require "luci.i18n"
+translate = I18N.translate
 
 function index()
     if not nixio.fs.access("/etc/config/dnsmasq-ipset") then

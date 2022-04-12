@@ -12,8 +12,9 @@ You may obtain a copy of the License at
 ]]--
 
 module("luci.controller.commands", package.seeall)
-local I18N = require "luci.i18n"
-local translate = I18N.translate
+
+I18N = require "luci.i18n"
+translate = I18N.translate
 
 function index()
 	entry({"admin", "system", "commands"}, firstchild(), _(translate("Custom Commands")), 80)

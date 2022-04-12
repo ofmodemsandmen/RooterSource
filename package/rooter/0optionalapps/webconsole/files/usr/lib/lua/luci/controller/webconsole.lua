@@ -4,8 +4,10 @@
 
 module("luci.controller.webconsole", package.seeall)
 local http = require("luci.http")
-local I18N = require "luci.i18n"
-local translate = I18N.translate
+
+I18N = require "luci.i18n"
+translate = I18N.translate
+
 function index()
     entry({"admin", "system", "console"}, template("web/web_console"), _(translate("Web Console")), 66)
     entry({"admin", "system", "webcmd"}, call("action_webcmd"))
