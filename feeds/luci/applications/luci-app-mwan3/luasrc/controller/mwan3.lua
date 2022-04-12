@@ -6,6 +6,8 @@ module("luci.controller.mwan3", package.seeall)
 
 sys = require "luci.sys"
 ut = require "luci.util"
+I18N = require "luci.i18n"
+translate = I18N.translate
 
 ip = "ip -4 "
 
@@ -16,7 +18,7 @@ function index()
 
 	entry({"admin", "status", "mwan"},
 		alias("admin", "status", "mwan", "overview"),
-		_("Load Balancing"), 600)
+		_(translate("Load Balancing")), 600)
 
 	entry({"admin", "status", "mwan", "overview"},
 		template("mwan/status_interface"))
@@ -38,26 +40,26 @@ function index()
 
 	entry({"admin", "network", "mwan"},
 		alias("admin", "network", "mwan", "interface"),
-		_("Load Balancing"), 600)
+		_(translate("Load Balancing")), 600)
 
 	entry({"admin", "network", "mwan", "globals"},
 		cbi("mwan/globalsconfig"),
-		_("Globals"), 5).leaf = true
+		_(translate("Globals")), 5).leaf = true
 	entry({"admin", "network", "mwan", "interface"},
 		arcombine(cbi("mwan/interface"), cbi("mwan/interfaceconfig")),
-		_("Interfaces"), 10).leaf = true
+		_(translate("Interfaces")), 10).leaf = true
 	entry({"admin", "network", "mwan", "member"},
 		arcombine(cbi("mwan/member"), cbi("mwan/memberconfig")),
-		_("Members"), 20).leaf = true
+		_(translate("Members")), 20).leaf = true
 	entry({"admin", "network", "mwan", "policy"},
 		arcombine(cbi("mwan/policy"), cbi("mwan/policyconfig")),
-		_("Policies"), 30).leaf = true
+		_(translate("Policies")), 30).leaf = true
 	entry({"admin", "network", "mwan", "rule"},
 		arcombine(cbi("mwan/rule"), cbi("mwan/ruleconfig")),
-		_("Rules"), 40).leaf = true
+		_(translate("Rules")), 40).leaf = true
 	entry({"admin", "network", "mwan", "notify"},
 		form("mwan/notify"),
-		_("Notification"), 50).leaf = true
+		_(translate("Notification")), 50).leaf = true
 end
 
 function mwan_Status()
