@@ -1,13 +1,23 @@
 local utl = require "luci.util"
+local uci = require "luci.model.uci".cursor()
 
 local maxmodem = luci.model.uci.cursor():get("modem", "general", "max")  
+local profsave = luci.model.uci.cursor():get("custom", "profile", "save")  
+if profsave == nil then
+	profsave ="0"
+end
 
 m = Map("profile", translate("Modem Connection Profiles"),
 	translate("Create Profiles used to provide information at connection time"))
 
 m.on_after_commit = function(self)
-	--luci.sys.call("/etc/modpwr")
+	--lands = uci:get("profile", "disable", "enabled")
 end
+
+if profsave == "1" then
+	m:section(SimpleSection).template = "rooter/profile"
+end
+
 
 -- 
 -- Default profile
