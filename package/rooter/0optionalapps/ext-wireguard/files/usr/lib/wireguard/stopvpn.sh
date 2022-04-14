@@ -23,3 +23,5 @@ fi
 
 uci set wireguard."$WG".active="0"
 uci commit wireguard
+
+/etc/init.d/wireguard stop
