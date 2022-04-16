@@ -11,6 +11,9 @@ log() {
 check_config () {
 	log "Check Client Interfaces"
 	CHANGE="0"
+	#uci delete network.wg0
+	#uci delete network.wg1
+	#uci commit network
 	WW=$(uci get network.wg0)
 	if [ -z $WW ]; then
 		uci set network.wg0=interface
@@ -79,6 +82,8 @@ chk_start() {
 	uci commit wireguard
 	if [ $auto = '1' ]; then
 		/usr/lib/wireguard/startvpn.sh $config
+	else
+		/usr/lib/wireguard/stopvpn.sh $config
 	fi
 }
 

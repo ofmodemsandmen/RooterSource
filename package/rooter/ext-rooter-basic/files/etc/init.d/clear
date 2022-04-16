@@ -15,4 +15,7 @@ start() {
 		fi
 		let COUNTER=COUNTER+1 
 	done
+	uci delete network.wg0
+	uci delete network.wg1
+	uci commit network
 }
