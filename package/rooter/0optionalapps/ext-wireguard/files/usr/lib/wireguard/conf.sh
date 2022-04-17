@@ -2,6 +2,10 @@
 
 name=$1
 file=$2
+auto=$3
+if [ -z $auto ]; then
+	auto="0"
+fi
 
 extract() {
 	line=$1
@@ -67,7 +71,7 @@ endpoint=$(echo $PRK | cut -d, -f1)
 sport=$(echo $PRK | cut -d, -f2)
 
 uci set wireguard.$name=wireguard
-uci set wireguard.$name.auto="0"
+uci set wireguard.$name.auto=$auto
 uci set wireguard.$name.client="1"
 uci set wireguard.$name.active="0"
 uci set wireguard.$name.privatekey="$PrivateKey"

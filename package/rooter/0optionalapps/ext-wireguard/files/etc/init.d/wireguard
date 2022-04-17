@@ -8,70 +8,56 @@ log() {
 	logger -t "WireGuard Init.d : " "$@"
 }
 
+chk_zone() {
+	local config=$1
+	
+	config_get src $config src
+	config_get dest $config dest
+	if [ $src = "lan" -a $dest = "wan" ]; then
+		uci set firewall."$config".dest="wg"
+		uci commit firewall
+	fi
+}
+
 check_config () {
 	log "Check Client Interfaces"
-	CHANGE="0"
-	#uci delete network.wg0
-	#uci delete network.wg1
-	#uci commit network
-	WW=$(uci get network.wg0)
-	if [ -z $WW ]; then
-		uci set network.wg0=interface
-		uci set network.wg0.proto="wireguard"
-		uci set network.wg0.auto="0"
-		uci set network.wg0.private_key=""
-		uci set network.wg0.listen_port=""
-		uci add_list network.wg0.addresses=""
-		CHANGE="1"
-	fi
-	WW=$(uci get network.wg1)
-	if [ -z $WW ]; then
-		uci set network.wg1=interface
-		uci set network.wg1.proto="wireguard"
-		uci set network.wg1.auto="0"
-		uci set network.wg1.private_key=""
-		uci set network.wg1.listen_port=""
-		uci add_list network.wg1.addresses=""
-		CHANGE="1"
-	fi
-	if [ $CHANGE = "1" ]; then
-		uci commit network
-		#/etc/init.d/network restart
-	fi
+	uci delete network.wg0
+	uci delete network.wg1
+	uci commit network
+	uci set network.wg0=interface
+	uci set network.wg0.proto="wireguard"
+	uci set network.wg0.auto="0"
+	uci set network.wg0.private_key=""
+	uci set network.wg0.listen_port=""
+	uci add_list network.wg0.addresses=""
+	uci set network.wg1=interface
+	uci set network.wg1.proto="wireguard"
+	uci set network.wg1.auto="0"
+	uci set network.wg1.private_key=""
+	uci set network.wg1.listen_port=""
+	uci add_list network.wg1.addresses=""
+	uci commit network
 	
-	CHANGE="0"
-	WW=$(uci get firewall.wgzone)
-	if [ -z $WW ]; then
-		uci set firewall.wgzone=zone
-		uci set firewall.wgzone.name="wg"
-		uci set firewall.wgzone.forward="ACCEPT"
-		uci set firewall.wgzone.output="ACCEPT"
-		uci set firewall.wgzone.network="wg0 wg1"
-		uci set firewall.wgzone.input="ACCEPT"
-		uci set firewall.wgzone.masq="1"
-		uci set firewall.wgzone.mtu_fix="1"
-		
-		uci set firewall.wgwforward=forwarding
-		uci set firewall.wgwforward.dest="wan"
-		uci set firewall.wgwforward.src="wg"
-		
-		uci set firewall.wwgforward=forwarding
-		uci set firewall.wwgforward.dest="wg"
-		uci set firewall.wwgforward.src="wan"
-		
-		uci set firewall.lwgforward=forwarding
-		uci set firewall.lwgforward.dest="wg"
-		uci set firewall.lwgforward.src="lan"
-		
-		uci set firewall.wglforward=forwarding
-		uci set firewall.wglforward.dest="lan"
-		uci set firewall.wglforward.src="wg"
-		CHANGE="1"
-	fi	
-	if [ $CHANGE = "1" ]; then	
-		uci commit firewall
-		/etc/init.d/firewall restart
-	fi
+	uci delete firewall.wgzone
+	uci delete firewall.wgwforward
+	uci delete firewall.wwgforward
+	uci delete firewall.lwgforward
+	uci delete firewall.wglforward
+	uci commit firewall
+	uci set firewall.wgzone=zone
+	uci set firewall.wgzone.name="wg"
+	uci set firewall.wgzone.forward="ACCEPT"
+	uci set firewall.wgzone.output="ACCEPT"
+	uci set firewall.wgzone.network="wg0 wg1"
+	uci set firewall.wgzone.input="ACCEPT"
+	uci set firewall.wgzone.masq="1"
+	uci set firewall.wgzone.mtu_fix="1"
+	uci commit firewall
+	
+	config_load firewall
+	config_foreach chk_zone forwarding
+
+	/etc/init.d/firewall restart
 }
 
 chk_start() {

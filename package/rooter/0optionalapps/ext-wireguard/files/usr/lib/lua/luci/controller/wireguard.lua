@@ -14,6 +14,7 @@ function index()
   
   entry( {"admin", "vpn", "wireguard", "wupload"},   call("conf_upload"))
   entry( {"admin", "vpn", "generateconf"},   call("conf_gen"))
+  entry( {"admin", "vpn", "textconf"},   call("text_gen"))
 end
 
 function conf_upload()
@@ -54,4 +55,9 @@ end
 
 function conf_gen()
 	os.execute("/usr/lib/wireguard/create.sh")
+end
+
+function text_gen()
+	local set = luci.http.formvalue("set")
+	os.execute("/usr/lib/wireguard/text.sh " .. "\"" .. set .. "\"")
 end
