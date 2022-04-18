@@ -5,7 +5,22 @@ log() {
 	logger -t "Wireguard Stop" "$@"
 }
 
+chk_zone() {
+	local config=$1
+	
+	config_get src $config src
+	config_get dest $config dest
+	if [ $src = "lan" -a $dest = "wg" ]; then
+		uci set firewall."$config".dest="wan"
+		uci commit firewall
+	fi
+}
+
 WG=$1
+
+config_load firewall
+config_foreach chk_zone forwarding
+/etc/init.d/firewall restart
 
 SERVE=$(uci get wireguard."$WG".client)
 if [ $SERVE = "0" ]; then

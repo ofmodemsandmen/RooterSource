@@ -13,8 +13,8 @@ chk_zone() {
 	
 	config_get src $config src
 	config_get dest $config dest
-	if [ $src = "lan" -a $dest = "wan" ]; then
-		uci set firewall."$config".dest="wg"
+	if [ $src = "lan" -a $dest = "wg" ]; then
+		uci set firewall."$config".dest="wan"
 		uci commit firewall
 	fi
 }

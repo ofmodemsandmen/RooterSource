@@ -7,6 +7,17 @@ log() {
 
 WG=$1
 
+chk_zone() {
+	local config=$1
+	
+	config_get src $config src
+	config_get dest $config dest
+	if [ $src = "lan" -a $dest = "wan" ]; then
+		uci set firewall."$config".dest="wg"
+		uci commit firewall
+	fi
+}
+
 do_dns() {
 	cdns=$1
 	ldns=$(uci -q get network.wg0.dns)
@@ -243,6 +254,10 @@ udp_client() {
 	udptunnel "127.0.0.1:"$port $endpoint_host":"$sport &
 	#log "udptunnel 127.0.0.1:$port $endpoint_host:$sport"
 }
+
+config_load firewall
+config_foreach chk_zone forwarding
+/etc/init.d/firewall restart
 
 config_load network
 SERVE=$(uci -q get wireguard."$WG".client)
