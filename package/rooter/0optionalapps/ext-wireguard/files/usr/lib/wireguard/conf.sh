@@ -9,6 +9,10 @@ fi
 
 extract() {
 	line=$1
+	PD=$(echo "$line" | grep "#")
+	if [ ! -z "$PD" ]; then
+		return
+	fi
 	PRK=$(echo "$line" | grep "PrivateKey" | tr " " ",")
 	if [ ! -z "$PRK" ]; then
 		PrivateKey=$(echo $PRK | cut -d, -f3)
@@ -61,6 +65,27 @@ extract() {
 
 listenport="51280"
 dns=""
+sed -i -e "s!PrivateKey= !PrivateKey=!g" $file
+sed -i -e "s!PrivateKey=!PrivateKey = !g" $file
+sed -i -e "s!PublicKey= !PublicKey=!g" $file
+sed -i -e "s!PublicKey=!PublicKey = !g" $file
+sed -i -e "s!PresharedKey= !PresharedKey=!g" $file
+sed -i -e "s!PresharedKey=!PresharedKey = !g" $file
+sed -i -e "s!Address= !Address=!g" $file
+sed -i -e "s!Address=!Address = !g" $file
+sed -i -e "s!dns= !dns=!g" $file
+sed -i -e "s!dns=!dns = !g" $file
+sed -i -e "s!DNS= !DNS=!g" $file
+sed -i -e "s!DNS=!DNS = !g" $file
+sed -i -e "s!ListenPort= !ListenPort=!g" $file
+sed -i -e "s!ListenPort=!ListenPort = !g" $file
+sed -i -e "s!AllowedIPs= !AllowedIPs=!g" $file
+sed -i -e "s!AllowedIPs=!AllowedIPs = !g" $file
+sed -i -e "s!Endpoint= !Endpoint=!g" $file
+sed -i -e "s!Endpoint=!Endpoint = !g" $file
+sed -i -e "s!MTU= !MTU=!g" $file
+sed -i -e "s!MTU=!MTU = !g" $file
+
 while IFS= read -r linex
 do
 	extract "$linex"
@@ -70,6 +95,7 @@ PRK=$(echo "$endpoint" | tr ":" ",")
 endpoint=$(echo $PRK | cut -d, -f1)
 sport=$(echo $PRK | cut -d, -f2)
 
+uci delete wireguard.$name
 uci set wireguard.$name=wireguard
 uci set wireguard.$name.auto=$auto
 uci set wireguard.$name.client="1"
