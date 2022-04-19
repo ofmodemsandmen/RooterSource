@@ -18,7 +18,7 @@ define Package/ext-rooter16
 		+luci-app-ddns +ddns-scripts +ddns-scripts_no-ip_com \
 		+luci-app-rootervpn +ext-wireguard \
 		+bwmon +464xlat \
-		+ext-theme +luci-theme-argon +argon-config \
+		+ext-theme +luci-theme-argon +luci-theme-argondark \
 		+luci-theme-tomato +ext-login \
 		+ca-bundle +ca-certificates +libustream-openssl \
 		+luci-app-ksmbd +usb-storage \
