@@ -7,9 +7,9 @@ translate = I18N.translate
 
 function index()
 	local lock = luci.model.uci.cursor():get("custom", "menu", "full")
-	if lock == "1" then
+	--if lock == "1" then
 		local page
-		page = entry({"admin", "adminmenu", "blockport"}, cbi("portblk"), _(translate("---Port Blocking")), 10)
+		page = entry({"admin", "adminmenu", "blockport"}, cbi("portblk"), _(translate("Port Blocking")), 10)
 		page.dependent = true
-	end
+	--end
 end

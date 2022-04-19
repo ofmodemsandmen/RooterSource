@@ -5,7 +5,7 @@ translate = I18N.translate
 
 function index()
 	local page
-	entry({"admin", "adminmenu"}, firstchild(), translate("Administration"), 42).dependent=false
+	entry({"admin", "adminmenu"}, firstchild(), translate("Administration"), 24).dependent=false
 	local df = luci.model.uci.cursor():get("custom", "menu", "default")
 	if df == '0' then
 		page = entry({"admin", "adminmenu", "fullmenu"}, template("fullmenu/fullmenu"), translate("Unlock / Lock Menus"), 5)
