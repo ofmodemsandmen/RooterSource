@@ -489,7 +489,12 @@ function action_get_csq()
 	if file == nil then
 		rv["simerr"] = "0"
 	else
-		rv["simerr"] = "1"
+		typ = file:read("*line")
+		if typ == "0" then
+			rv["simerr"] = "1"
+		else
+			rv["simerr"] = "2"
+		end
 		file:close()
 	end
 

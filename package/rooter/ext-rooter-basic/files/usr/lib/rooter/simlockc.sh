@@ -10,7 +10,6 @@ log() {
 CURRMODEM=$1
 CPORT=$(uci get modem.modem$CURRMODEM.commport)
 
-rm -f /tmp/simpin$CURRMODEM
 ATCMDD="at+cpin?"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 RDY=$(echo "$OX" | grep "READY")
@@ -21,7 +20,10 @@ if [ -z "$RDY" ]; then
 	if [ ! -z "$RDY" ]; then
 		PIN=$(uci -q get modem.modeminfo$CURRMODEM.pincode)
 		if [ -z "$PIN" ]; then
-			echo "0" > /tmp/simpin$CURRMODEM
+			spin=$(uci -q get profile.simpin.pin)
+			if [ -z $spin ]; then
+				echo "0" > /tmp/simpin$CURRMODEM
+			fi
 		fi
 	fi
 fi

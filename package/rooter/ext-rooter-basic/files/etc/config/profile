@@ -15,3 +15,5 @@ config default 'default'
 
 config disable 'disable'
 	option enabled '0'
+	
+config simpin 'simpin'

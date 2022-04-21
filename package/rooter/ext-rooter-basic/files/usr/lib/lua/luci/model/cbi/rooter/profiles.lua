@@ -1,5 +1,6 @@
 local utl = require "luci.util"
 local uci = require "luci.model.uci".cursor()
+local sys   = require "luci.sys"
 
 local maxmodem = luci.model.uci.cursor():get("modem", "general", "max")  
 local profsave = luci.model.uci.cursor():get("custom", "profile", "save")  
@@ -11,11 +12,19 @@ m = Map("profile", translate("Modem Connection Profiles"),
 	translate("Create Profiles used to provide information at connection time"))
 
 m.on_after_commit = function(self)
-	--lands = uci:get("profile", "disable", "enabled")
+	if profsave == "1" then
+		luci.sys.call("/usr/lib/profile/restart.sh &")
+	end
 end
 
 if profsave == "1" then
 	m:section(SimpleSection).template = "rooter/profile"
+	ds = m:section(TypedSection, "simpin", translate("Default SIM Pin"), translate("Used if no SIM Pin value in Profile"))
+	ds.anonymous = true
+	
+	ms = ds:option(Value, "pin", translate("PIN :")); 
+	ms.rmempty = true;
+	ms.default = ""
 end
 
 

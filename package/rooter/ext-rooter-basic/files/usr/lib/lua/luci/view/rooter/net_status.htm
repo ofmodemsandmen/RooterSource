@@ -71,14 +71,22 @@ end
 			}
 			
 			simerr = rv.simerr;
-			if (simerr == "1")
+			if (simerr == "0")
 			{
-				document.getElementById("simwarn").style.display="block";
-				document.getElementById("simsg").style.color = "red";
+				document.getElementById("simwarn").style.display="none";
 			}
 			else
 			{
-				document.getElementById("simwarn").style.display="none";
+				document.getElementById("simwarn").style.display="block";
+				document.getElementById("simsg").style.color = "red";
+				if (simerr == "1")
+				{
+					document.getElementById("simsg").innerHTML = "<%:SIM is locked with no SIM Pin entered in Profile!!%>";
+				}
+				else
+				{
+					document.getElementById("simsg").innerHTML = "<%:Incorrect Pin to Unlock SIM%>";
+				}
 			}
 
 			reslt=rv.result
@@ -285,9 +293,9 @@ end
 
 <fieldset class="cbi-section" id="simwarn" style="display:none;">
 	<legend><%:SIM WARNING%></legend>
-	<table width="550"  border="1">
+	<table width="550"  border="0">
 		<tr>
-    		<td width="60%"><div align="right" id="simsg" style="font-size:1.875em"><strong><%:SIM is locked with no SIM Pin entered in Profile!!%></strong></div></td>
+    		<td width="60%"><div align="right" id="simsg" style="font-size:1.875em"><strong></strong></div></td>
 			<td width="40%"></td>
 		</tr>
 	</table>
