@@ -38,6 +38,13 @@ CURRMODEM=$1
 CPORT=$(uci get modem.modem$CURRMODEM.commport)
 rm -f /tmp/simpin$CURRMODEM
 
+IMSI=$(uci -q get modem.modem$CURRMODEM.imsi)
+ICCID=$(uci -q get modem.modem$CURRMODEM.iccid)
+if [ "$IMSI" = "Unknown" -a "$ICCID" = "Unknown" ]; then
+	echo "2" > /tmp/simpin$CURRMODEM
+	exit 0
+fi
+
 spin=$(uci -q get modem.modeminfo$CURRMODEM.pincode)
 if [ ! -z $spin ]; then
 	export PINCODE="$spin"

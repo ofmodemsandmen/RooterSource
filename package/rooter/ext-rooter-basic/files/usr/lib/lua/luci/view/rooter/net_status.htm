@@ -85,7 +85,14 @@ end
 				}
 				else
 				{
-					document.getElementById("simsg").innerHTML = "<%:Incorrect Pin to Unlock SIM%>";
+					if (simerr == "1")
+					{
+						document.getElementById("simsg").innerHTML = "<%:Incorrect Pin to Unlock SIM%>";
+					}
+					else
+					{
+						document.getElementById("simsg").innerHTML = "<%:SIM is Missing%>";
+					}
 				}
 			}
 
@@ -295,8 +302,9 @@ end
 	<legend><%:SIM WARNING%></legend>
 	<table width="550"  border="0">
 		<tr>
-    		<td width="60%"><div align="right" id="simsg" style="font-size:1.875em"><strong></strong></div></td>
-			<td width="40%"></td>
+			<td width="10%"></td>
+    		<td width="60%"><div align="left" id="simsg" style="font-size:1.875em"><strong></strong></div></td>
+			<td width="30%"></td>
 		</tr>
 	</table>
 	
