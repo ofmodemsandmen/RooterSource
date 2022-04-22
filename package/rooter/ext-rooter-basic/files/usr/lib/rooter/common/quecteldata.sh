@@ -96,6 +96,8 @@ if [ -n "$QTEMP" ]; then
 	CTEMP=$(echo $QTEMP | grep -o "[0-9]\{1,3\}")$(printf "\xc2\xb0")"C"
 fi
 RAT=$(echo $QENG | cut -d, -f4 | grep -o "[-A-Z5]\{3,7\}")
+uci set modem.modem$CURRMODEM.network='0'
+uci commit modem
 case $RAT in
 	"GSM")
 		MODE="GSM"
@@ -155,6 +157,8 @@ case $RAT in
 
 		if [ -n "$NR_NSA" ]; then
 			MODE="LTE/NR EN-DC"
+			uci set modem.modem$CURRMODEM.network='1'
+			uci commit modem
 			if [ -n "$QENG5" ]  && [ -n "$LBAND" ] && [ "$RSCP" != "-" ] && [ "$ECIO" != "-" ]; then
 				PCI="$PCI, "$(echo $QENG5 | cut -d, -f4)
 				SCHV=$(echo $QENG5 | cut -d, -f8)
@@ -229,6 +233,8 @@ case $RAT in
 		;;
 	"NR5G-SA")
 		MODE="NR5G-SA"
+		uci set modem.modem$CURRMODEM.network='1'
+		uci commit modem
 		if [ -n "$QENG5" ]; then
 			MODE="$RAT $(echo $QENG5 | cut -d, -f4)"
 			PCI=$(echo $QENG5 | cut -d, -f8)
@@ -251,6 +257,7 @@ case $RAT in
 		fi
 		;;
 esac
+
 QRSRP=$(echo "$OX" | grep -o "+QRSRP:[^,]\+,-[0-9]\{1,5\},-[0-9]\{1,5\},-[0-9]\{1,5\}[^ ]*")
 if [ -n "$QRSRP" ] && [ "$RAT" != "WCDMA" ]; then
 	QRSRP1=$(echo $QRSRP | cut -d, -f1 | grep -o "[-0-9]\+")
