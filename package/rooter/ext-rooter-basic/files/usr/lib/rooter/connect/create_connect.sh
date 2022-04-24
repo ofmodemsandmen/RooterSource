@@ -669,6 +669,9 @@ fi
 if [ -e $ROOTER/connect/preconnect.sh ]; then
 	$ROOTER/connect/preconnect.sh $CURRMODEM
 fi
+if [ -e /usr/lib/gps/gps.sh ]; then
+	/usr/lib/gps/gps.sh $CURRMODEM
+fi
 
 if $QUECTEL; then
 	ATCMDD="AT+CNMI?"
