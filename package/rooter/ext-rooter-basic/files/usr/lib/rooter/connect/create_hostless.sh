@@ -301,9 +301,6 @@ if [ $SP -gt 0 ]; then
 	if [ -e $ROOTER/connect/preconnect.sh ]; then
 		$ROOTER/connect/preconnect.sh $CURRMODEM
 	fi
-	if [ -e /usr/lib/gps/gps.sh ]; then
-		/usr/lib/gps/gps.sh $CURRMODEM
-	fi
 
 	if [ $SP = 5 ]; then
 		clck=$(uci -q get custom.bandlock.cenable)
@@ -350,6 +347,9 @@ fi
 $ROOTER/connect/get_profile.sh $CURRMODEM
 if [ -e $ROOTER/simlockc.sh ]; then
 	$ROOTER/simlockc.sh $CURRMODEM
+fi
+if [ -e /usr/lib/gps/gps.sh ]; then
+	/usr/lib/gps/gps.sh $CURRMODEM
 fi
 
 INTER=$(uci get modem.modeminfo$CURRMODEM.inter)

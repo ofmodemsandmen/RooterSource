@@ -669,9 +669,6 @@ fi
 if [ -e $ROOTER/connect/preconnect.sh ]; then
 	$ROOTER/connect/preconnect.sh $CURRMODEM
 fi
-if [ -e /usr/lib/gps/gps.sh ]; then
-	/usr/lib/gps/gps.sh $CURRMODEM
-fi
 
 if $QUECTEL; then
 	ATCMDD="AT+CNMI?"
@@ -743,6 +740,9 @@ if [ -n "$CHKPORT" ]; then
 	$ROOTER/connect/get_profile.sh $CURRMODEM
 	if [ -e $ROOTER/simlockc.sh ]; then
 		$ROOTER/simlockc.sh $CURRMODEM
+	fi
+	if [ -e /usr/lib/gps/gps.sh ]; then
+		/usr/lib/gps/gps.sh $CURRMODEM
 	fi
 	INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
 	[ $INTER = 3 ] && log "Modem $CURRMODEM disabled in Connection Profile" && exit 1
