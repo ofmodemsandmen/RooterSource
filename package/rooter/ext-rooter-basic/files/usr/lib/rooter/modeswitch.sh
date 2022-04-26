@@ -558,6 +558,9 @@ if [ "$ACTION" = remove ]; then
 			PID=$(ps |grep "mbim_monitor$retresult" | grep -v grep |head -n 1 | awk '{print $1}')
 			kill -9 $PID
 			rm -f $ROOTER_LINK/mbim_monitor$retresult
+			if [ -e /usr/lib/gps/gpskill ]; then
+				/usr/lib/gps/gpskill $retresult
+			fi
 			$ROOTER/signal/status.sh $retresult "No Modem Present"
 			$ROOTER/log/logger "Disconnect (Removed) Modem #$retresult"
 			display_top; display "Remove : $DEVICENAME : Modem $retresult"; display_bottom
