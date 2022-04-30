@@ -14,6 +14,7 @@ define Package/pingtest
   SECTION:=utils
   CATEGORY:=ROOter
   SUBMENU:=Optional Applications
+  DEPENDS:=+httping +curl
   TITLE:=Added scripts for custom ping test
   PKGARCH:=all
 endef
