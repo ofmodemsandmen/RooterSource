@@ -1,5 +1,23 @@
 #!/bin/sh
 
+setbackup() {
+	extn=$(uci -q get bwmon.general.external)
+	if [ "$extn" = "0" ]; then
+		backPath=/usr/lib/bwmon/data/
+	else
+		if [ -e "$extn""/" ]; then
+			backPath=$extn"/data/"
+		else
+			backPath=/usr/lib/bwmon/data/
+			uci set bwmon.general.external="0"
+			uci commit bwmon
+		fi
+	fi
+	if [ ! -e "$backpath" ]; then
+		mkdir -p $backPath
+	fi
+}
+
 LAN_TYPE=$(uci get network.lan.ipaddr | awk -F. ' { print $1"."$2 }')
 LEASES_FILE=/tmp/dhcp.leases
 lockDir=/tmp/WRTbmon
@@ -16,8 +34,7 @@ fi
 basePath="/tmp/bwmon/"
 mkdir -p $basePath"data"
 dataPath=$basePath"data/"
-backPath=/usr/lib/bwmon/data/
-mkdir -p "/usr/lib/bwmon/data/"
+setbackup
 lockDir1=/tmp/wrtbwmon1.lock
 lockDir=/tmp/wrtbwmon.lock
 mkdir -p "$lockDir"
@@ -28,9 +45,11 @@ STARTIMEZ=$(date +%s)
 cYear=$(date +%Y)
 cDay=$(date +%d)
 cMonth=$(date +%m)
-setup_time=300
-update_time=300
-backup_time=300
+setup_time=60
+update_time=60
+bs=$(uci -q get bwmon.general.backup)
+let "bs=$bs*60"
+backup_time=$bs
 pause=30
 unlimited="peak"
 
@@ -251,7 +270,12 @@ setup()
 	if [ ! -z $C2 ]; then
 		interfaces="$wan1 $wan2"
 	else
-		return
+		WW=$(uci -q get bwmon.bwwan.wan)
+		if [ "$WW" = "1" ]; then
+			interfaces="$wan"
+		else
+			return
+		fi
 	fi
 
 	# track local data
@@ -348,9 +372,11 @@ createFiles()
 	if [ -f $monthlyUsageBack ]; then
 		cp -f $monthlyUsageBack $monthlyUsageDB".bk"
 		sed "/start day $cDay/,/end day $cDay/d" $monthlyUsageDB".bk" > $monthlyUsageDB 
-		rm -f $monthlyUsageDB".bk"
+		cp -f $monthlyUsageBack $monthlyUsageDB".bk"
+		#rm -f $monthlyUsageDB".bk"
 	else
 		touch $monthlyUsageDB
+		/usr/lib/bwmon/backup.sh "backup" $cDay $monthlyUsageDB $dailyUsageDB $monthlyUsageBack $dailyUsageBack
 	fi
 	rm -f /tmp/lockbw
 }
@@ -361,13 +387,7 @@ shutDown()
 		sleep 1
 	done
 	echo "0" > /tmp/lockbw
-	cp -f $dailyUsageDB $dailyUsageBack 
-	cp -f $monthlyUsageDB $monthlyUsageDB".bk"
-	echo "start day $cDay" >> $monthlyUsageDB".bk"
-	cat "$dailyUsageDB" >> $monthlyUsageDB".bk"
-	echo "end day $cDay" >> $monthlyUsageDB".bk"
-	cp -f $monthlyUsageDB".bk" $monthlyUsageBack
-	rm -f $monthlyUsageDB".bk"
+	/usr/lib/bwmon/backup.sh "backup" $cDay $monthlyUsageDB $dailyUsageDB $monthlyUsageBack $dailyUsageBack
 	lua /usr/lib/bwmon/cleanup.lua
 	rm -f /tmp/lockbw
 }
@@ -379,6 +399,7 @@ checkSetup()
 	if [ $ELAPSE -gt $setup_time ]; then
 		STARTIMEX=$CURRTIME
 		setup
+		/usr/lib/bwmon/backup.sh "setup" $cDay $monthlyUsageDB $dailyUsageDB $monthlyUsageBack $dailyUsageBack
 	fi
 }
 
@@ -396,6 +417,9 @@ checkBackup()
 {
 	CURRTIME=$(date +%s)
 	let ELAPSE=CURRTIME-STARTIMEZ
+	bs=$(uci -q get bwmon.general.backup)
+	let "bs=$bs*60"
+	backup_time=$bs
 	if [ $ELAPSE -gt $backup_time ]; then
 		STARTIMEZ=$CURRTIME
 		shutDown
@@ -412,10 +436,8 @@ checkTime()
 	pYear=$(date +%Y)
 	pMonth=$(date +%m)
 	if [ "$cDay" -ne "$pDay" ]; then
-		echo "start day $cDay" >> $monthlyUsageDB
-		cat "$dailyUsageDB" >> $monthlyUsageDB
-		echo "end day $cDay" >> $monthlyUsageDB
-		cp -f $monthlyUsageDB $monthlyUsageBack
+		/usr/lib/bwmon/backup.sh "daily" $cDay $monthlyUsageDB $dailyUsageDB $monthlyUsageBack $dailyUsageBack
+		
 		cDay=$pDay
 		cMonth=$pMonth
 		cYear=$pYear
@@ -446,7 +468,6 @@ setup
 while [ -d $lockDir ]; do
 	checkSetup
 	checkTime
-	#checkUpdate
 	checkBackup
 	n=0
 	while [ true ] ; do

@@ -1,7 +1,7 @@
 #!/usr/bin/lua
 
-dirname = '/usr/lib/bwmon/data'
-filepost = "-mac_data.js"
+dirname = '/tmp/bwmon/data'
+filepost = "-mac_data.js.bk"
 bw = {}
 maclist = {}
 devices = {}
