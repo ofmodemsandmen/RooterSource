@@ -182,7 +182,7 @@ case $RAT in
 						SINR=$SINR"<br />"$((($(echo $SINRR) * 2) -20))" dB"
 					fi
 				fi
-				ECIO=$ECIO" dB<br />"$(echo $QENG5 | cut -d, -f7)
+				ECIO=$ECIO" (4G) dB<br />"$(echo $QENG5 | cut -d, -f7)" (5G) "
 			fi
 		fi
 		if [ -z "$LBAND" ]; then
@@ -280,15 +280,22 @@ if [ -n "$QRSRP" ] && [ "$RAT" != "WCDMA" ]; then
 		else
 			RSCP=$RSRPLTE
 			if [ -n "$QRSRP1" -a "$QRSRP1" != "-32768" ]; then
-				RSCP=$RSCP" dBm<br />"$QRSRP1
-			fi
-			if [ -n "$QRSRP2" -a "$QRSRP2" != "-32768" ]; then
-				RSCP1="RxD "$QRSRP2
+				RSCP=$RSCP" (4G) dBm<br />"$QRSRP1
+				if [ -n "$QRSRP2" -a "$QRSRP2" != "-32768" ]; then
+					RSCP="$RSCP,$QRSRP2"
+					if [ -n "$QRSRP3" -a "$QRSRP3" != "-32768" ]; then
+						RSCP="$RSCP,$QRSRP3"
+						if [ -n "$QRSRP4" -a "$QRSRP4" != "-32768" ]; then
+							RSCP="$RSCP,$QRSRP4"
+						fi
+					fi
+					RSCP=$RSCP" (5G) "
+				fi
 			fi
 		fi
 	elif [ "$QRSRP2$QRSRP3$QRSRP4" != "-44-44-44" -a -z "$QENG5" ]; then
 		RSCP=$QRSRP1
-		if [ "$QRSRP3$QRSRP4" == "-140-140" -o "$QRSRP3$QRSRP4" == "-44-44" ]; then
+		if [ "$QRSRP3$QRSRP4" == "-140-140" -o "$QRSRP3$QRSRP4" == "-44-44" -o "$QRSRP3$QRSRP4" == "-32768-32768" ]; then
 			RSCP1="RxD "$(echo $QRSRP | cut -d, -f2)
 		else
 			RSCP=$RSCP" dBm (RxD "$QRSRP2" dBm)<br />"$QRSRP3

@@ -13,7 +13,6 @@ dailyUsageDB=$4
 monthlyUsageBack=$5
 dailyUsageBack=$6
 
-log "compress data $btype"
 /usr/lib/bwmon/backup-daily.lua $dailyUsageDB
 /usr/lib/bwmon/backup-mon.lua $monthlyUsageDB
 cp -f $monthlyUsageDB".bk" $monthlyUsageDB
