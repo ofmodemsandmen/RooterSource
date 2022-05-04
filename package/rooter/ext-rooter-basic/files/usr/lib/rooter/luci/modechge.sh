@@ -9,7 +9,7 @@ NETMODE=$2
 	logger -t "ModeChange" "$@"
 # }
 
-CURRMODEM=$(uci get modem.general.modemnum)
+CURRMODEM=$(uci get modem.general.miscnum)
 uci set modem.modem$CURRMODEM.cmode="0"
 uci set modem.modem$CURRMODEM.netmode="10"
 uci commit modem
