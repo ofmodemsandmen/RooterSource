@@ -67,20 +67,24 @@ if [ $L3 = "253" ]; then
 fi
 IP="$L1"."$L2"."$NL3"."$L4"
 
-source /etc/openwrt_release
-ipaddr="ipaddr"
-twone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
-if [ ! -z $twone ]; then
-	ipaddr="device"
+ifname1="ifname"
+if [ -e /etc/newstyle ]; then
+	ifname1="device"
 fi
 	
 WW=$(uci get -q network.$GUEST)
 if [ -z $WW ]; then
 # Configure guest network
+	uci delete network.${GUEST}_dev
+	uci set network.${GUEST}_dev=device
+	uci set network.${GUEST}_dev.type=bridge
+	uci set network.${GUEST}_dev.name="br-"$GUEST
+
 	uci delete network.$GUEST
 	uci set network.$GUEST=interface
 	uci set network.$GUEST.proto=static
-	uci set network.$GUEST.$ipaddr=$IP
+	uci set network.$GUEST.ipaddr=$IP
+	uci set network.$GUEST.$ifname1=br-${GUEST}
 	uci set network.$GUEST.netmask=255.255.255.0
 	
 # Configure DHCP for guest network
