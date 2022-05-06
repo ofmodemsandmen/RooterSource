@@ -1760,5 +1760,18 @@
 			},
 			"files": "/huasifei/files1/"	
 		}
+	},
+	"RB951": {
+		"details": "Mikrotik RB951Ui-2nD (hAP)",
+		"type": "2",
+		"build": "1907",
+		"config": ".config_rb951",
+		"image1": "openwrt-ar71xx-mikrotik-rb-nor-flash-16M-squashfs-sysupgrade.bin",
+		"image2": "openwrt-ar71xx-mikrotik-rb-nor-flash-16M-initramfs-kernel.bin",
+		"imagepath": "/ar71xx/mikrotik/",
+		"mod": "Mikrotik-RB951Ui-2nD-(hAP)",
+		"ext1": "-upgrade.bin",
+		"ext2": "-kernel.bin",
+		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.pdf"]
 	}
 }

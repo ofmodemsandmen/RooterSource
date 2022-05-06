@@ -46,6 +46,11 @@ send "AT+QTEMP^m"
 let t=time()+1
 gosub gettemp
 
+send "AT+QENG=\"neighbourcell\"^m"
+let t=time()+f
+gosub getresult
+if $s="^mTIMEOUT ERROR" print $s
+
 exit 0
 
 :getresult
