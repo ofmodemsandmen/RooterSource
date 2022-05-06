@@ -364,7 +364,7 @@ var backflg = "0";
 	function applyb(btn)
 	{
 		bspd=document.getElementById("bwinter").value;
-		document.getElementById("attxt").value=bspd;
+		//document.getElementById("attxt").value=bspd;
 		XHR.get('<%=luci.dispatcher.build_url("admin", "nlbw", "change_backup")%>',
 			{ set: bspd },
 			function()
