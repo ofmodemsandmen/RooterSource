@@ -1,13 +1,15 @@
 #!/bin/sh
 
 > /tmp/crontmp
-while read -r line; do
-	if [ -n "$line" ]; then
-		if [ ${line: -1} == ";" ]; then
-			echo "$line" >> /tmp/crontmp
+if [ -e /etc/crontabs/root ]; then
+	while read -r line; do
+		if [ -n "$line" ]; then
+			if [ ${line: -1} == ";" ]; then
+				echo "$line" >> /tmp/crontmp
+			fi
 		fi
-	fi
-done < /etc/crontabs/root
+	done < /etc/crontabs/root
+fi
 
 if [ -f /etc/cronuser ]; then
 	if [ -f /etc/cronbase ]; then
