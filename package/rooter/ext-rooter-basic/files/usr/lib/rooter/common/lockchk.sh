@@ -35,6 +35,12 @@ setautocops() {
 }
 
 CURRMODEM=$1
+if [ -e /usr/lib/netroam/lock.sh ]; then
+	if [ -e /tmp/rlock ]; then
+		/usr/lib/netroam/lock.sh $CURRMODEM
+		exit 0
+	fi
+fi
 CPORT=/dev/ttyUSB$(uci get modem.modem$CURRMODEM.commport)
 MODTYPE=$(uci get modem.modem$CURRMODEM.modemtype)
 LOCK=$(uci get modem.modeminfo$CURRMODEM.lock)

@@ -417,18 +417,7 @@ if [ ! -z "$RECON" ]; then
 	CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 	WWANX=$(uci -q get modem.modem$CURRMODEM.wwan)
 	WDMNX=$(uci -q get modem.modem$CURRMODEM.wdm)
-
-	case $PROT in
-	"3"|"30" )
-		TIMEOUT=10
-		#$ROOTER/mbim/mbim_connect.lua stop wwan$WWANX cdc-wdm$WDMNX $CURRMODEM &
-		#handle_timeout "$!"
-		;;
-	* )
-		$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
-		;;
-	esac
-
+	$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
 else
 
 	DELAY=$(uci -q get modem.modem$CURRMODEM.delay)
@@ -1195,6 +1184,8 @@ while [ 1 -lt 6 ]; do
 	esac
 
 	if [ $BRK = 1 ]; then
+		ATCMDD="AT+COPS=0"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		$ROOTER/log/logger "Retry Connection with Modem #$CURRMODEM"
 		log "Retry Connection"
 		sleep 10

@@ -530,8 +530,11 @@ proto_mbim_setup() {
 	ret=$?
 
 	[ "$ret" = 0 ] || {
-		log "MBIM bringup failed, retry in 15s"
-		sleep 15
+		log "MBIM bringup failed, retry in 5s"
+		CPORT=$(uci get modem.modem$CURRMODEM.commport)
+		ATCMDD="AT+COPS=0"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		sleep 5
 	}
 
 	return $ret
