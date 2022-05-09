@@ -53,7 +53,7 @@ if [ "$TTL" = "0" ]; then
 	ENB=$(uci -q get ttl.ttl.enabled)
 	if [ $ENB = "1" ]; then
 		TTL=$(uci -q get ttl.ttl.value)
-		if [ -z $TTL ]; then
+		if [ -z "$TTL" ]; then
 			TTL=65
 		fi
 	else
@@ -69,14 +69,13 @@ if [ "$TTL" = "1" ]; then
 	exit 0
 fi
 
-if [ "$TTL" = "TTL-INC 1" ]; then
-	TTL="0"
-fi
-
 delTTL
 VALUE="$TTL"
 echo "#startTTL$CURRMODEM" >> /etc/ttl.user
 log "Setting TTL $VALUE on interface $IFACE"
+if [ "$TTL" = "TTL-INC 1" ]; then
+	TTL="0"
+fi
 
 if [ $VALUE = "0" ]; then
 	echo "iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-inc 1" >> /etc/ttl.user
