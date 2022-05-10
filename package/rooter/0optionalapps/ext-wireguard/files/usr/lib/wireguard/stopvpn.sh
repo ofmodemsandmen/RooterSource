@@ -18,8 +18,17 @@ chk_zone() {
 
 WG=$1
 
-config_load firewall
-config_foreach chk_zone forwarding
+forward=$(uci -q get wireguard."$WG".forward)
+if [ "$forward" != "0" ]; then
+	config_load firewall
+	config_foreach chk_zone forwarding
+else
+	uci delete firewall.wgwforward
+	uci delete firewall.wwgforward
+	uci delete firewall.lwgforward
+	uci delete firewall.wglforward
+	uci commit firewall
+fi
 /etc/init.d/firewall restart
 
 SERVE=$(uci get wireguard."$WG".client)

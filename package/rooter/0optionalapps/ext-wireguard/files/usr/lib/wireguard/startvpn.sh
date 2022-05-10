@@ -255,9 +255,29 @@ udp_client() {
 	#log "udptunnel 127.0.0.1:$port $endpoint_host:$sport"
 }
 
-config_load firewall
-config_foreach chk_zone forwarding
-/etc/init.d/firewall restart
+forward=$(uci -q get wireguard."$WG".forward)
+if [ "$forward" != "0" ]; then
+	config_load firewall
+	config_foreach chk_zone forwarding
+else
+	uci set firewall.wgwforward=forwarding
+	uci set firewall.wgwforward.dest="wan"
+	uci set firewall.wgwforward.src="wg"
+	
+	uci set firewall.wwgforward=forwarding
+	uci set firewall.wwgforward.dest="wg"
+	uci set firewall.wwgforward.src="wan"
+	
+	uci set firewall.lwgforward=forwarding
+	uci set firewall.lwgforward.dest="wg"
+	uci set firewall.lwgforward.src="lan"
+	
+	uci set firewall.wglforward=forwarding
+	uci set firewall.wglforward.dest="lan"
+	uci set firewall.wglforward.src="wg"
+	uci commit firewall
+fi
+etc/init.d/firewall restart
 
 config_load network
 SERVE=$(uci -q get wireguard."$WG".client)

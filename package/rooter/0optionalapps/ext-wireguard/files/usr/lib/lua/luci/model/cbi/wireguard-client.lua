@@ -63,7 +63,12 @@ pkey.optional=false;
 bl = s:option(ListValue, "auto", translate("Start on Boot :"));
 bl:value("0", translate("No"))
 bl:value("1", translate("Yes"))
-bl.default=0
+bl.default="0"
+
+xbl = s:option(ListValue, "forward", translate("All Traffic Through Tunnel :"));
+xbl:value("0", translate("No"))
+xbl:value("1", translate("Yes"))
+xbl.default="1"
 
 s = m:section( NamedSection, arg[1], "wireguard", translate("Server") )
 
