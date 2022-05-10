@@ -56,6 +56,11 @@ tt:value("117", "TTL 117")
 tt:value("TTL-INC 1", "TTL-INC 1")
 tt.default = "0"
 
+nl = di:taboption(this_tab, ListValue, "hostless", translate("Adjust TTL for Hostless Modem :"));
+nl:value("0", "No")
+nl:value("1", "Yes")
+nl.default=0
+
 pt = di:taboption(this_tab, ListValue, "pdptype", translate("Protocol Type :"))
 pt:value("IP", "IPv4")
 pt:value("IPV6", "IPv6")
@@ -420,6 +425,11 @@ tt:value("67", "TTL 67")
 tt:value("117", "TTL 117")
 tt:value("TTL-INC 1", "TTL-INC 1")
 tt.default = "0"
+
+nl = s:taboption(this_ctab, ListValue, "hostless", translate("Adjust TTL for Hostless Modem :"));
+nl:value("0", "No")
+nl:value("1", "Yes")
+nl.default=0
 
 pt = s:taboption(this_ctab, ListValue, "pdptype", translate("Protocol Type :"))
 pt:value("IP", "IPv4")

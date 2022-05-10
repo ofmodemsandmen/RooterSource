@@ -211,6 +211,11 @@ do_custom() {
 						ttl="0"
 					fi
 					uci set modem.modeminfo$CURRMODEM.ttl="$ttl"
+					config_get hostless $1 hostless
+					if [ -z "$hostless" ]; then
+						hostless="0"
+					fi
+					uci set modem.modeminfo$CURRMODEM.hostless="$hostless"
 
 					[ -n "$apn" ] || log "This profile has no APN configured !!!"
 
@@ -315,6 +320,11 @@ if [ $MATCH = 0 ]; then
 		ttl="0"
 	fi
 	uci set modem.modeminfo$CURRMODEM.ttl="$ttl"
+	hostless=$(uci -q get profile.default.hostless)
+	if [ -z "$hostless" ]; then
+		hostless="0"
+	fi
+	uci set modem.modeminfo$CURRMODEM.hostless="$hostless"
 
 	alive=$(uci get profile.default.alive)
 	uci delete modem.pinginfo$CURRMODEM
