@@ -1,6 +1,6 @@
 require("nixio.fs")
 
-m = Map("blacklist", "Blacklist Devices by Mac Address")
+m = Map("blacklist", translate("Blacklist Devices by Mac Address"))
 
 m.on_after_save = function(self)
 	luci.sys.call("/usr/lib/blacklist/chkblack.sh &")

@@ -56,10 +56,10 @@ tt:value("117", "TTL 117")
 tt:value("TTL-INC 1", "TTL-INC 1")
 tt.default = "0"
 
-nl = di:taboption(this_tab, ListValue, "hostless", translate("Adjust TTL for Hostless Modem :"));
-nl:value("0", "No")
-nl:value("1", "Yes")
-nl.default=0
+ynl = di:taboption(this_tab, ListValue, "hostless", translate("Adjust TTL for Hostless Modem"));
+ynl:value("0", "No")
+ynl:value("1", translate("Yes"))
+ynl.default=0
 
 pt = di:taboption(this_tab, ListValue, "pdptype", translate("Protocol Type :"))
 pt:value("IP", "IPv4")
@@ -89,12 +89,12 @@ mau.default = "0"
 
 mtz = di:taboption(this_tab, ListValue, "tzone", translate("Auto Set Timezone"), translate("Set the Timezone automatically when modem connects"));
 mtz:value("0", "No")
-mtz:value("1", "Yes")
+mtz:value("1", translate("Yes"))
 mtz.default=1
 
 ml = di:taboption(this_tab, ListValue, "lock", translate("Roaming Allowed :"));
-ml:value("0", "Yes")
-ml:value("1", "No")
+ml:value("0", translate("Yes"))
+ml:value("1", translate("No"))
 ml.default=1
 
 mcc = di:taboption(this_tab, Value, "mcc", translate("Provider Country Code :"));
@@ -112,8 +112,8 @@ mnc:depends("lock", "1")
 this_taba = "advance"
 
 mf = di:taboption(this_taba, ListValue, "ppp", translate("Force Modem to PPP Protocol :"));
-mf:value("0", "No")
-mf:value("1", "Yes")
+mf:value("0", translate("No"))
+mf:value("1", translate("Yes"))
 mf.default=0
 
 md = di:taboption(this_taba, Value, "delay", translate("Connection Delay in Seconds :")); 
@@ -123,8 +123,8 @@ md.default = 5
 md.datatype = "and(uinteger,min(5))"
 
 nl = di:taboption(this_taba, ListValue, "nodhcp", translate("No DHCP for QMI Modems :"));
-nl:value("0", "No")
-nl:value("1", "Yes")
+nl:value("0", translate("No"))
+nl:value("1", translate("Yes"))
 nl.default=0
 
 mdns1 = di:taboption(this_taba, Value, "dns1", translate("Custom DNS Server1 :")); 
@@ -149,14 +149,14 @@ mdns4.datatype = "ipaddr"
 
 
 mlog = di:taboption(this_taba, ListValue, "log", translate("Enable Connection Logging :"));
-mlog:value("0", "No")
-mlog:value("1", "Yes")
+mlog:value("0", translate("No"))
+mlog:value("1", translate("Yes"))
 mlog.default=0
 
 if nixio.fs.access("/etc/config/mwan3") then
 	mlb = di:taboption(this_taba, ListValue, "lb", translate("Enable Load Balancing at Connection :"));
-	mlb:value("0", "No")
-	mlb:value("1", "Yes")
+	mlb:value("0", translate("No"))
+	mlb:value("1", translate("Yes"))
 	mlb.default=0
 end
 
@@ -168,8 +168,8 @@ mtu.default = "1500"
 mtu.datatype = "range(1420, 1500)"
 
 mat = di:taboption(this_taba, ListValue, "at", translate("Enable Custom AT Startup Command at Connection :"));
-mat:value("0", "No")
-mat:value("1", "Yes")
+mat:value("0", translate("No"))
+mat:value("1", translate("Yes"))
 mat.default=0
 
 matc = di:taboption(this_taba, Value, "atc", translate("Custom AT Startup Command :"));
@@ -426,9 +426,9 @@ tt:value("117", "TTL 117")
 tt:value("TTL-INC 1", "TTL-INC 1")
 tt.default = "0"
 
-nl = s:taboption(this_ctab, ListValue, "hostless", translate("Adjust TTL for Hostless Modem :"));
-nl:value("0", "No")
-nl:value("1", "Yes")
+nl = s:taboption(this_ctab, ListValue, "hostless", translate("Adjust TTL for Hostless Modem"));
+nl:value("0", translate("No"))
+nl:value("1", translate("Yes"))
 nl.default=0
 
 pt = s:taboption(this_ctab, ListValue, "pdptype", translate("Protocol Type :"))
