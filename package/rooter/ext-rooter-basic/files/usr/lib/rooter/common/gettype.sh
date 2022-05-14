@@ -4,6 +4,17 @@ ROOTER=/usr/lib/rooter
 
 echo "0" > /tmp/block
 
+decode_crsm() {
+	i=0
+	while [ $i -lt $length ]; do
+		c1=${sstring:$i:1}
+		let 'j=i+1'
+		c2=${sstring:$j:1}
+		xstring=$xstring$c2$c1
+		let 'i=i+2'
+	done
+}
+
 CURRMODEM=$1
 CPORT=$(uci get modem.modem$CURRMODEM.commport)
 
@@ -153,7 +164,15 @@ OX=$($ROOTER/common/processat.sh "$OX")
 ERROR="ERROR"
 if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
 then
-	IMSI="Unknown"
+	ATCMDD="AT+CRSM=176,28423,0,0,9"
+	sstring=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD" | grep -o "[0-9F]\{18\}")
+	if [ -n "$sstring" ]; then
+		length=${#sstring}
+		decode_crsm
+		IMSI=${xstring:3}
+	else
+		IMSI="Unknown"
+	fi
 else
 	OX=${OX//[!0-9]/}
 	IMSIL=${#OX}
@@ -174,15 +193,8 @@ else
 	if [ "x$ICCID" != "x" ]; then
 		sstring=$(echo "$ICCID" | sed -e 's/"//g')
 		length=${#sstring}
-		xstring=
-		i=0
-		while [ $i -lt $length ]; do
-			c1=${sstring:$i:1}
-			let 'j=i+1'
-			c2=${sstring:$j:1}
-			xstring=$xstring$c2$c1
-			let 'i=i+2'
-		done
+		xstring=""
+		decode_crsm
 		ICCID=$xstring
 	else
 		ICCID="Unknown"

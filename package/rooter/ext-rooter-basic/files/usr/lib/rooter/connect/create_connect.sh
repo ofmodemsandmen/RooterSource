@@ -571,7 +571,7 @@ uci commit modem.modem$CURRMODEM
 				if [ -n "$CPORT" ]; then
 					uci set modem.modem$CURRMODEM.proto="30"
 				fi
-				log "MBIM Comm Port : /dev/ttyUSB$CPORT"
+				log "Modem $CURRMODEM MBIM Comm Port : /dev/ttyUSB$CPORT"
 			else
 				chkT77
 				if [ $T77 -eq 1 ]; then
@@ -583,8 +583,16 @@ uci commit modem.modem$CURRMODEM
 							get_tty_fix 2
 							mbimcport
 						;;
-						"1bc7"|"03f0" )
+						"03f0" )
 							get_tty 02
+							mbimcport
+						;;
+						"1bc7" )
+							if [ "$idP" = "1041" ]; then
+								get_tty 07
+							else
+								get_tty 02
+							fi
 							mbimcport
 						;;
 						"2cb7" )
@@ -597,7 +605,7 @@ uci commit modem.modem$CURRMODEM
 
 							uci set modem.modem$CURRMODEM.commport=$CPORT
 							uci set modem.modem$CURRMODEM.proto="30"
-							log "Modem $CURRMODEM Fibocom MBIM Comm Port : /dev/ttyUSB$CPORT"
+							log "Modem $CURRMODEM MBIM Comm Port : /dev/ttyUSB$CPORT"
 						;;
 						* )
 							uci set modem.modem$CURRMODEM.commport=""

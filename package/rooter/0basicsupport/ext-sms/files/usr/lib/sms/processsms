@@ -25,13 +25,13 @@ OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 sleep 1
 ATCMDD="AT+CPMS=\"SM\",\"SM\",\"SM\""
 OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-OX=$(echo $OX | grep -o "+CPMS:.\+")
-if [ "$(echo "$OX" | cut -d, -f2)" == "0" -a "$MODEMID" != "119968a" ]; then
+OX=$(echo $OX | grep -o "+CPMS:[^,]\+" | grep -o "[0-9]\+")
+if [ "$OX" == "0" -a "$MODEMID" != "119968a" ]; then
 	ATCMDD="AT+CPMS=\"ME\",\"ME\",\"ME\""
 	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	uci set modem.modem$CURRMODEM.smsloc="ME"
 	SMSLOC="ME"
-	MEM3="-"
+	MEM3="ME"
 else
 	uci set modem.modem$CURRMODEM.smsloc="SM"
 	SMSLOC="SM"
@@ -68,14 +68,14 @@ while true; do
 		if mkdir "${LOCKDIR}" &>/dev/null; then
 			echo "$$" > "${PIDFILE}"
 			if [ "$METC" != "0" ]; then
-				ATCMDD="AT+CPMS=\"ME\""
+				ATCMDD="AT+CPMS=\"ME\",\"$SMSLOC\",\"$MEM3\""
 				SX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 				USED=$(echo "$SX" | cut -d, -f1 | grep -o "[0-9]\{1,3\}")
 				MESCc="$USED"
 				MAXED=$(echo "$SX" | cut -d, -f2 | grep -o "[0-9]\{1,3\}")
 			fi
 			if [ $SMSLOC == "SM" ]; then
-				ATCMDD="AT+CPMS=\"SM\""
+				ATCMDD="AT+CPMS=\"SM\",\"$SMSLOC\",\"$MEM3\""
 				SX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 				USED=$(echo "$SX" | cut -d, -f1 | grep -o "[0-9]\{1,3\}")
 				MAXED=$(echo "$SX" | cut -d, -f2 | grep -o "[0-9]\{1,3\}")
