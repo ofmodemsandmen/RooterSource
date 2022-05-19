@@ -231,8 +231,7 @@ case $RAT in
 		;;
 	"NR5G-SA")
 		MODE="NR5G-SA"
-		uci set modem.modem$CURRMODEM.network='1'
-		uci commit modem
+		echo "0" > /tmp/modnetwork
 		if [ -n "$QENG5" ]; then
 			MODE="$RAT $(echo $QENG5 | cut -d, -f4)"
 			PCI=$(echo $QENG5 | cut -d, -f8)
