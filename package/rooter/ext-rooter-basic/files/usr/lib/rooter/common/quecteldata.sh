@@ -96,8 +96,7 @@ if [ -n "$QTEMP" ]; then
 	CTEMP=$(echo $QTEMP | grep -o "[0-9]\{1,3\}")$(printf "\xc2\xb0")"C"
 fi
 RAT=$(echo $QENG | cut -d, -f4 | grep -o "[-A-Z5]\{3,7\}")
-uci set modem.modem$CURRMODEM.network='0'
-uci commit modem
+rm -f /tmp/modnetwork
 case $RAT in
 	"GSM")
 		MODE="GSM"
@@ -157,8 +156,7 @@ case $RAT in
 
 		if [ -n "$NR_NSA" ]; then
 			MODE="LTE/NR EN-DC"
-			uci set modem.modem$CURRMODEM.network='1'
-			uci commit modem
+			echo "0" > /tmp/modnetwork
 			if [ -n "$QENG5" ]  && [ -n "$LBAND" ] && [ "$RSCP" != "-" ] && [ "$ECIO" != "-" ]; then
 				PCI="$PCI, "$(echo $QENG5 | cut -d, -f4)
 				SCHV=$(echo $QENG5 | cut -d, -f8)
