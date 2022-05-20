@@ -43,6 +43,7 @@ this_tab = "default"
 ma = di:taboption(this_tab, Value, "apn", "APN :"); 
 ma.rmempty = true;
 ma.default = "broadband"
+ma.datatype = "hostname"
 
 tt = di:taboption(this_tab, ListValue, "ttl", translate("Custom TTL Value :"))
 tt:value("0", translate("Use Current Value"))
@@ -413,6 +414,7 @@ iccid1.default="1234567"
 
 cma = s:taboption(this_ctab, Value, "apn", "APN :"); 
 cma.rmempty = true;
+cma.datatype = "hostname"
 
 tt = s:taboption(this_ctab, ListValue, "ttl", translate("Custom TTL Value :"))
 tt:value("0", translate("Use Current Value"))
