@@ -411,6 +411,8 @@ function action_get_csq()
 	rv["proto"] = file:read("*line")
 	rv["pci"] = file:read("*line")
 	rv["sinr"] = file:read("*line")
+	rv["lat"] = file:read("*line")
+	rv["long"] = file:read("*line")
 
 	file:close()
 

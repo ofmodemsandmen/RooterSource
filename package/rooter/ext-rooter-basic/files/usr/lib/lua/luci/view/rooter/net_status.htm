@@ -5,6 +5,10 @@ nosms = 1
 if not fs.stat("/etc/nosim") then
 	nosms = 0
 end
+havegps = 0
+if fs.stat("/etc/havegps") then
+	havegps = 1
+end
 -%>
 <style>g {color:grey; font-size:75%; vertical-align: super;}</style>
 <script type="text/javascript" src="<%=resource%>/xhr.js"></script>
@@ -48,6 +52,8 @@ end
 			document.getElementById('proto').innerHTML=rv.proto;
 			document.getElementById('pci').innerHTML=rv.pci;
 			document.getElementById('sinr').innerHTML=rv.sinr;
+			document.getElementById('lat').innerHTML=rv.lat;
+			document.getElementById('long').innerHTML=rv.long;
 
 			document.getElementById('crate').innerHTML=rv.crate;
 			if (phonenx == "")
@@ -156,6 +162,8 @@ end
 		document.getElementById('iccid').innerHTML="-";
 		document.getElementById('lband').innerHTML="-";
 		document.getElementById('pci').innerHTML="-";
+		document.getElementById('lat').innerHTML="-";
+		document.getElementById('long').innerHTML="-";
 	}
 
 	function increase(btn)
@@ -499,6 +507,23 @@ end
 	</table>
 </fieldset>
 
+<% if havegps == 1 then %>
+<fieldset class="cbi-section" id="cbi-gps">
+	<legend><%:GPS Location%></legend>
+	<table width="550"  border="0">
+  	<tr>
+    		<td width="30%"><div align="right"><%:Latitude :%></div></td>
+    		<td><ul id="lat"></ul></td>
+    		<td width="1%">&nbsp;</td>
+  	</tr>
+  	<tr>
+    		<td><div align="right"><%:Longitude :%></div></td>
+    		<td><ul id="long"></ul></td>
+    		<td>&nbsp;</td>
+  	</tr>
+	</table>
+</fieldset>
+<% end %>
 <fieldset class="cbi-section" id="cbi-mode">
 	<legend><%:Refresh Rate%></legend>
 	<table width="550"  border="0">

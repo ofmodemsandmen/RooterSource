@@ -98,8 +98,8 @@ make_signal() {
 		echo "$PROTO"
 		echo "$PCI"
 		echo "$SINR"
-		echo "-"
-		echo "-"
+		echo "$LATITUDE"
+		echo "$LONGITUDE"
 	} > /tmp/statusx$CURRMODEM.file
 	mv -f /tmp/statusx$CURRMODEM.file /tmp/status$CURRMODEM.file
 	if [ -e $ROOTER/modem-led.sh ]; then
@@ -238,6 +238,8 @@ while [ 1 = 1 ]; do
 			LBAND="-"
 			TEMP="-"
 			SINR="-"
+			LATITUDE="-"
+			LONGITUDE="-"
 			if [ -e /tmp/signal$CURRMODEM.file ]; then
 				source /tmp/signal$CURRMODEM.file
 				rm -f /tmp/signal$CURRMODEM.file
@@ -245,6 +247,9 @@ while [ 1 = 1 ]; do
 			if [ -e /tmp/phonenumber$CURRMODEM ]; then
 				source /tmp/phonenumber$CURRMODEM
 				rm -f /tmp/phonenumber$CURRMODEM
+			fi
+			if [ -e /tmp/gpsdata ]; then
+				source /tmp/gpsdata
 			fi
 			make_signal
 			uci set modem.modem$CURRMODEM.cmode="1"
