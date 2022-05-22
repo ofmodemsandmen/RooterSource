@@ -167,7 +167,7 @@ while [ 1 = 1 ]; do
 			"2c7c" )
 				$ROOTER/common/quecteldata.sh $CURRMODEM $COMMPORT
 				;;
-			"2cb7" )
+			"2cb7"|"1508" )
 				$ROOTER/common/fibocomdata.sh $CURRMODEM $COMMPORT
 				;;
 			"2dee" )

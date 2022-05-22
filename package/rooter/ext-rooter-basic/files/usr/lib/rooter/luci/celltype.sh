@@ -432,7 +432,7 @@ case $idV in
 "2c7c" )
 	quectel_type
 	;;
-"2cb7"|"8087" )
+"2cb7"|"1508"|"8087" )
 	fibocom_type
 	;;
 "2dee" )
