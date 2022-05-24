@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/sh
 
 ROOTER=/usr/lib/rooter
 
@@ -408,9 +408,9 @@ if [ -n "$MTEMP" ]; then
 	CTEMP=$(echo $MTEMP | grep -o "[0-9.]\{1,5\}")$(printf "\xc2\xb0")"C"
 fi
 
+MODTYPE="9"
 MRAT=$(echo $OX | grep -o "+GTRAT: [0-9]\{1,2\}" | grep -o "[0-9]\{1,2\}")
 if [ -n "$MRAT" ]; then
-	MODTYPE="9"
 # If user inserted different SIM card, the Rat order will recover to default value (AT Commands manual)
 	case $MRAT in
 	"2" )
@@ -428,7 +428,6 @@ fi
 XACT=$(echo $OX | grep -o "+XACT: [0-9]" | grep -o "[0-9]")
 if [ -n "$XACT" ]; then
 	PREF=$(echo $OX | grep -o "+XACT: [0-9],[0-9]" | grep -o ",[0-9]")
-	MODTYPE="9"
 	case $XACT in
 	"1" )
 		NETMODE="5" ;;
@@ -444,7 +443,9 @@ if [ -n "$XACT" ]; then
 		NETMODE="6" ;;
 	esac
 fi
-
+if [ "$NETMODE" == "-" ]; then
+	NETMODE="1"
+fi
 CMODE=$(uci -q get modem.modem$CURRMODEM.cmode)
 if [ "$CMODE" = 0 ]; then
 	NETMODE="10"

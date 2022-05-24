@@ -313,6 +313,7 @@ telit_type() {
 }
 
 fibocom_type() {
+	NETMODE="1"
 	idPP=${idP:1:1}
 	if [ "$idPP" = "1" ]; then
 		ATCMDD="AT+GTRAT?"
@@ -331,7 +332,6 @@ fibocom_type() {
 				* )
 					NETMODE="1" ;;
 			esac
-			uci set modem.modem$CURRMODEM.modemtype="9"
 		fi
 	else
 		ATCMDD="AT+XACT?"
@@ -353,9 +353,10 @@ fibocom_type() {
 			* )
 				NETMODE="6" ;;
 			esac
-			uci set modem.modem$CURRMODEM.modemtype="9"
+
 		fi
 	fi
+	uci set modem.modem$CURRMODEM.modemtype="9"
 	uci set modem.modem$CURRMODEM.netmode=$NETMODE
 	uci commit modem
 }
