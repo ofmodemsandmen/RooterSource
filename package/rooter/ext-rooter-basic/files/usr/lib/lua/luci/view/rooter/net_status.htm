@@ -52,8 +52,10 @@ end
 			document.getElementById('proto').innerHTML=rv.proto;
 			document.getElementById('pci').innerHTML=rv.pci;
 			document.getElementById('sinr').innerHTML=rv.sinr;
+			<% if havegps == 1 then %>
 			document.getElementById('lat').innerHTML=rv.lat;
 			document.getElementById('long').innerHTML=rv.long;
+			<% end %>
 
 			document.getElementById('crate').innerHTML=rv.crate;
 			if (phonenx == "")
@@ -162,8 +164,10 @@ end
 		document.getElementById('iccid').innerHTML="-";
 		document.getElementById('lband').innerHTML="-";
 		document.getElementById('pci').innerHTML="-";
+		<% if havegps == 1 then %>
 		document.getElementById('lat').innerHTML="-";
 		document.getElementById('long').innerHTML="-";
+		<% end %>
 	}
 
 	function increase(btn)
