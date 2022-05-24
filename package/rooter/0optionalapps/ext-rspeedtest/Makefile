@@ -13,7 +13,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/ext-rspeedtest
   SECTION:=utils
   CATEGORY:=ROOter
-  DEPENDS:=+httping +curl +coreutils +coreutils-date
+  DEPENDS:=+httping +curl +coreutils +coreutils-date +speedtestpp
   SUBMENU:=Optional Applications
   TITLE:=support for ROOter SpeedTest
   PKGARCH:=all

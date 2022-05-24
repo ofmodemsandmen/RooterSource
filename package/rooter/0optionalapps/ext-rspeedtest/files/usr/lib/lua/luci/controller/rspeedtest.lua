@@ -5,11 +5,11 @@ translate = I18N.translate
 
 function index()
 	local page
-	page = entry({"admin", "speed", "rspeedtest"}, template("speedtest/rspeedtest"), translate("ROOter SpeedTest"), 72)
+	page = entry({"admin", "speed", "rspeedtest"}, template("speedtest/rspeedtest"), translate("SpeedTest by Ookla"), 72)
 	page.dependent = true
 	
 	entry({"admin", "speed", "closeserver"}, call("action_closeserver"))
-	entry({"admin", "speed", "pingserver"}, call("action_pingserver"))
+	entry({"admin", "speed", "stoptest"}, call("action_stoptest"))
 	entry({"admin", "speed", "getspeed"}, call("action_getspeed"))
 	entry({"admin", "speed", "getspeeddata"}, call("action_getspeeddata"))
 end
@@ -37,21 +37,8 @@ function action_closeserver()
 	luci.http.write_json(rv)
 end
 
-function action_pingserver()
-	local rv = {}
-	
-	os.execute("/usr/lib/speedtest/ping.sh")
-	result = "/tmp/pinfo"
-	file = io.open(result, "r")
-	if file ~= nil then
-		rv["ping"] = file:read("*line")
-		file:close()
-	else
-		rv["ping"] = "-"
-	end
-	
-	luci.http.prepare_content("application/json")
-	luci.http.write_json(rv)
+function action_stoptest()
+	os.execute("/usr/lib/speedtest/stop.sh")
 end
 
 function action_getspeed()

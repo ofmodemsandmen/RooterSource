@@ -8,15 +8,21 @@
 <script type="text/javascript" src="<%=resource%>/xhr.js"></script>
 <script type="text/javascript">//<![CDATA[
 
- XHR.poll(2, '<%=luci.dispatcher.build_url("admin", "speed", "getspeeddata")%>', null,
+ XHR.poll(1, '<%=luci.dispatcher.build_url("admin", "speed", "getspeeddata")%>', null,
 		function(x, rv)
 		{
-			dlsize = parseFloat(rv.dlsize) ;
+			latency = rv.dlsize ;
+			jitter = rv.dlelapse ;
+			dwnspeed = rv.ulsize;
+			upspeed = rv.ulelapse;
+			if ( upspeed == null)
+			{
+				upspeed = 0;
+			}
 
 			working = rv.working ;
 			if ( working == "0" )
 			{
-				document.getElementById("runbtn").disabled = false ;
 				document.getElementById("refe").disabled = false ;
 				document.getElementById("loading").style.visibility="hidden";	
 				document.getElementById("dwn").style.color = "inherit";
@@ -28,35 +34,29 @@
 			}
 			if ( working == "2" )
 			{
+				document.getElementById("ping").innerHTML = latency + " ms";
+				document.getElementById("jit").innerHTML = jitter + " ms";
+				document.getElementById("pingl").style.visibility="visible";
 				document.getElementById("updwn").style.visibility="visible";
 				document.getElementById("dwn").style.color = "red";
 				document.getElementById("up").style.color = "inherit";
+				document.getElementById("dwn").innerHTML = "<%:downloading%>" ;
+				document.getElementById("up").innerHTML = " "
 			}
 			if ( working == "3" )
 			{
 				document.getElementById("dwn").style.color = "inherit";
 				document.getElementById("up").style.color = "red";
+				document.getElementById("up").innerHTML = "<%:uploading%>" ;
 			}
-			if ( rv.dlsize == "0" )
+			if ( dwnspeed != "0" )
 			{
-				document.getElementById("dwn").innerHTML = " " ;
-			}
-			else
-			{
-				dlelapse = parseFloat(rv.dlelapse) ;
-				dlspeed = (dlsize*1000)/dlelapse ;
-				document.getElementById("dwn").innerHTML = dlspeed.toFixed(2) + " Mbps" ;
+				document.getElementById("dwn").innerHTML = dwnspeed + " Mbps" ;
 			} 
-			if ( rv.ulsize == "0" )
+			if ( upspeed != "0" )
 			{
-				document.getElementById("up").innerHTML = " " ;
-			}
-			else
-			{
-				ulsize = parseFloat(rv.ulsize) ;
-				ulelapse = parseFloat(rv.ulelapse) ;
-				dlspeed = (ulsize*1000)/ulelapse ;
-				document.getElementById("up").innerHTML = dlspeed.toFixed(2) + " Mbps" ;
+				document.getElementById("up").innerHTML = upspeed + " Mbps" ;
+				document.getElementById("up").style.color = "inherit";
 			} 
 		}
 ); 
@@ -93,35 +93,31 @@
 	}
 ); 
 
-function getsp()
-{
-	document.getElementById("loading").style.visibility="visible";
-	XHR.get('<%=luci.dispatcher.build_url("admin", "speed", "getspeed")%>', null,
-		function(x, rv)
-		{
-		}
-	);
-}
-
 function dotest(btn)
 {
 	document.getElementById("ping").innerHTML = " " ;
-	document.getElementById("up").innerHTML = "-" ;
-	document.getElementById("dwn").innerHTML = "-" ;
+	document.getElementById("up").innerHTML = " " ;
+	document.getElementById("dwn").innerHTML = " " ;
 	document.getElementById("refe").disabled = true ;
 	document.getElementById("runbtn").disabled = true ;
-	document.getElementById("pingl").style.visibility="hidden";
-	document.getElementById("updwn").style.visibility="hidden";
-	document.getElementById("loading").style.visibility="visible";
-	XHR.get('<%=luci.dispatcher.build_url("admin", "speed", "pingserver")%>', null,
+	document.getElementById("stopbtn").style.visibility="visible";
+	XHR.get('<%=luci.dispatcher.build_url("admin", "speed", "getspeed")%>', null,
 		function(x, rv)
 		{
-			latency = rv.ping;
-			document.getElementById("ping").innerHTML = latency + " ms";
-			document.getElementById("pingl").style.visibility="visible";
-			document.getElementById("updwn").style.visibility="visible";
-			
-			getsp() ;
+			document.getElementById("runbtn").disabled = false ;
+			document.getElementById("stopbtn").style.visibility="hidden";
+		}
+	);
+	
+}
+
+function stoptest(btn)
+{
+	document.getElementById("stopbtn").disabled = true ;
+	XHR.get('<%=luci.dispatcher.build_url("admin", "speed", "stoptest")%>', null,
+		function(x, rv)
+		{
+			window.location.reload(false);
 		}
 	);
 	
@@ -132,7 +128,7 @@ function dotest(btn)
 <form method="post" action="<%=REQUEST_URI%>">
 <body onload="refresh();"></body>
 <div class="cbi-map" id="cbi-misc">
-<h2><a id="content" name="content"><%:ROOter Speed Test%></a></h2>
+<h2><a id="content" name="content"><%:Speed Test by Ookla%></a></h2>
 <div class="cbi-map-descr"><%:An Internet speed test that runs from the router%></div>
 <head>
      <style>
@@ -193,9 +189,11 @@ function dotest(btn)
 	
 	<table width="550"  border="0" id="pingl" style="visibility:hidden">
 		<tr>
-				<td width="35%"><div align="right" style="font-size : 15px; width: 100%; height: 25px;"><%:Latency : %></div></td>
-				<td width="20%"><div align="left" id="ping"></div></td>
-				<td width="45%">&nbsp;</td>
+				<td width="30%"><div align="right" style="font-size : 15px; width: 100%; height: 25px;"><%:Latency : %></div></td>
+				<td width="5%"><div align="left" id="ping"></div></td>
+				<td width="5%"><div align="right" style="font-size : 15px; width: 100%; height: 25px;"><%:Jitter : %></div></td>
+				<td width="5%"><div align="left" id="jit"></div></td>
+				<td width="50%">&nbsp;</td>
 		</tr>
 	</table>
 	
@@ -204,9 +202,9 @@ function dotest(btn)
     		<td width="25%"><div align="right" style="font-size : 15px; width: 100%; height: 25px;"><strong><%:Download : %></strong></div></td>
 			<td width="10%"><div align="left"  id="dwn" style="font-size : 15px; width: 100%; height: 25px;"><strong></strong></div></td>
 			<td width="10%">&nbsp;</td>
-			<td width="6%"><div align="right"  style="font-size : 15px; width: 100%; height: 25px;"><strong><%:Upload : %></strong></div></td>
+			<td width="8%"><div align="right"  style="font-size : 15px; width: 100%; height: 25px;"><strong><%:Upload : %></strong></div></td>
 			<td width="10%"><div align="left"  id="up" style="font-size : 15px; width: 100%; height: 25px;"><strong></strong></div></td>
-			<td width="40%">&nbsp;</td>
+			<td width="38%">&nbsp;</td>
 		</tr>
  	</table>
 	
@@ -218,10 +216,16 @@ function dotest(btn)
 	
 	<table width="550"  border="0" id="runtest" style="visibility:hidden">
 		<tr>
-			<td width="30%">&nbsp;</td>
-			<td width="17%"><input type="button" id="runbtn" class="cbi-button cbi-button-apply" value="<%:Run Speed Test%>" onclick="return dotest(this)" /></td>
+			<td width="25%">&nbsp;</td>
+			<td width="17%" align="center"><input type="button" id="runbtn" class="cbi-button cbi-button-success" value="<%:Run Speed Test%>" onclick="return dotest(this)" /></td>
 			<td width="17%">&nbsp;</td>
-			<td width="36%">&nbsp;</td>
+			<td width="41%">&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td align="center" style="visibility:hidden"><input type="button" id="stopbtn" class="cbi-button cbi-button-remove" value="<%:Stop Speed Test%>" onclick="return stoptest(this)" /></td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
 		</tr>
 	</table>
 	
