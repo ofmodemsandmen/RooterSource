@@ -8,6 +8,8 @@
 <script type="text/javascript" src="<%=resource%>/xhr.js"></script>
 <script type="text/javascript">//<![CDATA[
 
+var upspeed;
+
  XHR.poll(1, '<%=luci.dispatcher.build_url("admin", "speed", "getspeeddata")%>', null,
 		function(x, rv)
 		{
@@ -26,7 +28,9 @@
 				document.getElementById("refe").disabled = false ;
 				document.getElementById("loading").style.visibility="hidden";	
 				document.getElementById("dwn").style.color = "inherit";
-				document.getElementById("up").style.color = "inherit";				
+				document.getElementById("up").style.color = "inherit";	
+				document.getElementById("runbtn").disabled = false ;
+				document.getElementById("stopbtn").style.visibility="hidden";
 			}
 			if ( working == "1" )
 			{
@@ -57,7 +61,10 @@
 			} 
 			else
 			{
-				document.getElementById("dwn").innerHTML = " ";
+				if ( working != "2" )
+				{
+					document.getElementById("dwn").innerHTML = " ";
+				}
 			}
 			if ( upspeed != "0" )
 			{
@@ -66,7 +73,10 @@
 			} 
 			else
 			{
-				document.getElementById("up").innerHTML = " ";
+				if ( working != "3" )
+				{
+					document.getElementById("up").innerHTML = " ";
+				}
 			}
 		}
 ); 
@@ -103,6 +113,7 @@
 	}
 ); 
 
+
 function dotest(btn)
 {
 	document.getElementById("ping").innerHTML = " " ;
@@ -115,8 +126,6 @@ function dotest(btn)
 	XHR.get('<%=luci.dispatcher.build_url("admin", "speed", "getspeed")%>', null,
 		function(x, rv)
 		{
-			document.getElementById("runbtn").disabled = false ;
-			document.getElementById("stopbtn").style.visibility="hidden";
 		}
 	);
 	

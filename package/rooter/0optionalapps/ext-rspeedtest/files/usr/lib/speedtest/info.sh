@@ -1,13 +1,17 @@
 #!/bin/sh
 
-PID=$(ps |grep "speedtest --test-server" | grep -v grep |head -n 1 | awk '{print $1}')
-kill -9 $PID
-PID=$(ps |grep "/speedtest/closest.lua" | grep -v grep |head -n 1 | awk '{print $1}')
-kill -9 $PID
-PID=$(ps |grep "/speedtest/getspeed.sh" | grep -v grep |head -n 1 | awk '{print $1}')
-kill -9 $PID
-PID=$(ps |grep "/speedtest/servers.lua" | grep -v grep |head -n 1 | awk '{print $1}')
-kill -9 $PID
+killprocess() {
+	proc=$1
+	PID=$(ps |grep "$proc" | grep -v grep |head -n 1 | awk '{print $1}')
+	if [ ! -z $PID ]; then
+		kill -9 $PID
+	fi
+}
+
+killprocess "speedtest --test-server"
+killprocess "/speedtest/closest.lua"
+killprocess "/speedtest/getspeed.sh"
+killprocess "/speedtest/servers.lua"
 	
 rm -f /tmp/speed	
 rm -f /tmp/sinfo
