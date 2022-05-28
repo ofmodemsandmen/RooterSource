@@ -93,10 +93,11 @@ mtz:value("0", "No")
 mtz:value("1", translate("Yes"))
 mtz.default=1
 
-ml = di:taboption(this_tab, ListValue, "lock", translate("Roaming Allowed :"));
-ml:value("0", translate("Yes"))
-ml:value("1", translate("No"))
-ml.default=1
+ml = di:taboption(this_tab, ListValue, "lock", translate("Lock Connection to a Provider :"));
+ml:value("0", translate("No"))
+ml:value("1", translate("Hard"))
+ml:value("2", translate("Soft"))
+ml.default=0
 
 mcc = di:taboption(this_tab, Value, "mcc", translate("Provider Country Code :"));
 mcc.optional=false; 
@@ -464,10 +465,17 @@ cmtz:value("0", translate("No"))
 cmtz:value("1", translate("Yes"))
 cmtz.default=1
 
-cml = s:taboption(this_ctab, ListValue, "lock", translate("Roaming Allowed :"));
-cml:value("0", translate("Yes"))
-cml:value("1", translate("No"))
-cml.default=1
+ml = di:taboption(this_tab, ListValue, "lock", translate("Lock Connection to a Provider :"));
+ml:value("0", translate("No"))
+ml:value("1", translate("Hard"))
+ml:value("2", translate("Soft"))
+ml.default=0
+
+cml = s:taboption(this_ctab, ListValue, "lock", translate("Lock Connection to a Provider :"));
+cml:value("0", translate("No"))
+cml:value("1", translate("Hard"))
+cml:value("2", translate("Soft"))
+cml.default=0
 
 cmcc = s:taboption(this_ctab, Value, "mcc", translate("Provider Country Code :"));
 cmcc.optional=false; 
