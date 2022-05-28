@@ -10,7 +10,8 @@ if [ $SET = "1" ]; then
 	AU=$(uci get travelmate.global.trm_auto)
 	hkillall travelmate.sh
 	if [ $AU = "1" ]; then
-		uci -q set wireless.wwan.ssid="Checking for Connection"
+		uci set travelmate.global.ssid="Checking for Connection"
+		uci commit travelmate
 		uci -q set wireless.wwan.encryption="none"
 		uci -q set wireless.wwan.key=
        	uci -q commit wireless

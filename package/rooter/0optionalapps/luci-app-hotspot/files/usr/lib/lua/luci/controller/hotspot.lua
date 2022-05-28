@@ -43,12 +43,13 @@ end
 
 function action_check_spot()
 	local rv = {}
+	local freq = {}
 	local set = luci.http.formvalue("set")
 	auto = luci.model.uci.cursor():get("travelmate", "global", "trm_auto")
 	rv["auto"] = auto
 	rv["enabled"] = luci.model.uci.cursor():get("travelmate", "global", "trm_enabled")
 
-	rv["ssid"] = luci.model.uci.cursor():get("wireless", "wwan", "ssid")
+	rv["ssid"] = luci.model.uci.cursor():get("travelmate", "global", "ssid")
 	if rv["ssid"] == nil then
 		rv["ssid"] = "No Connection"
 	end
@@ -60,18 +61,17 @@ function action_check_spot()
 	end
 	rv["disable"] = luci.model.uci.cursor():get("wireless", "wwan", "disabled")
 	
-	dual = luci.model.uci.cursor():get("travelmate", "global", "radio5")
-	if dual == nil then
-		rv["dual"] = 0
-	else
-		rv["dual"] = 1
+	dual = luci.model.uci.cursor():get("travelmate", "global", "radcnt")
+	rv["dual"] = dual
+	nrad = tonumber(dual)
+	for k = 0, nrad do
+		freq[k] = luci.model.uci.cursor():get("travelmate", "global", "radio" .. tostring(k))
 	end
+	rv['freq'] = freq
+
 	device = luci.model.uci.cursor():get("wireless", "wwan", "device")
-	if device == dual then
-		rv["band"] = 2
-	else
-		rv["band"] = 1
-	end
+	device = string.sub(device, 6, 7)
+	rv["band"] = device
 
 	luci.http.prepare_content("application/json")
 	luci.http.write_json(rv)

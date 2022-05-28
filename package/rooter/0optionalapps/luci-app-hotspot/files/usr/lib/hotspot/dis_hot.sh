@@ -2,7 +2,8 @@
 . /lib/functions.sh
 
 rm -f /tmp/hotman
-uci -q set wireless.wwan.ssid="Disconnected"
+uci set travelmate.global.ssid="Disconnected"
+uci commit travelmate
 uci -q set wireless.wwan.disabled=1
 uci -q commit wireless
 ifdown wwan

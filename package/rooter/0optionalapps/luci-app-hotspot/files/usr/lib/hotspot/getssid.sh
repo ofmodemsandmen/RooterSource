@@ -1,13 +1,7 @@
 #!/bin/sh
 
 RADIO=$(uci get wireless.wwan.device)
-if [ $RADIO = "radio0" ]; then
-	ap_list="$(ubus -S call network.wireless status | jsonfilter -e '@.radio0.interfaces[@.config.mode="ap"].ifname')"
-else
-	if [ $RADIO = "radio1" ]; then
-		ap_list="$(ubus -S call network.wireless status | jsonfilter -e '@.radio1.interfaces[@.config.mode="ap"].ifname')"
-	fi
-fi
+ap_list="$(ubus -S call network.wireless status | jsonfilter -e "@.$RADIO.interfaces[@.config.mode=\"ap\"].ifname")"
 
 rm -f /tmp/ssidlist
 for ap in ${ap_list}

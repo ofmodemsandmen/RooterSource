@@ -278,6 +278,8 @@ end
 	inprocess = "0";
 	show = 0;
 	dual = 0;
+	freq = new Array();
+	ulselect = -1;
 
 	XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "services", "check_spot")%>',
 		{ set: firstpass },
@@ -314,19 +316,16 @@ end
 				}
 
 				dual = rv.dual;
-				if ( dual == "1" )
+				freq = rv.freq
+				dcnt = parseInt(dual);
+				var sel = document.getElementById('rad1');
+				for(i=1;i<=dcnt;i++)
 				{
-					var sel = document.getElementById('rad1');
-					sel.options[sel.options.length] =new Option("2.4 Ghz", 1);
-					sel.options[sel.options.length] =new Option("5.0 Ghz", 2);
-					sel.value = rv.band;
+					ii = i - 1;
+					iis = ii.toString();
+					sel.options[sel.options.length] =new Option(freq[i-1] + "  ( radio" + iis + " )", i);
 				}
-				else
-				{
-					var sel = document.getElementById('rad1');
-					sel.options[sel.options.length] =new Option("2.4 Ghz", 1);
-					sel.value = 1;
-				}
+				sel.value = parseInt(rv.band) + 1;
 				
 				firstpass = "1";
 			}
@@ -409,8 +408,14 @@ end
 					crypt[indx] = "Yes";
 				}
 				txtline = txtline.replace(/ /g,"\240");
-				var select = document.getElementById("hotList");
-				select.options[select.options.length] = new Option(txtline, indx);
+				
+				var ul = document.getElementById("hotList1");
+				var li = document.createElement('li');
+				lix = indx + 1;
+				li.id = 'li' + lix;
+				li.setAttribute('onclick', "testclk(" + lix + ")");
+				li.appendChild(document.createTextNode(txtline));
+				ul.appendChild(li);
 				i = i + 3;
 				indx = indx + 1;
 			}
@@ -418,7 +423,10 @@ end
 			{
 				if ( selectline == -1 )
 				{
-					select.value = 0;
+					ulselect = 1;
+					id = "li" + 1;
+					document.getElementById(id).style.backgroundColor = '#4686fe';
+					document.getElementById(id).style.color = 'white';
 					document.getElementById('hname').innerHTML=ttext[0];
 					document.getElementById('hcrypt').innerHTML=crypt[0];
 					showhide(0);
@@ -430,7 +438,6 @@ end
 					{
 						selectline = indx-1 ;
 					}
-					select.value = selectline;
 					document.getElementById('hname').innerHTML=ttext[selectline];
 					document.getElementById('hcrypt').innerHTML=crypt[selectline];
 					showhide(selectline);
@@ -452,7 +459,7 @@ end
 		}
 		else
 		{
-			clearListBox("hotList");
+			clearListul("hotList1");
 			document.getElementById('hname').innerHTML=" ";
 			document.getElementById('hcrypt').innerHTML=" ";
 			document.getElementById('htkey').innerHTML=" ";
@@ -465,18 +472,14 @@ end
 		}
 	}
 
-	function clearListBox(listboxID)
+	function clearListul(listboxID)
  	{
   		var mylistbox = document.getElementById(listboxID);
-  		if(mylistbox == null)
+		if(mylistbox == null)
 		{
   			return 1;
 		}
-  		while(mylistbox.length > 0)
-  		{
-   			mylistbox.remove(0);
-  		}
-  		return 1;
+		mylistbox.innerHTML = '';
  	}
 
 	function chgemode(btn)
@@ -557,8 +560,10 @@ end
 
 	function changetxt()
 	{
-		var s = document.getElementById("hotList").value;
+		ilx = "il" + ulselect;
+		s = ulselect-1;
 		selectline = s;
+		
 		document.getElementById('hname').innerHTML=ttext[s];
 		document.getElementById('hcrypt').innerHTML=crypt[s];
 		showhide(s);
@@ -566,11 +571,10 @@ end
 
 	function moveup(btn)
 	{
-		var select = document.getElementById("hotList");
-		selectline = select.value;
+		selectline = ulselect-1;
 		if ( selectline > 0 )
 		{
-			clearListBox("hotList");
+			clearListul("hotList1");
 			XHR.get('<%=luci.dispatcher.build_url("admin", "services", "moveup")%>',
 				{ set: selectline },
 				function(x, rv)
@@ -579,6 +583,10 @@ end
 					var empty = rv.empty;
 					var hotline = rv.hotline;
 					fillist(empty, hotline);
+					ulselect = selectline + 1;
+					id = "li" + 1;
+					document.getElementById(id).style.backgroundColor = '#4686fe';
+					document.getElementById(id).style.color = 'white';
 				}
 			);
 		}
@@ -587,12 +595,11 @@ end
 
 	function movedown(btn)
 	{
-		var select = document.getElementById("hotList");
-		selectline = select.value;
+		selectline = ulselect-1;
 		var sel = Number(selectline) + 1;
 		if ( selectline < indx-1 )
 		{
-			clearListBox("hotList");
+			clearListul("hotList1");
 			XHR.get('<%=luci.dispatcher.build_url("admin", "services", "movedown")%>',
 				{ set: selectline },
 				function(x, rv)
@@ -601,6 +608,10 @@ end
 					var empty = rv.empty;
 					var hotline = rv.hotline;
 					fillist(empty, hotline);
+					ulselect = selectline + 1;
+					id = "li" + 1;
+					document.getElementById(id).style.backgroundColor = '#4686fe';
+					document.getElementById(id).style.color = 'white';
 				}
 			);
 		}
@@ -609,8 +620,7 @@ end
 
 	function deletelist(btn)
 	{
-		var select = document.getElementById("hotList");
-		selectline = select.value;
+		selectline = ulselect-1;
 		tt = "Delete this entry? : "
 		tt = tt.concat(ttext[selectline]); 
 		var r = confirm(tt);
@@ -621,7 +631,7 @@ end
 			{
 				sel = sel - 1;
 			}
-			clearListBox("hotList");
+			clearListul("hotList1");
 			XHR.get('<%=luci.dispatcher.build_url("admin", "services", "dellist")%>',
 				{ set: selectline },
 				function(x, rv)
@@ -630,6 +640,10 @@ end
 					var empty = rv.empty;
 					var hotline = rv.hotline;
 					fillist(empty, hotline);
+					ulselect = 1;
+					id = "li" + 1;
+					document.getElementById(id).style.backgroundColor = '#4686fe';
+					document.getElementById(id).style.color = 'white';
 				}
 			);
 		}
@@ -638,20 +652,31 @@ end
 
 	function refresh()
 	{
-		clearListBox("hotList");
-		var select = document.getElementById("hotList");
-		select.options[select.options.length] = new Option("  ", 1);
-		select.options[select.options.length] = new Option("<%:Checking Networks Availablity%>", 2);
+		clearListul("hotList1");
+		var ul = document.getElementById("hotList1");
+		var li = document.createElement('li');
+		li.appendChild(document.createTextNode("\240"));
+		ul.appendChild(li);
+		li = document.createElement('li');
+		li.appendChild(document.createTextNode("<%:Checking Networks Availablity%>"));
+		ul.appendChild(li);
+		li = document.createElement('li');
+		li.appendChild(document.createTextNode("\240"));
+		ul.appendChild(li);
 		document.getElementById('hname').innerHTML=" ";
 		document.getElementById('hcrypt').innerHTML=" ";
 		document.getElementById('htkey').innerHTML=" ";
 		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "refreshlist")%>', null,
 			function(x, rv)
 			{
-				clearListBox("hotList");
+				clearListul("hotList1");
 				var empty = rv.empty;
 				var hotline = rv.hotline;
 				fillist(empty, hotline);
+				ulselect = 1;
+				id = "li" + 1;
+				document.getElementById(id).style.backgroundColor = '#4686fe';
+				document.getElementById(id).style.color = 'white';
 			}
 		);
 		return false;
@@ -678,7 +703,7 @@ end
 			btn = btn.concat("|");
 			btn = btn.concat(key);
 		}
-		clearListBox("hotList");
+		clearListul("hotList1");
 		document.getElementById('hname').innerHTML=" ";
 		document.getElementById('hcrypt').innerHTML=" ";
 		document.getElementById('htkey').innerHTML=" ";
@@ -689,6 +714,10 @@ end
 				var empty = rv.empty;
 				var hotline = rv.hotline;
 				fillist(empty, hotline);
+				ulselect = 1;
+				id = "li" + 1;
+				document.getElementById(id).style.backgroundColor = '#4686fe';
+				document.getElementById(id).style.color = 'white';
 			}
 		);
 		return false;
@@ -696,8 +725,7 @@ end
 
 	function editkey(btn)
 	{
-		var select = document.getElementById("hotList");
-		selectline = select.value;
+		selectline = ulselect-1;
 		if( crypt[selectline] == "No")
 		{
 			tt = ttext[selectline];
@@ -715,7 +743,7 @@ end
 		dat = selectline;
 		dat = dat.concat("|");
 		dat = dat.concat(r);
-		clearListBox("hotList");
+		clearListul("hotList1");
 		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "editlist")%>',
 			{ set: dat },
 			function(x, rv)
@@ -730,8 +758,7 @@ end
 
 	function mankey(btn)
 	{
-		var select = document.getElementById("hotList");
-		selectline = select.value;
+		selectline = ulselect-1;
 		tt = "Connect to "
 		tt = tt.concat(ttext[selectline]); 
 		tt = tt.concat(" ?");
@@ -755,8 +782,7 @@ end
 
 	function showkey(btn)
 	{
-		var select = document.getElementById("hotList");
-		selectline = select.value;
+		selectline = ulselect-1;
 		if ( show == 0 )
 		{
 			show = 1;
@@ -777,10 +803,19 @@ end
 		}
 		var select = document.getElementById("rad1");
 		bnd = select.value;
-		clearListBox("hotList");
-		select = document.getElementById("hotList");
-		select.options[select.options.length] = new Option("  ", 1);
-		select.options[select.options.length] = new Option("<%:Changing Wifi Radio%>", 2);
+		clearListul("hotList1");
+		
+		var ul = document.getElementById("hotList1");
+		var li = document.createElement('li');
+		li.appendChild(document.createTextNode("\240"));
+		ul.appendChild(li);
+		li = document.createElement('li');
+		li.appendChild(document.createTextNode("<%:Changing Wifi Radio%>"));
+		ul.appendChild(li);
+		li = document.createElement('li');
+		li.appendChild(document.createTextNode("\240"));
+		ul.appendChild(li);
+
 		document.getElementById('hname').innerHTML=" ";
 		document.getElementById('hcrypt').innerHTML=" ";
 		document.getElementById('htkey').innerHTML=" ";
@@ -805,7 +840,30 @@ end
 			);
 		return false; 
 	}
-
+	
+	function testclk(row)
+	{
+		var num = indx+1;
+		for (i = 1; i <= num; i++) {
+			id = "li" + i;
+			if ( document.getElementById(id) != null )
+			{
+				document.getElementById(id).style.backgroundColor = 'inherit';
+				document.getElementById(id).style.color = 'inherit';
+			}
+		}
+		id = "li" + row;
+		ulselect = row;
+		document.getElementById(id).style.backgroundColor = '#4686fe';
+		document.getElementById(id).style.color = 'white';
+		s = ulselect-1;
+		selectline = s;
+	
+		document.getElementById('hname').innerHTML=ttext[s];
+		document.getElementById('hcrypt').innerHTML=crypt[s];
+		showhide(s);
+	}
+	
 //]]></script>
 
 <form method="post" action="<%=REQUEST_URI%>">
@@ -813,6 +871,47 @@ end
 <div class="cbi-map" id="cbi-hot">
 <h2><a id="content" name="content"><%:Wifi Hotspot Management%></a></h2>
 <div class="cbi-map-descr"><%:Manage Your Wifi Hotspot Connections%></div>
+<head>
+	<style>
+		table#example {
+			border-collapse: collapse;   
+		}
+		#example tr {
+			background-color: #eee;
+			border-top: 1px solid #fff;
+		}
+		#example tr:hover {
+			background-color: #ccc;
+		}
+		#example th {
+			background-color: #fff;
+		}
+		#example th, #example td {
+			padding: 3px 5px;
+		}
+		#example td:hover {
+			cursor: pointer;
+		}
+		ul.select {
+		   list-style: none;
+		   margin:  0;
+		   padding: 2px;
+		   border: 1px solid grey;
+		}
+		
+		ul.select li {
+		   padding: 2px 6px;
+		}
+		ul.select li:hover {
+			background-color: #ccc;
+		   cursor: pointer;
+		}
+		ul.select li.selected {
+		   background-color: blue;
+		   color: white;
+		}
+	</style>
+</head>
 <fieldset class="cbi-section" id="cbi-read">
 
 	<table width="550"  border="0">
@@ -834,8 +933,8 @@ end
 	<table width="550"  border="0">
   	<tr>
     		<td width="17%"><div align="right"><strong><%:Wifi Radio Frequency :%></strong></div></td>
-    		<td width="17%">
-				<select name="nrad" id="rad1" onchange="changeradio()" style="width:100px;">
+    		<td width="25%">
+				<select name="nrad" id="rad1" onchange="changeradio()" style="width:200px;">
 				</select>
 			</td>
 			<td width="66%">&nbsp;</td>
@@ -887,14 +986,6 @@ end
 
 	<table width="550"  border="0">
 	<tr>
-		<td width="17%"><ul id="test1"></ul></td>
-		<td width="15%"><ul id="test2"></ul></td>
-    		<td width="68%"><ul id="test3"></ul></td>
-  	</tr>
-	</table>
-
-	<table width="550"  border="0">
-	<tr>
 		<td width="7%"><div align="left"><strong><%:In Range%></strong></div></td>
     		<td width="20%"><div align="left"><strong><%:Wifi Hotspot Networks%></strong></div></td>
 		<td width="15%"><input type="button" id="refbtn" class="cbi-button cbi-button-apply" value="<%:In Range Refresh%>" onclick="return refresh()" /></td>
@@ -903,13 +994,16 @@ end
   	</tr>
 	</table>
 
-	<table width="700"  border="0">
-  	<tr>
-    		<td width="100%">
-		<select name="hotlist" id="hotList" size="5" style="width: 500px; font-size:15px; font-family:monospace; line-height:27px; float:left; height:130px;" onchange="changetxt()">
-        	</select>
-		</td>
-	</tr>
+	<ul class="select" id="hotList1" style="width:500px; font-size: 20px">
+	  <li id="li1" onclick="testclk(1)">One</li>
+	  <li id="li2"  onclick="testclk(2)">Two</li>
+	  <li id="li3"  onclick="testclk(3)">Three</li>
+	</ul>
+	
+	<table width="550"  border="0">
+	<tr>
+    		<td width="100%">&nbsp;</td>
+  	</tr>
 	</table>
 
 	<table width="550"  border="0">

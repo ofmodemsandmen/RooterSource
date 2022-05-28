@@ -47,7 +47,7 @@ check_wwan() {
 		uci set wireless.wwan.device=$RADIO
 		uci set wireless.wwan.network="wwan"
 		uci set wireless.wwan.mode="sta"
-		uci set wireless.wwan.ssid="No Connection"
+		uci set wireless.wwan.ssid="Hotspot Manager Interface"
 		uci set wireless.wwan.encryption="none"
 		uci set wireless.wwan.disabled="1"
 		uci commit wireless
@@ -55,6 +55,8 @@ check_wwan() {
 		#wifi down
 		wifi up
 		/etc/init.d/network restart
+		uci set travelmate.global.ssid="No Connection"
+		uci commit travelmate
 	fi
 }
 
@@ -64,19 +66,19 @@ do_radio24() {
 
 	config_get channel $1 channel
 	if [ $channel -gt 15 ]; then
-		uci set travelmate.global.radio5=$config
+		uci set travelmate.global.radio$radcnt="5.8 Ghz"
 	else
-		uci set travelmate.global.radio24=$config
+		uci set travelmate.global.radio$radcnt="2.4 Ghz"
 	fi
+	let radcnt=radcnt+1
 }
 
 check_radio() {
-#	WW=$(uci get travelmate.global.radio24)
-#		if [ -z $WW ]; then
-			config_load wireless
-			config_foreach do_radio24 wifi-device
-			uci commit travelmate
-#		fi
+	radcnt=0
+	config_load wireless
+	config_foreach do_radio24 wifi-device
+	uci set travelmate.global.radcnt=$radcnt
+	uci commit travelmate
 }
 f_envload()
 {
@@ -147,16 +149,10 @@ f_check()
     while [ ${cnt} -lt ${trm_maxwait} ]
     do
 		RADIO=$(uci get wireless.wwan.device)
-		if [ $RADIO = "radio0" ]; then
-			ifname="$(ubus -S call network.wireless status | jsonfilter -l 1 -e "@.radio0.interfaces[@.config.mode=\"${mode}\"].ifname")"
-		else
-			if [ $RADIO = "radio1" ]; then
-				ifname="$(ubus -S call network.wireless status | jsonfilter -l 1 -e "@.radio1.interfaces[@.config.mode=\"${mode}\"].ifname")"
-			fi
+		ifname="$(ubus -S call network.wireless status | jsonfilter -l 1 -e "@.$RADIO.interfaces[@.config.mode=\"${mode}\"].ifname")"
+		if [ -z $ifname ]; then
+			break
 		fi
-	if [ -z $ifname ]; then
-		break
-	fi
         if [ "${mode}" = "sta" ]
         then
 			trm_ifstatus="$(ubus -S call network.interface dump | jsonfilter -e "@.interface[@.device=\"${ifname}\"].up")"
@@ -185,7 +181,9 @@ f_log()
         logger -t "HOTSPOT-[${trm_ver}] ${class}" "${log_msg}"
         if [ "${class}" = "error" ]
         then
-		uci -q set wireless.wwan.ssid="Error during Connection"
+		uci set travelmate.global.ssid="Error during Connection"
+		uci commit travelmate
+		uci -q set wireless.wwan.ssid="Hotspot Manager Interface"
 		uci -q set wireless.wwan.encryption="none"
 		uci -q set wireless.wwan.key=
       		uci -q commit wireless
@@ -201,10 +199,12 @@ f_main()
     f_check "sta"
     if [ "${trm_ifstatus}" != "true" ]
     then
-	uci -q set wireless.wwan.ssid="Checking for Connection"
-	uci -q set wireless.wwan.encryption="none"
-	uci -q set wireless.wwan.key=
-       uci -q commit wireless
+		uci set travelmate.global.ssid="Checking for Connection"
+		uci commit travelmate
+		uci -q set wireless.wwan.ssid="Hotspot Manager Interface"
+		uci -q set wireless.wwan.encryption="none"
+		uci -q set wireless.wwan.key=
+		uci -q commit wireless
 
         config_load wireless
         config_foreach f_prepare wifi-iface
@@ -215,80 +215,105 @@ f_main()
         fi
         f_check "ap"
         RADIO=$(uci get wireless.wwan.device)
-		if [ $RADIO = "radio0" ]; then
-			ap_list="$(ubus -S call network.wireless status | jsonfilter -e '@.radio0.interfaces[@.config.mode="ap"].ifname')"
-		else
-			ap_list="$(ubus -S call network.wireless status | jsonfilter -e '@.radio1.interfaces[@.config.mode="ap"].ifname')"
-		fi
+		ap_list="$(ubus -S call network.wireless status | jsonfilter -e "@.$RADIO.interfaces[@.config.mode=\"ap\"].ifname")"
         f_log "debug" "main    ::: ap-list: ${ap_list}, sta-list: ${trm_stalist}"
+		if [ -z "${ap_list}" ] || [ -z "${trm_stalist}" ]
+        then
+			sleep 3
+			f_check "ap"
+			RADIO=$(uci get wireless.wwan.device)
+			ap_list="$(ubus -S call network.wireless status | jsonfilter -e "@.$RADIO.interfaces[@.config.mode=\"ap\"].ifname")"
+			f_log "debug" "main    ::: ap-list: ${ap_list}, sta-list: ${trm_stalist}"
+		fi
         if [ -z "${ap_list}" ] || [ -z "${trm_stalist}" ]
         then
             f_log "error" "main    ::: no usable AP/STA configuration found"
         else
-        for ap in ${ap_list}
-        do
-            while [ ${cnt} -lt ${trm_maxretry} ]
-            do
-                if [ ${trm_iw} -eq 1 ]
-                then
-                    ssid_list="$(${trm_scanner} dev "${ap}" scan 2>/dev/null | \
-                        awk '/SSID: /{if(!seen[$0]++){printf "\"";for(i=2; i<=NF; i++)if(i==2)printf $i;else printf " "$i;printf "\" "}}')"
-                else
-                    ssid_list="$(${trm_scanner} "${ap}" scan | \
-                        awk '/ESSID: ".*"/{ORS=" ";if (!seen[$0]++) for(i=2; i<=NF; i++) print $i}')"
-                fi
-                f_log "debug" "main    ::: scan-tool: ${trm_scanner}, ssidlist: ${ssid_list}"
-                if [ -n "${ssid_list}" ]
-                then
-			if [ "$trm_auto" = "1" ]; then
-				FILE="/etc/hotspot"
-			else
-				FILE="/tmp/hotman"
-			fi
-			if [ -f "${FILE}" ]; then
-                    		while IFS='|' read -r ssid encrypt key
-                   		do
-					ssidq="\"$ssid\""
-                     		if [ -n "$(printf "${ssid_list}" | grep -Fo "${ssidq}")" ]
-                     		then
-						uci -q set wireless.wwan.ssid="$ssid"
-						uci -q set wireless.wwan.encryption=$encrypt
-						uci -q set wireless.wwan.key=$key
-                           			uci -q set wireless.wwan.disabled=0
-                            		uci -q commit wireless
-                            		ubus call network.interface.wwan up
-                            		ubus call network reload
-                            		f_log "info " "main    ::: wwan interface connected to uplink ${ssid}"
-						sleep 10					
-						f_check "sta"
-    						if [ "${trm_ifstatus}" = "true" ]
-   						 then
-                            			exit 0
+			for ap in ${ap_list}
+			do
+				while [ ${cnt} -lt ${trm_maxretry} ]
+				do
+					if [ false ]; then
+						if [ ${trm_iw} -eq 1 ]
+						then
+							ssid_list="$(${trm_scanner} dev "${ap}" scan 2>/dev/null | \
+								awk '/SSID: /{if(!seen[$0]++){printf "\"";for(i=2; i<=NF; i++)if(i==2)printf $i;else printf " "$i;printf "\" "}}')"
+						else
+							ssid_list="$(${trm_scanner} "${ap}" scan | \
+								awk '/ESSID: ".*"/{ORS=" ";if (!seen[$0]++) for(i=2; i<=NF; i++) print $i}')"
 						fi
-						uci -q set wireless.wwan.ssid="Connection Failed"
-						uci -q set wireless.wwan.encryption="none"
-						uci -q set wireless.wwan.key=
-                           			uci -q set wireless.wwan.disabled=1
-                            		uci -q commit wireless
-                        		fi
-                    		done <"${FILE}"
-			fi
-                fi
-                cnt=$((cnt+1))
-                sleep 5
-            done
-        done
-	fi
-	if [ "$trm_auto" = "1" ]; then
-		uci -q set wireless.wwan.ssid="No Connection Found, Rechecking"
-	else
-		uci -q set wireless.wwan.ssid="No Connection Made"
-	fi
-	uci -q set wireless.wwan.encryption="none"
-	uci -q set wireless.wwan.key=
-       uci -q commit wireless
-        f_log "info " "main    ::: no wwan uplink found"
-	return 0
+						f_log "debug" "main    ::: scan-tool: ${trm_scanner}, ssidlist: ${ssid_list}"
+					fi
+					radio=$RADIO
+					trm_iwinfo="$(command -v iwinfo)"
+					trm_maxscan="10"
+					scan_dev="$(ubus -S call network.wireless status 2>/dev/null | jsonfilter -q -l1 -e "@.${radio}.interfaces[0].ifname")"
+					ssid_list="$("${trm_iwinfo}" "${scan_dev:-${radio}}" scan 2>/dev/null |
+							awk 'BEGIN{FS="[[:space:]]"}/Address:/{var1=$NF}/ESSID:/{var2="";for(i=12;i<=NF;i++)if(var2==""){var2=$i}else{var2=var2" "$i}}
+							/Quality:/{split($NF,var0,"/")}/Encryption:/{if($NF=="none"){var3="+"}else{var3="-"};
+							printf "%i %s %s %s\n",(var0[1]*100/var0[2]),var3,var1,var2}' | sort -rn | head -qn "${trm_maxscan}")"
+			
+					if [ -n "${ssid_list}" ]
+					then
+						if [ "$trm_auto" = "1" ]; then
+							FILE="/etc/hotspot"
+						else
+							FILE="/tmp/hotman"
+						fi
+						if [ -f "${FILE}" ]; then
+							while IFS='|' read -r ssid encrypt key
+							do
+								ssidq="\"$ssid\""
+								if [ -n "$(printf "${ssid_list}" | grep -Fo "${ssidq}")" ]
+								then
+									uci set travelmate.global.ssid="Connecting to $ssid"
+									uci commit travelmate
+									uci -q set wireless.wwan.ssid="$ssid"
+									uci -q set wireless.wwan.encryption=$encrypt
+									uci -q set wireless.wwan.key=$key
+									uci -q set wireless.wwan.disabled=0
+									uci -q commit wireless
+									ubus call network.interface.wwan up
+									ubus call network reload
+									f_log "info " "main    ::: wwan interface connected to uplink ${ssid}"
+									sleep 10					
+									f_check "sta"
+									if [ "${trm_ifstatus}" = "true" ]
+									then
+										uci set travelmate.global.ssid="$ssid"
+										uci commit travelmate
+										exit 0
+									fi
+									uci set travelmate.global.ssid="Connection Failed"
+									uci commit travelmate
+									uci -q set wireless.wwan.ssid="Hotspot Manager Interface"
+									uci -q set wireless.wwan.encryption="none"
+									uci -q set wireless.wwan.key=
+									uci -q set wireless.wwan.disabled=1
+									uci -q commit wireless
+								fi
+							done <"${FILE}"
+						fi
+					fi
+					cnt=$((cnt+1))
+					sleep 5
+				done
+			done
+		fi
+		if [ "$trm_auto" = "1" ]; then
+			uci set travelmate.global.ssid="No Connection Found, Rechecking"
+			uci commit travelmate
+			uci -q set wireless.wwan.ssid="Hotspot Manager Interface"
+		else
+			uci set travelmate.global.ssid="No Connection Made"
+			uci commit travelmate
+			uci -q set wireless.wwan.ssid="Hotspot Manager Interface"
+		fi
+		uci -q set wireless.wwan.encryption="none"
+		uci -q set wireless.wwan.key=
+		uci -q commit wireless
+		f_log "info " "main    ::: no wwan uplink found"
+		return 0
     fi
 	exit 0
 }
