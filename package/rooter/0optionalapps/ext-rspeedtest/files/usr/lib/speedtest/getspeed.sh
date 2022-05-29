@@ -4,6 +4,16 @@ log() {
 	logger -t "Getspeed " "$@"
 }
 
+fixspeed() {
+	rm -f /tmp/tspeed
+	while IFS= read -r line
+	do
+		var=$line"'"
+		var=$(echo "$var" | sed -e "s!=!='!g")
+		echo "$var" >> /tmp/tspeed
+	done < /tmp/speed
+}
+
 echo "0" > /tmp/getspeed
 echo "0" >> /tmp/getspeed
 echo "0" >> /tmp/getspeed
@@ -26,13 +36,14 @@ do
 done < /tmp/sinfo
 url=${line:7:100}
 url=$(echo $url" " | tr "/" ",")
-url=$(echo $url | cut -d, -f1)
+url=$(echo "$url" | cut -d, -f1)
 rm -f /tmp/speed
 speedtest --test-server $url --output text > /tmp/speed &
-while [ -z $JITTER ]
+while [ -z "$JITTER" ]
 do
 	if [ -e /tmp/speed ]; then
-		source /tmp/speed
+		fixspeed
+		source /tmp/tspeed
 	fi
 	sleep 1
 done
@@ -42,10 +53,11 @@ echo "0" >> /tmp/getspeed
 echo "0" >> /tmp/getspeed
 echo "2" > /tmp/spworking
 
-while [ -z $DOWNLOAD_SPEED ]
+while [ -z "$DOWNLOAD_SPEED" ]
 do
 	if [ -e /tmp/speed ]; then
-		source /tmp/speed
+		fixspeed
+		source /tmp/tspeed
 	fi
 	sleep 1
 done
@@ -55,10 +67,11 @@ echo "$DOWNLOAD_SPEED" >> /tmp/getspeed
 echo "0" >> /tmp/getspeed
 echo "3" > /tmp/spworking
 
-while [ -z $UPLOAD_SPEED ]
+while [ -z "$UPLOAD_SPEED" ]
 do
 	if [ -e /tmp/speed ]; then
-		source /tmp/speed
+		fixspeed
+		source /tmp/tspeed
 	fi
 	sleep 1
 done
