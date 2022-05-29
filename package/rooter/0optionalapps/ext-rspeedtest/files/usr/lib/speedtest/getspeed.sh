@@ -43,7 +43,9 @@ while [ -z "$JITTER" ]
 do
 	if [ -e /tmp/speed ]; then
 		fixspeed
-		source /tmp/tspeed
+		if [ -e /tmp/tspeed ]; then
+			source /tmp/tspeed
+		fi
 	fi
 	sleep 1
 done
@@ -57,7 +59,9 @@ while [ -z "$DOWNLOAD_SPEED" ]
 do
 	if [ -e /tmp/speed ]; then
 		fixspeed
-		source /tmp/tspeed
+		if [ -e /tmp/tspeed ]; then
+			source /tmp/tspeed
+		fi
 	fi
 	sleep 1
 done
@@ -71,7 +75,9 @@ while [ -z "$UPLOAD_SPEED" ]
 do
 	if [ -e /tmp/speed ]; then
 		fixspeed
-		source /tmp/tspeed
+		if [ -e /tmp/tspeed ]; then
+			source /tmp/tspeed
+		fi
 	fi
 	sleep 1
 done

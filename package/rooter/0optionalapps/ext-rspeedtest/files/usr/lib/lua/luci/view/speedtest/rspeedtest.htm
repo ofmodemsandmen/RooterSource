@@ -121,6 +121,7 @@ function dotest(btn)
 	document.getElementById("refe").disabled = true ;
 	document.getElementById("runbtn").disabled = true ;
 	document.getElementById("stopbtn").style.visibility="visible";
+	document.getElementById("stopbtn").disabled = false ;
 	XHR.get('<%=luci.dispatcher.build_url("admin", "speed", "getspeed")%>', null,
 		function(x, rv)
 		{
