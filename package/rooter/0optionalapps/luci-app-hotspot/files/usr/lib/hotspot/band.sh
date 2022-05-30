@@ -14,7 +14,7 @@ uci set wireless.wwan.device=$WW
 uci set wireless.wwan.encryption="none"
 uci set wireless.wwan.disabled="1"
 uci commit wireless
-uci set travelmate.global.ssid="Wifi Radio is currently changing"
+uci set travelmate.global.ssid="6"
 uci commit travelmate
 wifi up
 result=`ps | grep -i "travelmate.sh" | grep -v "grep" | wc -l`

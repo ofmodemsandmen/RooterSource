@@ -330,6 +330,38 @@ end
 				firstpass = "1";
 			}
 			var ssid = rv.ssid;
+			switch(ssid) {
+				case "0":
+					ssid = "<%:No Connection%>";
+					break;
+				case "1":
+					ssid = "<%:Error during Connection%>";
+					break;
+				case "2":
+					ssid = "<%:Checking for Connection%>";
+					break;
+				case "3":
+					ssid = "<%:Connection Failed%>";
+					break;
+				case "4":
+					ssid = "<%:No Connection Found, Rechecking%>";
+					break;
+				case "5":
+					ssid = "<%:No Connection Made%>";
+					break;
+				case "6":
+					ssid = "<%:Wifi Radio is currently changing%>";
+					break;
+				case "7":
+					ssid = "<%:Disconnected%>";
+					break;
+				case "8":
+					ssid = "<%:Checking for Connection%>";
+					break;
+			  default:
+
+			}
+
 			var encryp = rv.encryp;
 			var disable = rv.disable;
 			if (inprocess == "0" )
@@ -377,6 +409,8 @@ end
 	{
 		if ( empty == "0" )
 		{
+			document.getElementById("noList1").style.display="none";
+			document.getElementById("noList1").style.visibility="hidden";
 			var line=hotline;
    			var arr=(line.split("|"));
 			var len = arr.length;
@@ -460,6 +494,8 @@ end
 		else
 		{
 			clearListul("hotList1");
+			document.getElementById("noList1").style.display="block";
+			document.getElementById("noList1").style.visibility="visible";
 			document.getElementById('hname').innerHTML=" ";
 			document.getElementById('hcrypt').innerHTML=" ";
 			document.getElementById('htkey').innerHTML=" ";
@@ -653,6 +689,8 @@ end
 	function refresh()
 	{
 		clearListul("hotList1");
+		document.getElementById("noList1").style.display="none";
+		document.getElementById("noList1").style.visibility="hidden";
 		var ul = document.getElementById("hotList1");
 		var li = document.createElement('li');
 		li.appendChild(document.createTextNode("\240"));
@@ -718,6 +756,12 @@ end
 				id = "li" + 1;
 				document.getElementById(id).style.backgroundColor = '#4686fe';
 				document.getElementById(id).style.color = 'white';
+				document.getElementById("upbtn").disabled=false;
+				document.getElementById("dwnbtn").disabled=false;
+				document.getElementById("delbtn").disabled=false;
+				document.getElementById("edbtn").disabled=false;
+				document.getElementById("refbtn").disabled=false;
+				document.getElementById("manbtn").disabled=false;
 			}
 		);
 		return false;
@@ -873,25 +917,6 @@ end
 <div class="cbi-map-descr"><%:Manage Your Wifi Hotspot Connections%></div>
 <head>
 	<style>
-		table#example {
-			border-collapse: collapse;   
-		}
-		#example tr {
-			background-color: #eee;
-			border-top: 1px solid #fff;
-		}
-		#example tr:hover {
-			background-color: #ccc;
-		}
-		#example th {
-			background-color: #fff;
-		}
-		#example th, #example td {
-			padding: 3px 5px;
-		}
-		#example td:hover {
-			cursor: pointer;
-		}
 		ul.select {
 		   list-style: none;
 		   margin:  0;
@@ -998,6 +1023,12 @@ end
 	  <li id="li1" onclick="testclk(1)">One</li>
 	  <li id="li2"  onclick="testclk(2)">Two</li>
 	  <li id="li3"  onclick="testclk(3)">Three</li>
+	</ul>
+	
+	<ul id="noList1" style="width:500px; font-size: 20px">
+	  <li>&nbsp;</li>
+	  <li>No Wifi Hotspot Networks Selected</li>
+	  <li>&nbsp;</li>
 	</ul>
 	
 	<table width="550"  border="0">

@@ -5,13 +5,7 @@ log() {
 }
 
 fixspeed() {
-	rm -f /tmp/tspeed
-	while IFS= read -r line
-	do
-		var=$line"'"
-		var=$(echo "$var" | sed -e "s!=!='!g")
-		echo "$var" >> /tmp/tspeed
-	done < /tmp/speed
+	sed 's/\(PROVIDER=[[:blank:]]*\)\(.*\)/\1'\''\2'\''/' /tmp/speed > /tmp/tspeed
 }
 
 echo "0" > /tmp/getspeed
