@@ -43,7 +43,6 @@ this_tab = "default"
 ma = di:taboption(this_tab, Value, "apn", "APN :"); 
 ma.rmempty = true;
 ma.default = "broadband"
-ma.datatype = "hostname"
 
 tt = di:taboption(this_tab, ListValue, "ttl", translate("Custom TTL Value :"))
 tt:value("0", translate("Use Current Value"))
@@ -93,7 +92,7 @@ mtz:value("0", "No")
 mtz:value("1", translate("Yes"))
 mtz.default=1
 
-ml = di:taboption(this_tab, ListValue, "lock", translate("Lock Connection to a Provider :"));
+ml = di:taboption(this_tab, ListValue, "lock", translate("Lock to Provider :"));
 ml:value("0", translate("No"))
 ml:value("1", translate("Hard"))
 ml:value("2", translate("Soft"))
@@ -104,12 +103,14 @@ mcc.optional=false;
 mcc.rmempty = true;
 mcc.datatype = "and(uinteger,min(1),max(999))"
 mcc:depends("lock", "1")
+mcc:depends("lock", "2")
 
 mnc = di:taboption(this_tab, Value, "mnc", translate("Provider Network Code :"));
 mnc.optional=false; 
 mnc.rmempty = true;
 mnc.datatype = "and(uinteger,min(1),max(999))"
 mnc:depends("lock", "1")
+mnc:depends("lock", "2")
 
 this_taba = "advance"
 
@@ -415,7 +416,6 @@ iccid1.default="1234567"
 
 cma = s:taboption(this_ctab, Value, "apn", "APN :"); 
 cma.rmempty = true;
-cma.datatype = "hostname"
 
 tt = s:taboption(this_ctab, ListValue, "ttl", translate("Custom TTL Value :"))
 tt:value("0", translate("Use Current Value"))
@@ -465,13 +465,7 @@ cmtz:value("0", translate("No"))
 cmtz:value("1", translate("Yes"))
 cmtz.default=1
 
-ml = di:taboption(this_tab, ListValue, "lock", translate("Lock Connection to a Provider :"));
-ml:value("0", translate("No"))
-ml:value("1", translate("Hard"))
-ml:value("2", translate("Soft"))
-ml.default=0
-
-cml = s:taboption(this_ctab, ListValue, "lock", translate("Lock Connection to a Provider :"));
+cml = s:taboption(this_ctab, ListValue, "lock", translate("Lock to Provider :"));
 cml:value("0", translate("No"))
 cml:value("1", translate("Hard"))
 cml:value("2", translate("Soft"))
@@ -482,12 +476,14 @@ cmcc.optional=false;
 cmcc.rmempty = true;
 cmcc.datatype = "and(uinteger,min(1),max(999))"
 cmcc:depends("lock", "1")
+cmcc:depends("lock", "2")
 
 cmnc = s:taboption(this_ctab, Value, "mnc", translate("Provider Network Code :"));
 cmnc.optional=false; 
 cmnc.rmempty = true;
 cmnc.datatype = "and(uinteger,min(1),max(999))"
 cmnc:depends("lock", "1")
+cmnc:depends("lock", "2")
 
 this_ctaba = "cadvanced"
 
