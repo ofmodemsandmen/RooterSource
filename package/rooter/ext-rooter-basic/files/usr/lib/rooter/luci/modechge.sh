@@ -9,7 +9,7 @@ NETMODE=$2
 	logger -t "ModeChange" "$@"
 # }
 
-CURRMODEM=$(uci get modem.general.miscnum)
+CURRMODEM=$(uci get modem.general.modemnum)
 uci set modem.modem$CURRMODEM.cmode="0"
 uci set modem.modem$CURRMODEM.netmode="10"
 uci commit modem
@@ -121,7 +121,7 @@ if [ $MODEMTYPE -eq 6 ]; then
 	fi
 	NEWFMT=false
 	if [ "$idV" = "2c7c" ]; then
-		if [ "$idP" = "0800" ] || [ "$idP" = "0620" ]; then
+		if [ "$idP" = "0800" -o "$idP" = "0620" -o "$idP" = "030b" ]; then
 			NEWFMT=true
 		fi
 	fi
@@ -208,6 +208,7 @@ fi
 # Fibocom
 if [ $MODEMTYPE -eq 9 ]; then
 	CURRMODEM=$(uci -q get modem.general.modemnum)
+	idV=$(uci -q get modem.modem$CURRMODEM.idV)
 	idP=$(uci -q get modem.modem$CURRMODEM.idP)
 	idPP=${idP:1:1}
 	if [ "$idPP" = "1" ]; then
@@ -221,6 +222,22 @@ if [ $MODEMTYPE -eq 9 ]; then
 			*)
 				ATC="AT+GTRAT=10" ;;
 		esac
+	elif [ "$idV" == "1508" -a "$idP" == "1001" ]; then
+		NETLOCK=$(uci -q get modem.modeminfo$CURRMODEM.lock)
+		if [ -z "$NETLOCK" -o "$NETLOCK" == "0" ]; then
+			case $NETMODE in
+				"3")
+					ATC="AT+COPS=0,,,0" ;;
+				"5")
+					ATC="AT+COPS=0,,,2" ;;
+				"7")
+					ATC="AT+COPS=0,,,7" ;;
+				*)
+					ATC="AT+WS46=12" ;;
+			esac
+		else
+			ATC="AT+WS46=12"
+		fi
 	else
 		case $NETMODE in
 			"4")
@@ -233,7 +250,6 @@ if [ $MODEMTYPE -eq 9 ]; then
 				ATC="AT+XACT=4,2" ;;
 		esac
 	fi
-
 fi
 
 # SIMCom

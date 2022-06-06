@@ -251,6 +251,7 @@ elif [ $idV = 1410 -a $idP = 9022 ]; then
 elif [ $idV = 1410 -a $idP = 9032 ]; then
 	SP=3
 elif [ $idV = 2cb7 -o $idV = 1508 ]; then
+	sleep 5
 	log "Fibocom ECM"
 	SP=4
 elif [ $idV = 2c7c ]; then

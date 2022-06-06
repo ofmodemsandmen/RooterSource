@@ -1,7 +1,5 @@
 #!/bin/sh
 
-# /usr/lib/rooter/common/quecteldata.sh
-
 ROOTER=/usr/lib/rooter
 
 CURRMODEM=$1
@@ -71,7 +69,7 @@ if [ -n "$NR_NSA" ]; then
 	QENG=",,"$(echo $OX" " | grep -o "+QENG: \"LTE\".\+\"NR5G-NSA\"," | tr " " ",")
 	QENG5=$(echo $OX | grep -o "+QENG:[ ]\?\"NR5G-NSA\",[0-9]\{3\},[0-9]\{2,3\},[0-9]\{1,5\},-[0-9]\{2,5\},[-0-9]\{1,3\},-[0-9]\{2,3\},[0-9]\{6,7\},[0-9]\{1,3\}.\{1,6\}")
 	if [ -z "$QENG5" ]; then
-		QENG5=$(echo $OX | grep -o "+QENG:[ ]\?\"NR5G-NSA\",[0-9]\{3\},[0-9]\{2,3\},[0-9]\{1,5\},-[0-9]\{2,5\},[-0-9]\{1,3\},-[0-9]\{2,3\}")
+		QENG5=$(echo $OX | grep -o "+QENG:[ ]\?\"NR5G-NSA\",[0-9]\{3\},[0-9]\{2,3\},[0-9]\{1,5\},-[0-9]\{2,3\},[-0-9]\{1,3\},-[0-9]\{2,3\}")
 		if [ -n "$QENG5" ]; then
 			QENG5=$QENG5",,"
 		fi
@@ -87,10 +85,10 @@ QNSM=$(echo $OX | grep -o "+QCFG: \"NWSCANMODE\",[0-9]")
 QNWP=$(echo $OX | grep -o "+QNWPREFCFG: \"MODE_PREF\",[A-Z5:]\+" | cut -d, -f2)
 QTEMP=$(echo $OX | grep -o "+QTEMP: [0-9]\{1,3\}")
 if [ -z "$QTEMP" ]; then
-	QTEMP=$(echo $OX | grep -o "+QTEMP:[ ]\?\"XO[_-]THERM[_-].\+[0-9]\{1,3\}\"" | cut -d\" -f 4)
+	QTEMP=$(echo $OX | grep -o "+QTEMP:[ ]\?\"XO[_-]THERM[_-][^,]\+,[\"]\?[0-9]\{1,3\}" | grep -o "[0-9]\{1,3\}")
 fi
 if [ -z "$QTEMP" ]; then
-	QTEMP=$(echo $OX | grep -o "+QTEMP:[ ]\?\"MDM-CORE-USR.\+[0-9]\{1,3\}\"" | cut -d\" -f 4)
+	QTEMP=$(echo $OX | grep -o "+QTEMP:[ ]\?\"MDM-CORE-USR.\+[0-9]\{1,3\}\"" | cut -d\" -f4)
 fi
 if [ -n "$QTEMP" ]; then
 	CTEMP=$(echo $QTEMP | grep -o "[0-9]\{1,3\}")$(printf "\xc2\xb0")"C"
