@@ -411,8 +411,8 @@ function action_get_csq()
 	rv["proto"] = file:read("*line")
 	rv["pci"] = file:read("*line")
 	rv["sinr"] = file:read("*line")
-	rv["lat"] = file:read("*line")
-	rv["long"] = file:read("*line")
+	--rv["lat"] = file:read("*line")
+	--rv["long"] = file:read("*line")
 
 	file:close()
 
@@ -475,6 +475,18 @@ function action_get_csq()
 		rv["host"] = file:read("*line")
 		file:close()
 	end
+	
+	gpsdata = "/tmp/gpsdata1"
+	file = io.open(gpsdata, "r")
+	if file == nil then
+		rv["lat"] = "-"
+		rv["long"] = "-"
+	else
+		rv["lat"] = file:read("*line")
+		rv["long"] = file:read("*line")
+		file:close()
+	end
+	
 	stat = "/tmp/msimnum" .. modnum
 	file = io.open(stat, "r")
 	if file == nil then
