@@ -1,11 +1,12 @@
 --- a/drivers/net/usb/qmi_wwan.c
 +++ b/drivers/net/usb/qmi_wwan.c
-@@ -995,6 +995,8 @@
+@@ -995,6 +995,9 @@
  	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0125)},	/* Quectel EC25, EC20 R2.0  Mini PCIe */
  	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0306)},	/* Quectel EP06/EG06/EM06 */
  	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0512)},	/* Quectel EG12/EM12 */
 +	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0620)},	/* Quectel EM20 */
 +	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0900)},	/* Quectel RM500Q-CN */
++	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x030b)},	/* Quectel EM060 */
  	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0620)},	/* Quectel EM160R-GL */
  	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0800)},	/* Quectel RM500Q-GL */
  

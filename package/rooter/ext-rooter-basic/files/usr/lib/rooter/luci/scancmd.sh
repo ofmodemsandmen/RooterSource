@@ -123,6 +123,10 @@ case $uVid in
 				fi
 				M4='AT+QCFG="band",0,'$M3',0'
 			;;
+			"030b" ) # EM060
+				M3="420000A7E27B0E38DF"
+				M4='AT+QCFG="band",0,'$M3',0'
+			;;
 			"0512" ) # EM12-G
 				M3="2000001E0BB1F39DF"
 				M4='AT+QCFG="band",0,'$M3',0'
@@ -344,7 +348,7 @@ echo "Done" >> /tmp/scan
 case $uVid in
 	"2c7c" )
 		if [ $uPid != "0800" ]; then
-			if [ $uPid = 0620 -o $uPid = "0800" ]; then
+			if [ $uPid = 0620 -o $uPid = "0800" -o $uPid = "030b" ]; then
 				EM20=$(echo $model | grep "EM20")
 				if [ ! -z $EM20 ]; then # EM20
 					M2='AT+QCFG="band",0,'$L1',0'

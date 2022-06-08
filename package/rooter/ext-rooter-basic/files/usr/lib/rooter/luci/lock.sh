@@ -192,6 +192,14 @@ case $uVid in
 				fi
 			fi
 		fi
+		if [ $uPid = 030b ]; then
+			if [ ! -z $mask ]; then
+				fibdecode $mask 1 1
+			else
+				lst="0"
+			fi
+			M2='AT+QNWPREFCFG="lte_band",'$lst
+		fi
 		if [ $uPid = 0800 ]; then
 			if [ ! -z $mask ]; then
 				fibdecode $mask 1 1
