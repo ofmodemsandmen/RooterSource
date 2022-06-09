@@ -681,6 +681,10 @@ end
 							document.getElementById("pci").disabled=false;
 							document.getElementById("earfcn1").disabled=false;
 							document.getElementById("pci1").disabled=false;
+							document.getElementById("earfcn2").disabled=false;
+							document.getElementById("pci2").disabled=false;
+							document.getElementById("earfcn3").disabled=false;
+							document.getElementById("pci3").disabled=false;
 						}
 						else
 						{
@@ -690,6 +694,10 @@ end
 							document.getElementById("pci").disabled=true;
 							document.getElementById("earfcn1").disabled=true;
 							document.getElementById("pci1").disabled=true;
+							document.getElementById("earfcn2").disabled=true;
+							document.getElementById("pci2").disabled=true;
+							document.getElementById("earfcn3").disabled=true;
+							document.getElementById("pci3").disabled=true;
 						}
 						earfcn = rv.earfcn;
 						if ( earfcn == "0" )
@@ -727,6 +735,44 @@ end
 						else
 						{
 							document.getElementById("pci1").value=pci1;
+						}
+						
+						earfcn2 = rv.earfcn2;
+						if ( earfcn2 == "0" )
+						{
+							document.getElementById("earfcn2").value="";
+						}
+						else
+						{
+							document.getElementById("earfcn2").value=earfcn2;
+						}
+						pci2 = rv.pci2;
+						if ( pci2 == "0" )
+						{
+							document.getElementById("pci2").value="";
+						}
+						else
+						{
+							document.getElementById("pci2").value=pci2;
+						}
+						
+						earfcn3 = rv.earfcn3;
+						if ( earfcn3 == "0" )
+						{
+							document.getElementById("earfcn3").value="";
+						}
+						else
+						{
+							document.getElementById("earfcn3").value=earfcn3;
+						}
+						pci3 = rv.pci3;
+						if ( pci3 == "0" )
+						{
+							document.getElementById("pci3").value="";
+						}
+						else
+						{
+							document.getElementById("pci3").value=pci3;
 						}
 					}
 					else
@@ -1652,6 +1698,10 @@ end
 			var pc = document.getElementById("pci").value;
 			var ear1 = document.getElementById("earfcn1").value;
 			var pc1 = document.getElementById("pci1").value;
+			var ear2 = document.getElementById("earfcn2").value;
+			var pc2 = document.getElementById("pci2").value;
+			var ear3 = document.getElementById("earfcn3").value;
+			var pc3 = document.getElementById("pci3").value;
 			if ( ear.length == 0 )
 			{
 				alert("<%:You must enter an EARFCN Number!!%>");
@@ -1670,7 +1720,23 @@ end
 			{
 				pc1 = "0";
 			}
-			st = "1|" + ear + "|" + pc + "|" + ear1 + "|" + pc1;
+			if ( ear2.length == 0 )
+			{
+				ear2 = "0";
+			}
+			if ( pc2.length == 0 )
+			{
+				pc2 = "0";
+			}
+			if ( ear3.length == 0 )
+			{
+				ear3 = "0";
+			}
+			if ( pc3.length == 0 )
+			{
+				pc3 = "0";
+			}
+			st = "1|" + ear + "|" + pc + "|" + ear1 + "|" + pc1 + "|" + ear2 + "|" + pc2 + "|" + ear3 + "|" + pc3;
 			cenable = "1";
 		} 
 		else
@@ -1684,6 +1750,10 @@ end
 			document.getElementById("pci").disabled=true;
 			document.getElementById("earfcn1").disabled=true;
 			document.getElementById("pci1").disabled=true;
+			document.getElementById("earfcn2").disabled=true;
+			document.getElementById("pci2").disabled=true;
+			document.getElementById("earfcn3").disabled=true;
+			document.getElementById("pci3").disabled=true;
 			document.getElementById("cellbtn").disabled=true;
 			XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "change_cell")%>',
 				{ set: st },
@@ -1969,6 +2039,20 @@ end
 		<td width="10%"><input type="text" name="earfcn1" id="earfcn1" class="cbi-input-text" style="width: 150px;" maxlength="20"></input></td>
 		<td width="5%"><div align="right"><strong><%:PCI 2 : %></strong></div></td>
 		<td width="10%"><input type="text" name="pci1" id="pci1" class="cbi-input-text" style="width: 150px;" maxlength="20"></input></td>
+		<td width="67%">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="8%"><div align="right"><strong><%:EARFCN 3 : %></strong></div></td>
+		<td width="10%"><input type="text" name="earfcn2" id="earfcn2" class="cbi-input-text" style="width: 150px;" maxlength="20"></input></td>
+		<td width="5%"><div align="right"><strong><%:PCI 3 : %></strong></div></td>
+		<td width="10%"><input type="text" name="pci2" id="pci2" class="cbi-input-text" style="width: 150px;" maxlength="20"></input></td>
+		<td width="67%">&nbsp;</td>
+	</tr>
+	<tr>
+		<td width="8%"><div align="right"><strong><%:EARFCN 4 : %></strong></div></td>
+		<td width="10%"><input type="text" name="earfcn3" id="earfcn3" class="cbi-input-text" style="width: 150px;" maxlength="20"></input></td>
+		<td width="5%"><div align="right"><strong><%:PCI 4 : %></strong></div></td>
+		<td width="10%"><input type="text" name="pci3" id="pci3" class="cbi-input-text" style="width: 150px;" maxlength="20"></input></td>
 		<td width="67%">&nbsp;</td>
 	</tr>
 	</table>

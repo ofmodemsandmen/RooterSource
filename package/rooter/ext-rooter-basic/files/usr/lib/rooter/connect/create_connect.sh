@@ -694,11 +694,25 @@ if $QUECTEL; then
 		pc=$(uci -q get custom.bandlock.pci)
 		ear1=$(uci -q get custom.bandlock.earfcn1)
 		pc1=$(uci -q get custom.bandlock.pci1)
-		if [ $ear1 = "0" -o $pc1 = "0" ]; then
-			earcnt="1,"$ear","$pc
-		else
-			earcnt="2,"$ear","$pc","$ear1","$pc1
+		ear2=$(uci -q get custom.bandlock.earfcn2)
+		pc2=$(uci -q get custom.bandlock.pci2)
+		ear3=$(uci -q get custom.bandlock.earfcn3)
+		pc3=$(uci -q get custom.bandlock.pci3)
+		cnt=1
+		earcnt=$ear","$pc
+		if [ $ear1 != "0" -a $pc1 != "0" ]; then
+			earcnt=$earcnt","$ear1","$pc1
+			let cnt=cnt+1
 		fi
+		if [ $ear2 != "0" -a $pc2 != "0" ]; then
+			earcnt=$earcnt","$ear2","$pc2
+			let cnt=cnt+1
+		fi
+		if [ $ear3 != "0" -a $pc3 != "0" ]; then
+			earcnt=$earcnt","$ear3","$pc3
+			let cnt=cnt+1
+		fi
+		earcnt=$cnt","$earcnt
 		ATCMDD="at+qnwlock=\"common/4g\""
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		if `echo $OX | grep "ERROR" 1>/dev/null 2>&1`

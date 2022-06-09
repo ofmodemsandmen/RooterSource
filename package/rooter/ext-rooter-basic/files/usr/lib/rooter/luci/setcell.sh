@@ -17,11 +17,19 @@ else
 	pc=$(echo $dat1 | cut -d, -f3)
 	ear1=$(echo $dat1 | cut -d, -f4)
 	pc1=$(echo $dat1 | cut -d, -f5)
+	ear2=$(echo $dat1 | cut -d, -f6)
+	pc2=$(echo $dat1 | cut -d, -f7)
+	ear3=$(echo $dat1 | cut -d, -f8)
+	pc3=$(echo $dat1 | cut -d, -f9)
 	uci set custom.bandlock.cenable='1'
 	uci set custom.bandlock.earfcn=$ear
 	uci set custom.bandlock.pci=$pc
 	uci set custom.bandlock.earfcn1=$ear1
 	uci set custom.bandlock.pci1=$pc1
+	uci set custom.bandlock.earfcn2=$ear2
+	uci set custom.bandlock.pci2=$pc2
+	uci set custom.bandlock.earfcn3=$ear3
+	uci set custom.bandlock.pci3=$pc3
 fi
 uci commit custom
 
