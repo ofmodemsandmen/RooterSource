@@ -6,7 +6,6 @@ log() {
 }
 
 profile=$(cat /tmp/profilename)
-log "$profile"
 valid=$(echo "$profile" | grep "**Profile**")
 if [ ! -z "$valid" ]; then
 	echo "$profile" > /tmp/profile
