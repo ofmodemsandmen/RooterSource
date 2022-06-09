@@ -26,12 +26,25 @@
 	function loaded(evt) 
 	{
 		var fileString = evt.target.result;
+		part1 = fileString;
+		part2 = "~~";
+		if ( fileString.length > 2000 )
+		{
+			part1 = fileString.substring(0,2000);
+			part2 = fileString.substring(2000);
+		}
 		
-		XHR.get('<%=luci.dispatcher.build_url("admin", "profile", "loadcfg")%>',
-			{ set: fileString },
+		XHR.get('<%=luci.dispatcher.build_url("admin", "profile", "loadcfg1")%>',
+			{ set: part1 },
 			function()
 			{
-				window.location.reload(false);
+				XHR.get('<%=luci.dispatcher.build_url("admin", "profile", "loadcfg2")%>',
+					{ set1: part2 },
+					function()
+					{
+						window.location.reload(false);
+					}
+				);
 			}
 		);
 		
@@ -58,4 +71,5 @@
 			<td><div align="left"><%:Page will automatically refresh after file is loaded%></div></td>
 		</tr>
 	</table>
+
 </fieldset>
