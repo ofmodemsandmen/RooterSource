@@ -48,7 +48,8 @@
 	if file ~= nil then
 		line = file:read("*line")
 		line = line:gsub("<model>", model)
-		headername = line:gsub("^%s*(.-)%s*$", "%1")
+		line = line:gsub(" ", "&nbsp;")
+		headername = headername .. line
 		line = file:read("*line")
 		if line ~= nil then
 			img_name = resource .. line
