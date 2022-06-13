@@ -124,7 +124,7 @@ case $uVid in
 				M4='AT+QCFG="band",0,'$M3',0'
 			;;
 			"030b" ) # EM060
-				M3="420000A7E27B0E38DF"
+				M3="420000A7E23B0E38DF"
 				M4='AT+QCFG="band",0,'$M3',0'
 			;;
 			"0512" ) # EM12-G
