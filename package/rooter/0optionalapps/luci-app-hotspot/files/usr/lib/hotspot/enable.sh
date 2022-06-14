@@ -20,5 +20,15 @@ if [ $SET = "1" ]; then
 	fi
 else
 	hkillall travelmate.sh
-	/usr/lib/hotspot/dis_hot.sh
+	rm -f /tmp/hotman
+	uci set travelmate.global.ssid="7"
+	uci set travelmate.global.trm_enabled="0"
+	uci commit travelmate
+	uci -q set wireless.wwan.disabled=1
+	uci set wireless.wwan.ssid="Hotspot Manager Interface"
+	uci -q commit wireless
+	ubus call network.interface.wwan down
+    ubus call network reload
+	#ifdown wwan
+	#/etc/init.d/network reload
 fi
