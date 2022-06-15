@@ -299,8 +299,7 @@ f_main()
 									uci -q set wireless.wwan.key=$key
 									uci -q set wireless.wwan.disabled=0
 									uci -q commit wireless
-									ubus call network.interface.wwan down
-									ubus call network reload
+									wifi up $(uci -q get wireless.wwan.device)
 									ubus call network.interface.wwan up
                             		ubus call network reload
 									#wifi down $(uci -q get wireless.wwan.device)
