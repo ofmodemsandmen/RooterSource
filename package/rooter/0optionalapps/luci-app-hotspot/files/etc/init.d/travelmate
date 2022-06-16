@@ -33,7 +33,9 @@ log "Hotspot Firewall"
 
 	config_load firewall
 	config_foreach do_zone zone
-	/usr/lib/hotspot/travelmate.sh &
+	uci set travelmate.global.lost="0"
+	uci set travelmate.global.delay="30"
+	uci commit travelmate
 }
 
 

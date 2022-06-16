@@ -23,8 +23,9 @@ if [ "$ACTION" = ifdown -a "$INTERFACE" = "wwan" ]; then
 				lost=$(uci -q get travelmate.global.lost)
 				if [ "$lost" != "1" ]; then
 					uci set travelmate.global.lost="1"
-					/usr/lib/hotspot/travelmate.sh &
+					uci set travelmate.global.delay="30"
 					uci commit travelmate
+					/usr/lib/hotspot/travelmate.sh &
 					exit 0
 				fi
 			fi

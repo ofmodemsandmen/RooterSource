@@ -314,12 +314,13 @@ f_main()
 										f_check "ap"
 									done
 									cnt=0
+									delay=$(uci -q get travelmate.global.delay)
 									f_check "sta"
 									while [ "${trm_ifstatus}" != "true" ]; do
 										sleep 1
 										f_check "sta"
 										let cnt=cnt+1
-										if [ $cnt -ge 15 ]; then
+										if [ $cnt -ge $delay ]; then
 											break
 										fi
 									done
