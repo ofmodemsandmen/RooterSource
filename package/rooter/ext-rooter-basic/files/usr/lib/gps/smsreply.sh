@@ -72,15 +72,13 @@ while true; do
 		LATx=$(echo $OX | grep -o "Lat:[^(]\+([^)]\+" | grep -o "0x.\+")
 		LONx=$(echo $OX | grep -o "Lon:[^(]\+([^)]\+" | grep -o "0x.\+")
 		if [ -n "$LATx" -a -n "$LONx" ]; then
-			LATd=$(printf "%d" $LATx)
-			if [ $LATd -gt 2147483647 ]; then
+			if [ $(printf "%d" $LATx) -gt $(printf "%d" 0x7FFFFFFF) ]; then
 				LATx=$(( ($LATx ^ 0xFFFFFFFF) + 1 ))
 				LAT="-"$(lua -e "print(string.format(\"%.5f\", $LATx * (180 / 2^25)))")
 			else
 				LAT=$(lua -e "print(string.format(\"%.5f\", $LATx * (180 / 2^25)))")
 			fi
-			LONd=$(printf "%d" $LONx)
-			if [ $LONd -gt 2147483647 ]; then
+			if [ $(printf "%d" $LONx) -gt $(printf "%d" 0x7FFFFFFF) ]; then
 				LONx=$(( ($LONx ^ 0xFFFFFFFF) + 1 ))
 				LON="-"$(lua -e "print(string.format(\"%.5f\", $LONx * (180 / 2^25)))")
 			else
@@ -104,13 +102,11 @@ while true; do
 		break
 	fi
 	if [ $(date +%s) -gt $SMStime ]; then
+		log "Failed request from $SMSdest by SMS for LAT/LON, position not available"
 		break
 	fi
 	sleep 8
 done
-if [ -z "$LAT" -o -z "$LON" ]; then
-	log "Failed request from $SMSdest by SMS for LAT/LON, position not available"
-fi
 if [ "$GPSon" != "1" ]; then
 	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$GPSendcmd")
 fi

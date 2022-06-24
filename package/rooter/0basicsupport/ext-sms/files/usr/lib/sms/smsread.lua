@@ -787,6 +787,16 @@ if file ~= nil then
 					os.execute("(sleep 60; reboot -f) &")
 				elseif m_text == "::pwrtoggle!!" then
 					os.execute("(sleep 60; /usr/lib/rooter/pwrtoggle.sh 3) &")
+				elseif m_text:sub(1, 3) == "GPS" then
+					cmd_hand = io.popen("uci -q get modem.general.pin")
+					gpspin = cmd_hand:read()
+					cmd_hand:close()
+					if (m_text == "GPS" and gpspin == nil) or (m_text == "GPS " .. gpspin) then
+						if tonumber(m_number) ~= nil then
+							os.execute("/usr/lib/gps/smsreply.sh " .. m_number .. "&")
+							delslots = delslots .. m_index .. " "
+						end
+					end
 				end
 			end
 		end
