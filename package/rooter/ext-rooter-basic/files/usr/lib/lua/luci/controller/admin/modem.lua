@@ -38,6 +38,7 @@ function index()
 	entry({"admin", "modem", "extping"}, call("action_extping"))
 	entry({"admin", "modem", "change_cell"}, call("action_change_cell"))
 	entry({"admin", "modem", "change_proto"}, call("action_change_proto"))
+	entry({"admin", "modem", "setpin"}, call("action_setpin"))
 end
 
 function trim(s)
@@ -270,6 +271,7 @@ function action_check_misc()
 		netmode = luci.model.uci.cursor():get("modem", "modem" .. miscnum, "netmode")
 		rv["netmode"] = netmode
 	end
+	rv["pin"] = luci.model.uci.cursor():get("modem", "general", "pin")
 	rv["plock"] = luci.model.uci.cursor():get("custom", "atcmd", "lock")
 	if rv["plock"] == "1" then
 		rv["atlock"] = luci.model.uci.cursor():get("custom", "menu", "full")
@@ -647,3 +649,7 @@ function action_change_proto()
 	os.execute("/usr/lib/rooter/luci/protochnge.sh " ..set)
 end
 
+function action_setpin()
+	local set = luci.http.formvalue("set")
+	os.execute("uci set modem.general.pin=" .. set .. "; uci commit modem")
+end

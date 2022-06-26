@@ -28,6 +28,7 @@ end
 <script type="text/javascript">//<![CDATA[
 
 	bnds = "0" ;
+	loadpin = "0";
 	chnge = 0 ;
 	sca = 0;
 	selectall = 1 ;
@@ -133,6 +134,16 @@ end
 			stat = rv.active;
 			gpio = rv.gpio;
 			usb = rv.usb;
+			if ( loadpin == "0" )
+			{
+				pinn = rv.pin;
+				if ( rv.pin == null )
+				{
+					pinn = "";
+				}
+				document.getElementById("modpin").value = pinn;
+				loadpin = "1";
+			} 
 
 			if ( stat == "0" )
 			{
@@ -1765,6 +1776,25 @@ end
 		return false;
 	}
 	
+	function sndpin(event)
+	{
+	
+	}
+	
+	function sendpin(btn)
+	{
+		var s = document.getElementById("modpin").value;
+		document.getElementById("attxt").value=s;
+		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "setpin")%>',
+			{ set: s },
+			function(x, rv)
+			{
+			}
+		); 
+
+		return true;
+	}
+	
 //]]></script>
 
 <form method="post" action="<%=REQUEST_URI%>">
@@ -2142,6 +2172,19 @@ end
 		<td>&nbsp;</td>
   	</tr>
 
+ 	</table>
+</fieldset>
+
+<fieldset class="cbi-section" id="cbi-mode-pin">
+	<legend><%:GPS Message Pin%></legend>
+	<table id="pinchnge" border="0">
+		<tr>
+				<td width="5%">&nbsp;</td>
+				<td width="10%"><div align="right"><%:Message Pin :%></div></td>
+				<td width="20%"><input type="text" name="modpin" id="modpin" class="cbi-input-text" style="width: 350px;" maxlength="500" ></input></td>
+				<td width="10%"><input type="button" id="submit" class="cbi-button cbi-button-success" value="<%:Set Pin%>" onclick="return sendpin(this)" /></td>
+				<td width="55%">&nbsp;</td>
+		</tr>
  	</table>
 </fieldset>
 
