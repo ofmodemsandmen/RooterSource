@@ -2,6 +2,10 @@
 
 ROOTER=/usr/lib/rooter
 
+log() {
+	logger -t "CellData" "$@"
+}
+
 CURRMODEM=$1
 COMMPORT=$2
 
@@ -13,10 +17,10 @@ else
 	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "cellinfo0.gcom" "$CURRMODEM")
 fi
 OY=$($ROOTER/gcom/gcom-locked "$COMMPORT" "cellinfo.gcom" "$CURRMODEM")
-OXx=$OX
 
 OX=$(echo $OX | tr 'a-z' 'A-Z')
 OY=$(echo $OY | tr 'a-z' 'A-Z')
+OXx=$OX
 OX=$OX" "$OY
 
 COPS="-"

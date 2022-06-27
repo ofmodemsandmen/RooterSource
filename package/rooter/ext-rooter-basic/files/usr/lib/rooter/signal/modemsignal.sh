@@ -109,18 +109,25 @@ make_signal() {
 
 get_basic() {
 	$ROOTER/signal/basedata.sh $CURRMODEM $COMMPORT
-	source /tmp/base$CURRMODEM.file
-	rm -f /tmp/base$CURRMODEM.file
+	if [ -e /tmp/base$CURRMODEM.file ]; then
+		source /tmp/base$CURRMODEM.file
+		rm -f /tmp/base$CURRMODEM.file
+	fi
 	$ROOTER/signal/celldata.sh $CURRMODEM $COMMPORT
-	source /tmp/cell$CURRMODEM.file
-	rm -f /tmp/cell$CURRMODEM.file
+	if [ -e /tmp/cell$CURRMODEM.file ]; then
+		source /tmp/cell$CURRMODEM.file
+		rm -f /tmp/cell$CURRMODEM.file
+	fi
 	lua $ROOTER/signal/celltype.lua "$MODEM" $CURRMODEM
-	source /tmp/celltype$CURRMODEM
-	rm -f /tmp/celltype$CURRMODEM
+	if [ -e /tmp/celltype$CURRMODEM ]; then
+		source /tmp/celltype$CURRMODEM
+		rm -f /tmp/celltype$CURRMODEM
+	fi
 }
 
 get_basic
 while [ 1 = 1 ]; do
+	get_basic
 	if [ -e /tmp/port$CURRMODEM.file ]; then
 		source /tmp/port$CURRMODEM.file
 		rm -f /tmp/port$CURRMODEM.file
@@ -135,8 +142,10 @@ while [ 1 = 1 ]; do
 		if [ $ELAPSE -ge 60 ]; then
 			STARTIME=$CURRTIME
 			$ROOTER/signal/celldata.sh $CURRMODEM $COMMPORT
-			source /tmp/cell$CURRMODEM.file
-			rm -f /tmp/cell$CURRMODEM.file
+			if [ -e /tmp/cell$CURRMODEM.file ]; then
+				source /tmp/cell$CURRMODEM.file
+				rm -f /tmp/cell$CURRMODEM.file
+			fi
 		fi
 		if [ -e /tmp/port$CURRMODEM.file ]; then
 			source /tmp/port$CURRMODEM.file
