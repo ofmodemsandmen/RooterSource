@@ -6,20 +6,14 @@ log() {
 	logger -t "GPS" "$@"
 }
 
-SMSdest=$1
-CURRMODEM=1
+CURRMODEM=$1
+SMSdest=$2
 MODTYPE=$(uci -q get modem.modem$CURRMODEM.modemtype)
 if [ "$MODTYPE" == "2" -o "$MODTYPE" == "6" ]; then
 	COMMPORT="/dev/ttyUSB"$(uci -q get modem.modem$CURRMODEM.commport)
 else
-	CURRMODEM=2
-	MODTYPE=$(uci -q get modem.modem$CURRMODEM.modemtype)
-	if [ "$MODTYPE" == "2" -o "$MODTYPE" == "6" ]; then
-		COMMPORT="/dev/ttyUSB"$(uci -q get modem.modem$CURRMODEM.commport)
-	else
-		log "SMS position request from $SMSdest failed, no Sierra or Quectel modem found"
-		exit
-	fi
+	log "SMS position request from $SMSdest failed, modem $CURRMODEM is neither a Sierra nor Quectel"
+	exit
 fi
 GPSon=$(uci -q get gps.configuration.enabled)
 if [ "$GPSon" != "1" -o $CURRMODEM == "2" ]; then
@@ -91,6 +85,11 @@ while true; do
 		LON=$(echo $OX | grep -o "+QGPSLOC:[ .0-9]\+,.\+" | cut -d, -f3)
 	fi
 	if [ -n "$LAT" -a -n "$LON" ]; then
+		SMSMODEM=$(uci -q get modem.general.smsnum)
+		if [ "$CURRMODEM" != "$SMSMODEM" ]; then
+			uci set modem.general.smsnum=$CURRMODEM
+			uci commit modem.general.smsnum
+		fi
 		OY=$(/usr/lib/sms/smsout.sh "$SMSdest" "$LAT $LON")
 		OYsent=$(echo $OY | grep -o "SMS sent")
 		if [ -n "$OYsent" ]; then
@@ -98,6 +97,10 @@ while true; do
 			log "GPS coordinates sent to $SMSdest"
 		else
 			log "Failed to send GPS coordinates sent to $SMSdest"
+		fi
+		if [ "$CURRMODEM" != "$SMSMODEM" ]; then
+			uci set modem.general.smsnum=$SMSMODEM
+			uci commit modem.general.smsnum
 		fi
 		break
 	fi

@@ -793,7 +793,7 @@ if file ~= nil then
 					cmd_hand:close()
 					if (m_text == "GPS" and gpspin == nil) or (m_text == "GPS " .. gpspin) then
 						if tonumber(m_number) ~= nil then
-							os.execute("/usr/lib/gps/smsreply.sh " .. m_number .. "&")
+							os.execute("/usr/lib/gps/smsreply.sh " .. modemn .. " " .. m_number .. "&")
 							delslots = delslots .. m_index .. " "
 						end
 					end
