@@ -194,7 +194,7 @@ quectel_type() {
 	if [ $EM20 ]; then
 		idVidP=$idV":"$idP"0"
 	fi
-	if [ "$idVidP" = "2c7c:0800" ] || [ "$idVidP" = "2c7c:0620" ]; then
+	if [ "$idVidP" == "2c7c:0800" -o "$idVidP" == "2c7c:0620" -o "$idVidP" == "2c7c:030b" ]; then
 		ATCMDD="AT+QNWPREFCFG=\"mode_pref\""
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		QNSM=$(echo $OX | grep -o ",[AUTOLENR5GWCDM:]\+" | tr ',' ' ')
@@ -355,22 +355,6 @@ fibocom_type() {
 			esac
 
 		fi
-	fi
-	if [ -z "$NETMODE" ]; then
-		ATCMDD="AT+WS46?"
-		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		MRAT=$(echo $OX | grep -o "[0-9]\{2\}")
-		MRAT=${MRAT: -2}
-		case $MRAT in
-			"12" )
-				NETMODE="3" ;;
-			"22" )
-				NETMODE="5" ;;
-			"28" )
-				NETMODE="7" ;;
-			* )
-				NETMODE="1" ;;
-		esac
 	fi
 	uci set modem.modem$CURRMODEM.modemtype="9"
 	uci set modem.modem$CURRMODEM.netmode=$NETMODE
