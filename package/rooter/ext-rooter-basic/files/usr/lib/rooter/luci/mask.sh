@@ -250,22 +250,23 @@ case $uVid in
 esac
 
 reverse $L1
-echo $revstr > /tmp/bmask
+echo $revstr > /tmp/bmask1
 if [ ! -z $L5 ]; then
 	reverse $L5
 else
 	revstr="x"
 fi
-echo $revstr >> /tmp/bmask
-echo $M2 >> /tmp/bmask
-echo $M5 >> /tmp/bmask
+echo $revstr >> /tmp/bmask1
+echo $M2 >> /tmp/bmask1
+echo $M5 >> /tmp/bmask1
 if [ $CA ]; then
-	echo $CA >> /tmp/bmask
+	echo $CA >> /tmp/bmask1
 	if [ $CA3 ]; then
-		echo $CA3 >> /tmp/bmask
+		echo $CA3 >> /tmp/bmask1
 		if [ $CA4 ]; then
-			echo $CA4 >> /tmp/bmask
+			echo $CA4 >> /tmp/bmask1
 		fi
 	fi
 fi
+mv /tmp/bmask1 /tmp/bmask
 

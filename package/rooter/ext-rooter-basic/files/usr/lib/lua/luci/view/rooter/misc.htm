@@ -58,6 +58,7 @@ end
 	var lockb = 0;
 	var cenable;
 	var modtype;
+	var locking = 0;
 	
 	function T77(uVid, uPid)
 	{
@@ -650,6 +651,7 @@ end
 			// Supported LTE bands
 			//
 			bx = rv.bndsup ;
+			//document.getElementById("attxt").value=bx + " " + stat + " " + bnds;
 			if ( stat != "0" && bx != "0" )
 			{
 				//document.getElementById("tab5g").style.display = "none";
@@ -1095,6 +1097,7 @@ end
 			}
 			else
 			{
+				bnds = "0";
 				document.getElementById("tab5").style.display = "none";
 				document.getElementById("tab6").style.display = "none";
 				document.getElementById("tab7").style.display = "none";
@@ -1472,6 +1475,7 @@ end
 
 		if ( confirm("<%:Modem will be locked to selected bands.\nContinue?%>") )
 		{
+			locking = 1;
 			s = rstr ;
 			XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "send_lockcmd")%>',
 				{ set: s },
@@ -1926,7 +1930,7 @@ end
 </fieldset>
 <% end %>
 
-<% if block == 0 then %>
+<% if 0 == 0 then %>
 <fieldset class="cbi-section" id="cbi-mode-cb">
 	<legend><%:Cellular Bands%></legend>
 	<table width="500" border="0" id ="tab10">

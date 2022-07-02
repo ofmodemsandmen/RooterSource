@@ -404,6 +404,7 @@ idP=$(uci -q get modem.modem$CURRMODEM.idP)
 
 if [ ! -z "$RECON" ]; then
 	$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "ReConnecting"
+	uci set modem.modem$CURRMODEM.active=1
 	uci set modem.modem$CURRMODEM.connected=0
 	uci commit modem
 	INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
@@ -417,7 +418,9 @@ if [ ! -z "$RECON" ]; then
 	CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 	WWANX=$(uci -q get modem.modem$CURRMODEM.wwan)
 	WDMNX=$(uci -q get modem.modem$CURRMODEM.wdm)
-	$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
+	if [ "$RECON" = "1" ]; then
+		$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
+	fi
 else
 
 	DELAY=$(uci -q get modem.modem$CURRMODEM.delay)
@@ -664,29 +667,33 @@ elif [ "$idV" = "05c6" ]; then
 fi
 
 if [ -e $ROOTER/connect/preconnect.sh ]; then
-	$ROOTER/connect/preconnect.sh $CURRMODEM
+	if [ "$RECON" != "2" ]; then
+		$ROOTER/connect/preconnect.sh $CURRMODEM
+	fi
 fi
 
 if $QUECTEL; then
-	ATCMDD="AT+CNMI?"
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if `echo $OX | grep -o "+CNMI: [0-3],2," >/dev/null 2>&1`; then
-		ATCMDD="AT+CNMI=0,0,0,0,0"
+	if [ "$RECON" != "2" ]; then
+		ATCMDD="AT+CNMI?"
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	fi
-	ATCMDD="AT+QINDCFG=\"smsincoming\""
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if `echo $OX | grep -o ",1" >/dev/null 2>&1`; then
-		ATCMDD="AT+QINDCFG=\"smsincoming\",0,1"
+		if `echo $OX | grep -o "+CNMI: [0-3],2," >/dev/null 2>&1`; then
+			ATCMDD="AT+CNMI=0,0,0,0,0"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
+		ATCMDD="AT+QINDCFG=\"smsincoming\""
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	fi
-	ATCMDD="AT+QINDCFG=\"all\""
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if `echo $OX | grep -o ",1" >/dev/null 2>&1`; then
-		ATCMDD="AT+QINDCFG=\"all\",0,1"
+		if `echo $OX | grep -o ",1" >/dev/null 2>&1`; then
+			ATCMDD="AT+QINDCFG=\"smsincoming\",0,1"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
+		ATCMDD="AT+QINDCFG=\"all\""
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	fi
-	log "Quectel Unsolicited Responses Disabled"
+		if `echo $OX | grep -o ",1" >/dev/null 2>&1`; then
+			ATCMDD="AT+QINDCFG=\"all\",0,1"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
+		log "Quectel Unsolicited Responses Disabled"
+fi
 
 	clck=$(uci -q get custom.bandlock.cenable)
 	if [ $clck = "1" ]; then
@@ -747,13 +754,13 @@ fi
 
 CHKPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 if [ -n "$CHKPORT" ]; then
-	$ROOTER/common/gettype.sh $CURRMODEM
+	$ROOTER/common/gettype.sh $CURRMODEM &
 	$ROOTER/connect/get_profile.sh $CURRMODEM
 	if [ -e $ROOTER/simlockc.sh ]; then
-		$ROOTER/simlockc.sh $CURRMODEM
+		$ROOTER/simlockc.sh $CURRMODEM &
 	fi
 	if [ -e /usr/lib/gps/gps.sh ]; then
-		/usr/lib/gps/gps.sh $CURRMODEM
+		/usr/lib/gps/gps.sh $CURRMODEM &
 	fi
 	INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
 	[ $INTER = 3 ] && log "Modem $CURRMODEM disabled in Connection Profile" && exit 1
@@ -825,7 +832,7 @@ if [ -n "$CHKPORT" ]; then
 	if [ -z "$ttl" ]; then
 		ttl="0"
 	fi
-	$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl"
+	$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl" &
 
 	if [ -e $ROOTER/changedevice.sh ]; then
 		$ROOTER/changedevice.sh $ifname
@@ -971,7 +978,7 @@ while [ 1 -lt 6 ]; do
 		if [ $? = 0 ]; then
 			ifup wan$INTER
 			[ -f /tmp/ipv6supp$INTER ] && addv6
-			sleep 20
+			#sleep 20
 		else
 			apn2=$(uci -q get modem.modeminfo$CURRMODEM.apn2)
 			if [ -z $apn2 ]; then
@@ -983,7 +990,7 @@ while [ 1 -lt 6 ]; do
 				if [ $? = 0 ]; then
 					ifup wan$INTER
 					[ -f /tmp/ipv6supp$INTER ] && addv6
-					sleep 20
+					#sleep 20
 				else
 					BRK=1
 					$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
