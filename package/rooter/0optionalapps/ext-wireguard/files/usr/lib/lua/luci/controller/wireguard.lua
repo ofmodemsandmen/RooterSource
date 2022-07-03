@@ -7,7 +7,6 @@ I18N = require "luci.i18n"
 translate = I18N.translate
 
 function index()
-  entry({"admin", "vpn", "wireguards"}, template("wireguard/wireguard"), _(translate("--WireGuard Status")), 70)
   entry({"admin", "vpn", "wireguard"}, cbi("wireguard"), _("Wireguard"), 63)
   entry( {"admin", "vpn", "wireguard", "client"},    cbi("wireguard-client"),    nil ).leaf = true
   entry( {"admin", "vpn", "wireguard", "server"},    cbi("wireguard-server"),    nil ).leaf = true

@@ -10,7 +10,11 @@ translate = I18N.translate
 function index()
 	entry({"admin", "vpn"}, firstchild(), translate("VPN"), 30).dependent=false
 	entry( {"admin", "vpn", "openvpn"}, cbi("openvpn"), _(translate("OpenVPN")), 1 )
-	entry( {"admin", "vpn", "openvpn-server"}, cbi("openvpn-server"), _(translate("--OpenVPN Extras")), 2 )
+	local multilock = luci.model.uci.cursor():get("custom", "multiuser", "multi") or "0"
+	local rootlock = luci.model.uci.cursor():get("custom", "multiuser", "root") or "0"
+	if (multilock == "0") or (multilock == "1" and rootlock == "1") then
+		entry( {"admin", "vpn", "openvpn-server"}, cbi("openvpn-server"), _(translate("--OpenVPN Extras")), 2 )
+	end
 	entry( {"admin", "vpn", "openvpn", "basic"},    cbi("openvpn-basic"),    nil ).leaf = true
 	entry( {"admin", "vpn", "openvpn", "advanced"}, cbi("openvpn-advanced"), nil ).leaf = true
 	entry( {"admin", "vpn", "openvpn", "file"},     form("openvpn-file"),    nil ).leaf = true
