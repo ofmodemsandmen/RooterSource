@@ -17,7 +17,7 @@ define Package/ext-rooter16
 		+luci-app-mwan3 +luci-app-dnsmasq-ipset \
 		+luci-app-ddns +ddns-scripts +ddns-scripts_no-ip_com \
 		+luci-app-rootervpn +ext-wireguard \
-		+bwmon +464xlat \
+		+bwmon +464xlat +webconsole \
 		+ext-theme +luci-theme-argon +luci-theme-argondark \
 		+luci-theme-tomato +ext-login \
 		+ca-bundle +ca-certificates +libustream-openssl \

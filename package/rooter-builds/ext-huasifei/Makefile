@@ -26,7 +26,7 @@ define Package/ext-huasifei
 		+openvpn-easy-rsa +openvpn-openssl \
 		+ext-extra +luci-app-hotspot +luci-app-wol \
 		+usbmuxd +libusbmuxd-utils +libimobiledevice-utils +kmod-usb-net-ipheth \
-		+nano +picocom +wpad +wget +qfirehose 
+		+nano +picocom +wpad +wget +qfirehose
   TITLE:=ROOter support w/o MWan3 for Huasifei
   PKGARCH:=all
 endef
