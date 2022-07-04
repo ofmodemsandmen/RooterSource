@@ -1,5 +1,7 @@
 require("luci.ip")
 local uci = require "luci.model.uci".cursor()
+local multilock = uci:get("custom", "multiuser", "multi") or "0"
+local rootlock = uci:get("custom", "multiuser", "root") or "0"
 
 local m = Map("guestwifi", translate("Guest Wifi Configuration"), translate("Set up a Guest Wifi"))
 
@@ -48,21 +50,23 @@ pass.default="";
 pass.datatype="wpakey";
 pass.password = true
 
-ql = s:option(ListValue, "qos", translate("Bandwidth Limited :"));
-ql:value("0", "Disabled")
-ql:value("1", "Enabled")
-ql.default=0
+if (multilock == "0") then
+	ql = s:option(ListValue, "qos", translate("Bandwidth Limited :"));
+	ql:value("0", "Disabled")
+	ql:value("1", "Enabled")
+	ql.default=0
 
-dl = s:option(Value, "dl", translate("Download Speed (Mbit/s) :"));
-dl.optional=false; 
-dl.rmempty = true;
-dl.datatype = "and(uinteger,min(1))"
-dl.default=10
+	dl = s:option(Value, "dl", translate("Download Speed (Mbit/s) :"));
+	dl.optional=false; 
+	dl.rmempty = true;
+	dl.datatype = "and(uinteger,min(1))"
+	dl.default=10
 
-ul = s:option(Value, "ul", translate("Upload Speed (Mbit/s) :"));
-ul.optional=false; 
-ul.rmempty = true;
-ul.datatype = "and(uinteger,min(1))"
-ul.default=2
+	ul = s:option(Value, "ul", translate("Upload Speed (Mbit/s) :"));
+	ul.optional=false; 
+	ul.rmempty = true;
+	ul.datatype = "and(uinteger,min(1))"
+	ul.default=2
+end
 
 return m
