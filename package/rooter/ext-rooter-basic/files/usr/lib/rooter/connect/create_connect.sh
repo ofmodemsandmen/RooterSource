@@ -754,7 +754,7 @@ fi
 
 CHKPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 if [ -n "$CHKPORT" ]; then
-	$ROOTER/common/gettype.sh $CURRMODEM &
+	$ROOTER/common/gettype.sh $CURRMODEM
 	$ROOTER/connect/get_profile.sh $CURRMODEM
 	if [ -e $ROOTER/simlockc.sh ]; then
 		$ROOTER/simlockc.sh $CURRMODEM &
