@@ -534,7 +534,11 @@ function action_get_csq()
 			if typ == "1" then
 				rv["simerr"] = "2"
 			else
-				rv["simerr"] = "3"
+				if typ == "2" then
+					rv["simerr"] = "3"
+				else
+					rv["simerr"] = "4"
+				end
 			end
 		end
 		file:close()

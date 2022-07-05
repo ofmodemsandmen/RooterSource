@@ -198,7 +198,12 @@ get_connect() {
 	NUSER=$(uci -q get modem.modeminfo$CURRMODEM.user)
 	NPASS=$(uci -q get modem.modeminfo$CURRMODEM.passw)
 	NAUTH=$(uci -q get modem.modeminfo$CURRMODEM.auth)
-	PINC=$(uci -q get modem.modeminfo$CURRMODEM.pincode)
+	spin=$(uci -q get custom.simpin.pin)
+	if [ -z $spin ]; then
+		PINC=$(uci -q get modem.modeminfo$CURRMODEM.pincode)
+	else
+		PINC=$spin
+	fi
 	PDPT=$(uci -q get modem.modeminfo$CURRMODEM.pdptype)
 #
 # QMI and MBIM can't handle nil
@@ -218,7 +223,12 @@ get_connect() {
 	uci set modem.modem$CURRMODEM.user=$NUSER
 	uci set modem.modem$CURRMODEM.passw=$NPASS
 	uci set modem.modem$CURRMODEM.auth=$NAUTH
-	uci set modem.modem$CURRMODEM.pin=$PINC
+	spin=$(uci -q get custom.simpin.pin)
+	if [ -z $spin ]; then
+		uci set modem.modem$CURRMODEM.pin=$PINC
+	else
+		uci set modem.modem$CURRMODEM.pin=$spin
+	fi
 	uci commit modem
 }
 
@@ -842,7 +852,12 @@ if [ -n "$CHKPORT" ]; then
 	export SETUSER=$NUSER
 	export SETPASS=$NPASS
 	export SETAUTH=$NAUTH
-	export PINCODE=$PINC
+	spin=$(uci -q get custom.simpin.pin)
+	if [ -z $spin ]; then
+		export PINCODE=$PINC
+	else
+		export PINCODE=$spin
+	fi
 
 	if [ $idV = 12d1 ]; then
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "curc.gcom" "$CURRMODEM")
@@ -909,6 +924,24 @@ while [ 1 -lt 6 ]; do
 		log "No Provider Lock Done"
 		;;
 	esac
+	
+	spin=$(uci -q get custom.simpin.pin)
+	log "$spin"
+	if [ ! -z $spin ]; then
+		sblk=$(uci -q get custom.simpin.block)
+		log "$sblk"
+		if [ "$sblk" = "1" ]; then
+			ATCMDD="at+cpin?"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			log "$OX"
+			RDY=$(echo "$OX" | grep "READY")
+			if [ ! -z "$RDY" ]; then
+				$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : SIM is not Pin Locked. Incorrect SIM."
+				echo "4" > /tmp/simpin$CURRMODEM
+				exit 0
+			fi
+		fi
+	fi
 
 	case $PROT in
 #

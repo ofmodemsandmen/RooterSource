@@ -93,13 +93,19 @@ end
 				}
 				else
 				{
-					if (simerr == "1")
+					if (simerr == "2")
 					{
 						document.getElementById("simsg").innerHTML = "<%:Incorrect Pin to Unlock SIM%>";
 					}
 					else
 					{
-						document.getElementById("simsg").innerHTML = "<%:SIM is Missing%>";
+						if (simerr == "3")
+						{
+							document.getElementById("simsg").innerHTML = "<%:SIM is Missing%>";
+						} else
+						{
+							document.getElementById("simsg").innerHTML = "<%:SIM is not locked. Incorrect SIM%>";
+						}
 					}
 				}
 			}
