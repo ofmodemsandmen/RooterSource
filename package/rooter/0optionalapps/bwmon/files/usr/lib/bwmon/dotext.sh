@@ -50,7 +50,7 @@ sendmsg() {
 		fi
 	else
 		email=$(uci -q get custom.texting.email)
-		
+		/usr/lib/bwmon/editemail.sh
 		STEMP="/tmp/emailmsg"
 		MSG="/usr/lib/bwmon/message"
 		rm -f $STEMP

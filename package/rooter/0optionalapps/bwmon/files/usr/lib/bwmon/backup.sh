@@ -12,6 +12,7 @@ monthlyUsageDB=$3
 dailyUsageDB=$4
 monthlyUsageBack=$5
 dailyUsageBack=$6
+pDay=$7
 
 /usr/lib/bwmon/backup-daily.lua $dailyUsageDB
 /usr/lib/bwmon/backup-mon.lua $monthlyUsageDB
@@ -33,6 +34,13 @@ else
 	fi
 fi
 
-#rm -f $monthlyUsageDB".bk"
 rm -f $dailyUsageDB".bk"
 
+bwday=$(uci -q get modem.modeminfo1.bwday)
+if [ ! -z "$bwday" ]; then
+	if [ $bwday = $pDay -a $bwday != "0" ]; then
+		if [ -e /usr/lib/bwmon/sendsms ]; then
+			/usr/lib/bwmon/sendsms.sh
+		fi
+	fi
+fi

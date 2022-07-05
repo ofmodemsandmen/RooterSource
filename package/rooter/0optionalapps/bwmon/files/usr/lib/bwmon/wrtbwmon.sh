@@ -436,7 +436,7 @@ checkTime()
 	pYear=$(date +%Y)
 	pMonth=$(date +%m)
 	if [ "$cDay" -ne "$pDay" ]; then
-		/usr/lib/bwmon/backup.sh "daily" $cDay $monthlyUsageDB $dailyUsageDB $monthlyUsageBack $dailyUsageBack
+		/usr/lib/bwmon/backup.sh "daily" $cDay $monthlyUsageDB $dailyUsageDB $monthlyUsageBack $dailyUsageBack $pDay
 		
 		cDay=$pDay
 		cMonth=$pMonth

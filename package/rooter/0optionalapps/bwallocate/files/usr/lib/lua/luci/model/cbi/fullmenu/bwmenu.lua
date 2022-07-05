@@ -4,7 +4,6 @@ m = Map("custom", translate("Bandwidth Allocation"), translate("Set Maximum Band
 
 m.on_after_save = function(self)
 	luci.sys.call("/usr/lib/bwmon/allocate.sh 0 &")
-	luci.sys.call("/usr/lib/bwmon/editemail.sh &")
 end
 
 s = m:section(TypedSection, "bwallocate", translate("Allocation Settings"))
@@ -247,34 +246,6 @@ ph1.optional=false;
 ph1.rmempty = true;
 ph1:depends("tore", "1")
 ph1.default = "jdoe@domain.com"
-
-
-
-ct1 = s:option(ListValue, "eedit", translate("Edit Email Account : "), translate("Change information about email account"))
-ct.rmempty = true
-ct1:value("0", "No")
-ct1:value("1", "Yes")
-ct1.default = "0"
-ct1:depends("tore", "1")
-
-ph2 = s:option(Value, "smtp", translate("SMTP Host :"));
-ph2.optional=false; 
-ph2.rmempty = true;
-ph2:depends("eedit", "1")
-ph2.default = "smtp.gmail.com"
-
-ph3 = s:option(Value, "euser", translate("User Name :"));
-ph3.optional=false; 
-ph3.rmempty = true;
-ph3:depends("eedit", "1")
-ph3.default = "user@gmail.com"
-
-ph4 = s:option(Value, "epass", translate("Password :"));
-ph4.optional=false; 
-ph4.rmempty = true;
-ph4:depends("eedit", "1")
-ph4.default = "xxxxxxxxxxxxxxxx"
-
 
 
 return m

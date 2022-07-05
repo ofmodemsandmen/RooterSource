@@ -5,7 +5,6 @@ log() {
 }
 
 amount=$1
-log "Allocate $amount"
 
 if [ $amount != "0" ]; then
 	uci set custom.bwallocate.allocate=$amount
