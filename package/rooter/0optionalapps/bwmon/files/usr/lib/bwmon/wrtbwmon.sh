@@ -298,6 +298,7 @@ update()
 {
 	createDbIfMissing
     checkWAN
+	PERTOTAL=0
 
     > /tmp/iptables_$$.tmp
     lock
@@ -324,6 +325,7 @@ update()
 		OUT=$((${OUT}/1000))
 		TOTAL=$(echo ${L1} | cut -f6 -d, )
 		TOTAL=$((${TOTAL}/1000))
+		let PERTOTAL=PERTOTAL+TOTAL
 		if [ $TOTAL -gt 0 -a $IP != "NA" ]; then
 			for USERSFILE in /tmp/dhcp.leases /tmp/dnsmasq.conf /etc/dnsmasq.conf /etc/hosts; do
 				[ -e "$USERSFILE" ] || continue
@@ -349,7 +351,9 @@ update()
 		fi
 	  fi
 	done < $DB
-		
+	if [ -e /usr/lib/bwmon/period.sh ]; then
+		/usr/lib/bwmon/period.sh "$PERTOTAL"
+	fi
     unlock
 }
 
@@ -436,7 +440,7 @@ checkTime()
 	pYear=$(date +%Y)
 	pMonth=$(date +%m)
 	if [ "$cDay" -ne "$pDay" ]; then
-		/usr/lib/bwmon/backup.sh "daily" $cDay $monthlyUsageDB $dailyUsageDB $monthlyUsageBack $dailyUsageBack $pDay
+		/usr/lib/bwmon/backup.sh "daily" $cDay $monthlyUsageDB $dailyUsageDB $monthlyUsageBack $dailyUsageBack
 		
 		cDay=$pDay
 		cMonth=$pMonth
@@ -453,6 +457,9 @@ checkTime()
 			touch $monthlyUsageDB
 			uci set custom.texting.used='0'
 			uci commit custom
+			if [ -e /usr/lib/bwmon/periodreset.sh ]; then
+				/usr/lib/bwmon/periodreset.sh
+			fi
 		fi
 		rm -f $dailyUsageDB
 		rm -f $dailyUsageBack
@@ -460,7 +467,7 @@ checkTime()
 		touch $dailyUsageDB
 		dailyUsageBack="$backPath$cYear-$cMonth-$cDay-daily_data.js"
 	fi 
-	rm -f> /tmp/lockbw
+	rm -f /tmp/lockbw
 }
 
 createFiles
