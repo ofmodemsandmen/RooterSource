@@ -143,7 +143,7 @@ int auto_find_quectel_modules(char *module_sys_path, unsigned size)
 
         if (!isdigit(de->d_name[0])) continue;
 
-        snprintf(uevent, sizeof(uevent), "%s/%.16s/uevent", base, de->d_name);
+        snprintf(uevent, sizeof(uevent), "%.24s/%.16s/uevent", base, de->d_name);
         if (!quectel_get_sysinfo_by_uevent(uevent, &sysinfo))
             continue;
 
@@ -172,7 +172,7 @@ int auto_find_quectel_modules(char *module_sys_path, unsigned size)
             && (sysinfo.PRODUCT[strlen("2c7c/6000")] == '/')) //skip ASR&HISI modules
             continue;
 
-        snprintf(module_sys_path, size, "%s/%s", base, de->d_name);
+        snprintf(module_sys_path, size, "%.24s/%s", base, de->d_name);
         count++;
         dbg_time("[%d] %s %s\n", count, module_sys_path, sysinfo.PRODUCT);
     }
@@ -229,7 +229,7 @@ static void quectel_fixup_sysport(const char *module_port_name, char *sysport, u
         if (!strncasecmp("ttyUSB", dev->d_name, strlen("ttyUSB"))) {
             MODULE_SYS_INFO sysinfo;
 
-            snprintf(syspath, sizeof(syspath), "%s/%.16s/uevent", sys_base, dev->d_name);
+            snprintf(syspath, sizeof(syspath), "%.24s/%.16s/uevent", sys_base, dev->d_name);
             if (quectel_get_sysinfo_by_uevent(syspath, &sysinfo)) {
                 struct stat buf;
                 dev_t devt;
@@ -251,12 +251,12 @@ void quectel_get_syspath_name_by_ttyport(const char *module_port_name, char *mod
     char sysport[64];
     int count;
     char *pchar = NULL;
-    char dm_tty[16];
+    char dm_tty[24];
 
     snprintf(dm_tty, sizeof(dm_tty), ":1.%d/tty", usb_dm_interface);
     module_sys_path[0] = '\0';
 
-    snprintf(sysport, sizeof(sysport), "/sys/class/tty/%s", &module_port_name[strlen("/dev/")]);
+    snprintf(sysport, sizeof(sysport), "/sys/class/tty/%.48s", &module_port_name[strlen("/dev/")]);
     if(access(sysport, F_OK) && errno == ENOENT) {
 		quectel_fixup_sysport(module_port_name, sysport, sizeof(sysport));//query real name
     }
@@ -275,7 +275,7 @@ void quectel_get_syspath_name_by_ttyport(const char *module_port_name, char *mod
     while (*pchar != '/')
         pchar--;
 
-    snprintf(module_sys_path, size, "/sys/bus/usb/devices/%s", pchar + 1);
+    snprintf(module_sys_path, size, "/sys/bus/usb/devices/%.232s", pchar + 1);
 }
 
 static void quectel_get_usb_device_info(const char *module_sys_path, struct quectel_usb_device *udev) {
@@ -287,7 +287,7 @@ static void quectel_get_usb_device_info(const char *module_sys_path, struct quec
     int dev_mknod_and_delete_after_use = 0;
 
     MODULE_SYS_INFO sysinfo;
-    snprintf(devname, sizeof(devname), "%s/%s", module_sys_path, "uevent");
+    snprintf(devname, sizeof(devname), "%.248s/%s", module_sys_path, "uevent");
     if (!quectel_get_sysinfo_by_uevent(devname, &sysinfo))
         return;
 
@@ -745,7 +745,7 @@ void *qusb_noblock_open(const char *module_sys_path, int *idVendor, int *idProdu
                     
                     pl = (typeof(pl)) malloc(sizeof(*pl));
 
-                    snprintf(pl->infname, sizeof(pl->infname), "%s:1.%d/driver", module_sys_path, usb_dm_interface);
+                    snprintf(pl->infname, sizeof(pl->infname), "%.255s:1.%d/driver", module_sys_path, usb_dm_interface);
                     n = readlink(pl->infname, pl->driver, sizeof(pl->driver));
                     if (n > 0) {
                         pl->driver[n] = '\0';
@@ -1022,9 +1022,9 @@ int qpcie_open(const char *firehose_dir) {
     size_t filesize;
     void *filebuf;
 
-    snprintf(prog_firehose_sdx24, sizeof(prog_firehose_sdx24), "%s/prog_firehose_sdx24.mbn", firehose_dir);
+    snprintf(prog_firehose_sdx24, sizeof(prog_firehose_sdx24), "%.255s/prog_firehose_sdx24.mbn", firehose_dir);
     if (access(prog_firehose_sdx24, R_OK))
-        snprintf(prog_firehose_sdx24, sizeof(prog_firehose_sdx24), "%s/prog_firehose_sdx55.mbn", firehose_dir);
+        snprintf(prog_firehose_sdx24, sizeof(prog_firehose_sdx24), "%.255s/prog_firehose_sdx55.mbn", firehose_dir);
 
     fp = fopen(prog_firehose_sdx24, "rb");
     if (fp ==NULL) {
@@ -1038,7 +1038,7 @@ int qpcie_open(const char *firehose_dir) {
 
     filebuf = malloc(sizeof(filesize)+filesize);
     memcpy(filebuf, &filesize, sizeof(filesize));
-    if (fread((uint8_t *)filebuf+sizeof(filesize), 1, filesize, fp) == -1) { };
+    if (fread((uint8_t *)filebuf+sizeof(filesize), 1, filesize, fp) == (size_t)0) { };
     fclose(fp);
 
     diagfd = open("/dev/mhi_DIAG", O_RDWR | O_NOCTTY);
