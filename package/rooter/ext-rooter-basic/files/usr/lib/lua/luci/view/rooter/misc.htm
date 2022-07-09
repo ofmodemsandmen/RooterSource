@@ -9,6 +9,7 @@ local a = uci:get("custom", "atcmd", "enabled")
 
 local multilock = uci:get("custom", "multiuser", "multi") or "0"
 local rootlock = uci:get("custom", "multiuser", "root") or "0"
+nomulti=1
 if (multilock == "0") or (multilock == "1" and rootlock == "1") then
 	nosms = 1
 	if a == "1" then
@@ -16,6 +17,7 @@ if (multilock == "0") or (multilock == "1" and rootlock == "1") then
 	end
 else
 	nosms = 1
+	nomulti = 0
 end
 block = 1
 if s == "1" then
@@ -1946,6 +1948,7 @@ end
 </fieldset>
 <% end %>
 
+<% if nomulti == 1 then %>
 <% if block == 0 then %>
 <fieldset class="cbi-section" id="cbi-mode-cb">
 	<legend><%:Cellular Bands%></legend>
@@ -2194,6 +2197,7 @@ end
 
  	</table>
 </fieldset>
+<% end %>
 
 <fieldset class="cbi-section" id="cbi-mode-pin">
 	<legend><%:GPS Message Pin%></legend>

@@ -375,6 +375,7 @@ enabled.optional=false;
 --
 -- Custom profile
 --
+if (multilock == "0") or (multilock == "1" and rootlock == "1") then
 
 s = m:section(TypedSection, "custom", translate("Custom Profiles"), translate("Matches specific modem and SIM combination to a Profile"))
 s.anonymous = true
@@ -800,6 +801,8 @@ if (multilock == "0") or (multilock == "1" and rootlock == "1") then
 	bwdelay:value("10", translate("10 hour"))
 	bwdelay:value("11", translate("11 hour"))
 	bwdelay:value("12", translate("12 hour"))
+end
+
 end
 
 return m
