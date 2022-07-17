@@ -893,6 +893,14 @@ if $QUECTEL; then
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 fi
 
+modis=$(uci -q get basic.basic.modem)
+if [ ! -z $modis ]; then
+	if [ $modis = "0" ]; then
+		log "Modem Disabled"
+		exit 0
+	fi
+fi
+
 while [ 1 -lt 6 ]; do
 
 	case $PROT in
