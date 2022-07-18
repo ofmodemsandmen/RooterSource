@@ -38,6 +38,8 @@ case $TYPE in
 	;;
 "misc" )
 	uci set modem.general.miscnum=$MODENUM
+	uci commit modem
+	/usr/lib/rooter/luci/mask.sh
 	;;
 esac
 uci commit modem
