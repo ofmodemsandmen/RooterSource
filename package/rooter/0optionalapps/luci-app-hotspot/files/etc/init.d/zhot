@@ -14,6 +14,7 @@ start()
 	if [ -z $PRO ]; then
 		uci set network.wwan=interface
 		uci set network.wwan.proto=dhcp 
+		uci set network.wwan.metric='2'
 		uci set network.wwan6=interface
 		uci set network.wwan6.proto=dhcpv6 
 		uci commit network
