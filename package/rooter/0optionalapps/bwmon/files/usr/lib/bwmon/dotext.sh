@@ -2,7 +2,7 @@
 . /lib/functions.sh
 
 log() {
-	logger -t "TEXTING" "$@"
+	logger -t "TEXTING" "$@" 
 }
 
 getbw() {
