@@ -93,6 +93,7 @@ ct = s:option(ListValue, "method", translate("Criteria : "), translate("Criteria
 ct.rmempty = true
 ct:value("0", translate("By Specified Time Interval"))
 ct:value("1", translate("By Amount Used"))
+ct:value("2", translate("By Percentage Used"))
 ct.default = "0"
 ct:depends("text", "1")
 
@@ -214,6 +215,21 @@ xxct:value("75", translate("Every 75 GB"))
 xxct:value("100", translate("Every 100 GB"))
 xxct.default = "50"
 xxct:depends("method", "1")
+
+ph1 = s:option(ListValue, "percent", translate("Percentage Used :"));
+ph1.optional=false; 
+ph1.rmempty = true;
+ph1:value("10", translate("10%"))
+ph1:value("20", translate("20%"))
+ph1:value("30", translate("30%"))
+ph1:value("40", translate("40%"))
+ph1:value("50", translate("50%"))
+ph1:value("60", translate("60%"))
+ph1:value("70", translate("70%"))
+ph1:value("80", translate("80%"))
+ph1:value("90", translate("90%"))
+ph1:depends("method", "2")
+ph1.default = "90"
 
 --b3 = s:option(DummyValue, "blank", " ");
 
