@@ -165,7 +165,7 @@ if nixio.fs.access("/etc/config/mwan3") then
 	mlb = di:taboption(this_taba, ListValue, "lb", translate("Enable Load Balancing at Connection :"));
 	mlb:value("0", translate("No"))
 	mlb:value("1", translate("Yes"))
-	mlb.default=0
+	mlb.default=1
 end
 
 mtu = di:taboption(this_taba, Value, "mtu", translate("Custom MTU :"),
@@ -603,7 +603,7 @@ if nixio.fs.access("/etc/config/mwan3") then
 	cmlb = s:taboption(this_ctaba, ListValue, "lb", translate("Enable Load Balancing at Connection :"));
 	cmlb:value("0", translate("No"))
 	cmlb:value("1", translate("Yes"))
-	cmlb.default=0
+	cmlb.default=1
 end
 
 mtu = s:taboption(this_ctaba, Value, "mtu", translate("Custom MTU :"),
