@@ -1,0 +1,56 @@
+#!/bin/sh
+
+# Taobao Z100-EU
+# Taobao Q988-EU
+
+uci set system.led_wan=led
+uci set system.led_wan.name="LAN1"
+uci set system.led_wan.sysfs="oolite-v5.2-dev:green:wan"
+uci set system.led_wan.trigger="switch0"
+uci set system.led_wan.port_mask='0x10'
+
+uci set system.led_lan1=led
+uci set system.led_lan1.name="LAN2"
+uci set system.led_lan1.sysfs="oolite-v5.2-dev:green:lan1"
+uci set system.led_lan1.trigger="switch0"
+uci set system.led_lan1.port_mask='0x08'
+
+uci set system.led_lan2=led
+uci set system.led_lan2.name="4G"
+uci set system.led_lan2.sysfs="oolite-v5.2-dev:green:lan2"
+uci set system.led_lan2.trigger="netdev"
+uci set system.led_lan2.dev='usb0'
+uci set system.led_lan2.mode="link tx rx"
+uci set system.led_lan2.default='0'
+
+uci set system.led_lan3=led
+uci set system.led_lan3.name="Wifi"
+uci set system.led_lan3.sysfs="oolite-v5.2-dev:green:lan3"
+uci set system.led_lan3.trigger="phy0tpt"
+uci set system.led_lan3.default='0'
+
+uci set system.led_lan4=led
+uci set system.led_lan4.name="LAN3"
+uci set system.led_lan4.sysfs="oolite-v5.2-dev:green:lan4"
+uci set system.led_lan4.trigger="switch0"
+uci set system.led_lan4.port_mask='0x04'
+
+uci set system.led_wlan2g=led
+uci set system.led_wlan2g.name="WAN"
+uci set system.led_wlan2g.sysfs="oolite-v5.2-dev:green:wlan-2g"
+uci set system.led_wlan2g.trigger="netdev"
+uci set system.led_wlan2g.dev='eth1'
+uci set system.led_wlan2g.mode="link tx rx"
+uci set system.led_wlan2g.default='0'
+
+uci set system.led_sys=led
+uci set system.led_sys.name="LAN4"
+uci set system.led_sys.sysfs="oolite-v5.2-dev:blue:system"
+uci set system.led_sys.trigger="switch0"
+uci set system.led_sys.port_mask='0x02'
+
+uci commit system
+/etc/init.d/led restart
+
+
+

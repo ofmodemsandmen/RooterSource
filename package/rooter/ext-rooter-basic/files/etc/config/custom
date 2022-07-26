@@ -32,7 +32,7 @@ config atcmd 'atcmd'
 	option generic '/etc/genericcmd'
 	
 config bandlock 'bandlock'
-	option enabled '0'
+	option enabled '1'
 	option cenable '0'
 	option earfcn '0'
 	option pci '0'

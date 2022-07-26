@@ -147,7 +147,11 @@ if [ -z $mask64 ]; then
 	mask64="0"
 fi
 
-CURRMODEM=$(uci get modem.general.miscnum)
+if [ -z "$2" ]; then
+	CURRMODEM=$(uci get modem.general.miscnum)
+else
+	CURRMODEM=1
+fi
 COMMPORT="/dev/ttyUSB"$(uci get modem.modem$CURRMODEM.commport)
 CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 model=$(uci get modem.modem$CURRMODEM.model)
@@ -159,7 +163,9 @@ export TIMEOUT="5"
 case $uVid in
 	"2c7c" )
 		MODT="1"
-		RESTART="0"
+		if [ -z "$2" ]; then
+			RESTART="0"
+		fi
 		M5=""
 		M2='AT+QCFG="band",0,'$mask',0,1'
 		if [ $uPid = 0620 ]; then
