@@ -367,6 +367,7 @@ createFiles()
 	dailyUsageDB="$dataPath$cYear-$cMonth-$cDay-daily_data.js"
 	dailyUsageBack="$backPath$cYear-$cMonth-$cDay-daily_data.js"
 	if [ ! -f $dailyUsageBack ]; then
+		rm -f $backPath*"daily_data.js"
 		touch $dailyUsageDB
 	else
 		cp -f $dailyUsageBack $dailyUsageDB
@@ -379,6 +380,7 @@ createFiles()
 		cp -f $monthlyUsageBack $monthlyUsageDB".bk"
 		#rm -f $monthlyUsageDB".bk"
 	else
+		rm -f $backPath*"mac_data.js"
 		touch $monthlyUsageDB
 		/usr/lib/bwmon/backup.sh "backup" $cDay $monthlyUsageDB $dailyUsageDB $monthlyUsageBack $dailyUsageBack
 	fi
@@ -451,7 +453,7 @@ checkTime()
 		[ -z $roll ] && roll=1
 		if [ "$roll" -eq "$pDay" ]; then
 			rm -f $monthlyUsageDB
-			rm -f $monthlyUsageBack
+			rm -f $backPath*"mac_data.js"
 			monthlyUsageDB="$dataPath$cYear-$cMonth-mac_data.js"
 			monthlyUsageBack="$backPath$cYear-$cMonth-mac_data.js"
 			touch $monthlyUsageDB
@@ -462,7 +464,7 @@ checkTime()
 			fi
 		fi
 		rm -f $dailyUsageDB
-		rm -f $dailyUsageBack
+		rm -f $backPath*"daily_data.js"
 		dailyUsageDB="$dataPath$cYear-$cMonth-$cDay-daily_data.js"
 		touch $dailyUsageDB
 		dailyUsageBack="$backPath$cYear-$cMonth-$cDay-daily_data.js"
