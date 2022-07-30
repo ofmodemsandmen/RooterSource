@@ -153,7 +153,7 @@ case $uVid in
 					M4='AT+QNWPREFCFG="lte_band",'$lst
 				fi
 			;;
-			"0800" )
+			"0800"|"0900" )
 
 			;;
 			* )

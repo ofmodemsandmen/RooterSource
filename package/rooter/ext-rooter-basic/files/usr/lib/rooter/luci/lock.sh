@@ -212,7 +212,7 @@ case $uVid in
 			fi
 			M2='AT+QNWPREFCFG="lte_band",'$lst
 		fi
-		if [ $uPid = 0800 ]; then
+		if [ $uPid = 0800 -o $uPid = 0900 ]; then
 			if [ ! -z $mask ]; then
 				fibdecode $mask 1 1
 			else
