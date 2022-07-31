@@ -1,9 +1,9 @@
 
 config iframe 'iframe'
-	option splashpage '1'
+	option splashpage '0'
 	option splashtitle 'ROOter'
 	option url 'www.ofmodemsandmen.com'
-	option dual '1'
+	option dual '0'
 	option speed '0'
 	option band '0'
 

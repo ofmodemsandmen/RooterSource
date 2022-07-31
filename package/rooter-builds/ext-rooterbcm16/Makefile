@@ -26,6 +26,7 @@ define Package/ext-rooterbcm16
 		+openvpn-easy-rsa +openvpn-openssl \
 		+ext-extra +luci-app-wol \
 		+usbmuxd +libusbmuxd-utils +libimobiledevice-utils +kmod-usb-net-ipheth \
+		+qlog +luci-ssl-openssl +usbutils +irqbalance +ext-splashconfig \
 		+nano +picocom +wpad +wget +qfirehose +luci-app-vpnbypass 
   TITLE:=ROOter support for 16meg and larger Broadcom routers w/o Hotspot Manager or MWan3
   PKGARCH:=all
