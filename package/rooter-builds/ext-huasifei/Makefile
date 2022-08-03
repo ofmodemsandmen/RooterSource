@@ -19,7 +19,7 @@ define Package/ext-huasifei
 		+luci-app-rootervpn +ext-wireguard \
 		+webconsole +bwmon +464xlat \
 		+iptables-mod-hashlimit \
-		+ca-bundle +ca-certificates +libustream-openssl \
+		+ca-bundle +ca-certificates \
 		+luci-app-ksmbd +usb-storage \
 		+ext-p910nd +kmod-sched-cake +luci-app-nft-qos \
 		+ext-command +ext-speedtest +luci-app-guestwifi \
