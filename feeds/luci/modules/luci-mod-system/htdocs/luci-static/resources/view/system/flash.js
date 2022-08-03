@@ -300,7 +300,7 @@ return view.extend({
 		opts.push('/tmp/firmware.bin');
 
 		/* Currently the sysupgrade rpc call will not return, hence no promise handling */
-		fs.exec('/sbin/sysupgrade', opts);
+		fs.exec('/sbin/sysupgrade -z ', opts);
 
 		if (keep.checked)
 			ui.awaitReconnect(window.location.host);
