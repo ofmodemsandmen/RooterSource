@@ -7,14 +7,17 @@ I18N = require "luci.i18n"
 translate = I18N.translate
 
 function index()
-  entry({"admin", "vpn", "wireguards"}, template("wireguard/wireguard"), _(translate("--WireGuard Status")), 70)
-  entry({"admin", "vpn", "wireguard"}, cbi("wireguard"), _("Wireguard"), 63)
-  entry( {"admin", "vpn", "wireguard", "client"},    cbi("wireguard-client"),    nil ).leaf = true
-  entry( {"admin", "vpn", "wireguard", "server"},    cbi("wireguard-server"),    nil ).leaf = true
-  
-  entry( {"admin", "vpn", "wireguard", "wupload"},   call("conf_upload"))
-  entry( {"admin", "vpn", "generateconf"},   call("conf_gen"))
-  entry( {"admin", "vpn", "textconf"},   call("text_gen"))
+	local multilock = luci.model.uci.cursor():get("custom", "multiuser", "multi") or "0"
+	local rootlock = luci.model.uci.cursor():get("custom", "multiuser", "root") or "0"
+	if (multilock == "0") or (multilock == "1" and rootlock == "1") then
+		entry({"admin", "vpn", "wireguard"}, cbi("wireguard"), _("Wireguard"), 63)
+		entry( {"admin", "vpn", "wireguard", "client"},    cbi("wireguard-client"),    nil ).leaf = true
+		entry( {"admin", "vpn", "wireguard", "server"},    cbi("wireguard-server"),    nil ).leaf = true
+	end
+	  
+	  entry( {"admin", "vpn", "wireguard", "wupload"},   call("conf_upload"))
+	  entry( {"admin", "vpn", "generateconf"},   call("conf_gen"))
+	  entry( {"admin", "vpn", "textconf"},   call("text_gen"))
 end
 
 function conf_upload()

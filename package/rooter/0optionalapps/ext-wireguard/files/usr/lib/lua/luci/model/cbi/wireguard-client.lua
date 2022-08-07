@@ -42,7 +42,6 @@ ul.default=0
 dns = s:option(Value, "dns", translate("DNS Servers :"), translate("Comma separated list of DNS Servers.")); 
 dns.rmempty = true;
 dns.optional=false;
-dns.default="8.8.8.8";
 
 mtu = s:option(Value, "mtu", translate("MTU :"), translate("Maximum MTU")); 
 mtu.rmempty = true;

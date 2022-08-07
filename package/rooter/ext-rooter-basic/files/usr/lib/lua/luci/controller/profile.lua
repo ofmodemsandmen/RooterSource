@@ -25,7 +25,7 @@ end
 function action_loadcfg1()
 	local set = luci.http.formvalue("set")
 	local tfile = io.open("/tmp/profilename", "w")
-	tfile:write(set, "\n")
+	tfile:write(set)
 	tfile:close()
 end
 
@@ -33,7 +33,7 @@ function action_loadcfg2()
 	local set1 = luci.http.formvalue("set1")
 	if set1 ~= "~~" then
 		local tfile = io.open("/tmp/profilename", "a")
-		tfile:write(set1, "\n")
+		tfile:write(set1)
 		tfile:close()
 	end
 	os.execute("/usr/lib/profile/loadcfg.sh")

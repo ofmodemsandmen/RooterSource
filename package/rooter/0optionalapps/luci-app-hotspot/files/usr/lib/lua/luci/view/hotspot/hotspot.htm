@@ -280,39 +280,30 @@ end
 	dual = 0;
 	freq = new Array();
 	ulselect = -1;
+	runbtn = "0";
 
-	XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "services", "check_spot")%>',
+	XHR.poll(1, '<%=luci.dispatcher.build_url("admin", "services", "check_spot")%>',
 		{ set: firstpass },
 		function(x, rv)
 		{
 			if ( firstpass == "0" )
 			{
 				var auto = rv.auto;
+				mode = auto;
 				enmode = rv.enabled;
 				if ( enmode == "0" )
 				{
-					document.getElementById('hotenb').checked=false;
-					document.getElementById("modebtn").disabled=true;
-					document.getElementById("manbtn").disabled=true;
-					document.getElementById("disbtn").style.display="none";
 					document.getElementById('ssid').innerHTML="<%:Disconnected%>";
 					document.getElementById('encrypted').innerHTML="";
 				}
-				else
+				reconn = rv.reconn;
+				if ( reconn == "0" )
 				{
-					document.getElementById('hotenb').checked=true;
-					document.getElementById("modebtn").disabled=false;
-				}
-				if ( auto == "1" )
-				{
-					document.getElementById('modebtn').value='<%:Automatic%>';
-					document.getElementById("manbtn").disabled=true;
-					mode = "1";
+					document.getElementById('reconn').checked=false;
 				}
 				else
 				{
-					document.getElementById('modebtn').value='<%:Manual%>';
-					mode = "0";
+					document.getElementById('reconn').checked=true;
 				}
 
 				dual = rv.dual;
@@ -329,6 +320,22 @@ end
 				
 				firstpass = "1";
 			}
+			enmode = rv.enabled;
+			if (inprocess == "0" )
+			{
+				if ( enmode == "0" )
+				{
+					document.getElementById('runbtn').value="<%:Connect to Hotspot%>";
+					document.getElementById('runbtn').className="cbi-button cbi-button-success";
+					runbtn = "0";
+				}
+				else
+				{
+					document.getElementById('runbtn').value="<%:Disconnect from Hotspot%>";
+					document.getElementById('runbtn').className="cbi-button cbi-button-remove";
+					runbtn = "1";
+				}
+			}
 			var ssid = rv.ssid;
 			switch(ssid) {
 				case "0":
@@ -344,7 +351,7 @@ end
 					ssid = "<%:Connection Failed%>";
 					break;
 				case "4":
-					ssid = "<%:No Connection Found, Rechecking%>";
+					ssid = "<%:No Connection Found%>";
 					break;
 				case "5":
 					ssid = "<%:No Connection Made%>";
@@ -357,6 +364,9 @@ end
 					break;
 				case "8":
 					ssid = "<%:Checking for Connection%>";
+					break;
+				case "9":
+					ssid = "<%:Lost Connection%>";
 					break;
 			  default:
 
@@ -371,14 +381,12 @@ end
 					document.getElementById('ssid').innerHTML=ssid;
 					document.getElementById("encrypted").style.display="none";
 					document.getElementById('encrypted').innerHTML="";
-					document.getElementById("disbtn").style.display="none";
 				}
 				else
 				{
 					document.getElementById('ssid').innerHTML=ssid;
 					document.getElementById("encrypted").style.display="block";
 					document.getElementById('encrypted').innerHTML=encryp;
-					document.getElementById("disbtn").style.display="block";
 				}
 			}
 		}
@@ -482,11 +490,11 @@ end
 					document.getElementById("refbtn").disabled=false;
 					if (mode == 1)
 					{
-						document.getElementById("manbtn").disabled=false;
+						//document.getElementById("manbtn").disabled=false;
 					}
 					else
 					{
-						document.getElementById("manbtn").disabled=true;
+						//document.getElementById("manbtn").disabled=true;
 					}
 				}
 			}
@@ -504,7 +512,7 @@ end
 			document.getElementById("delbtn").disabled=true;
 			document.getElementById("edbtn").disabled=true;
 			document.getElementById("refbtn").disabled=true;
-			document.getElementById("manbtn").disabled=true;
+			//document.getElementById("manbtn").disabled=true;
 		}
 	}
 
@@ -524,13 +532,13 @@ end
 		{
 			mode = "0";
 			btn.value    = '<%:Manual%>';
-			document.getElementById("manbtn").disabled=false;
+			//document.getElementById("manbtn").disabled=false;
 		}
 		else
 		{
 			mode = "1";
 			btn.value    = '<%:Automatic%>';
-			document.getElementById("manbtn").disabled=true;
+			//document.getElementById("manbtn").disabled=true;
 		}
 		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "set_mode")%>',
 			{ set: mode },
@@ -541,56 +549,37 @@ end
 		return false;
 	}
 
-	function disconnect()
-	{
-		inprocess = "1";
-		document.getElementById('ssid').innerHTML="<%:Disconnecting%>";
-		document.getElementById("encrypted").style.display="none";
-		document.getElementById('encrypted').innerHTML="";
-		document.getElementById("disbtn").style.display="none";
-		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "disconnect")%>', null,
-			function(x, rv)
-			{
-			}
-		);
-		inprocess = "0";
-		return false;
-	}
-
-	function hotenable(btn)
+	function btnenable(btn)
 	{
 		dx = 0;
 		inprocess = "1";
-		if ( btn.checked == true )
+		if ( runbtn == "0" )
 		{
 			dx = 1;
-			document.getElementById("modebtn").disabled=false;
 			document.getElementById('ssid').innerHTML="<%:Connecting%>";
 			document.getElementById('encrypted').innerHTML="";
-			if ( mode == "1" )
-			{
-				document.getElementById("manbtn").disabled=true;
-			}
-			else
-			{
-				document.getElementById("manbtn").disabled=false;
-			}
+			runbtn = "1";
+			document.getElementById('runbtn').value="<%:Disconnect from Hotspot%>";
+			document.getElementById('runbtn').className="cbi-button cbi-button-remove";
 		}
 		else
 		{
-			document.getElementById("modebtn").disabled=true;
-			document.getElementById("disbtn").style.display="none";
 			document.getElementById('ssid').innerHTML="<%:Disconnecting%>";
 			document.getElementById('encrypted').innerHTML="";
-			document.getElementById("manbtn").disabled=true;
+			runbtn = "0";
+			document.getElementById('runbtn').value="<%:Connect to Hotspot%>";
+			document.getElementById('runbtn').className="cbi-button cbi-button-success";
 		}
+		document.getElementById("runbtn").disabled=true;
 		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "set_enabled")%>',
 			{ set: dx },
 			function()
 			{
+				document.getElementById("runbtn").disabled=false;
+				inprocess = "0";
 			}
 		);
-		inprocess = "0";
+		//inprocess = "0";
 		return false;
 	}
 
@@ -761,7 +750,7 @@ end
 				document.getElementById("delbtn").disabled=false;
 				document.getElementById("edbtn").disabled=false;
 				document.getElementById("refbtn").disabled=false;
-				document.getElementById("manbtn").disabled=false;
+				//document.getElementById("manbtn").disabled=false;
 			}
 		);
 		return false;
@@ -784,7 +773,7 @@ end
 		{
 			return false;
 		}
-		dat = selectline;
+		dat = selectline.toString();
 		dat = dat.concat("|");
 		dat = dat.concat(r);
 		clearListul("hotList1");
@@ -796,7 +785,7 @@ end
 				var hotline = rv.hotline;
 				fillist(empty, hotline);
 			}
-		);
+		); 
 		return false;
 	}
 
@@ -863,16 +852,13 @@ end
 		document.getElementById('hname').innerHTML=" ";
 		document.getElementById('hcrypt').innerHTML=" ";
 		document.getElementById('htkey').innerHTML=" ";
-		document.getElementById("modebtn").disabled=true;
 		document.getElementById("upbtn").disabled=true;
 		document.getElementById("dwnbtn").disabled=true;
 		document.getElementById("delbtn").disabled=true;
 		document.getElementById("edbtn").disabled=true;
 		document.getElementById("refbtn").disabled=true;
-		document.getElementById("manbtn").disabled=true;
 		document.getElementById('ssid').innerHTML="<%:Wifi Radio is currently changing%>";
 		document.getElementById('encrypted').innerHTML="";
-		document.getElementById("disbtn").style.display="none";
 
 		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "bandchange")%>',
 				{ set: bnd },
@@ -908,6 +894,21 @@ end
 		showhide(s);
 	}
 	
+	function reconnenable(btn)
+	{
+		dx = "0";
+		if ( btn.checked == true )
+		{
+			dx = "1";
+		}
+		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "reconn")%>',
+			{ set: dx },
+			function()
+			{
+			}
+		);
+	}
+	
 //]]></script>
 
 <form method="post" action="<%=REQUEST_URI%>">
@@ -941,11 +942,25 @@ end
 
 	<table width="550"  border="0">
   	<tr>
-		<td width="17%"><div align="right"><strong><%:Enable Hotspot Connection : %></strong></div></td>
-		<td width="8%">
-			<input type="checkbox" id="hotenb" onclick="hotenable(this)" />
+		<td width="17%">&nbsp;</td>
+		<td width="10%"><input type="button" id="runbtn" class="cbi-button cbi-button-success" value="<%:Connect to Hotspot%>" onclick="return btnenable(this)"</td>
+		<td width="73%">&nbsp;</td>
+	</tr>
+	</table>
+	
+	<table width="550"  border="0">
+	<tr>
+    		<td width="100%">&nbsp;</td>
+  	</tr>
+	</table>
+	
+	<table width="550"  border="0">
+  	<tr>
+		<td width="17%"><strong><%:Allow One Reconnect Attempt on Dropped Connection%></strong></td>
+		<td width="5%">
+			<input type="checkbox" id="reconn" onclick="reconnenable(this)" />
 		</td>
-		<td width="75%">&nbsp;</td>
+		<td width="78%">&nbsp;</td>
 	</tr>
 	</table>
 
@@ -974,24 +989,9 @@ end
 	
 	<table width="550"  border="0">
 	<tr>
-		<td width="17%"><div align="right"><strong><%:Connection Mode : %></strong></div></td>
-    		<td width="17%"><input type="button" id="modebtn" class="cbi-button cbi-button-apply" value="<%:       %>" onclick="return chgemode(this)" /></td>
-		<td width="17%">&nbsp;</td>
-    		<td width="49%">&nbsp;</td>
-  	</tr>
-	</table>
-
-	<table width="550"  border="0">
-	<tr>
-    		<td width="100%">&nbsp;</td>
-  	</tr>
-	</table>
-
-	<table width="550"  border="0">
-	<tr>
 		<td width="17%"><div align="right"><strong><%:Current Wifi Hotspot : %></strong></div></td>
     		<td width="19%"><ul id="ssid"></ul></td>
-    		<td width="65%"><input type="button" id="disbtn" class="cbi-button cbi-button-apply" value="<%:Disconnect%>" onclick="return disconnect(this)" /></td>
+    		<td width="65%"></td>
   	</tr>
 	</table>
 
@@ -1012,9 +1012,9 @@ end
 	<table width="550"  border="0">
 	<tr>
 		<td width="7%"><div align="left"><strong><%:In Range%></strong></div></td>
-    		<td width="20%"><div align="left"><strong><%:Wifi Hotspot Networks%></strong></div></td>
-		<td width="15%"><input type="button" id="refbtn" class="cbi-button cbi-button-apply" value="<%:In Range Refresh%>" onclick="return refresh()" /></td>
-		<td width="58%">&nbsp;</td>
+    		<td width="13%"><div align="left"><strong><%:Wifi Hotspot Networks%></strong></div></td>
+		<td width="10%"><input type="button" id="refbtn" class="cbi-button cbi-button-apply" value="<%:In Range Refresh%>" onclick="return refresh()" /></td>
+		<td width="63%">&nbsp;</td>
 
   	</tr>
 	</table>
@@ -1071,8 +1071,7 @@ end
     		<td width="15%"><input type="button" id="dwnbtn" class="cbi-button cbi-button-apply" value="<%:Move Down%>" onclick="return movedown(this)" /></td>
 		<td width="8%"><input type="button" id="delbtn" class="cbi-button cbi-button-apply" value="<%:Delete%>" onclick="return deletelist(this)" /></td>
 		<td width="10%"><input type="button" id="edbtn" class="cbi-button cbi-button-apply" value="<%:Edit Key%>" onclick="return editkey(this)" /></td>
-		<td width="15%"><input type="button" id="manbtn" class="cbi-button cbi-button-apply" value="<%:Manual Connect%>" onclick="return mankey(this)" /></td>
-		<td width="45%">&nbsp;</td>
+		<td width="60%">&nbsp;</td>
   	</tr>
 	</table>
 

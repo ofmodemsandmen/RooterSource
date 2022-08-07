@@ -7,6 +7,8 @@ local profsave = luci.model.uci.cursor():get("custom", "profile", "save")
 if profsave == nil then
 	profsave ="0"
 end
+local multilock = luci.model.uci.cursor():get("custom", "multiuser", "multi") or "0"
+local rootlock = luci.model.uci.cursor():get("custom", "multiuser", "root") or "0"
 
 m = Map("profile", translate("Modem Connection Profiles"),
 	translate("Create Profiles used to provide information at connection time"))
@@ -37,6 +39,9 @@ di.anonymous = true
 di:tab("default", translate("General"))
 di:tab("advance", translate("Advanced"))
 di:tab("connect", translate("Connection Monitoring"))
+if (multilock == "0") or (multilock == "1" and rootlock == "1") then
+	di:tab("bwidth", translate("Bandwidth Reporting"))
+end
 
 this_tab = "default"
 
@@ -160,7 +165,7 @@ if nixio.fs.access("/etc/config/mwan3") then
 	mlb = di:taboption(this_taba, ListValue, "lb", translate("Enable Load Balancing at Connection :"));
 	mlb:value("0", translate("No"))
 	mlb:value("1", translate("Yes"))
-	mlb.default=0
+	mlb.default=1
 end
 
 mtu = di:taboption(this_taba, Value, "mtu", translate("Custom MTU :"),
@@ -305,6 +310,61 @@ cb2:depends("alive", "4")
 cb2.optional=false;
 cb2.default="8.8.8.8"
 
+if (multilock == "0") or (multilock == "1" and rootlock == "1") then
+	this_tab = "bwidth"
+	bwday = di:taboption(this_tab, ListValue, "bwday", translate("Day to Send Report"),
+		translate("Day of month to send report for this Profile."))
+	bwday.default = "0"
+	bwday:value("0", translate("Disabled"))
+	bwday:value("1", translate("1st"))
+	bwday:value("2", translate("2nd"))
+	bwday:value("3", translate("3rd"))
+	bwday:value("4", translate("4th"))
+	bwday:value("5", translate("5th"))
+	bwday:value("6", translate("6th"))
+	bwday:value("7", translate("7th"))
+	bwday:value("8", translate("8th"))
+	bwday:value("9", translate("9th"))
+	bwday:value("10", translate("10th"))
+	bwday:value("11", translate("11th"))
+	bwday:value("12", translate("12th"))
+	bwday:value("13", translate("13th"))
+	bwday:value("14", translate("14th"))
+	bwday:value("15", translate("15th"))
+	bwday:value("16", translate("16th"))
+	bwday:value("17", translate("17th"))
+	bwday:value("18", translate("18th"))
+	bwday:value("19", translate("19th"))
+	bwday:value("20", translate("20th"))
+	bwday:value("21", translate("21th"))
+	bwday:value("22", translate("22th"))
+	bwday:value("23", translate("23th"))
+	bwday:value("24", translate("24th"))
+	bwday:value("25", translate("25th"))
+	bwday:value("26", translate("26th"))
+	bwday:value("27", translate("27th"))
+	bwday:value("28", translate("28th"))
+
+	phone = di:taboption(this_tab, Value, "phone", translate("Phone Number"), translate("Phone Number to send Text Message"))
+	phone.default = "12223334444"
+	
+	bwdelay = di:taboption(this_tab, ListValue, "bwdelay", translate("Delay before Sending"),
+		translate("Hours after Midnight before sending text"))
+	bwdelay:value("0", translate("No Delay"))
+	bwdelay:value("1", translate("1 hour"))
+	bwdelay:value("2", translate("2 hour"))
+	bwdelay:value("3", translate("3 hour"))
+	bwdelay:value("4", translate("4 hour"))
+	bwdelay:value("5", translate("5 hour"))
+	bwdelay:value("6", translate("6 hour"))
+	bwdelay:value("7", translate("7 hour"))
+	bwdelay:value("8", translate("8 hour"))
+	bwdelay:value("9", translate("9 hour"))
+	bwdelay:value("10", translate("10 hour"))
+	bwdelay:value("11", translate("11 hour"))
+	bwdelay:value("12", translate("12 hour"))
+end
+
 dd = m:section(TypedSection, "disable", translate("Disable Automatic APN"), translate("Disable the use of automatic APN selection. All modems will use the Default Profile"))
 dd.anonymous = true
 
@@ -315,6 +375,7 @@ enabled.optional=false;
 --
 -- Custom profile
 --
+if (multilock == "0") or (multilock == "1" and rootlock == "1") then
 
 s = m:section(TypedSection, "custom", translate("Custom Profiles"), translate("Matches specific modem and SIM combination to a Profile"))
 s.anonymous = true
@@ -322,6 +383,9 @@ s.addremove = true
 s:tab("custom", translate("General"))
 s:tab("cadvanced", translate("Advanced"))
 s:tab("cconnect", translate("Connection Monitoring"))
+if (multilock == "0") or (multilock == "1" and rootlock == "1") then
+	s:tab("cbwidth", translate("Bandwidth Reporting"))
+end
 
 this_ctab = "custom"
 
@@ -539,7 +603,7 @@ if nixio.fs.access("/etc/config/mwan3") then
 	cmlb = s:taboption(this_ctaba, ListValue, "lb", translate("Enable Load Balancing at Connection :"));
 	cmlb:value("0", translate("No"))
 	cmlb:value("1", translate("Yes"))
-	cmlb.default=0
+	cmlb.default=1
 end
 
 mtu = s:taboption(this_ctaba, Value, "mtu", translate("Custom MTU :"),
@@ -683,6 +747,63 @@ cb2:depends("alive", "3")
 cb2:depends("alive", "4")
 cb2.optional=false;
 cb2.default="8.8.8.8"
+
+if (multilock == "0") or (multilock == "1" and rootlock == "1") then
+	this_ctab = "cbwidth"
+	bwday = s:taboption(this_ctab, ListValue, "bwday", translate("Day to Send Report"),
+		translate("Day of month to send report for this Profile."))
+	bwday.default = "0"
+	bwday:value("0", translate("Disabled"))
+	bwday:value("1", translate("1st"))
+	bwday:value("2", translate("2nd"))
+	bwday:value("3", translate("3rd"))
+	bwday:value("4", translate("4th"))
+	bwday:value("5", translate("5th"))
+	bwday:value("6", translate("6th"))
+	bwday:value("7", translate("7th"))
+	bwday:value("8", translate("8th"))
+	bwday:value("9", translate("9th"))
+	bwday:value("10", translate("10th"))
+	bwday:value("11", translate("11th"))
+	bwday:value("12", translate("12th"))
+	bwday:value("13", translate("13th"))
+	bwday:value("14", translate("14th"))
+	bwday:value("15", translate("15th"))
+	bwday:value("16", translate("16th"))
+	bwday:value("17", translate("17th"))
+	bwday:value("18", translate("18th"))
+	bwday:value("19", translate("19th"))
+	bwday:value("20", translate("20th"))
+	bwday:value("21", translate("21th"))
+	bwday:value("22", translate("22th"))
+	bwday:value("23", translate("23th"))
+	bwday:value("24", translate("24th"))
+	bwday:value("25", translate("25th"))
+	bwday:value("26", translate("26th"))
+	bwday:value("27", translate("27th"))
+	bwday:value("28", translate("28th"))
+
+	phone = s:taboption(this_ctab, Value, "phone", translate("Phone Number"), translate("Phone Number to send Text Message"))
+	phone.default = "12223334444"
+	
+	bwdelay = s:taboption(this_ctab, ListValue, "bwdelay", translate("Delay before Sending"),
+		translate("Hours after Midnight before sending text"))
+	bwdelay:value("0", translate("No Delay"))
+	bwdelay:value("1", translate("1 hour"))
+	bwdelay:value("2", translate("2 hour"))
+	bwdelay:value("3", translate("3 hour"))
+	bwdelay:value("4", translate("4 hour"))
+	bwdelay:value("5", translate("5 hour"))
+	bwdelay:value("6", translate("6 hour"))
+	bwdelay:value("7", translate("7 hour"))
+	bwdelay:value("8", translate("8 hour"))
+	bwdelay:value("9", translate("9 hour"))
+	bwdelay:value("10", translate("10 hour"))
+	bwdelay:value("11", translate("11 hour"))
+	bwdelay:value("12", translate("12 hour"))
+end
+
+end
 
 return m
 

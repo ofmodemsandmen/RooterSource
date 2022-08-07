@@ -17,12 +17,16 @@ I18N = require "luci.i18n"
 translate = I18N.translate
 
 function index()
-	entry({"admin", "system", "commands"}, firstchild(), _(translate("Custom Commands")), 80)
-	entry({"admin", "system", "commands", "dashboard"}, template("commands"), _(translate("Dashboard")), 1)
-	entry({"admin", "system", "commands", "config"}, cbi("commands"), _(translate("Configure")), 2)
-	entry({"admin", "system", "commands", "script"}, template("cmdedit"), _(translate("Scripts")), 3)
-	entry({"admin", "system", "commands", "run"}, call("action_run"), nil, 3).leaf = true
-	entry({"admin", "system", "commands", "download"}, call("action_download"), nil, 3).leaf = true
+	local multilock = luci.model.uci.cursor():get("custom", "multiuser", "multi") or "0"
+	local rootlock = luci.model.uci.cursor():get("custom", "multiuser", "root") or "0"
+	if (multilock == "0") or (multilock == "1" and rootlock == "1") then
+		entry({"admin", "system", "commands"}, firstchild(), _(translate("Custom Commands")), 80)
+		entry({"admin", "system", "commands", "dashboard"}, template("commands"), _(translate("Dashboard")), 1)
+		entry({"admin", "system", "commands", "config"}, cbi("commands"), _(translate("Configure")), 2)
+		entry({"admin", "system", "commands", "script"}, template("cmdedit"), _(translate("Scripts")), 3)
+		entry({"admin", "system", "commands", "run"}, call("action_run"), nil, 3).leaf = true
+		entry({"admin", "system", "commands", "download"}, call("action_download"), nil, 3).leaf = true
+	end
 
 	entry({"admin", "system", "load_script"}, call("action_load_script"))
 	entry({"admin", "system", "save_script"}, call("action_save_script"))

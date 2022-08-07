@@ -7,8 +7,12 @@ function index()
 	entry({"admin", "modem"}, firstchild(), translate("Modem"), 25).dependent=false
 	entry({"admin", "modem", "prof"}, cbi("rooter/profiles"), translate("Connection Profile"), 2)
 	entry({"admin", "modem", "nets"}, template("rooter/net_status"), translate("Network Status"), 30)
-	entry({"admin", "modem", "debug"}, template("rooter/debug"), translate("Debug Information"), 50)
-	entry({"admin", "modem", "cust"}, cbi("rooter/customize"), translate("Custom Modem Ports"), 55)
+	local multilock = uci:get("custom", "multiuser", "multi") or "0"
+	local rootlock = uci:get("custom", "multiuser", "root") or "0"
+	if (multilock == "0") or (multilock == "1" and rootlock == "1") then
+		entry({"admin", "modem", "debug"}, template("rooter/debug"), translate("Debug Information"), 50)
+		entry({"admin", "modem", "cust"}, cbi("rooter/customize"), translate("Custom Modem Ports"), 55)
+	end
 	entry({"admin", "modem", "log"}, template("rooter/log"), translate("Connection Log"), 60)
 	entry({"admin", "modem", "misc"}, template("rooter/misc"), translate("Miscellaneous"), 40)
 	
@@ -38,6 +42,7 @@ function index()
 	entry({"admin", "modem", "extping"}, call("action_extping"))
 	entry({"admin", "modem", "change_cell"}, call("action_change_cell"))
 	entry({"admin", "modem", "change_proto"}, call("action_change_proto"))
+	entry({"admin", "modem", "setpin"}, call("action_setpin"))
 end
 
 function trim(s)
@@ -270,6 +275,7 @@ function action_check_misc()
 		netmode = luci.model.uci.cursor():get("modem", "modem" .. miscnum, "netmode")
 		rv["netmode"] = netmode
 	end
+	rv["pin"] = luci.model.uci.cursor():get("modem", "general", "pin")
 	rv["plock"] = luci.model.uci.cursor():get("custom", "atcmd", "lock")
 	if rv["plock"] == "1" then
 		rv["atlock"] = luci.model.uci.cursor():get("custom", "menu", "full")
@@ -528,7 +534,11 @@ function action_get_csq()
 			if typ == "1" then
 				rv["simerr"] = "2"
 			else
-				rv["simerr"] = "3"
+				if typ == "2" then
+					rv["simerr"] = "3"
+				else
+					rv["simerr"] = "4"
+				end
 			end
 		end
 		file:close()
@@ -647,3 +657,7 @@ function action_change_proto()
 	os.execute("/usr/lib/rooter/luci/protochnge.sh " ..set)
 end
 
+function action_setpin()
+	local set = luci.http.formvalue("set")
+	os.execute("uci set modem.general.pin=" .. set .. "; uci commit modem")
+end

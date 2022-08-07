@@ -198,7 +198,12 @@ get_connect() {
 	NUSER=$(uci -q get modem.modeminfo$CURRMODEM.user)
 	NPASS=$(uci -q get modem.modeminfo$CURRMODEM.passw)
 	NAUTH=$(uci -q get modem.modeminfo$CURRMODEM.auth)
-	PINC=$(uci -q get modem.modeminfo$CURRMODEM.pincode)
+	spin=$(uci -q get custom.simpin.pin)
+	if [ -z $spin ]; then
+		PINC=$(uci -q get modem.modeminfo$CURRMODEM.pincode)
+	else
+		PINC=$spin
+	fi
 	PDPT=$(uci -q get modem.modeminfo$CURRMODEM.pdptype)
 #
 # QMI and MBIM can't handle nil
@@ -218,7 +223,12 @@ get_connect() {
 	uci set modem.modem$CURRMODEM.user=$NUSER
 	uci set modem.modem$CURRMODEM.passw=$NPASS
 	uci set modem.modem$CURRMODEM.auth=$NAUTH
-	uci set modem.modem$CURRMODEM.pin=$PINC
+	spin=$(uci -q get custom.simpin.pin)
+	if [ -z $spin ]; then
+		uci set modem.modem$CURRMODEM.pin=$PINC
+	else
+		uci set modem.modem$CURRMODEM.pin=$spin
+	fi
 	uci commit modem
 }
 
@@ -404,6 +414,7 @@ idP=$(uci -q get modem.modem$CURRMODEM.idP)
 
 if [ ! -z "$RECON" ]; then
 	$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "ReConnecting"
+	uci set modem.modem$CURRMODEM.active=1
 	uci set modem.modem$CURRMODEM.connected=0
 	uci commit modem
 	INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
@@ -417,7 +428,9 @@ if [ ! -z "$RECON" ]; then
 	CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 	WWANX=$(uci -q get modem.modem$CURRMODEM.wwan)
 	WDMNX=$(uci -q get modem.modem$CURRMODEM.wdm)
-	$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
+	if [ "$RECON" = "1" ]; then
+		$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
+	fi
 else
 
 	DELAY=$(uci -q get modem.modem$CURRMODEM.delay)
@@ -621,6 +634,13 @@ uci commit modem.modem$CURRMODEM
 # Huawei NCM
 #
 	"4"|"6"|"7"|"24"|"26"|"27" )
+		if [ "$idV" = "2c7c" -a "$idP" = "0900" ]; then
+			ATCMDD='AT+QCFG="usbnet",2'
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB2" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			ATCMDD='AT+CFUN=1,1'
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB2" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			reboot -f
+		fi
 		log "Start NCM Connection"
 		sleep $DELAY
 
@@ -664,29 +684,33 @@ elif [ "$idV" = "05c6" ]; then
 fi
 
 if [ -e $ROOTER/connect/preconnect.sh ]; then
-	$ROOTER/connect/preconnect.sh $CURRMODEM
+	if [ "$RECON" != "2" ]; then
+		$ROOTER/connect/preconnect.sh $CURRMODEM
+	fi
 fi
 
 if $QUECTEL; then
-	ATCMDD="AT+CNMI?"
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if `echo $OX | grep -o "+CNMI: [0-3],2," >/dev/null 2>&1`; then
-		ATCMDD="AT+CNMI=0,0,0,0,0"
+	if [ "$RECON" != "2" ]; then
+		ATCMDD="AT+CNMI?"
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	fi
-	ATCMDD="AT+QINDCFG=\"smsincoming\""
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if `echo $OX | grep -o ",1" >/dev/null 2>&1`; then
-		ATCMDD="AT+QINDCFG=\"smsincoming\",0,1"
+		if `echo $OX | grep -o "+CNMI: [0-3],2," >/dev/null 2>&1`; then
+			ATCMDD="AT+CNMI=0,0,0,0,0"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
+		ATCMDD="AT+QINDCFG=\"smsincoming\""
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	fi
-	ATCMDD="AT+QINDCFG=\"all\""
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if `echo $OX | grep -o ",1" >/dev/null 2>&1`; then
-		ATCMDD="AT+QINDCFG=\"all\",0,1"
+		if `echo $OX | grep -o ",1" >/dev/null 2>&1`; then
+			ATCMDD="AT+QINDCFG=\"smsincoming\",0,1"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
+		ATCMDD="AT+QINDCFG=\"all\""
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	fi
-	log "Quectel Unsolicited Responses Disabled"
+		if `echo $OX | grep -o ",1" >/dev/null 2>&1`; then
+			ATCMDD="AT+QINDCFG=\"all\",0,1"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
+		log "Quectel Unsolicited Responses Disabled"
+fi
 
 	clck=$(uci -q get custom.bandlock.cenable)
 	if [ $clck = "1" ]; then
@@ -750,10 +774,10 @@ if [ -n "$CHKPORT" ]; then
 	$ROOTER/common/gettype.sh $CURRMODEM
 	$ROOTER/connect/get_profile.sh $CURRMODEM
 	if [ -e $ROOTER/simlockc.sh ]; then
-		$ROOTER/simlockc.sh $CURRMODEM
+		$ROOTER/simlockc.sh $CURRMODEM &
 	fi
 	if [ -e /usr/lib/gps/gps.sh ]; then
-		/usr/lib/gps/gps.sh $CURRMODEM
+		/usr/lib/gps/gps.sh $CURRMODEM &
 	fi
 	INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
 	[ $INTER = 3 ] && log "Modem $CURRMODEM disabled in Connection Profile" && exit 1
@@ -825,7 +849,7 @@ if [ -n "$CHKPORT" ]; then
 	if [ -z "$ttl" ]; then
 		ttl="0"
 	fi
-	$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl"
+	$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl" &
 
 	if [ -e $ROOTER/changedevice.sh ]; then
 		$ROOTER/changedevice.sh $ifname
@@ -835,7 +859,12 @@ if [ -n "$CHKPORT" ]; then
 	export SETUSER=$NUSER
 	export SETPASS=$NPASS
 	export SETAUTH=$NAUTH
-	export PINCODE=$PINC
+	spin=$(uci -q get custom.simpin.pin)
+	if [ -z $spin ]; then
+		export PINCODE=$PINC
+	else
+		export PINCODE=$spin
+	fi
 
 	if [ $idV = 12d1 ]; then
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "curc.gcom" "$CURRMODEM")
@@ -871,6 +900,14 @@ if $QUECTEL; then
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 fi
 
+modis=$(uci -q get basic.basic.modem)
+if [ ! -z $modis ]; then
+	if [ $modis = "0" ]; then
+		log "Modem Disabled"
+		exit 0
+	fi
+fi
+
 while [ 1 -lt 6 ]; do
 
 	case $PROT in
@@ -902,6 +939,24 @@ while [ 1 -lt 6 ]; do
 		log "No Provider Lock Done"
 		;;
 	esac
+	
+	spin=$(uci -q get custom.simpin.pin)
+	log "$spin"
+	if [ ! -z $spin ]; then
+		sblk=$(uci -q get custom.simpin.block)
+		log "$sblk"
+		if [ "$sblk" = "1" ]; then
+			ATCMDD="at+cpin?"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			log "$OX"
+			RDY=$(echo "$OX" | grep "READY")
+			if [ ! -z "$RDY" ]; then
+				$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : SIM is not Pin Locked. Incorrect SIM."
+				echo "4" > /tmp/simpin$CURRMODEM
+				exit 0
+			fi
+		fi
+	fi
 
 	case $PROT in
 #
@@ -971,7 +1026,7 @@ while [ 1 -lt 6 ]; do
 		if [ $? = 0 ]; then
 			ifup wan$INTER
 			[ -f /tmp/ipv6supp$INTER ] && addv6
-			sleep 20
+			#sleep 20
 		else
 			apn2=$(uci -q get modem.modeminfo$CURRMODEM.apn2)
 			if [ -z $apn2 ]; then
@@ -983,7 +1038,7 @@ while [ 1 -lt 6 ]; do
 				if [ $? = 0 ]; then
 					ifup wan$INTER
 					[ -f /tmp/ipv6supp$INTER ] && addv6
-					sleep 20
+					#sleep 20
 				else
 					BRK=1
 					$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
@@ -1006,20 +1061,15 @@ while [ 1 -lt 6 ]; do
 		else
 			OX=$($ROOTER/gcom/gcom-locked "/dev/cdc-wdm$WDMNX" "connect-ncm.gcom" "$CURRMODEM")
 			chcklog "$OX"
-			ERROR=$(echo $OX | grep "ERROR")
-			ERROR1=$(echo $OX | grep "Can't open device")
-			if [ "$ERROR" ]; then
+			ERROR="ERROR"
+			if `echo $OX | grep "$ERROR" 1>/dev/null 2>&1`
+			then
 				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-ncm.gcom" "$CURRMODEM")
 				chcklog "$OX"
-			else
-				if [ "$ERROR1" ]; then
-					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-ncm.gcom" "$CURRMODEM")
-					chcklog "$OX"
-				fi
 			fi
-			ERROR=$(echo $OX | grep "ERROR")
-			ERROR1=$(echo $OX | grep "Can't open device")
-			if [ "$ERROR" -o "$ERROR1" ]; then
+			ERROR="ERROR"
+			if `echo $OX | grep "$ERROR" 1>/dev/null 2>&1`
+			then
 				BRK=1
 				$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
 			else

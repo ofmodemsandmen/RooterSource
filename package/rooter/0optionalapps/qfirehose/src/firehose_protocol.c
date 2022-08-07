@@ -159,7 +159,7 @@ static int fh_parse_xml_line(const char *xml_line, struct fh_cmd *fh_cmd) {
     memset(fh_cmd, 0, sizeof( struct fh_cmd));
     if (strstr(xml_line, "vendor=\"quectel\"")) {
         fh_cmd->vdef.type = "vendor";
-        snprintf(fh_cmd->vdef.buffer, sizeof(fh_cmd->vdef.buffer), "%s", xml_line);
+        snprintf(fh_cmd->vdef.buffer, sizeof(fh_cmd->vdef.buffer), "%.255s", xml_line);
         return 0;
     }
     else if (!strncmp(xml_line, "<erase ", strlen("<erase "))) {
@@ -319,7 +319,7 @@ __fh_parse_xml_line:
 }
 
 static int fh_fixup_program_cmd(struct fh_data *fh_data, struct fh_cmd *fh_cmd, long* filesize_out) {
-    char full_path[256];
+    char full_path[512];
     char *unix_filename = strdup(fh_cmd->program.filename);
     char *ptmp;
     FILE *fp;
@@ -329,7 +329,7 @@ static int fh_fixup_program_cmd(struct fh_data *fh_data, struct fh_cmd *fh_cmd, 
         *ptmp = '/';
     }    
 
-   snprintf(full_path, sizeof(full_path), "%s/%s", fh_data->firehose_dir, unix_filename);
+   snprintf(full_path, sizeof(full_path), "%.255s/%.240s", fh_data->firehose_dir, unix_filename);
    if (access(full_path, R_OK)) {
 	fh_cmd->program.num_partition_sectors = 0;
 	dbg_time("fail to access %s, errno: %d (%s)\n", full_path, errno, strerror(errno));
@@ -489,7 +489,7 @@ static int fh_send_xml_complete(char *xml_buf, unsigned xml_size, const struct f
     buf_temp1 = strstr(fh_cmd->xml_original_data,"num_partition_sectors");
     buf_temp2 = strstr(fh_cmd->xml_original_data,"physical_partition_number");
     strncpy(buf_temp, fh_cmd->xml_original_data, strlen(fh_cmd->xml_original_data) - strlen(buf_temp1) - 1);
-    snprintf(xml_buf + strlen(xml_buf), xml_size, "%s num_partition_sectors=\"%d\" %s",buf_temp, fh_cmd->program.num_partition_sectors, buf_temp2);
+    snprintf(xml_buf + strlen(xml_buf), xml_size, "%.480s num_partition_sectors=\"%d\" %.480s",buf_temp, fh_cmd->program.num_partition_sectors, buf_temp2);
     return 0;
 }
 
@@ -534,19 +534,19 @@ static int fh_send_cmd(struct fh_data *fh_data, const struct fh_cmd *fh_cmd) {
         {
             if (fh_cmd->program.label[0] && fh_cmd->program.last_sector)
             snprintf(xml_buf + strlen(xml_buf), xml_size,
-                "<program PAGES_PER_BLOCK=\"%d\" SECTOR_SIZE_IN_BYTES=\"%d\" filename=\"%s\" label=\"%s\" last_sector=\"%d\" num_partition_sectors=\"%d\"  physical_partition_number=\"%d\" start_sector=\"%d\" />",
+                "<program PAGES_PER_BLOCK=\"%d\" SECTOR_SIZE_IN_BYTES=\"%d\" filename=\"%.120s\" label=\"%s\" last_sector=\"%d\" num_partition_sectors=\"%d\"  physical_partition_number=\"%d\" start_sector=\"%d\" />",
                 fh_cmd->program.PAGES_PER_BLOCK,  fh_cmd->program.SECTOR_SIZE_IN_BYTES,  fh_cmd->program.filename,
                 fh_cmd->program.label, fh_cmd->program.last_sector,
                 fh_cmd->program.num_partition_sectors, fh_cmd->program.physical_partition_number,  fh_cmd->program.start_sector);
             else if (fh_cmd->program.last_sector)
             snprintf(xml_buf + strlen(xml_buf), xml_size,
-                "<program PAGES_PER_BLOCK=\"%d\" SECTOR_SIZE_IN_BYTES=\"%d\" filename=\"%s\" last_sector=\"%d\" num_partition_sectors=\"%d\"  physical_partition_number=\"%d\" start_sector=\"%d\" />",
+                "<program PAGES_PER_BLOCK=\"%d\" SECTOR_SIZE_IN_BYTES=\"%d\" filename=\"%.120s\" last_sector=\"%d\" num_partition_sectors=\"%d\"  physical_partition_number=\"%d\" start_sector=\"%d\" />",
                 fh_cmd->program.PAGES_PER_BLOCK,  fh_cmd->program.SECTOR_SIZE_IN_BYTES,  fh_cmd->program.filename,
                 fh_cmd->program.last_sector, fh_cmd->program.num_partition_sectors,
                 fh_cmd->program.physical_partition_number,  fh_cmd->program.start_sector);
             else        
             snprintf(xml_buf + strlen(xml_buf), xml_size,
-                "<program PAGES_PER_BLOCK=\"%d\" SECTOR_SIZE_IN_BYTES=\"%d\" filename=\"%s\" num_partition_sectors=\"%d\"  physical_partition_number=\"%d\" start_sector=\"%d\" />",
+                "<program PAGES_PER_BLOCK=\"%d\" SECTOR_SIZE_IN_BYTES=\"%d\" filename=\"%.120s\" num_partition_sectors=\"%d\"  physical_partition_number=\"%d\" start_sector=\"%d\" />",
                  fh_cmd->program.PAGES_PER_BLOCK,  fh_cmd->program.SECTOR_SIZE_IN_BYTES,  fh_cmd->program.filename,
                  fh_cmd->program.num_partition_sectors, fh_cmd->program.physical_partition_number,  fh_cmd->program.start_sector);
         }
@@ -566,7 +566,7 @@ static int fh_send_cmd(struct fh_data *fh_data, const struct fh_cmd *fh_cmd) {
     else if (strstr(fh_cmd->cmd.type, "configure")) {
 #if 1
         snprintf(xml_buf + strlen(xml_buf), xml_size,  
-            "<configure MemoryName=\"%s\" Verbose=\"%d\" AlwaysValidate=\"%d\" MaxDigestTableSizeInBytes=\"%d\" MaxPayloadSizeToTargetInBytes=\"%d\"  ZlpAwareHost=\"%d\" SkipStorageInit=\"%d\" />",
+            "<configure MemoryName=\"%.8s\" Verbose=\"%d\" AlwaysValidate=\"%d\" MaxDigestTableSizeInBytes=\"%d\" MaxPayloadSizeToTargetInBytes=\"%d\"  ZlpAwareHost=\"%d\" SkipStorageInit=\"%d\" />",
             fh_cmd->cfg.MemoryName, fh_cmd->cfg.Verbose, fh_cmd->cfg.AlwaysValidate,
             fh_cmd->cfg.MaxDigestTableSizeInBytes, 
             fh_cmd->cfg.MaxPayloadSizeToTargetInBytes,
@@ -706,7 +706,7 @@ static int fh_send_reset_cmd(struct fh_data *fh_data) {
 }
 
 static int fh_send_rawmode_image(struct fh_data *fh_data, const struct fh_cmd *fh_cmd, unsigned timeout) {
-    char full_path[256];
+    char full_path[512];
     char *unix_filename = strdup(fh_cmd->program.filename);
     char *ptmp;
     FILE *fp;
@@ -720,7 +720,7 @@ static int fh_send_rawmode_image(struct fh_data *fh_data, const struct fh_cmd *f
         *ptmp = '/';
     }
 
-    snprintf(full_path, sizeof(full_path), "%s/%s", fh_data->firehose_dir, unix_filename);
+    snprintf(full_path, sizeof(full_path), "%.255s/%.240s", fh_data->firehose_dir, unix_filename);
     fp = fopen(full_path, "rb");
     if (!fp) {
         dbg_time("fail to fopen %s, errno: %d (%s)\n", full_path, errno, strerror(errno));
@@ -848,8 +848,8 @@ static int fh_process_program(struct fh_data *fh_data, const struct fh_cmd *fh_c
 
 int firehose_main(const char *firehose_dir, void *usb_handle, unsigned qusb_zlp_mode) {
     unsigned x;
-    char rawprogram_full_path[256];
-    char patch0_full_path[256];
+    char rawprogram_full_path[512];
+    char patch0_full_path[512];
     char *rawprogram_file;// = "rawprogram_nand_p4K_b256K_update.xml";
     char *patch0_file;
     struct fh_cmd fh_rx_cmd;
@@ -875,7 +875,7 @@ int firehose_main(const char *firehose_dir, void *usb_handle, unsigned qusb_zlp_
         error_return();
     }
     
-    snprintf(rawprogram_full_path, sizeof(rawprogram_full_path), "%s/%s", firehose_dir, rawprogram_file);
+    snprintf(rawprogram_full_path, sizeof(rawprogram_full_path), "%.255s/%.255s", firehose_dir, rawprogram_file);
     free(rawprogram_file);
     
     if (access(rawprogram_full_path, R_OK)) {
@@ -1041,7 +1041,7 @@ int firehose_main(const char *firehose_dir, void *usb_handle, unsigned qusb_zlp_
         }
 
         printf("%s patch0_file:%s\n",__func__,patch0_file);
-        snprintf(patch0_full_path, sizeof(patch0_full_path), "%s/%s", firehose_dir, patch0_file);
+        snprintf(patch0_full_path, sizeof(patch0_full_path), "%.255s/%.255s", firehose_dir, patch0_file);
         free(patch0_file);
 
         printf("%s patch0_full_path:%s\n",__func__,patch0_full_path);

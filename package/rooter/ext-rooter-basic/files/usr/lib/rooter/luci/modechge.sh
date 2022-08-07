@@ -222,22 +222,6 @@ if [ $MODEMTYPE -eq 9 ]; then
 			*)
 				ATC="AT+GTRAT=10" ;;
 		esac
-	elif [ "$idV" == "1508" -a "$idP" == "1001" ]; then
-		NETLOCK=$(uci -q get modem.modeminfo$CURRMODEM.lock)
-		if [ -z "$NETLOCK" -o "$NETLOCK" == "0" ]; then
-			case $NETMODE in
-				"3")
-					ATC="AT+COPS=0,,,0" ;;
-				"5")
-					ATC="AT+COPS=0,,,2" ;;
-				"7")
-					ATC="AT+COPS=0,,,7" ;;
-				*)
-					ATC="AT+WS46=12" ;;
-			esac
-		else
-			ATC="AT+WS46=12"
-		fi
 	else
 		case $NETMODE in
 			"4")

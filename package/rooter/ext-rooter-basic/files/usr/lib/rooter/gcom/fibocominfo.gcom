@@ -40,11 +40,6 @@ let t=time()+f
 gosub getresult
 if $s="^mTIMEOUT ERROR" print $s
 
-send "AT+WS46?^m"
-let t=time()+f
-gosub getresult
-if $s="^mTIMEOUT ERROR" print $s
-
 send "AT+XMCI=1;+XLEC?^m"
 let t=time()+f
 gosub getresult

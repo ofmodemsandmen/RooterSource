@@ -1,6 +1,7 @@
 #!/bin/sh
 
 ROOTER=/usr/lib/rooter
+ROOTER_LINK="/tmp/links"
 
 log() {
 	logger -t "Lock Band" "$@"
@@ -127,6 +128,9 @@ else
 	mask5g=""
 fi
 
+log "$mask"
+log "$mask5g"
+
 encode $mask
 mask=$maskz
 encode $mask5g
@@ -143,7 +147,11 @@ if [ -z $mask64 ]; then
 	mask64="0"
 fi
 
-CURRMODEM=$(uci get modem.general.miscnum)
+if [ -z "$2" ]; then
+	CURRMODEM=$(uci get modem.general.miscnum)
+else
+	CURRMODEM=1
+fi
 COMMPORT="/dev/ttyUSB"$(uci get modem.modem$CURRMODEM.commport)
 CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 model=$(uci get modem.modem$CURRMODEM.model)
@@ -154,8 +162,12 @@ GW=$(uci -q get modem.modem$CURRMODEM.GW)
 export TIMEOUT="5"
 case $uVid in
 	"2c7c" )
+		MODT="1"
+		if [ -z "$2" ]; then
+			RESTART="0"
+		fi
 		M5=""
-		M2='AT+QCFG="band",0,'$mask',0'
+		M2='AT+QCFG="band",0,'$mask',0,1'
 		if [ $uPid = 0620 ]; then
 			EM20=$(echo $model | grep "EM20")
 			if [ -z "$EM20" ]; then #EM160
@@ -200,7 +212,7 @@ case $uVid in
 			fi
 			M2='AT+QNWPREFCFG="lte_band",'$lst
 		fi
-		if [ $uPid = 0800 ]; then
+		if [ $uPid = 0800 -o $uPid = 0900 ]; then
 			if [ ! -z $mask ]; then
 				fibdecode $mask 1 1
 			else
@@ -236,6 +248,7 @@ case $uVid in
 		fi
 	;;
 	"1199" )
+		MODT="0"
 		M1='AT!ENTERCND="A710"'
 		if [ -z $mask64 ]; then
 			mask64="0"
@@ -274,6 +287,7 @@ case $uVid in
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	;;
 	"8087"|"2cb7" )
+		MODT="2"
 		FM150=""
 		if [ $uVid = 2cb7 ]; then
 			FM150=$(echo $model | grep "FM150")
@@ -327,6 +341,7 @@ case $uVid in
 		fi
 	;;
 	"413c" )
+		MODT="3"
 		case $uPid in
 
 			"81d7"|"81d8"|"e0b4" |"e0b5"|"1910")
@@ -354,7 +369,7 @@ case $uVid in
 esac
 
 if [ $RESTART = "0" ]; then
-log "No Restart"
+	/usr/lib/rooter/connect/bandmask $CURRMODEM $MODT
 	exit 0
 fi
 rm -f /tmp/bmask

@@ -8,8 +8,12 @@ function index()
 	entry({"admin", "adminmenu"}, firstchild(), translate("Administration"), 24).dependent=false
 	local df = luci.model.uci.cursor():get("custom", "menu", "default")
 	if df == '0' then
-		page = entry({"admin", "adminmenu", "fullmenu"}, template("fullmenu/fullmenu"), translate("Unlock / Lock Menus"), 5)
-		page.dependent = true
+		local multilock = luci.model.uci.cursor():get("custom", "multiuser", "multi") or "0"
+	local rootlock = luci.model.uci.cursor():get("custom", "multiuser", "root") or "0"
+	if (multilock == "0") or (multilock == "1" and rootlock == "1") then
+			page = entry({"admin", "adminmenu", "fullmenu"}, template("fullmenu/fullmenu"), translate("Unlock / Lock Menus"), 5)
+			page.dependent = true
+		end
 	end
 	
 	entry({"admin", "menu", "getmenu"}, call("action_getmenu"))

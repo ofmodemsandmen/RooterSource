@@ -9,7 +9,11 @@ I18N = require "luci.i18n"
 translate = I18N.translate
 
 function index()
-    entry({"admin", "system", "console"}, template("web/web_console"), _(translate("Web Console")), 66)
+	local multilock = luci.model.uci.cursor():get("custom", "multiuser", "multi") or "0"
+	local rootlock = luci.model.uci.cursor():get("custom", "multiuser", "root") or "0"
+	if (multilock == "0") or (multilock == "1" and rootlock == "1") then
+		entry({"admin", "system", "console"}, template("web/web_console"), _(translate("Web Console")), 66)
+	end
     entry({"admin", "system", "webcmd"}, call("action_webcmd"))
 end
 

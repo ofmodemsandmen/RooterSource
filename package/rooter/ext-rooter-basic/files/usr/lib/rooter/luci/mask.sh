@@ -121,8 +121,8 @@ case $uVid in
 				fi
 			;;
 			"030b" ) # EM060
-				M2='1111101100011100011100001101111001000111111001010000000000000000010000100'
-				CA=""
+				M2='111110110001110001110000110111000100011111100101000000000000000001000010'
+				CA="em060-2xbands"
 				CA3=""
 			;;
 			"0512" ) # EM12-G
@@ -159,7 +159,7 @@ case $uVid in
 					CA4="em20-4xbands"
 				fi
 			;;
-			"0800" ) # RM500
+			"0800"|"0900" ) # RM500
 				GL=$(echo $model | grep "\-GL")
 				if [ ! -z "$GL" ]; then #RM500-GL
 					M2='1111101100011100011100001101110101000111111000010000000000000000010000100'
@@ -250,22 +250,23 @@ case $uVid in
 esac
 
 reverse $L1
-echo $revstr > /tmp/bmask
+echo $revstr > /tmp/bmask1
 if [ ! -z $L5 ]; then
 	reverse $L5
 else
 	revstr="x"
 fi
-echo $revstr >> /tmp/bmask
-echo $M2 >> /tmp/bmask
-echo $M5 >> /tmp/bmask
+echo $revstr >> /tmp/bmask1
+echo $M2 >> /tmp/bmask1
+echo $M5 >> /tmp/bmask1
 if [ $CA ]; then
-	echo $CA >> /tmp/bmask
+	echo $CA >> /tmp/bmask1
 	if [ $CA3 ]; then
-		echo $CA3 >> /tmp/bmask
+		echo $CA3 >> /tmp/bmask1
 		if [ $CA4 ]; then
-			echo $CA4 >> /tmp/bmask
+			echo $CA4 >> /tmp/bmask1
 		fi
 	fi
 fi
+mv /tmp/bmask1 /tmp/bmask
 

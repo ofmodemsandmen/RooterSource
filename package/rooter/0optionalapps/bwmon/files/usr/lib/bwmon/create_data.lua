@@ -189,4 +189,5 @@ else
 end
 os.execute("rm -f /tmp/lockbw")
 os.execute("/usr/lib/bwmon/excede.sh " .. tostring(total) .. " " .. tostring(allo) .. " " .. tostring(ptotal))
+os.execute("/usr/lib/bwmon/savetot.sh \"" .. calc(total) .. "\"")
 os.execute("/usr/lib/bwmon/perday.lua")

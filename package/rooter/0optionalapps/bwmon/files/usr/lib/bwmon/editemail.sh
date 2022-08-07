@@ -4,15 +4,6 @@ log() {
 	logger -t "edit email" "$@"
 }
 
-sleep 3
-
-eedit=$(uci -q get custom.texting.eedit)
-if [ -z $eedit ]; then
-	exit 0
-fi
-if [ $eedit = "0" ]; then
-	exit 0
-fi
 host=$(uci -q get custom.texting.smtp)
 if [ -z $host ]; then
 	exit 0

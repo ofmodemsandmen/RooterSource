@@ -149,7 +149,7 @@ fi
 	fi
 	log "T77 $NEWMOD $DEVICE"
  fi
-
+sleep 5
 ATCMDD="AT+CFUN=1,1"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 log "Hard modem reset done on /dev/ttyUSB$CPORT to reload drivers"

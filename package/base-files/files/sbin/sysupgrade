@@ -24,6 +24,7 @@ export HELP=0
 export FORCE=0
 export TEST=0
 export UMOUNT_ETCBACKUP_DIR=0
+export SAVE_OVERLAY=1 SAVE_OVERLAY_PATH=/etc/config/zerotier
 
 # parse options
 while [ -n "$1" ]; do
@@ -34,6 +35,7 @@ while [ -n "$1" ]; do
 		-n) export SAVE_CONFIG=0;;
 		-c) export SAVE_OVERLAY=1 SAVE_OVERLAY_PATH=/etc;;
 		-o) export SAVE_OVERLAY=1 SAVE_OVERLAY_PATH=/;;
+		-z) export SAVE_OVERLAY=1 SAVE_OVERLAY_PATH=/etc/config/zerotier;;
 		-p) export SAVE_PARTITIONS=0;;
 		-k) export SAVE_INSTALLED_PKGS=1;;
 		-u) export SKIP_UNCHANGED=1;;

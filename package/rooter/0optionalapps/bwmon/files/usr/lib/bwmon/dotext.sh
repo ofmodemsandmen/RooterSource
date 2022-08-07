@@ -2,7 +2,7 @@
 . /lib/functions.sh
 
 log() {
-	logger -t "TEXTING" "$@"
+	logger -t "TEXTING" "$@" 
 }
 
 getbw() {
@@ -31,10 +31,10 @@ sendmsg() {
 	/usr/lib/bwmon/amtleft.lua $alloc $used
 	bwleft=$(cat /tmp/amtleft)
 	
-	ident=$(uci -q get custom.texting.ident)
-	#ident="ICCID "$(uci -q get modem.modem1.iccid)
+	#ident=$(uci -q get custom.texting.ident)
+	ident=$(uci -q get modem.modem1.iccid)
 	if [ -z "$ident" ]; then
-		ident="John Doe"
+		ident="Unknown User"
 	fi
 	message="$ident has used $useda bandwidth and has $bwleft of bandwidth left"
 	
@@ -51,14 +51,29 @@ sendmsg() {
 	else
 		email=$(uci -q get custom.texting.email)
 		
+		host=$(uci -q get custom.texting.smtp)
+		user=$(uci -q get custom.texting.euser)	
+		pass=$(uci -q get custom.texting.epass)
+	
+		STEMP="/tmp/eemail"
+		MSG="/usr/lib/bwmon/msmtprc"
+		DST="/etc/msmtprc"
+		rm -f $STEMP
+		cp $MSG $STEMP
+		sed -i -e "s!#HOST#!$host!g" $STEMP
+		sed -i -e "s!#USER#!$user!g" $STEMP
+		sed -i -e "s!#PASS#!$pass!g" $STEMP
+		mv $STEMP $DST
+	
 		STEMP="/tmp/emailmsg"
 		MSG="/usr/lib/bwmon/message"
 		rm -f $STEMP
 		cp $MSG $STEMP
 		sed -i -e "s!#EMAIL#!$email!g" $STEMP
 		sed -i -e "s!#MESSAGE#!$message!g" $STEMP
+		sed -i -e "s!#IDENT#!$ident!g" $STEMP
 		mess=$(cat /tmp/emailmsg)
-		echo -e "$mess" | msmtp $email
+		echo -e "$mess" | msmtp --read-envelope-from --read-recipients
 		log "$email $message"
 	fi
 	

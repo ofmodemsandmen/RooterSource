@@ -32,7 +32,7 @@ config atcmd 'atcmd'
 	option generic '/etc/genericcmd'
 	
 config bandlock 'bandlock'
-	option enabled '0'
+	option enabled '1'
 	option cenable '0'
 	option earfcn '0'
 	option pci '0'
@@ -47,4 +47,18 @@ config logo 'logo'
 	
 config connect 'connect'
 	option ipv6 '1'
+
+config profile 'profile'
+	option save '0'
+
+config multi 'multiuser'
+	option multi '0'
+	option root '0'
+
+config bwday 'bwday'
+	option bwday '0'
+	option phone '0'
+	option delay '8'	
 	
+config simpin 'simpin'
+	option pin ''

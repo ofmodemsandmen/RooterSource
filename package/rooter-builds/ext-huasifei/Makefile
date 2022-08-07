@@ -19,14 +19,15 @@ define Package/ext-huasifei
 		+luci-app-rootervpn +ext-wireguard \
 		+webconsole +bwmon +464xlat \
 		+iptables-mod-hashlimit \
-		+ca-bundle +ca-certificates +libustream-openssl \
+		+ca-bundle +ca-certificates \
 		+luci-app-ksmbd +usb-storage \
 		+ext-p910nd +kmod-sched-cake +luci-app-nft-qos \
 		+ext-command +ext-speedtest +luci-app-guestwifi \
 		+openvpn-easy-rsa +openvpn-openssl \
 		+ext-extra +luci-app-hotspot +luci-app-wol \
 		+usbmuxd +libusbmuxd-utils +libimobiledevice-utils +kmod-usb-net-ipheth \
-		+nano +picocom +wpad +wget +qfirehose 
+		+qlog +luci-ssl +usbutils +openssl-util +irqbalance +ext-splashconfig \
+		+nano +picocom +wpad +wget +qfirehose
   TITLE:=ROOter support w/o MWan3 for Huasifei
   PKGARCH:=all
 endef

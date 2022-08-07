@@ -108,7 +108,7 @@ REGSTAT=$(echo "$REGV" | cut -d, -f2)
 if [ "$REGSTAT" == "5" -a "$COPS" != "-" ]; then
 	COPS_MNC=$COPS_MNC" (Roaming)"
 fi
-if [ -n "$CID" -a -n "$CID5" -a "$RAT" == "13" ]; then
+if [ -n "$CID" -a -n "$CID5" ] && [ "$RAT" == "13" -o "$RAT" == "10" ]; then
 	LAC="4G $LAC, 5G $LAC5"
 	CID="4G $CID<br />5G $CID5"
 	RNC="4G $RNC, 5G $RNC5"

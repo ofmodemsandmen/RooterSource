@@ -177,4 +177,6 @@ function updown.write(self, section, value)
 	luci.http.redirect( self.redirect )
 end
 
+m:section(SimpleSection).template = "wireguard/wireguard"
+
 return m

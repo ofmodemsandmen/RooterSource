@@ -19,13 +19,14 @@ define Package/ext-rooterbcm16
 		+webconsole +bwmon +464xlat \
 		+ext-theme +luci-theme-argon +luci-theme-argondark \
 		+luci-theme-tomato +ext-login \
-		+ca-bundle +ca-certificates +libustream-openssl \
+		+ca-bundle +ca-certificates \
 		+luci-app-ksmbd +usb-storage \
 		+ext-p910nd +luci-app-sqm +kmod-sched-cake +luci-app-nft-qos \
 		+ext-command +ext-speedtest +luci-app-guestwifi \
 		+openvpn-easy-rsa +openvpn-openssl \
 		+ext-extra +luci-app-wol \
 		+usbmuxd +libusbmuxd-utils +libimobiledevice-utils +kmod-usb-net-ipheth \
+		+qlog +luci-ssl +usbutils +openssl-util +irqbalance +ext-splashconfig \
 		+nano +picocom +wpad +wget +qfirehose +luci-app-vpnbypass 
   TITLE:=ROOter support for 16meg and larger Broadcom routers w/o Hotspot Manager or MWan3
   PKGARCH:=all

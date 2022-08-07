@@ -381,9 +381,9 @@ static const char *stream_firehose_dir;
 static int stread_fread(const char *filename, void **pp_filebuf) {
     int filesize = 0;
     FILE *fp;
-    char fullpath[MAX_PATH];
+    char fullpath[MAX_PATH*2];
 
-    snprintf(fullpath, sizeof(fullpath), "%s/../%s", stream_firehose_dir, filename);
+    snprintf(fullpath, sizeof(fullpath), "%.240s/../%.240s", stream_firehose_dir, filename);
     fp = fopen(fullpath, "rb");
     if (fp == NULL) {
         dbg_time("fail to fope %s, errno: %d (%s)\n", fullpath, errno, strerror(errno));

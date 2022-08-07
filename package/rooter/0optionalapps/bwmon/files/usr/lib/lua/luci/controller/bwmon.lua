@@ -53,7 +53,17 @@ function action_check_bw()
 	else
 		rv['days'] = 0
 	end
-	rv['lock']  = luci.model.uci.cursor():get("custom", "bwallocate", "lock")
+	local multilock = luci.model.uci.cursor():get("custom", "multiuser", "multi") or "0"
+	local rootlock = luci.model.uci.cursor():get("custom", "multiuser", "root") or "0"
+	if multilock == "0" then
+		rv['lock']  = luci.model.uci.cursor():get("custom", "bwallocate", "lock")
+	else
+		if rootlock == "0" then
+			rv['lock']  = "1"
+		else
+			rv['lock']  = "0"
+		end
+	end
 	rv['rollover'] = luci.model.uci.cursor():get("custom", "bwallocate", "rollover")
 	rv['enabled'] = luci.model.uci.cursor():get("custom", "bwallocate", "enabled")
 	rv['bwenabled'] = luci.model.uci.cursor():get("bwmon", "general", "enabled")

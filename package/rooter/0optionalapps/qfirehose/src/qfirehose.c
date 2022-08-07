@@ -61,9 +61,12 @@ int switch_to_edl_mode(void *usb_handle) {
     //unsigned char edl_cmd[] = {0x3a, 0xa1, 0x6e, 0x7e}; //DL (download mode)
     unsigned char *pbuf = malloc(512);
     int rx_len;
+    int rx_count = 0;
 
      do {
         rx_len = qusb_noblock_read(usb_handle, pbuf , 512, 0, 1000);
+        if (rx_count++ > 100)
+            break;
     } while (rx_len > 0);
 
     dbg_time("switch to 'Emergency download mode'\n");
@@ -71,6 +74,8 @@ int switch_to_edl_mode(void *usb_handle) {
     if (rx_len < 0)
         return 0;
 
+    rx_count = 0;
+    
     do {
         rx_len = qusb_noblock_read(usb_handle, pbuf , 512, 0, 3000);
         if (rx_len == sizeof(edl_cmd) && memcmp(pbuf, edl_cmd, sizeof(edl_cmd)) == 0) {
@@ -78,6 +83,10 @@ int switch_to_edl_mode(void *usb_handle) {
             free(pbuf);
             return 1;
         }
+        
+        if (rx_count++ > 50)
+            break;
+        
     } while (rx_len > 0);
 
     free(pbuf);
@@ -188,7 +197,7 @@ int main(int argc, char* argv[])
     /* set file priviledge mask 0 */
     umask(0);
     /*build V1.0.8*/
-    dbg_time("Version: QFirehose_Linux_Android_V1.4.8\n"); //when release, rename to V1.X
+    dbg_time("Version: QFirehose_Linux_Android_V1.4.9\n"); //when release, rename to V1.X
 #ifndef __clang__
     dbg_time("Builded: %s %s\n", __DATE__,__TIME__);
 #endif
@@ -216,7 +225,7 @@ int main(int argc, char* argv[])
                 break;
             case 'l':
                 if (loghandler) fclose(loghandler);
-                snprintf(filename, sizeof(filename), "%s/qfirehose_%lu.log", optarg, time(NULL));
+                snprintf(filename, sizeof(filename), "%.80s/qfirehose_%lu.log", optarg, time(NULL));
                 loghandler = fopen(filename, "w+");
                 if (loghandler) dbg_time("upgrade log will be sync to %s\n", filename);
                 break;

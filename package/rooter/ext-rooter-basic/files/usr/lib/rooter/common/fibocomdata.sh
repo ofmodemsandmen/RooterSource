@@ -442,20 +442,6 @@ if [ -n "$XACT" ]; then
 		NETMODE="6" ;;
 	esac
 fi
-if [ "$NETMODE" == "-" ]; then
-	MRAT=$(echo $OX | grep -o "+WS46[^K]\+" | grep -o "[0-9]\{2\}")
-	MRAT=${MRAT: -2}
-	case $MRAT in
-		"12" )
-			NETMODE="3" ;;
-		"22" )
-			NETMODE="5" ;;
-		"28" )
-			NETMODE="7" ;;
-		* )
-			NETMODE="1" ;;
-	esac
-fi
 CMODE=$(uci -q get modem.modem$CURRMODEM.cmode)
 if [ "$CMODE" = 0 ]; then
 	NETMODE="10"

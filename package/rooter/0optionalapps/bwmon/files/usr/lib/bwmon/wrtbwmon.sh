@@ -1,6 +1,6 @@
 #!/bin/sh
 
-setbackup() {
+setbackup() { 
 	extn=$(uci -q get bwmon.general.external)
 	if [ "$extn" = "0" ]; then
 		backPath=/usr/lib/bwmon/data/
@@ -298,6 +298,7 @@ update()
 {
 	createDbIfMissing
     checkWAN
+	PERTOTAL=0
 
     > /tmp/iptables_$$.tmp
     lock
@@ -324,6 +325,7 @@ update()
 		OUT=$((${OUT}/1000))
 		TOTAL=$(echo ${L1} | cut -f6 -d, )
 		TOTAL=$((${TOTAL}/1000))
+		let PERTOTAL=PERTOTAL+TOTAL
 		if [ $TOTAL -gt 0 -a $IP != "NA" ]; then
 			for USERSFILE in /tmp/dhcp.leases /tmp/dnsmasq.conf /etc/dnsmasq.conf /etc/hosts; do
 				[ -e "$USERSFILE" ] || continue
@@ -349,7 +351,9 @@ update()
 		fi
 	  fi
 	done < $DB
-		
+	if [ -e /usr/lib/bwmon/period.sh ]; then
+		/usr/lib/bwmon/period.sh "$PERTOTAL"
+	fi
     unlock
 }
 
@@ -363,6 +367,7 @@ createFiles()
 	dailyUsageDB="$dataPath$cYear-$cMonth-$cDay-daily_data.js"
 	dailyUsageBack="$backPath$cYear-$cMonth-$cDay-daily_data.js"
 	if [ ! -f $dailyUsageBack ]; then
+		rm -f $backPath*"daily_data.js"
 		touch $dailyUsageDB
 	else
 		cp -f $dailyUsageBack $dailyUsageDB
@@ -375,6 +380,7 @@ createFiles()
 		cp -f $monthlyUsageBack $monthlyUsageDB".bk"
 		#rm -f $monthlyUsageDB".bk"
 	else
+		rm -f $backPath*"mac_data.js"
 		touch $monthlyUsageDB
 		/usr/lib/bwmon/backup.sh "backup" $cDay $monthlyUsageDB $dailyUsageDB $monthlyUsageBack $dailyUsageBack
 	fi
@@ -441,26 +447,33 @@ checkTime()
 		cDay=$pDay
 		cMonth=$pMonth
 		cYear=$pYear
+		monthlyUsageBack="$backPath$cYear-$cMonth-mac_data.js"
+		if [ ! -e $monthlyUsageBack ]; then
+			rm -f $backPath*"mac_data.js"
+		fi
 		rm -f $dataPath[[:digit:]][[:digit:]][[:digit:]][[:digit:]]"-"[[:digit:]][[:digit:]]"-"[[:digit:]][[:digit:]]-daily_data.js
 		rm -f $backPath[[:digit:]][[:digit:]][[:digit:]][[:digit:]]"-"[[:digit:]][[:digit:]]"-"[[:digit:]][[:digit:]]-daily_data.js
 		roll=$(uci -q get custom.bwallocate.rollover)
 		[ -z $roll ] && roll=1
 		if [ "$roll" -eq "$pDay" ]; then
 			rm -f $monthlyUsageDB
-			rm -f $monthlyUsageBack
+			rm -f $backPath*"mac_data.js"
 			monthlyUsageDB="$dataPath$cYear-$cMonth-mac_data.js"
 			monthlyUsageBack="$backPath$cYear-$cMonth-mac_data.js"
 			touch $monthlyUsageDB
 			uci set custom.texting.used='0'
 			uci commit custom
+			if [ -e /usr/lib/bwmon/periodreset.sh ]; then
+				/usr/lib/bwmon/periodreset.sh
+			fi
 		fi
 		rm -f $dailyUsageDB
-		rm -f $dailyUsageBack
+		rm -f $backPath*"daily_data.js"
 		dailyUsageDB="$dataPath$cYear-$cMonth-$cDay-daily_data.js"
 		touch $dailyUsageDB
 		dailyUsageBack="$backPath$cYear-$cMonth-$cDay-daily_data.js"
 	fi 
-	rm -f> /tmp/lockbw
+	rm -f /tmp/lockbw
 }
 
 createFiles

@@ -174,4 +174,6 @@ function m.on_after_apply(self,map)
 	--sys.call('/etc/init.d/openvpn reload')
 end
 
+m:section(SimpleSection).template = "openvpn/vpn1"
+
 return m

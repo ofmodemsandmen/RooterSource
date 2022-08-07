@@ -80,7 +80,6 @@ getbw() {
 checkamt() {
 	istime=$(checktime)
 	if [ $istime = '1' ]; then
-		prev=$(uci -q get custom.texting.used)
 		incr=$(uci -q get custom.texting.increment)
 		getbw
 		/usr/lib/bwmon/datainc.lua $prev $incr $used
@@ -88,6 +87,29 @@ checkamt() {
 		uci set custom.texting.used=$prev
 		uci commit custom
 		echo $runn
+	else
+		echo "0"
+	fi
+}
+
+checkper() {
+	istime=$(checktime)
+	if [ $istime = '1' ]; then
+		prev=$(uci -q get custom.texting.used)
+		per=$(uci -q get custom.bwallocate.percent)
+		persent=$(uci -q get custom.bwallocate.persent)
+		if [ "$persent" != "1" ]; then
+			getbw
+			/usr/lib/bwmon/dataper.lua $alloc $per $used
+			source /tmp/bwper
+			if [ $runn = "1" ]; then
+				uci set custom.bwallocate.persent="1"
+				uci commit custom
+			fi
+			echo $runn
+		else
+			echo "0"
+		fi
 	else
 		echo "0"
 	fi
@@ -110,7 +132,11 @@ do
 				running="0"
 			fi
 		else
-			running=$(checkamt)
+			if [ $MT = '1' ]; then
+				running=$(checkamt)
+			else
+				running=$(checkper)
+			fi
 		fi
 		if [ $running = "1" ]; then
 			EN=$(uci -q get custom.texting.text)

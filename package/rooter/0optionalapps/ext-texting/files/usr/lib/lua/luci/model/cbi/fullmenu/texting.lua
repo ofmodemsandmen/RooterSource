@@ -214,6 +214,10 @@ sdhour.default = "68"
 
 sdhour = s:option(ListValue, "times", translate("Times per Day :"))
 sdhour.rmempty = true
+sdhour:value("2", "2")
+sdhour:value("4", "4")
+sdhour:value("6", "6")
+sdhour:value("8", "8")
 sdhour:value("10", "10")
 sdhour:value("12", "12")
 sdhour:value("14", "14")
@@ -230,7 +234,7 @@ sdhour:value("34", "34")
 sdhour:value("36", "36")
 sdhour:value("38", "38")
 sdhour:value("40", "40")
-sdhour.default = "20"
+sdhour.default = "10"
 
 
 s = m:section(TypedSection, "numbers", "Phone Numbers")

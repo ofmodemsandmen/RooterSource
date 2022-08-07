@@ -311,7 +311,7 @@ static int sahara_start(void *usb_handle, void *tx_buffer, void *rx_buffer, FILE
 int sahara_main(const char *firehose_dir, void *usb_handle, int edl_mode_05c69008) {
     int retval = 0;
     char* prog_nand_firehose_filename = NULL; 
-    char full_path[255];
+    char full_path[512];
     FILE *file_handle;
     void *tx_buffer;
     void *rx_buffer;
@@ -327,10 +327,10 @@ int sahara_main(const char *firehose_dir, void *usb_handle, int edl_mode_05c6900
     if (!strncmp(prog_nand_firehose_filename, "prog_emmc_firehose_8953_ddr.mbn", strlen(prog_nand_firehose_filename)))
         g_is_sc600y_chip = 1;
 
-    snprintf(full_path, sizeof(full_path), "%s/%s", firehose_dir, prog_nand_firehose_filename);
+    snprintf(full_path, sizeof(full_path), "%.255s/%.240s", firehose_dir, prog_nand_firehose_filename);
     }
     else {
-        snprintf(full_path, sizeof(full_path), "%s/..", firehose_dir);
+        snprintf(full_path, sizeof(full_path), "%.255s/..", firehose_dir);
         if(qfile_find_xmlfile(full_path, "NPRG9x", &prog_nand_firehose_filename) != 0
             && qfile_find_xmlfile(full_path, "NPRG9x", &prog_nand_firehose_filename) != 0) {
             dbg(LOG_ERROR, "retrieve NPRG MBN failed.");
@@ -338,7 +338,7 @@ int sahara_main(const char *firehose_dir, void *usb_handle, int edl_mode_05c6900
         }
         dbg(LOG_INFO, "prog_nand_firehose_filename = %s", prog_nand_firehose_filename);
 
-        snprintf(full_path, sizeof(full_path), "%s/../%s", firehose_dir, prog_nand_firehose_filename);
+        snprintf(full_path, sizeof(full_path), "%.255s/../%.240s", firehose_dir, prog_nand_firehose_filename);
     }
     
     free(prog_nand_firehose_filename);

@@ -4,7 +4,6 @@ m = Map("custom", translate("Bandwidth Allocation"), translate("Set Maximum Band
 
 m.on_after_save = function(self)
 	luci.sys.call("/usr/lib/bwmon/allocate.sh 0 &")
-	luci.sys.call("/usr/lib/bwmon/editemail.sh &")
 end
 
 s = m:section(TypedSection, "bwallocate", translate("Allocation Settings"))
@@ -94,6 +93,7 @@ ct = s:option(ListValue, "method", translate("Criteria : "), translate("Criteria
 ct.rmempty = true
 ct:value("0", translate("By Specified Time Interval"))
 ct:value("1", translate("By Amount Used"))
+ct:value("2", translate("By Percentage Used"))
 ct.default = "0"
 ct:depends("text", "1")
 
@@ -216,6 +216,21 @@ xxct:value("100", translate("Every 100 GB"))
 xxct.default = "50"
 xxct:depends("method", "1")
 
+ph1 = s:option(ListValue, "percent", translate("Percentage Used :"));
+ph1.optional=false; 
+ph1.rmempty = true;
+ph1:value("10", translate("10%"))
+ph1:value("20", translate("20%"))
+ph1:value("30", translate("30%"))
+ph1:value("40", translate("40%"))
+ph1:value("50", translate("50%"))
+ph1:value("60", translate("60%"))
+ph1:value("70", translate("70%"))
+ph1:value("80", translate("80%"))
+ph1:value("90", translate("90%"))
+ph1:depends("method", "2")
+ph1.default = "90"
+
 --b3 = s:option(DummyValue, "blank", " ");
 
 btn = s:option(Button, "_btn", translate(" "))
@@ -247,34 +262,6 @@ ph1.optional=false;
 ph1.rmempty = true;
 ph1:depends("tore", "1")
 ph1.default = "jdoe@domain.com"
-
-
-
-ct1 = s:option(ListValue, "eedit", translate("Edit Email Account : "), translate("Change information about email account"))
-ct.rmempty = true
-ct1:value("0", "No")
-ct1:value("1", "Yes")
-ct1.default = "0"
-ct1:depends("tore", "1")
-
-ph2 = s:option(Value, "smtp", translate("SMTP Host :"));
-ph2.optional=false; 
-ph2.rmempty = true;
-ph2:depends("eedit", "1")
-ph2.default = "smtp.gmail.com"
-
-ph3 = s:option(Value, "euser", translate("User Name :"));
-ph3.optional=false; 
-ph3.rmempty = true;
-ph3:depends("eedit", "1")
-ph3.default = "user@gmail.com"
-
-ph4 = s:option(Value, "epass", translate("Password :"));
-ph4.optional=false; 
-ph4.rmempty = true;
-ph4:depends("eedit", "1")
-ph4.default = "xxxxxxxxxxxxxxxx"
-
 
 
 return m

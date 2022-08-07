@@ -90,6 +90,9 @@ fi
 if [ -z "$QTEMP" ]; then
 	QTEMP=$(echo $OX | grep -o "+QTEMP:[ ]\?\"MDM-CORE-USR.\+[0-9]\{1,3\}\"" | cut -d\" -f4)
 fi
+if [ -z "$QTEMP" ]; then
+	QTEMP=$(echo $OX | grep -o "+QTEMP:[ ]\?\"MDMSS.\+[0-9]\{1,3\}\"" | cut -d\" -f4)
+fi
 if [ -n "$QTEMP" ]; then
 	CTEMP=$(echo $QTEMP | grep -o "[0-9]\{1,3\}")$(printf "\xc2\xb0")"C"
 fi
@@ -241,7 +244,10 @@ case $RAT in
 			RSCP=$(echo $QENG5 | cut -d, -f13)
 			ECIO=$(echo $QENG5 | cut -d, -f14)
 			if [ "$CSQ_PER" = "-" ]; then
-				CSQ_PER=$((100 - (($RSCP + 31) * 100/-125)))"%"
+				RSSI=$(rsrp2rssi $RSCP $BW)
+				CSQ_PER=$((100 - (($RSSI + 51) * 100/-62)))"%"
+				CSQ=$((($RSSI + 113) / 2))
+				CSQ_RSSI=$RSSI" dBm"
 			fi
 			SINRR=$(echo $QENG5 | cut -d, -f15 | grep -o "[0-9]\{1,3\}")
 			if [ -n "$SINRR" ]; then

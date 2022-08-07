@@ -103,13 +103,14 @@ while true; do
 				if [ $MEM3 == "SM" -a $USED -lt $MAXED -a $MESC -gt 0 -a $(uci -q get modem.sms.menable) == 1 ]; then
 					ATCMDD="AT+CPMS=\"ME\";+CMGR=$MESLOT;+CPMS=\"SM\""
 					OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+					Rstat=$(echo "$OX" | grep -o "+CMGR:[^,]\+" | grep -o "[0-3]")
 					PDU=$(echo "$OX" | grep -o "[0-9A-F]\{30,\}")
 					PDUL=$(echo "$OX" | grep -o "+CMGR:.*" | grep -o ",[0-9]\{1,\}" | grep -o "[0-9]\{1,3\}")
-					if [ ${#PDU} -gt 0 ] && [ ${#PDUL} -gt 0 ]; then
+					if [ -n "$PDU" -a -n "$PDUL" -a -n "$Rstat" ]; then
 						if [ ${#PDUL} -eq 2 ]; then
 							PDUL="0$PDUL"
 						fi
-						ATCMDD="$PDUL,SM,1,$PDU"
+						ATCMDD="$PDUL,SM,$Rstat,$PDU"
 						OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "smswrite.gcom" "$CURRMODEM" "$ATCMDD")
 						MREF=$(echo "$OX" | grep -o "[0-9]\{1,3\}")
 						if [ ${#MREF} -gt 0 ]; then

@@ -6,9 +6,18 @@ local fs = require "nixio.fs"
 local uci = require "luci.model.uci".cursor()
 local s = uci:get("custom", "bandlock", "enabled")
 local a = uci:get("custom", "atcmd", "enabled")
-nosms = 1
-if a == "1" then
-	nosms = 0
+
+local multilock = uci:get("custom", "multiuser", "multi") or "0"
+local rootlock = uci:get("custom", "multiuser", "root") or "0"
+nomulti=1
+if (multilock == "0") or (multilock == "1" and rootlock == "1") then
+	nosms = 1
+	if a == "1" then
+		nosms = 0
+	end
+else
+	nosms = 1
+	nomulti = 0
 end
 block = 1
 if s == "1" then
@@ -28,6 +37,7 @@ end
 <script type="text/javascript">//<![CDATA[
 
 	bnds = "0" ;
+	loadpin = "0";
 	chnge = 0 ;
 	sca = 0;
 	selectall = 1 ;
@@ -57,6 +67,7 @@ end
 	var lockb = 0;
 	var cenable;
 	var modtype;
+	var locking = 0;
 	
 	function T77(uVid, uPid)
 	{
@@ -133,6 +144,16 @@ end
 			stat = rv.active;
 			gpio = rv.gpio;
 			usb = rv.usb;
+			if ( loadpin == "0" )
+			{
+				pinn = rv.pin;
+				if ( rv.pin == null )
+				{
+					pinn = "";
+				}
+				document.getElementById("modpin").value = pinn;
+				loadpin = "1";
+			} 
 
 			if ( stat == "0" )
 			{
@@ -140,9 +161,11 @@ end
 				document.getElementById("active").innerHTML="<%:No Modem Present%>";
 				document.getElementById("conn").disabled=true;
 				document.getElementById("disconn").disabled=true;
+				<% if nosms == 0 then %>
 				document.getElementById("sendcmdat").disabled=true;
 				document.getElementById("atcmd").value=" ";
 				document.getElementById("attxt").value=" ";
+				<% end %>
 				document.getElementById("apply1").disabled=true;
 				document.getElementById("net1").style.display="none";
 				document.getElementById("net2").style.display="none";
@@ -168,7 +191,7 @@ end
 					document.getElementById("pwrtoggle").disabled=true;
 					document.getElementById("pwrtoggle1").disabled=true;
 				}
-				
+			<% if nosms == 0 then %>	
 				plock = rv.plock;
 				if ( plock == "0" )
 				{
@@ -214,17 +237,19 @@ end
 						document.getElementById("sendfullat").style.visibility="hidden";
 					}
 				}
+			<% end %>
 			}
 			if ( stat == "1" )
 			{
 				document.getElementById("active").innerHTML="<%:Modem Present/Not Connected%>";
 				document.getElementById("conn").disabled=false;
 				document.getElementById("disconn").disabled=true;
-				document.getElementById("sendcmdat").disabled=false;
 				document.getElementById("apply1").disabled=false;
+				<% if nosms == 0 then %>
 				document.getElementById("senddropat").disabled=false;
 				document.getElementById("atcmd").disabled=false;
 				document.getElementById("drop1").disabled=false;
+				document.getElementById("sendcmdat").disabled=false;
 				
 				plock = rv.plock;
 				if ( plock == "0" )
@@ -282,6 +307,7 @@ end
 						document.getElementById("sendfullat").style.visibility="hidden";
 					}
 				}
+			<% end %>
 				if ( gpio == "0" )
 				{
 					if ( usb == "0" )
@@ -335,6 +361,7 @@ end
 				document.getElementById("conn").disabled=true;
 				document.getElementById("disconn").disabled=false;
 				document.getElementById("apply1").disabled=false;
+				<% if nosms == 0 then %>
 				plock = rv.plock;
 				if ( plock == "0" )
 				{
@@ -389,6 +416,7 @@ end
 						document.getElementById("sendfullat").style.visibility="hidden";
 					}
 				} 
+				<% end %>
 				if ( gpio == "0" )
 				{
 					if ( usb == "0" )
@@ -439,9 +467,11 @@ end
 			proto = rv.proto
 			if ( proto == "3" )
 			{
+				<% if nosms == 0 then %>
 				document.getElementById("sendcmdat").disabled=true;
 				document.getElementById("atcmd").value=" ";
 				document.getElementById("attxt").value=" ";
+				<% end %>
 				document.getElementById("apply1").disabled=true;
 			}
 			var netm = rv.netmode;
@@ -639,6 +669,7 @@ end
 			// Supported LTE bands
 			//
 			bx = rv.bndsup ;
+			//document.getElementById("attxt").value=bx + " " + stat + " " + bnds;
 			if ( stat != "0" && bx != "0" )
 			{
 				//document.getElementById("tab5g").style.display = "none";
@@ -1084,6 +1115,7 @@ end
 			}
 			else
 			{
+				bnds = "0";
 				document.getElementById("tab5").style.display = "none";
 				document.getElementById("tab6").style.display = "none";
 				document.getElementById("tab7").style.display = "none";
@@ -1461,6 +1493,7 @@ end
 
 		if ( confirm("<%:Modem will be locked to selected bands.\nContinue?%>") )
 		{
+			locking = 1;
 			s = rstr ;
 			XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "send_lockcmd")%>',
 				{ set: s },
@@ -1765,6 +1798,25 @@ end
 		return false;
 	}
 	
+	function sndpin(event)
+	{
+	
+	}
+	
+	function sendpin(btn)
+	{
+		var s = document.getElementById("modpin").value;
+		document.getElementById("attxt").value=s;
+		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "setpin")%>',
+			{ set: s },
+			function(x, rv)
+			{
+			}
+		); 
+
+		return true;
+	}
+	
 //]]></script>
 
 <form method="post" action="<%=REQUEST_URI%>">
@@ -1896,6 +1948,7 @@ end
 </fieldset>
 <% end %>
 
+<% if nomulti == 1 then %>
 <% if block == 0 then %>
 <fieldset class="cbi-section" id="cbi-mode-cb">
 	<legend><%:Cellular Bands%></legend>
@@ -2142,6 +2195,20 @@ end
 		<td>&nbsp;</td>
   	</tr>
 
+ 	</table>
+</fieldset>
+<% end %>
+
+<fieldset class="cbi-section" id="cbi-mode-pin">
+	<legend><%:GPS Message Pin%></legend>
+	<table id="pinchnge" border="0">
+		<tr>
+				<td width="5%">&nbsp;</td>
+				<td width="10%"><div align="right"><%:Message Pin :%></div></td>
+				<td width="20%"><input type="text" name="modpin" id="modpin" class="cbi-input-text" style="width: 350px;" maxlength="500" ></input></td>
+				<td width="10%"><input type="button" id="submit" class="cbi-button cbi-button-apply" value="<%:Set Pin%>" onclick="return sendpin(this)" /></td>
+				<td width="55%">&nbsp;</td>
+		</tr>
  	</table>
 </fieldset>
 

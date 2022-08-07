@@ -216,6 +216,21 @@ do_custom() {
 						hostless="0"
 					fi
 					uci set modem.modeminfo$CURRMODEM.hostless="$hostless"
+					config_get bwday $1 bwday
+					if [ -z $bwday ]; then
+						bwday="0"
+					fi
+					uci set modem.modeminfo$CURRMODEM.bwday=$bwday
+					config_get phone $1 phone
+					if [ -z $phone ]; then
+						phone="0"
+					fi
+					uci set modem.modeminfo$CURRMODEM.bwphone=$phone
+					config_get bwdelay $1 bwdelay
+					if [ -z $bwdelay ]; then
+						bwdelay="0"
+					fi
+					uci set modem.modeminfo$CURRMODEM.bwdelay=$bwdelay
 
 					[ -n "$apn" ] || log "This profile has no APN configured !!!"
 
@@ -325,6 +340,21 @@ if [ $MATCH = 0 ]; then
 		hostless="0"
 	fi
 	uci set modem.modeminfo$CURRMODEM.hostless="$hostless"
+	bwday=$(uci -q get profile.default.bwday)
+	if [ -z $bwday ]; then
+		bwday="0"
+	fi
+	uci set modem.modeminfo$CURRMODEM.bwday=$bwday
+	phone=$(uci -q get profile.default.phone)
+	if [ -z $phone ]; then
+		phone="0"
+	fi
+	uci set modem.modeminfo$CURRMODEM.bwphone=$phone
+	bwdelay=$(uci -q get profile.default.bwdelay)
+	if [ -z $bwdelay ]; then
+		bwdelay="0"
+	fi
+	uci set modem.modeminfo$CURRMODEM.bwdelay=$bwdelay
 
 	alive=$(uci get profile.default.alive)
 	uci delete modem.pinginfo$CURRMODEM

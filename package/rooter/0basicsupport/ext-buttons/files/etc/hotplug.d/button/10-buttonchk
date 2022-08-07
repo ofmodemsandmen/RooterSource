@@ -7,12 +7,4 @@ log() {
 log "Button Name : $BUTTON     Action : $ACTION"
 
 log "$ACTION $SEEN"
-case "$ACTION" in
-released)
-	if [ "$SEEN" -gt 5 -a "$SEEN" -lt 15 ]
-	then
-		passwd -d root
-		reboot -f
-	fi
-;;
-esac
+

@@ -33,6 +33,9 @@ log "Hotspot Firewall"
 
 	config_load firewall
 	config_foreach do_zone zone
+	uci set travelmate.global.lost="0"
+	uci set travelmate.global.delay="30"
+	uci commit travelmate
 }
 
 
