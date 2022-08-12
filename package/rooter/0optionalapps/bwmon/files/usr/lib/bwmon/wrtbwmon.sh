@@ -1,6 +1,6 @@
 #!/bin/sh
 
-setbackup() { 
+setbackup() {
 	extn=$(uci -q get bwmon.general.external)
 	if [ "$extn" = "0" ]; then
 		backPath=/usr/lib/bwmon/data/
