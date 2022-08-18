@@ -749,6 +749,18 @@ fi
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		log "Cell Lock $OX"
 		sleep 10
+	else
+		ATCMDD="at+qnwlock=\"common/4g\""
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		if `echo $OX | grep "ERROR" 1>/dev/null 2>&1`
+		then
+			ATCMDD="at+qnwlock=\"common/lte\",0"
+		else
+			ATCMDD=$ATCMDD",0"
+		fi
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		log "$OX"
+		sleep 5		
 	fi
 
 	$ROOTER/connect/bandmask $CURRMODEM 1
