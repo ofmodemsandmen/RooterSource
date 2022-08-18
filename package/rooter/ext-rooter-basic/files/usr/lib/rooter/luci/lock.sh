@@ -369,6 +369,7 @@ case $uVid in
 esac
 
 if [ $RESTART = "0" ]; then
+	sleep 5
 	/usr/lib/rooter/connect/bandmask $CURRMODEM $MODT
 	exit 0
 fi
