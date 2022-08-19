@@ -710,8 +710,8 @@ if $QUECTEL; then
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		fi
 		log "Quectel Unsolicited Responses Disabled"
-fi
-
+	fi
+	$ROOTER/connect/bandmask $CURRMODEM 1
 	clck=$(uci -q get custom.bandlock.cenable)
 	if [ $clck = "1" ]; then
 		ear=$(uci -q get custom.bandlock.earfcn)
@@ -749,21 +749,7 @@ fi
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		log "Cell Lock $OX"
 		sleep 10
-	else
-		ATCMDD="at+qnwlock=\"common/4g\""
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		if `echo $OX | grep "ERROR" 1>/dev/null 2>&1`
-		then
-			ATCMDD="at+qnwlock=\"common/lte\",0"
-		else
-			ATCMDD=$ATCMDD",0"
-		fi
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		log "$OX"
-		sleep 5		
 	fi
-
-	$ROOTER/connect/bandmask $CURRMODEM 1
 fi
 $ROOTER/luci/celltype.sh $CURRMODEM
 if [ $SIERRAID -eq 1 ]; then

@@ -232,6 +232,18 @@ quebandmask() {
 	uci set modem.modem$CURRMODEM.L5="$L5"
 	uci set modem.modem$CURRMODEM.L6="$L6"
 	uci commit modem
+	
+	ATCMDD="at+qnwlock=\"common/4g\""
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	if `echo $OX | grep "ERROR" 1>/dev/null 2>&1`
+	then
+		ATCMDD="at+qnwlock=\"common/lte\",0"
+	else
+		ATCMDD=$ATCMDD",0"
+	fi
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	log "Unlock $OX"
+	sleep 15		
 }
 
 fibomask() {
