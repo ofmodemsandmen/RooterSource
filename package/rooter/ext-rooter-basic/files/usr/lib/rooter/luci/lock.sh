@@ -234,7 +234,11 @@ case $uVid in
 		log "Locking Cmd : $M2"
 		log "Locking Cmd : $M5"
 		log " "
-		ATCMDD="AT"
+		ATCMDD="AT+CFUN=1,1"
+		if [ -z "$2" ]; then
+			ATCMDD="AT"
+		fi
+		
 		NOCFUN=$uVid
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M2")
 		if [ ! -z $M5 ]; then
