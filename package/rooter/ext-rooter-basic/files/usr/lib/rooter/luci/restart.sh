@@ -1,7 +1,11 @@
-#!/bin/sh 
+#!/bin/sh
 
 ROOTER=/usr/lib/rooter
 ROOTER_LINK="/tmp/links"
+
+log() {
+	logger -t "Modem Restart/Diisconnect" "$@"
+}
 
 ifname1="ifname"
 if [ -e /etc/newstyle ]; then
@@ -10,11 +14,23 @@ fi
 
 CURRMODEM=$1
 CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
+INTER=$(uci get modem.modeminfo$CURRMODEM.inter)
 
-if [ ! -z "$CPORT" ]; then
-	ATCMDD="AT+CFUN=1,1"
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	ifdown wan$CURRMODEM
+if [ ! -z "$2" ]; then # disconnect
+	uci set modem.modem$CURRMODEM.connected=0
+	uci commit modem
+	jkillall getsignal$CURRMODEM
+	rm -f $ROOTER_LINK/getsignal$CURRMODEM
+	jkillall con_monitor$CURRMODEM
+	rm -f $ROOTER_LINK/con_monitor$CURRMODEM
+	ifdown wan$INTER
+	$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
+else # restart
+	if [ ! -z "$CPORT" ]; then
+		ATCMDD="AT+CFUN=1,1"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	fi
+	ifdown wan$INTER
 	uci delete network.wan$CURRMODEM
 	uci set network.wan$CURRMODEM=interface
 	uci set network.wan$CURRMODEM.proto=dhcp
@@ -22,28 +38,17 @@ if [ ! -z "$CPORT" ]; then
 	uci set network.wan$CURRMODEM.metric=$CURRMODEM"0"
 	uci commit network
 	/etc/init.d/network reload
-	ifdown wan$CURRMODEM
+	ifdown wan$INTER
 	echo "1" > /tmp/modgone
+	log "Hard modem reset done"
+	exit 0
+	PORT="usb1"
+	echo $PORT > /sys/bus/usb/drivers/usb/unbind
+	sleep 5
+	echo $PORT > /sys/bus/usb/drivers/usb/bind
+	PORT="usb2"
+	echo $PORT > /sys/bus/usb/drivers/usb/unbind
+	sleep 5
+	echo $PORT > /sys/bus/usb/drivers/usb/bind
+	log "Hard modem reset done"
 fi
-
-PORT="usb1"
-echo $PORT > /sys/bus/usb/drivers/usb/unbind
-sleep 15
-echo $PORT > /sys/bus/usb/drivers/usb/bind
-sleep 10
-PORT="usb2"
-log "Re-binding USB driver on $PORT to reset modem"
-echo $PORT > /sys/bus/usb/drivers/usb/unbind
-sleep 15
-echo $PORT > /sys/bus/usb/drivers/usb/bind
-sleep 10
-ifdown wan$CURRMODEM
-uci delete network.wan$CURRMODEM
-uci set network.wan$CURRMODEM=interface
-uci set network.wan$CURRMODEM.proto=dhcp
-uci set network.wan$CURRMODEM.${ifname1}="wan"$CURRMODEM
-uci set network.wan$CURRMODEM.metric=$CURRMODEM"0"
-uci commit network
-/etc/init.d/network reload
-ifdown wan$CURRMODEM
-echo "1" > /tmp/modgone

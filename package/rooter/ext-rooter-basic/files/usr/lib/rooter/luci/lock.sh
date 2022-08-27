@@ -235,10 +235,6 @@ case $uVid in
 		log "Locking Cmd : $M5"
 		log " "
 		ATCMDD="AT+CFUN=1,1"
-		if [ -z "$2" ]; then
-			ATCMDD="AT"
-		fi
-		
 		NOCFUN=$uVid
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M2")
 		if [ ! -z $M5 ]; then
@@ -249,6 +245,7 @@ case $uVid in
 		log " "
 		if [ $RESTART = "1" ]; then
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			sleep 10
 		fi
 	;;
 	"1199" )
@@ -373,11 +370,13 @@ case $uVid in
 esac
 
 if [ $RESTART = "0" ]; then
-	sleep 5
 	/usr/lib/rooter/connect/bandmask $CURRMODEM $MODT
 	exit 0
 fi
 rm -f /tmp/bmask
+/usr/lib/rooter/luci/restart.sh $CURRMODEM
+exit 0
+
 uci set modem.modem$CURRMODEM.connected=0
 uci commit modem
 
@@ -420,8 +419,7 @@ if ! $CFUNDONE; then
 		uci commit network
 		/etc/init.d/network reload
 		ifdown wan$CURRMODEM
-		echo "1" > /tmp/modgone
-		log "Setting Modem Removal flag (2)"
+		exit 0
 		if [[ -n "$CPORT" ]] && [[ ! `echo $NOCFUN | grep -o "$uVid"` ]]; then
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			sleep 30
