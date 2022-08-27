@@ -769,6 +769,12 @@ if [ $T77 -eq 1 ]; then
 	$ROOTER/connect/bandmask $CURRMODEM 3
 fi
 
+if [ $idV = "1bc7" ]; then
+	if [ $idP = "1040" -o $idP = "1041" ]; then
+		$ROOTER/connect/bandmask $CURRMODEM 4
+	fi
+fi
+
 CHKPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 if [ -n "$CHKPORT" ]; then
 	$ROOTER/common/gettype.sh $CURRMODEM

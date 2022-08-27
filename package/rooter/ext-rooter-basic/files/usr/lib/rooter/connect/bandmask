@@ -232,18 +232,6 @@ quebandmask() {
 	uci set modem.modem$CURRMODEM.L5="$L5"
 	uci set modem.modem$CURRMODEM.L6="$L6"
 	uci commit modem
-	
-	ATCMDD="at+qnwlock=\"common/4g\""
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if `echo $OX | grep "ERROR" 1>/dev/null 2>&1`
-	then
-		ATCMDD="at+qnwlock=\"common/lte\",0"
-	else
-		ATCMDD=$ATCMDD",0"
-	fi
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	log "Unlock $OX"
-	sleep 15		
 }
 
 fibomask() {
@@ -354,6 +342,130 @@ t77mask() {
 	uci commit modem
 }
 
+reversebit() {
+	LX=$1
+	length=${#LX}
+	jx="${LX:2:length-2}"
+	length=${#jx}
+	str=""
+	i=$((length-1))
+	while [ $i -ge 0 ]
+	do
+		dgt="0x"${jx:$i:1}
+		DecNum=`printf "%d" $dgt`
+		Binary=
+		Number=$DecNum
+		while [ $DecNum -ne 0 ]
+		do
+			Bit=$(expr $DecNum % 2)
+			Binary=$Bit$Binary
+			DecNum=$(expr $DecNum / 2)
+		done
+		if [ -z $Binary ]; then
+			Binary="0000"
+		fi
+		len=${#Binary}
+		while [ $len -lt 4 ]
+		do
+			Binary="0"$Binary
+			len=${#Binary}
+		done
+		revstr=""
+		length=${#Binary}
+		ii=$((length-1))
+		while [ $ii -ge 0 ]
+		do
+			revstr=$revstr${Binary:$ii:1}
+			ii=$((ii-1))
+		done
+		str=$str$revstr
+		i=$((i-1))
+	done
+	revstr=$str"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+}
+
+reverse() {
+	REV=""
+	BNDD=$1
+	strlen=${#BNDD}
+	i=$((strlen-1))
+	while [ $i -ge 0 ]
+	do
+		REV=$REV${BNDD:$i:1}
+		i=$((i-1))
+	done
+}
+
+telitbandmask() {
+	enb=$(uci -q get custom.bandlock.enabled)
+	ATCMDD='AT#BND?'
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	if [ $enb == "1" ]; then
+		log " "
+		log "Telit Response : $OX"
+		log " "
+	fi
+	OX=$(echo $OX | tr " " '\x0a')
+	line=$OX
+	bnd=$(echo $line | grep "BND: ")
+	if [ ! -z "$bnd" ]; then
+		line=$(echo $bnd | tr " " ',')
+		if [ $enb == "1" ]; then
+			log "$line"
+		fi
+		BND=$(echo $line | cut -d, -f5)
+		ext=$(echo $line | cut -d, -f6)
+		reverse $BND
+		revs=$REV"0000000000000000"
+		revs=${revs:0:16}
+		reverse $revs
+		EXT=""
+		if [ "$ext" != "OK" -a "$ext" != "0" ]; then
+			EXT=$ext
+		fi
+		revs=$EXT$REV
+		if [ $enb == "1" ]; then
+			log " "
+			log "LTE Band Mask : $revs"
+			log " "
+		fi
+		ATCMDD='AT#BND=?'
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		OX=$(echo $OX | tr " " '\x0a')
+		OX=$(echo ${OX//),(/!})
+		BND=$(echo $OX"!!" | cut -d! -f3)
+		extt=$(echo $OX"!!" | cut -d! -f4)
+		if [ ! -z "$extt" ]; then
+			extt=$(echo $extt | tr "(" ',')
+			extt=$(echo $extt | tr ")" ',')
+			extt=$(echo $extt",," | cut -d, -f1)
+		fi
+		BND=$(echo $BND | tr "(" ',')
+		BND=$(echo $BND | tr ")" ',')
+		BND=$(echo $BND",," | cut -d, -f1)
+		reverse $BND
+		revx=$REV"0000000000000000"
+		revx=${revx:0:16}
+		reverse $revx
+		revx=$extt$REV
+		revx=${revx:0:18}
+		reversebit "0x"$revx
+		revstr=${revstr:0:72}
+		if [ $enb == "1" ]; then
+			log " "
+			log "LTE Bit Mask : $revstr"
+			log " "
+		fi
+
+		uci set modem.modem$CURRMODEM.GW="0"
+		uci set modem.modem$CURRMODEM.L1="0x$revs"
+		uci set modem.modem$CURRMODEM.L1X="$revstr"
+		uci set modem.modem$CURRMODEM.LEXT="$extt"
+		uci set modem.modem$CURRMODEM.L2="0"
+		uci commit modem
+	fi
+}
+
 case $MODTYPE in
 	"0" )
 		sierrabandmask
@@ -366,6 +478,9 @@ case $MODTYPE in
 	;;
 	"3" )
 		t77mask
+	;;
+	"4" )
+		telitbandmask
 	;;
 esac
 

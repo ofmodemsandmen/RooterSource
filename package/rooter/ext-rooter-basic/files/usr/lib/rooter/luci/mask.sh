@@ -247,6 +247,17 @@ case $uVid in
 			;;
 		esac
 	;;
+	"1bc7" )
+		case $uPid in
+
+			"1040"|"1041")
+				L1X=$(uci -q get modem.modem$CURRMODEM.L1X)
+				M2=$L1X
+				CA=""
+				CA3=""
+			;;
+		esac
+	;;
 	* )
 		exit 0
 	;;

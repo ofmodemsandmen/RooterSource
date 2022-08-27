@@ -364,6 +364,38 @@ case $uVid in
 			;;
 		esac
 	;;
+	"1bc7" )
+		case $uPid in
+			"1040"|"1041")
+				MODT="4"
+				RESTART="1"
+				ext=""
+				extt=$(uci -q get modem.modem$CURRMODEM.LEXT)
+				strlen=${#mask}
+				if [ "$strlen" -lt 17 ]; then
+					if [ ! -z $extt ]; then
+						mask=$mask",00"
+					fi
+				fi
+				if [ "$strlen" -eq 17 ]; then
+					ext="0"${mask:0:1}
+					mask=${mask:5:17}",$ext"
+				fi
+				if [ "$strlen" -eq 18 ]; then
+					ext=${mask:0:2}
+					mask=${mask:6:18}",$ext"
+				fi
+				
+				ATCMDD="AT#BND=0,11,""$mask"
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				log "Response $OX"
+				if [ $RESTART = "1" ]; then
+					ATCMDD="AT+CFUN=1,1"
+					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				fi
+			;;
+		esac
+	;;
 	* )
 		exit 0
 	;;
