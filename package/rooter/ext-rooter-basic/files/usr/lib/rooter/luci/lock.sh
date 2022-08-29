@@ -212,6 +212,9 @@ case $uVid in
 			fi
 			M2='AT+QNWPREFCFG="lte_band",'$lst
 		fi
+		if [ $uPid = 0306 ]; then
+			RESTART="1"
+		fi
 		if [ $uPid = 0800 -o $uPid = 0900 ]; then
 			if [ ! -z $mask ]; then
 				fibdecode $mask 1 1
@@ -234,7 +237,7 @@ case $uVid in
 		log "Locking Cmd : $M2"
 		log "Locking Cmd : $M5"
 		log " "
-		ATCMDD="AT+CFUN=1,1"
+		ATCMDD="AT"
 		NOCFUN=$uVid
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M2")
 		if [ ! -z $M5 ]; then
@@ -364,38 +367,6 @@ case $uVid in
 			;;
 		esac
 	;;
-	"1bc7" )
-		case $uPid in
-			"1040"|"1041")
-				MODT="4"
-				RESTART="1"
-				ext=""
-				extt=$(uci -q get modem.modem$CURRMODEM.LEXT)
-				strlen=${#mask}
-				if [ "$strlen" -lt 17 ]; then
-					if [ ! -z $extt ]; then
-						mask=$mask",00"
-					fi
-				fi
-				if [ "$strlen" -eq 17 ]; then
-					ext="0"${mask:0:1}
-					mask=${mask:5:17}",$ext"
-				fi
-				if [ "$strlen" -eq 18 ]; then
-					ext=${mask:0:2}
-					mask=${mask:6:18}",$ext"
-				fi
-				
-				ATCMDD="AT#BND=0,11,""$mask"
-				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-				log "Response $OX"
-				if [ $RESTART = "1" ]; then
-					ATCMDD="AT+CFUN=1,1"
-					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-				fi
-			;;
-		esac
-	;;
 	* )
 		exit 0
 	;;
@@ -408,56 +379,3 @@ fi
 rm -f /tmp/bmask
 /usr/lib/rooter/luci/restart.sh $CURRMODEM
 exit 0
-
-uci set modem.modem$CURRMODEM.connected=0
-uci commit modem
-
-CFUNDONE=false
-if `echo ${OX} | grep "OK" 1>/dev/null 2>&1` && \
-[[ ! `echo $NOCFUN | grep -o "$uVid"` ]]; then
-	CFUNDONE=true
-	log "Hard modem reset done on /dev/ttyUSB$CPORT to reload drivers"
-	ifdown wan$CURRMODEM
-	uci delete network.wan$CURRMODEM
-	uci set network.wan$CURRMODEM=interface
-	uci set network.wan$CURRMODEM.proto=dhcp
-	uci set network.wan$CURRMODEM.${ifname1}="wan"$CURRMODEM
-	uci set network.wan$CURRMODEM.metric=$CURRMODEM"0"
-	uci commit network
-	/etc/init.d/network reload
-	ifdown wan$CURRMODEM
-	echo "1" > /tmp/modgone
-	log "Setting Modem Removal flag (1)"
-fi
-if ! $CFUNDONE; then
-		PORT="usb1"
-		log "Re-binding USB driver on $PORT to reset modem"
-		echo $PORT > /sys/bus/usb/drivers/usb/unbind
-		sleep 15
-		echo $PORT > /sys/bus/usb/drivers/usb/bind
-		sleep 10
-		PORT="usb2"
-		log "Re-binding USB driver on $PORT to reset modem"
-		echo $PORT > /sys/bus/usb/drivers/usb/unbind
-		sleep 15
-		echo $PORT > /sys/bus/usb/drivers/usb/bind
-		sleep 10
-		ifdown wan$CURRMODEM
-		uci delete network.wan$CURRMODEM
-		uci set network.wan$CURRMODEM=interface
-		uci set network.wan$CURRMODEM.proto=dhcp
-		uci set network.wan$CURRMODEM.${ifname1}="wan"$CURRMODEM
-		uci set network.wan$CURRMODEM.metric=$CURRMODEM"0"
-		uci commit network
-		/etc/init.d/network reload
-		ifdown wan$CURRMODEM
-		exit 0
-		if [[ -n "$CPORT" ]] && [[ ! `echo $NOCFUN | grep -o "$uVid"` ]]; then
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			sleep 30
-		else
-			if [ -f $ROOTER_LINK/reconnect$CURRMODEM ]; then
-				$ROOTER_LINK/reconnect$CURRMODEM $CURRMODEM &
-			fi
-		fi
-	fi

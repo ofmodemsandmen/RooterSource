@@ -26,10 +26,15 @@ if [ ! -z "$2" ]; then # disconnect
 	ifdown wan$INTER
 	$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
 else # restart
-	if [ ! -z "$CPORT" ]; then
-		ATCMDD="AT+CFUN=1,1"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	fi
+	uVid=$(uci get modem.modem$CURRMODEM.uVid)
+	uPid=$(uci get modem.modem$CURRMODEM.uPid)
+	#if [ $uVid != "2c7c" ]; then
+		if [ ! -z "$CPORT" ]; then
+			ATCMDD="AT+CFUN=1,1"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
+		log "Hard modem reset done"
+	#fi
 	ifdown wan$INTER
 	uci delete network.wan$CURRMODEM
 	uci set network.wan$CURRMODEM=interface
@@ -38,17 +43,16 @@ else # restart
 	uci set network.wan$CURRMODEM.metric=$CURRMODEM"0"
 	uci commit network
 	/etc/init.d/network reload
-	ifdown wan$INTER
 	echo "1" > /tmp/modgone
-	log "Hard modem reset done"
-	exit 0
+	log "Hard USB reset done"
+
 	PORT="usb1"
 	echo $PORT > /sys/bus/usb/drivers/usb/unbind
-	sleep 5
-	echo $PORT > /sys/bus/usb/drivers/usb/bind
 	PORT="usb2"
 	echo $PORT > /sys/bus/usb/drivers/usb/unbind
-	sleep 5
+	sleep 35
+	PORT="usb1"
 	echo $PORT > /sys/bus/usb/drivers/usb/bind
-	log "Hard modem reset done"
+	PORT="usb2"
+	echo $PORT > /sys/bus/usb/drivers/usb/bind
 fi
