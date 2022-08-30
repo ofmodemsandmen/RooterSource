@@ -1,5 +1,9 @@
 #!/bin/sh
 
+log() {
+	logger -t "Croncat" "$@"
+}
+
 > /tmp/crontmp
 if [ -e /etc/crontabs/root ]; then
 	while read -r line; do

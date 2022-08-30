@@ -1,5 +1,9 @@
 #!/bin/sh
 
+log() {
+	logger -t "Schedule Reboot" "$@"
+}
+
 PARM=$1
 
 if [ $PARM = "0" ]; then
