@@ -46,13 +46,8 @@ else # restart
 	echo "1" > /tmp/modgone
 	log "Hard USB reset done"
 
-	PORT="usb1"
-	echo $PORT > /sys/bus/usb/drivers/usb/unbind
-	PORT="usb2"
+	PORT="usb$CURRMODEM"
 	echo $PORT > /sys/bus/usb/drivers/usb/unbind
 	sleep 35
-	PORT="usb1"
-	echo $PORT > /sys/bus/usb/drivers/usb/bind
-	PORT="usb2"
 	echo $PORT > /sys/bus/usb/drivers/usb/bind
 fi
