@@ -22,13 +22,11 @@ nr_bw() {
 	case $BW in
 		"0"|"1"|"2"|"3"|"4"|"5")
 			BW=$((($(echo $BW) + 1) * 5)) ;;
-		"6"|"7"|"8")
+		"6"|"7"|"8"|"9"|"10"|"11"|"12")
 			BW=$((($(echo $BW) - 2) * 10)) ;;
-		"9"|"10"|"11")
-			BW=$((($(echo $BW) - 1) * 10)) ;;
-		"12")
-			BW="200" ;;
 		"13")
+			BW="200" ;;
+		"14")
 			BW="400" ;;
 	esac
 }
@@ -67,7 +65,7 @@ NR_NSA=$(echo $OX | grep -o "+QENG:[ ]\?\"NR5G-NSA\",")
 NR_SA=$(echo $OX | grep -o "+QENG: \"SERVINGCELL\",[^,]\+,\"NR5G-SA\",\"[DFT]\{3\}\",")
 if [ -n "$NR_NSA" ]; then
 	QENG=",,"$(echo $OX" " | grep -o "+QENG: \"LTE\".\+\"NR5G-NSA\"," | tr " " ",")
-	QENG5=$(echo $OX | grep -o "+QENG:[ ]\?\"NR5G-NSA\",[0-9]\{3\},[0-9]\{2,3\},[0-9]\{1,5\},-[0-9]\{2,5\},[-0-9]\{1,3\},-[0-9]\{2,3\},[0-9]\{6,7\},[0-9]\{1,3\}.\{1,6\}")
+	QENG5=$(echo $OX | grep -o "+QENG:[ ]\?\"NR5G-NSA\",[0-9]\{3\},[0-9]\{2,3\},[0-9]\{1,5\},-[0-9]\{2,5\},[-0-9]\{1,3\},-[0-9]\{2,3\},[0-9]\{1,7\},[0-9]\{1,3\}.\{1,6\}")
 	if [ -z "$QENG5" ]; then
 		QENG5=$(echo $OX | grep -o "+QENG:[ ]\?\"NR5G-NSA\",[0-9]\{3\},[0-9]\{2,3\},[0-9]\{1,5\},-[0-9]\{2,3\},[-0-9]\{1,3\},-[0-9]\{2,3\}")
 		if [ -n "$QENG5" ]; then
@@ -169,7 +167,11 @@ case $RAT in
 						nr_bw
 						LBAND=$LBAND" (Bandwidth $BW MHz)"
 					fi
-					CHANNEL=$CHANNEL", "$SCHV
+					if [ "$SCHV" -ge 123400 ]; then
+						CHANNEL=$CHANNEL", "$SCHV
+					else
+						CHANNEL=$CHANNEL", -"
+					fi
 				else
 					LBAND=$LBAND"<br />nxx (unknown NR5G band)"
 					CHANNEL=$CHANNEL", -"

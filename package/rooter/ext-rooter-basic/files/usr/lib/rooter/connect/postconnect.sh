@@ -13,3 +13,7 @@ idP=$(uci -q get modem.modem$CURRMODEM.idP)
 CPORT=$(uci get modem.modem$CURRMODEM.commport)
 
 log "Running PostConnect script"
+
+if [ -e /usr/lib/scan/emailchk.sh ]; then
+	/usr/lib/scan/emailchk.sh &
+fi

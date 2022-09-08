@@ -18,6 +18,7 @@ function index()
 	  entry( {"admin", "vpn", "wireguard", "wupload"},   call("conf_upload"))
 	  entry( {"admin", "vpn", "generateconf"},   call("conf_gen"))
 	  entry( {"admin", "vpn", "textconf"},   call("text_gen"))
+	  entry( {"admin", "vpn", "wirestatus"},   call("wirestatus"))
 end
 
 function conf_upload()
@@ -63,4 +64,48 @@ end
 function text_gen()
 	local set = luci.http.formvalue("set")
 	os.execute("/usr/lib/wireguard/text.sh " .. "\"" .. set .. "\"")
+end
+
+function wirestatus()
+	local data = { }
+  local last_device = ""
+
+  local wg_dump = io.popen("wg show all dump")
+  if wg_dump then
+    local line
+    for line in wg_dump:lines() do
+      local line = string.split(line, "\t")
+      if not (last_device == line[1]) then
+        last_device = line[1]
+        data[line[1]] = {
+          name                 = line[1],
+          public_key           = line[3],
+          listen_port          = line[4],
+          fwmark               = line[5],
+          peers                = { }
+        }
+      else
+        local peer = {
+          public_key           = line[2],
+          endpoint             = line[4],
+          allowed_ips          = { },
+          latest_handshake     = line[6],
+          transfer_rx          = line[7],
+          transfer_tx          = line[8],
+          persistent_keepalive = line[9]
+        }
+        if not (line[4] == '(none)') then
+          for ipkey, ipvalue in pairs(string.split(line[5], ",")) do
+            if #ipvalue > 0 then
+              table.insert(peer['allowed_ips'], ipvalue)
+            end
+          end
+        end
+        table.insert(data[line[1]].peers, peer)
+      end
+    end
+  end
+
+    luci.http.prepare_content("application/json")
+    luci.http.write_json(data)
 end

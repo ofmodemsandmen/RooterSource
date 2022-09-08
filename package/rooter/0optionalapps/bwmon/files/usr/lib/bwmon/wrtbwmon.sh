@@ -364,6 +364,14 @@ createFiles()
 		sleep 1
 	done
 	echo "0" > /tmp/lockbw
+	while [ ! -e $backPath*"mac_data.js" ]; do
+		valid=$(cat /var/state/dnsmasqsec)
+		st=$(echo "$valid" | grep "ntpd says time is valid")
+		if [ ! -z "$st" ]; then
+			break
+		fi
+		sleep 10
+	done
 	dailyUsageDB="$dataPath$cYear-$cMonth-$cDay-daily_data.js"
 	dailyUsageBack="$backPath$cYear-$cMonth-$cDay-daily_data.js"
 	if [ ! -f $dailyUsageBack ]; then

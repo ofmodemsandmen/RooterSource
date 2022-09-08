@@ -42,6 +42,18 @@ fi
 CURRMODEM=$(uci get modem.general.miscnum)
 COMMPORT="/dev/ttyUSB"$(uci get modem.modem$CURRMODEM.commport)
 CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
+
+ATCMDD="at+qnwlock=\"common/4g\""
+OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+if `echo $OX | grep "ERROR" 1>/dev/null 2>&1`
+then
+	ATCMDD="at+qnwlock=\"common/lte\",0"
+else
+	ATCMDD=$ATCMDD",0"
+fi
+OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+log "$OX"
+sleep 5		
 ATCMDD="AT+CFUN=1,1"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 log "Hard modem reset done on /dev/ttyUSB$CPORT to reload drivers"

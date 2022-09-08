@@ -17,12 +17,11 @@ waitfor() {
 	while [ -e /tmp/modgone ]; do
 		sleep 1
 		CNTR=`expr $CNTR + 1`
-		if [ $CNTR -gt 10 ]; then
+		if [ $CNTR -gt 35 ]; then
 			rm -f /tmp/modgone
 			break
 		fi
 	done
-	sleep 4
 }
 
 rebind() {
@@ -69,9 +68,8 @@ rebind() {
 		PORT=$1
 		log "Re-binding USB driver on $PORT to reset modem"
 		echo $PORT > /sys/bus/usb/drivers/usb/unbind
-		sleep 15
+		sleep 35
 		echo $PORT > /sys/bus/usb/drivers/usb/bind
-		sleep 10
 		ifdown wan$CURRMODEM
 		uci delete network.wan$CURRMODEM
 		uci set network.wan$CURRMODEM=interface

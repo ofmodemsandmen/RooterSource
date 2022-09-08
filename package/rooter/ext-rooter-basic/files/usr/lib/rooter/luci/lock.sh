@@ -212,7 +212,10 @@ case $uVid in
 			fi
 			M2='AT+QNWPREFCFG="lte_band",'$lst
 		fi
-		if [ $uPid = 0800 -o $uPid = 0900 ]; then
+		if [ $uPid = 0306 ]; then
+			RESTART="1"
+		fi
+		if [ $uPid = 0800 -o $uPid = 0900 -o $uPid = 0801]; then
 			if [ ! -z $mask ]; then
 				fibdecode $mask 1 1
 			else
@@ -245,6 +248,7 @@ case $uVid in
 		log " "
 		if [ $RESTART = "1" ]; then
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			sleep 10
 		fi
 	;;
 	"1199" )
@@ -373,56 +377,5 @@ if [ $RESTART = "0" ]; then
 	exit 0
 fi
 rm -f /tmp/bmask
-uci set modem.modem$CURRMODEM.connected=0
-uci commit modem
-
-CFUNDONE=false
-if `echo ${OX} | grep "OK" 1>/dev/null 2>&1` && \
-[[ ! `echo $NOCFUN | grep -o "$uVid"` ]]; then
-	CFUNDONE=true
-	log "Hard modem reset done on /dev/ttyUSB$CPORT to reload drivers"
-	ifdown wan$CURRMODEM
-	uci delete network.wan$CURRMODEM
-	uci set network.wan$CURRMODEM=interface
-	uci set network.wan$CURRMODEM.proto=dhcp
-	uci set network.wan$CURRMODEM.${ifname1}="wan"$CURRMODEM
-	uci set network.wan$CURRMODEM.metric=$CURRMODEM"0"
-	uci commit network
-	/etc/init.d/network reload
-	ifdown wan$CURRMODEM
-	echo "1" > /tmp/modgone
-	log "Setting Modem Removal flag (1)"
-fi
-if ! $CFUNDONE; then
-		PORT="usb1"
-		log "Re-binding USB driver on $PORT to reset modem"
-		echo $PORT > /sys/bus/usb/drivers/usb/unbind
-		sleep 15
-		echo $PORT > /sys/bus/usb/drivers/usb/bind
-		sleep 10
-		PORT="usb2"
-		log "Re-binding USB driver on $PORT to reset modem"
-		echo $PORT > /sys/bus/usb/drivers/usb/unbind
-		sleep 15
-		echo $PORT > /sys/bus/usb/drivers/usb/bind
-		sleep 10
-		ifdown wan$CURRMODEM
-		uci delete network.wan$CURRMODEM
-		uci set network.wan$CURRMODEM=interface
-		uci set network.wan$CURRMODEM.proto=dhcp
-		uci set network.wan$CURRMODEM.${ifname1}="wan"$CURRMODEM
-		uci set network.wan$CURRMODEM.metric=$CURRMODEM"0"
-		uci commit network
-		/etc/init.d/network reload
-		ifdown wan$CURRMODEM
-		echo "1" > /tmp/modgone
-		log "Setting Modem Removal flag (2)"
-		if [[ -n "$CPORT" ]] && [[ ! `echo $NOCFUN | grep -o "$uVid"` ]]; then
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			sleep 30
-		else
-			if [ -f $ROOTER_LINK/reconnect$CURRMODEM ]; then
-				$ROOTER_LINK/reconnect$CURRMODEM $CURRMODEM &
-			fi
-		fi
-	fi
+/usr/lib/rooter/luci/restart.sh $CURRMODEM
+exit 0
