@@ -833,6 +833,9 @@ if [ -n "$CHKPORT" ]; then
 		[ $MAN = "Telit" ] || DHCP=0
 	fi
 	NODHCP=$(uci -q get modem.modeminfo$CURRMODEM.nodhcp)
+	if [ $idV = "2c7c" -a $idP = "0801" ]; then
+		NODHCP="1"
+	fi
 	if [ "$NODHCP" = "1" ]; then
 		DHCP=0
 		log "Using QMI without DHCP"
