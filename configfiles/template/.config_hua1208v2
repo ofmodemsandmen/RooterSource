@@ -3928,14 +3928,14 @@ CONFIG_PACKAGE_libblobmsg-json=y
 # CONFIG_PACKAGE_libftdi is not set
 # CONFIG_PACKAGE_libftdi1 is not set
 # CONFIG_PACKAGE_libgabe is not set
-# CONFIG_PACKAGE_libgcrypt is not set
+CONFIG_PACKAGE_libgcrypt=y
 # CONFIG_PACKAGE_libgd is not set
 # CONFIG_PACKAGE_libgdbm is not set
 # CONFIG_PACKAGE_libgee is not set
 # CONFIG_PACKAGE_libglpk is not set
 # CONFIG_PACKAGE_libgmp is not set
 # CONFIG_PACKAGE_libgnurl is not set
-# CONFIG_PACKAGE_libgpg-error is not set
+CONFIG_PACKAGE_libgpg-error=y
 # CONFIG_PACKAGE_libgphoto2 is not set
 # CONFIG_PACKAGE_libgpiod is not set
 # CONFIG_PACKAGE_libgps is not set
@@ -4252,7 +4252,7 @@ CONFIG_LUCI_CSSTIDY=y
 # CONFIG_LUCI_LANG_vi is not set
 # CONFIG_LUCI_LANG_zh_Hans is not set
 # CONFIG_LUCI_LANG_zh_Hant is not set
-# CONFIG_PACKAGE_luci-compat is not set
+CONFIG_PACKAGE_luci-compat=y
 CONFIG_PACKAGE_luci-mod-admin-full=y
 # CONFIG_PACKAGE_luci-mod-failsafe is not set
 # CONFIG_PACKAGE_luci-mod-freifunk is not set
@@ -4265,6 +4265,7 @@ CONFIG_PACKAGE_luci-mod-system=y
 #
 # 3. Applications
 #
+# CONFIG_PACKAGE_luci-app-acme is not set
 # CONFIG_PACKAGE_luci-app-adblock is not set
 # CONFIG_PACKAGE_luci-app-advanced-reboot is not set
 # CONFIG_PACKAGE_luci-app-ahcp is not set
@@ -4280,6 +4281,7 @@ CONFIG_PACKAGE_luci-mod-system=y
 # CONFIG_PACKAGE_luci-app-clamav is not set
 # CONFIG_PACKAGE_luci-app-commands is not set
 # CONFIG_PACKAGE_luci-app-cshark is not set
+CONFIG_PACKAGE_luci-app-dawn19=y
 # CONFIG_PACKAGE_luci-app-dcwapd is not set
 # CONFIG_PACKAGE_luci-app-ddns is not set
 # CONFIG_PACKAGE_luci-app-diag-core is not set
@@ -4385,7 +4387,7 @@ CONFIG_PACKAGE_luci-lib-ip=y
 # CONFIG_PACKAGE_luci-lib-ipkg is not set
 # CONFIG_PACKAGE_luci-lib-iptparser is not set
 # CONFIG_PACKAGE_luci-lib-jquery-1-4 is not set
-# CONFIG_PACKAGE_luci-lib-json is not set
+CONFIG_PACKAGE_luci-lib-json=y
 CONFIG_PACKAGE_luci-lib-jsonc=y
 CONFIG_PACKAGE_luci-lib-nixio=y
 CONFIG_PACKAGE_luci-lib-nixio_notls=y
@@ -5060,6 +5062,7 @@ CONFIG_OPENLDAP_DEBUG=y
 # VPN
 #
 # CONFIG_PACKAGE_chaosvpn is not set
+# CONFIG_PACKAGE_eoip is not set
 # CONFIG_PACKAGE_fastd is not set
 # CONFIG_PACKAGE_ipsec-tools is not set
 # CONFIG_PACKAGE_libreswan is not set
@@ -5217,6 +5220,7 @@ CONFIG_PACKAGE_uhttpd=y
 # CONFIG_PACKAGE_cshark is not set
 # CONFIG_PACKAGE_daemonlogger is not set
 # CONFIG_PACKAGE_darkstat is not set
+CONFIG_PACKAGE_dawn19=y
 # CONFIG_PACKAGE_dhcpcd is not set
 # CONFIG_PACKAGE_dmapd is not set
 # CONFIG_PACKAGE_dnscrypt-proxy2 is not set
@@ -5396,6 +5400,7 @@ CONFIG_PACKAGE_ppp-mod-pppoe=y
 # CONFIG_PACKAGE_softflowd is not set
 # CONFIG_PACKAGE_soloscli is not set
 # CONFIG_PACKAGE_speedtest-netperf is not set
+# CONFIG_PACKAGE_speedtestpp is not set
 # CONFIG_PACKAGE_spoofer is not set
 # CONFIG_PACKAGE_stunnel is not set
 # CONFIG_PACKAGE_tac_plus is not set
@@ -5417,7 +5422,7 @@ CONFIG_PACKAGE_uclient-fetch=y
 # CONFIG_PACKAGE_udpxy is not set
 # CONFIG_PACKAGE_ulogd is not set
 # CONFIG_PACKAGE_umbim is not set
-# CONFIG_PACKAGE_umdns is not set
+CONFIG_PACKAGE_umdns=y
 # CONFIG_PACKAGE_usbip is not set
 # CONFIG_PACKAGE_vallumd is not set
 # CONFIG_PACKAGE_vncrepeater is not set
@@ -5490,9 +5495,9 @@ CONFIG_PACKAGE_ext-blacklist=y
 CONFIG_PACKAGE_ext-blockport=y
 # CONFIG_PACKAGE_ext-domain is not set
 # CONFIG_PACKAGE_ext-easycwmp is not set
-# CONFIG_PACKAGE_ext-menu is not set
 # CONFIG_PACKAGE_ext-mosquitto is not set
 # CONFIG_PACKAGE_ext-rspeedtest is not set
+# CONFIG_PACKAGE_ext-simplegps is not set
 # CONFIG_PACKAGE_ext-speedtest is not set
 # CONFIG_PACKAGE_ext-texting is not set
 # CONFIG_PACKAGE_ext-throttle is not set
@@ -5529,12 +5534,15 @@ CONFIG_PACKAGE_ext-blockport=y
 # CONFIG_PACKAGE_rbm11g is not set
 # CONFIG_PACKAGE_rbm33g is not set
 # CONFIG_PACKAGE_rd05a1 is not set
+# CONFIG_PACKAGE_taobao is not set
 # CONFIG_PACKAGE_we826 is not set
 # CONFIG_PACKAGE_we826q is not set
 # CONFIG_PACKAGE_wg1608 is not set
 # CONFIG_PACKAGE_wg209 is not set
+# CONFIG_PACKAGE_wg3526 is not set
 # CONFIG_PACKAGE_wrt1900 is not set
 CONFIG_PACKAGE_ws1208v2=y
+# CONFIG_PACKAGE_x750 is not set
 
 #
 # Splash Screens
@@ -5550,6 +5558,7 @@ CONFIG_PACKAGE_ws1208v2=y
 # CONFIG_PACKAGE_argon-config is not set
 # CONFIG_PACKAGE_ext-login is not set
 # CONFIG_PACKAGE_ext-theme is not set
+# CONFIG_PACKAGE_luci-theme-argondark is not set
 CONFIG_PACKAGE_luci-theme-material=y
 # CONFIG_PACKAGE_luci-theme-materialgrey is not set
 # CONFIG_PACKAGE_luci-theme-tomato is not set
