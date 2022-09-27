@@ -390,6 +390,6 @@ log "APN of profile used is $APN"
 
 touch /tmp/profile$CURRMODEM
 
-if [ -e /usr/lib/rooter/autoapn.sh ]; then
-	/usr/lib/rooter/autoapn.sh $CURRMODEM
-fi
+#if [ -e /usr/lib/rooter/autoapn.sh ]; then
+#	/usr/lib/rooter/autoapn.sh $CURRMODEM
+#fi
