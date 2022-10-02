@@ -519,7 +519,7 @@ uci commit modem.modem$CURRMODEM
 			get_tty 03
 		else
 			if [ $idV = 2c7c ]; then
-				QUEIF2="0121 0125 0306 0296 0512 0620 0800 030b"
+				QUEIF2="0121 0125 0306 0296 0512 0620 0800 030b 0801 0900"
 				if [[ $(echo "$QUEIF2" | grep -o -i "$idP") ]]; then
 					TPORT=2
 				fi
