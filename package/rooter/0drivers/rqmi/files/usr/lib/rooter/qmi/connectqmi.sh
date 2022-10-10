@@ -120,7 +120,11 @@ while uqmi -s -d "$device" --get-serving-system | grep '"searching"' > /dev/null
 	fi
 done
 
-log "Starting network $NAPN"
+if [ ! -e /etc/config/isp ]; then
+	log "Starting network $NAPN"
+else
+	log "Starting network"
+fi
 cid=`uqmi -s -d "$device" --get-client-id wds`
 [ $? -ne 0 ] && {
 	log "Unable to obtain client ID"

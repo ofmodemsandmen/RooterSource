@@ -282,15 +282,26 @@ else
 fi
 
 if [ $MATCH = 0 ]; then
-	apn=$(uci -q get profile.default.apn)
-	dapn=$(echo "$apn" | grep "|")
-	if [ -z $dapn ]; then
+	if [ $autod = "1" ]; then
+		if [ -e /etc/config/isp ]; then
+			MATCH=1
+		fi
+	fi
+	if [ $MATCH = 1 ]; then
+		isp=$(uci -q get isp.general.current)
+		apn=$(uci -q get isp.$isp.apn)
 		apn2=""
 	else
-		fapn=$apn"|"
-		fapn=$(echo $fapn" " | tr "|" ",")
-		apn=$(echo $fapn | cut -d, -f1)
-		apn2=$(echo $fapn | cut -d, -f2)
+		apn=$(uci -q get profile.default.apn)
+		dapn=$(echo "$apn" | grep "|")
+		if [ -z $dapn ]; then
+			apn2=""
+		else
+			fapn=$apn"|"
+			fapn=$(echo $fapn" " | tr "|" ",")
+			apn=$(echo $fapn | cut -d, -f1)
+			apn2=$(echo $fapn | cut -d, -f2)
+		fi
 	fi
 	uci set modem.modeminfo$CURRMODEM.apn=$apn
 	uci set modem.modeminfo$CURRMODEM.apn2=$apn2
@@ -385,8 +396,10 @@ if [ $MATCH = 0 ]; then
 	[ -n "$(uci -q get profile.default.apn)" ] || log "Default profile has no APN configured"
 fi
 
-APN=$(uci -q get modem.modeminfo$CURRMODEM.apn)
-log "APN of profile used is $APN"
+if [ ! -e /etc/config/isp ]; then
+	APN=$(uci -q get modem.modeminfo$CURRMODEM.apn)
+	log "APN of profile used is $APN"
+fi
 
 touch /tmp/profile$CURRMODEM
 

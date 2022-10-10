@@ -261,7 +261,12 @@ _proto_mbim_setup() {
 
 	tid=$((tid + 1))
 
-	log "Connect to network using $apn"
+	if [ ! -e /etc/config/isp ]; then
+		log "Connect to network using $apn"
+	else
+		log "Connect to network"
+	fi
+
 	tidd=0
 	while ! umbim $DBG -n -t $tid -d $device connect "$ipt""$apn" "$auth" "$username" "$password"; do
 		tid=$((tid + 1))
