@@ -228,10 +228,7 @@ case $uVid in
 				lst="0"
 			fi
 			M5='AT+QNWPREFCFG="nsa_nr5g_band",'$lst
-			NET=$(uci -q get modem.modem$CURRMODEM.netmode)
-			if [ $NET = "9" ]; then
-				M5='AT+QNWPREFCFG="nr5g_band",'$lst
-			fi
+			M6='AT+QNWPREFCFG="nr5g_band",'$lst
 		fi
 		log " "
 		log "Locking Cmd : $M2"
@@ -243,8 +240,12 @@ case $uVid in
 		if [ ! -z $M5 ]; then
 			OX5=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M5")
 		fi
+		if [ ! -z $M6 ]; then
+			OX6=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M6")
+		fi
 		log "Locking Cmd Response : $OX"
 		log "Locking Cmd Response : $OX5"
+		log "Locking Cmd Response : $OX6"
 		log " "
 		if [ $RESTART = "1" ]; then
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
