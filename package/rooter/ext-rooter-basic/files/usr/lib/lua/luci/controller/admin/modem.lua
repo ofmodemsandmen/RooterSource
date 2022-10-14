@@ -163,42 +163,42 @@ function action_check_misc()
 				file:close()
 			end
 			
-			rv["cenable"] = luci.model.uci.cursor():get("custom", "bandlock", "cenable")
+			rv["cenable"] = luci.model.uci.cursor():get("custom", "bandlock", "cenable" .. miscnum)
 			if rv["cenable"] == nil then
 				rv["cenable"] = "0"
 			end
-			rv["earfcn"] = luci.model.uci.cursor():get("custom", "bandlock", "earfcn")
+			rv["earfcn"] = luci.model.uci.cursor():get("custom", "bandlock", "earfcn" .. miscnum)
 			if rv["earfcn"] == nil then
 				rv["earfcn"] = "0"
 			end
-			rv["pci"] = luci.model.uci.cursor():get("custom", "bandlock", "pci")
+			rv["pci"] = luci.model.uci.cursor():get("custom", "bandlock", "pci" .. miscnum)
 			if rv["pci"] == nil then
 				rv["pci"] = "0"
 			end
 			
-			rv["earfcn1"] = luci.model.uci.cursor():get("custom", "bandlock", "earfcn1")
+			rv["earfcn1"] = luci.model.uci.cursor():get("custom", "bandlock", "earfcn1" .. miscnum)
 			if rv["earfcn1"] == nil then
 				rv["earfcn1"] = "0"
 			end
-			rv["pci1"] = luci.model.uci.cursor():get("custom", "bandlock", "pci1")
+			rv["pci1"] = luci.model.uci.cursor():get("custom", "bandlock", "pci1" .. miscnum)
 			if rv["pci1"] == nil then
 				rv["pci1"] = "0"
 			end
 			
-			rv["earfcn2"] = luci.model.uci.cursor():get("custom", "bandlock", "earfcn2")
+			rv["earfcn2"] = luci.model.uci.cursor():get("custom", "bandlock", "earfcn2" .. miscnum)
 			if rv["earfcn2"] == nil then
 				rv["earfcn2"] = "0"
 			end
-			rv["pci2"] = luci.model.uci.cursor():get("custom", "bandlock", "pci2")
+			rv["pci2"] = luci.model.uci.cursor():get("custom", "bandlock", "pci2" .. miscnum)
 			if rv["pci2"] == nil then
 				rv["pci2"] = "0"
 			end
 			
-			rv["earfcn3"] = luci.model.uci.cursor():get("custom", "bandlock", "earfcn3")
+			rv["earfcn3"] = luci.model.uci.cursor():get("custom", "bandlock", "earfcn3" .. miscnum)
 			if rv["earfcn3"] == nil then
 				rv["earfcn3"] = "0"
 			end
-			rv["pci3"] = luci.model.uci.cursor():get("custom", "bandlock", "pci3")
+			rv["pci3"] = luci.model.uci.cursor():get("custom", "bandlock", "pci3" .. miscnum)
 			if rv["pci3"] == nil then
 				rv["pci3"] = "0"
 			end

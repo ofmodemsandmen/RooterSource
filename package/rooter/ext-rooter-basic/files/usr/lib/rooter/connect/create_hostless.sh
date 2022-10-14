@@ -297,23 +297,22 @@ if [ $SP -gt 0 ]; then
 	uci commit modem
 
 	$ROOTER/sms/check_sms.sh $CURRMODEM &
-	$ROOTER/common/gettype.sh $CURRMODEM
 
 	if [ -e $ROOTER/connect/preconnect.sh ]; then
 		$ROOTER/connect/preconnect.sh $CURRMODEM
 	fi
 
 	if [ $SP = 5 ]; then
-		clck=$(uci -q get custom.bandlock.cenable)
+		clck=$(uci -q get custom.bandlock.cenable$CURRMODEM)
 		if [ $clck = "1" ]; then
-			ear=$(uci -q get custom.bandlock.earfcn)
-			pc=$(uci -q get custom.bandlock.pci)
-			ear1=$(uci -q get custom.bandlock.earfcn1)
-			pc1=$(uci -q get custom.bandlock.pci1)
-			ear2=$(uci -q get custom.bandlock.earfcn2)
-			pc2=$(uci -q get custom.bandlock.pci2)
-			ear3=$(uci -q get custom.bandlock.earfcn3)
-			pc3=$(uci -q get custom.bandlock.pci3)
+			ear=$(uci -q get custom.bandlock.earfcn$CURRMODEM)
+			pc=$(uci -q get custom.bandlock.pci$CURRMODEM)
+			ear1=$(uci -q get custom.bandlock.earfcn1$CURRMODEM)
+			pc1=$(uci -q get custom.bandlock.pci1$CURRMODEM)
+			ear2=$(uci -q get custom.bandlock.earfcn2$CURRMODEM)
+			pc2=$(uci -q get custom.bandlock.pci2$CURRMODEM)
+			ear3=$(uci -q get custom.bandlock.earfcn3$CURRMODEM)
+			pc3=$(uci -q get custom.bandlock.pci3$CURRMODEM)
 			cnt=1
 			earcnt=$ear","$pc
 			if [ $ear1 != "0" -a $pc1 != "0" ]; then
@@ -331,19 +330,22 @@ if [ $SP -gt 0 ]; then
 			earcnt=$cnt","$earcnt
 			ATCMDD="at+qnwlock=\"common/4g\""
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			log "$OX"
 			if `echo $OX | grep "ERROR" 1>/dev/null 2>&1`
-		then
-			ATCMDD="at+qnwlock=\"common/lte\",2,$ear,$pc"
-		else
-			ATCMDD=$ATCMDD","$earcnt
-		fi
+			then
+				ATCMDD="at+qnwlock=\"common/lte\",2,$ear,$pc"
+			else
+				ATCMDD=$ATCMDD","$earcnt
+			fi
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			log "Cell Lock $OX"
+			sleep 10
+		fi
 	fi
 
-		$ROOTER/connect/bandmask $CURRMODEM 1
-		uci commit modem
-	fi
+	$ROOTER/connect/bandmask $CURRMODEM 1
+	uci commit modem
+fi
 	if [ $SP = 4 ]; then
 		if [ -e /etc/interwave ]; then
 			idP=$(uci -q get modem.modem$CURRMODEM.idP)
@@ -360,11 +362,16 @@ if [ $SP -gt 0 ]; then
 	fi
 fi
 $ROOTER/connect/get_profile.sh $CURRMODEM
-if [ -e $ROOTER/simlockc.sh ]; then
-	$ROOTER/simlockc.sh $CURRMODEM
+if [ -e $ROOTER/simlock.sh ]; then
+	$ROOTER/simlock.sh $CURRMODEM
+fi
+$ROOTER/common/gettype.sh $CURRMODEM
+if [ -e /tmp/simpin$CURRMODEM ]; then
+	log " SIM Error"
+	exit 0
 fi
 if [ -e /usr/lib/gps/gps.sh ]; then
-	/usr/lib/gps/gps.sh $CURRMODEM
+	/usr/lib/gps/gps.sh $CURRMODEM &
 fi
 
 INTER=$(uci get modem.modeminfo$CURRMODEM.inter)

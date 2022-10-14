@@ -24,7 +24,7 @@ if [ -z "$RDY" ]; then # SIM Locked
 		spin=$(uci -q get modem.modeminfo$CURRMODEM.pincode) # Profile Pin
 		if [ -z "$spin" ]; then
 			spin=$(uci -q get profile.simpin.pin) # Default profile Pin
-			if [ -z $spin ]; then
+			if [ -z "$spin" ]; then
 				echo "0" > /tmp/simpin$CURRMODEM # Locked/No Pin
 				log "Locked/No Pin"
 				exit 0

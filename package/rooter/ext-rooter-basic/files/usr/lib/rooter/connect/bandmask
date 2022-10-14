@@ -11,10 +11,6 @@ MODTYPE=$2
 
 CPORT=$(uci get modem.modem$CURRMODEM.commport)
 
-if [ -e $ROOTER/simlock.sh ]; then
-	$ROOTER/simlock.sh $CURRMODEM
-fi
-
 sierrabandmask() {
 	enb=$(uci -q get custom.bandlock.enabled)
 	ATCMDD='AT!ENTERCND="A710";!BAND?'
