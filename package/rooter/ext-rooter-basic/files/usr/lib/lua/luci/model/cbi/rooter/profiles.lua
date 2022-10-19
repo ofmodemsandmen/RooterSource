@@ -73,6 +73,12 @@ pt:value("IPV4V6", "IPv4+IPv6")
 pt:value("0", "Default")
 pt.default = "0"
 
+cmcc = di:taboption(this_tab, Value, "context", translate("PDP Context for APN :"));
+cmcc.optional=false; 
+cmcc.rmempty = true;
+cmcc.datatype = "and(uinteger,min(1),max(10))"
+cmcc.default = "1"
+
 mu = di:taboption(this_tab, Value, "user", translate("Connection User Name :")); 
 mu.optional=false; 
 mu.rmempty = true;
@@ -504,6 +510,12 @@ pt:value("IPv6", "IPv6")
 pt:value("IPV4V6", "IPv4+IPv6")
 pt:value("0", "Default")
 pt.default = "0"
+
+cmcc = s:taboption(this_ctab, Value, "context", translate("PDP Context for APN :"));
+cmcc.optional=false; 
+cmcc.rmempty = true;
+cmcc.datatype = "and(uinteger,min(1),max(10))"
+cmcc.default = "1"
 
 cmu = s:taboption(this_ctab, Value, "user", translate("Connection User Name :")); 
 cmu.optional=false; 

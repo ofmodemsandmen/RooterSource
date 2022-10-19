@@ -161,6 +161,8 @@ do_custom() {
 					uci set modem.modeminfo$CURRMODEM.apn2=$apn2
 					config_get mtu $1 mtu
 					uci set modem.modeminfo$CURRMODEM.mtu=$mtu
+					config_get context $1 context
+					uci set modem.modeminfo$CURRMODEM.context=$context
 					config_get user $1 user
 					uci set modem.modeminfo$CURRMODEM.user=$user
 					config_get passw $1 passw
@@ -318,6 +320,7 @@ if [ $MATCH = 0 ]; then
 	uci set modem.modeminfo$CURRMODEM.user=$(uci -q get profile.default.user)
 	uci set modem.modeminfo$CURRMODEM.passw=$(uci -q get profile.default.passw)
 	uci set modem.modeminfo$CURRMODEM.pincode=$(uci -q get profile.default.pincode)
+	uci set modem.modeminfo$CURRMODEM.context=$(uci -q get profile.default.context)
 	uci set modem.modeminfo$CURRMODEM.auth=$(uci get profile.default.auth)
 	uci set modem.modeminfo$CURRMODEM.ppp=$(uci get profile.default.ppp)
 	uci set modem.modeminfo$CURRMODEM.inter=0
