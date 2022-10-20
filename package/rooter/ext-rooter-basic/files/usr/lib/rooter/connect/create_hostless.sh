@@ -404,12 +404,7 @@ uci set modem.modem$CURRMODEM.inter=$INTER
 uci commit modem
 log "Modem $CURRMODEM is using WAN$INTER"
 
-if [ -s /tmp/wan$INTER.cid ]; then
-	CID=$(cat /tmp/wan$INTER.cid 2>/dev/null)
-	CID=$(echo $CID | grep -o "[[:digit:]]")
-	[ -n "$CID" ] && log "User selected PDP Context $CID"
-fi
-
+CID=$(uci -q get modem.modeminfo$CURRMODEM.context)
 [ -z "$CID" ] && CID=1
 
 log "Checking Network Interface"

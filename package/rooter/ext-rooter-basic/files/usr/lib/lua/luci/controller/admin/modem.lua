@@ -213,9 +213,13 @@ function action_check_misc()
 				line = file:read("*line")
 				rv["bndstr5g"] = line
 				line = file:read("*line")
+				rv["bndstr5gsa"] = line
+				line = file:read("*line")
 				rv["bndsup"] = line
 				line = file:read("*line")
 				rv["bndsup5g"] = line
+				line = file:read("*line")
+				rv["bndsup5gsa"] = line
 				line = file:read("*line")
 				ca = line
 				if ca ~= nil then

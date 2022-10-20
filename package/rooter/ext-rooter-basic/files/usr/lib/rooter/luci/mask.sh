@@ -202,12 +202,6 @@ case $uVid in
 				fi
 				CA=""
 				CA3=""
-				$ROOTER/luci/celltype.sh $CURRMODEM
-				NET=$(uci -q get modem.modem$CURRMODEM.netmode)
-				if [ $NET = "9" ]; then
-					M5=$M6
-					L5=$L6
-				fi
 			;;
 		esac
 	;;
@@ -301,8 +295,18 @@ else
 	revstr="x"
 fi
 echo $revstr >> /tmp/bmask1
+if [ ! -z $L6 ]; then
+	reverse $L6
+else
+	revstr="x"
+fi
+echo $revstr >> /tmp/bmask1
 echo $M2 >> /tmp/bmask1
 echo $M5 >> /tmp/bmask1
+if [ -z "$M6" ]; then
+	M6="x"
+fi
+echo $M6 >> /tmp/bmask1
 if [ $CA ]; then
 	echo $CA >> /tmp/bmask1
 	if [ $CA3 ]; then
