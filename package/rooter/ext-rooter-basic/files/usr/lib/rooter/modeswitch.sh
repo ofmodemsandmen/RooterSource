@@ -239,6 +239,14 @@ if [ "$ACTION" = add ]; then
 		fi
 	fi
 
+	if [ -f /tmp/usbwait ]; then
+		log "Delay for previous modem"
+		while [ -f /tmp/usbwait ]; do
+			sleep 1
+		done
+	fi
+	echo "1" > /tmp/usbwait
+	
 	source /tmp/variable.file
 	source /tmp/modcnt
 	MODCNT=$MODCNTX
