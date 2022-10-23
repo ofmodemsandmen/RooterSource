@@ -1027,21 +1027,6 @@
 		"ext2": "-squashfs.img",
 		"addons": ["readme.pdf", "readmeSD.txt"]
 	},
-	"RASPPI3": {
-		"details": "Raspberry Pi 3",
-		"type": "3",
-		"build": "1907",
-		"config": ".config_rasppi3",
-		"image1": "openwrt-brcm2708-bcm2710-rpi-3-ext4-factory.img.gz",
-		"image2": "openwrt-brcm2708-bcm2710-rpi-3-ext4-factory.img",
-		"image3": "openwrt-brcm2708-bcm2710-rpi-3-squashfs-sysupgrade.img.gz",
-		"image4": "openwrt-brcm2708-bcm2710-rpi-3-squashfs-sysupgrade.img",
-		"imagepath": "/brcm2708/bcm2710/",
-		"mod": "RaspberryPi-3",
-		"ext1": "-ext4.img",
-		"ext2": "-squashfs.img",
-		"addons": ["readme.pdf", "readmeSD.txt"]
-	},
 	"D240": {
 		"details": "Sanlinking D240",
 		"type": "1",
@@ -1236,28 +1221,6 @@
 			},
 			"files": "/LteFix/"
 		}
-	},
-	"X86-64": {
-		"details": "Generic x86 64 bit",
-		"type": "4",
-		"build": "1907",
-		"config": ".config_x86-64",
-		"image1": "openwrt-x86-64-combined-ext4.img.gz",
-		"image2": "openwrt-x86-64-combined-ext4.img",
-		"imagepath": "/x86/64/",
-		"mod": "x86-64",
-		"addons": ["readme.pdf"]
-	},
-	"X86-32": {
-		"details": "Generic x86 32 bit",
-		"type": "4",
-		"build": "1907",
-		"config": ".config_x86-32",
-		"image1": "openwrt-x86-generic-combined-ext4.img.gz",
-		"image2": "openwrt-x86-generic-combined-ext4.img",
-		"imagepath": "/x86/generic/",
-		"mod": "x86-Generic",
-		"addons": ["readme.pdf"]
 	},
 	"XMIFI3PRO": {
 		"details": "Xiaomi Mifi 3 Pro",
@@ -1480,17 +1443,6 @@
 		"ext": "-upgrade.bin",
 		"addons": ["readme.pdf", "xiaomi.txt"]
 	},
-	"WG3526": {
-		"details": "ZBT WG3526",
-		"type": "1",
-		"build": "1907",
-		"config": ".config_wg3526",
-		"image": "openwrt-ramips-mt7621-zbt-wg3526-16M-squashfs-sysupgrade.bin",
-		"imagepath": "/ramips/mt7621/",
-		"mod": "ZBT-WG3526",
-		"ext": "-upgrade.bin",
-		"addons": ["readme.pdf", "readmerecovery.txt"]
-	},
 	"WT3020-16": {
 		"details": "Nexx WT3020-16",
 		"type": "2",
@@ -1633,22 +1585,6 @@
 		"ext2": "-factory.bin",
 		"addons": ["readme.pdf"]
 	},
-	"H721": {
-		"details": "DualQ H721",
-		"type": "1",
-		"build": "1907",
-		"config": ".config_h721",
-		"image": "openwrt-ramips-mt7621-dualq-h721-256m-16m-squashfs-sysupgrade.bin",
-		"imagepath": "/ramips/mt7621/",
-		"mod": "DualQ-H721",
-		"ext": "-upgrade.bin",
-		"addons": ["readme.pdf", "readmerecovery.txt"],
-		"custom": {
-			"name": {
-				"model": "DualQ H721"
-			}
-		}
-	},
 	"Z6817": {
 		"details": "ZyXEL NBG6817",
 		"type": "2",
@@ -1706,60 +1642,6 @@
 		"imagepath": "/sunxi/cortexa7/",
 		"mod": "OrangePi-Plus",
 		"addons": ["readme.pdf"]
-	},
-	"HUA1208": {
-		"details": "Huasifei WS1208",
-		"type": "1",
-		"package": "ext-huasifei",
-		"config": ".config_hua1208",
-		"image": "openwrt-ramips-mt7621-zbt-wg3526-16M-squashfs-sysupgrade.bin",
-		"imagepath": "/ramips/mt7621/",
-		"mod": "Huasifei-WS1208",
-		"ext": "-upgrade.bin",
-		"custom": {
-			"name": {
-				"model": "WS1208",
-				"hostname": "WS1208"
-			},
-			"wifi": {
-				"SSID2G": "wifi-2.4g",
-				"SSID5G": "wifi-5.8g",
-				"Password": "12345678"
-			},
-			"image": {
-				"Material": "hua.png",
-				"Argon": "hua.png",
-				"Tomato": "hua.png"
-			},
-			"files": "/huasifei/files/"	
-		}
-	},
-	"HUA1208V2": {
-		"details": "Huasifei WS1208V2",
-		"type": "1",
-		"package": "ext-huasifei",
-		"config": ".config_hua1208v2",
-		"image": "openwrt-ramips-mt7621-huasifei-ws1208v2-squashfs-sysupgrade.bin",
-		"imagepath": "/ramips/mt7621/",
-		"mod": "Huasifei-WS1208V2",
-		"ext": "-upgrade.bin",
-		"custom": {
-			"name": {
-				"model": "WS1208V2",
-				"hostname": "WS1208V2"
-			},
-			"wifi": {
-				"SSID2G": "wifi-2.4g",
-				"SSID5G": "wifi-5.8g",
-				"Password": "12345678"
-			},
-			"image": {
-				"Material": "hua.png",
-				"Argon": "hua.png",
-				"Tomato": "hua.png"
-			},
-			"files": "/huasifei/files1/"	
-		}
 	},
 	"RB951": {
 		"details": "Mikrotik RB951Ui-2nD (hAP)",
