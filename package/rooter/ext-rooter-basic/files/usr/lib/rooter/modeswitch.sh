@@ -245,7 +245,7 @@ if [ "$ACTION" = add ]; then
 		while [ -f /tmp/usbwait ]; do
 			sleep 1
 			let DELAY=$DELAY+1
-			if [ $DELAY -gt 5 ]; then
+			if [ $DELAY -gt 15 ]; then
 				break
 			fi
 		done
