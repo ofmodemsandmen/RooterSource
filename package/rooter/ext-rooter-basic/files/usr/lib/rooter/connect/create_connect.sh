@@ -776,11 +776,12 @@ fi
 
 CHKPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 if [ -n "$CHKPORT" ]; then
+	$ROOTER/common/gettype.sh $CURRMODEM
 	$ROOTER/connect/get_profile.sh $CURRMODEM
 	if [ -e $ROOTER/simlock.sh ]; then
 		$ROOTER/simlock.sh $CURRMODEM
 	fi
-	$ROOTER/common/gettype.sh $CURRMODEM
+
 	if [ -e /tmp/simpin$CURRMODEM ]; then
 		log " SIM Error"
 		exit 0
