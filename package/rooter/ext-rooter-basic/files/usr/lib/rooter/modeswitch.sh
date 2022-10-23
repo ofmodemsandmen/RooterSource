@@ -239,10 +239,15 @@ if [ "$ACTION" = add ]; then
 		fi
 	fi
 
+	DELAY=1
 	if [ -f /tmp/usbwait ]; then
 		log "Delay for previous modem"
 		while [ -f /tmp/usbwait ]; do
 			sleep 1
+			let DELAY=$DELAY+1
+			if [ $DELAY -gt 5 ]; then
+				break
+			fi
 		done
 	fi
 	echo "1" > /tmp/usbwait
