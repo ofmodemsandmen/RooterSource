@@ -273,4 +273,4 @@ $ROOTER/luci/celltype.sh $CURRMODEM
 uci set modem.modem$CURRMODEM.cmode="1"
 uci commit modem
 
-$ROOTER/luci/mask.sh
+$ROOTER/luci/restart.sh $CURRMODEM
