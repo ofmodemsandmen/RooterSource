@@ -134,7 +134,7 @@ case $uVid in
 				else # EG18
 					EM12=$(echo $model | grep "EA")
 					if [ -z "$EM12" ]; then # NA
-						M3="84000000100330138A"
+						M3="4200000100330138A"
 					else # EA
 						M3="1A0080800C5"
 					fi
