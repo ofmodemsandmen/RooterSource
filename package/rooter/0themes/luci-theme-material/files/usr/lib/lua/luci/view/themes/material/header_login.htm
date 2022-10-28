@@ -35,17 +35,17 @@
 
     -- Custom settings
 	local mode = 'normal'
-	local dark_css = fs.readfile('/www/luci-static/argon/css/dark.css')
+	local dark_css = fs.readfile('/www/luci-static/material/css/dark.css')
 	local bar_color = '#5e72e4'
 	local primary, dark_primary, blur_radius, blur_radius_dark, blur_opacity
-	if fs.access('/etc/config/argon') then
-		primary = uci:get_first('argon', 'global', 'primary')
-		dark_primary = uci:get_first('argon', 'global', 'dark_primary')
-		blur_radius = uci:get_first('argon', 'global', 'blur')
-		blur_radius_dark = uci:get_first('argon', 'global', 'blur_dark')
-		blur_opacity = uci:get_first('argon', 'global', 'transparency')
-		blur_opacity_dark = uci:get_first('argon', 'global', 'transparency_dark')
-		mode = uci:get_first('argon', 'global', 'mode')
+	if fs.access('/etc/config/material') then
+		primary = uci:get_first('material', 'global', 'primary')
+		dark_primary = uci:get_first('material', 'global', 'dark_primary')
+		blur_radius = uci:get_first('material', 'global', 'blur')
+		blur_radius_dark = uci:get_first('material', 'global', 'blur_dark')
+		blur_opacity = uci:get_first('material', 'global', 'transparency')
+		blur_opacity_dark = uci:get_first('material', 'global', 'transparency_dark')
+		mode = uci:get_first('material', 'global', 'mode')
 		bar_color = mode == 'dark' and dark_primary or primary
     end
     
@@ -81,9 +81,16 @@
     <meta name="msapplication-TileColor" content="<%=bar_color%>">
     <meta name="msapplication-TileImage" content="/luci-static/icon/ms-icon-144x144.png">
     <meta name="theme-color" content="<%=bar_color%>">
-    <link rel="stylesheet" href="<%=media%>/css/cascade.css?v=<%=math.random(1,100000)%>">
+    <link rel="stylesheet" href="/luci-static/css/cascade.css?v=<%=math.random(1,100000)%>">
     <style title="text/css">
-        <% if fs.access('/etc/config/argon') then %>
+        <% if mode == 'normal' then %>
+            @media (prefers-color-scheme: dark) {
+                <%=dark_css%>
+            }
+        <% elseif mode == 'dark' then %>
+            <%=dark_css%>
+        <% end -%>
+        <% if fs.access('/etc/config/material') then %>
         :root {
             --primary: <%=primary%>;
             --dark-primary: <%=dark_primary%>;

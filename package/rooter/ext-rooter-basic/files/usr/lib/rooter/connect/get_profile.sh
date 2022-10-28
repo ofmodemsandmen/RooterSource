@@ -275,12 +275,22 @@ do_custom() {
 	fi
 }
 
-autod=$(uci -q get profile.disable.enabled)
-if [ $autod = "1" ]; then
+autoapn=$(uci -q get profile.disable.autoapn)
+apd=0
+if [ -e /usr/lib/autoapn/apn.data ]; then
+	apd=1
+fi
+log "APD $apd"
+if [ $autoapn = "1" -a "$apd" -eq 1 ]; then
 	MATCH=0
 else
-	config_load profile
-	config_foreach do_custom custom
+	autod=$(uci -q get profile.disable.enabled)
+	if [ $autod = "1" ]; then
+		MATCH=0
+	else
+		config_load profile
+		config_foreach do_custom custom
+	fi
 fi
 
 if [ $MATCH = 0 ]; then
@@ -395,17 +405,19 @@ if [ $MATCH = 0 ]; then
 	fi
 
 	uci commit modem
-	log "Default Profile Used"
-	[ -n "$(uci -q get profile.default.apn)" ] || log "Default profile has no APN configured"
+	if [ "$autoapn" = "1" -a "$apd"-eq 1 ]; then
+		log "Automatic APN Used"
+	else
+		log "Default Profile Used"
+		[ -n "$(uci -q get profile.default.apn)" ] || log "Default profile has no APN configured"
+	fi
 fi
 
 if [ ! -e /etc/config/isp ]; then
-	APN=$(uci -q get modem.modeminfo$CURRMODEM.apn)
-	log "APN of profile used is $APN"
+	if [ "$autoapn" != "1" -a "$apd" -eq 1 ]; then
+		APN=$(uci -q get modem.modeminfo$CURRMODEM.apn)
+		log "APN of profile used is $APN"
+	fi
 fi
 
 touch /tmp/profile$CURRMODEM
-
-#if [ -e /usr/lib/rooter/autoapn.sh ]; then
-#	/usr/lib/rooter/autoapn.sh $CURRMODEM
-#fi

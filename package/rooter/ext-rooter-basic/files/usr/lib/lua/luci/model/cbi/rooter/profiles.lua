@@ -1,6 +1,7 @@
 local utl = require "luci.util"
 local uci = require "luci.model.uci".cursor()
 local sys   = require "luci.sys"
+local fs = require "nixio.fs" 
 
 local maxmodem = luci.model.uci.cursor():get("modem", "general", "max")  
 local profsave = luci.model.uci.cursor():get("custom", "profile", "save")  
@@ -371,9 +372,16 @@ if (multilock == "0") or (multilock == "1" and rootlock == "1") then
 	bwdelay:value("12", translate("12 hour"))
 end
 
-dd = m:section(TypedSection, "disable", translate("Disable Automatic APN"), translate("Disable the use of automatic APN selection. All modems will use the Default Profile"))
-dd.anonymous = true
+if fs.stat("/usr/lib/autoapn/apn.data") then
+	dda = m:section(TypedSection, "disable", translate("Use Automatic APN"), translate("Enable the use of the Automatic APN selection. This disables Custom Profiles."))
+	dda.anonymous = true
+	aenabled = dda:option(Flag, "autoapn", translate("Enabled"))
+	aenabled.default="0"
+	aenabled.optional=false;
+end
 
+dd = m:section(TypedSection, "disable", translate("Disable Custom Profiles"), translate("Disable the use of Custom profiles. All modems will use the Default Profile"))
+dd.anonymous = true
 enabled = dd:option(Flag, "enabled", translate("Disabled"))
 enabled.default="0"
 enabled.optional=false;
@@ -382,7 +390,6 @@ enabled.optional=false;
 -- Custom profile
 --
 if (multilock == "0") or (multilock == "1" and rootlock == "1") then
-
 s = m:section(TypedSection, "custom", translate("Custom Profiles"), translate("Matches specific modem and SIM combination to a Profile"))
 s.anonymous = true
 s.addremove = true
