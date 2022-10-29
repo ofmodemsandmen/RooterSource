@@ -397,19 +397,19 @@ hr {
 }
 
 .login-page .login-iframe {
-	height: 12vh;
+	height: 45vh;
 	position: absolute;
-	top: 85vh;
+	top: 52vh;
 	left: 0;
 	display: flex;
 	flex-direction: column;
 	-webkit-box-pack: center;
 	justify-content: center;
 	align-items: flex-start;
-	min-height: 12vh;
+	min-height: 45vh;
 	z-index: 2;
-	width: 18vw;
-	margin-left: 1vw;
+	width: 24vw;
+	margin-left: 20vw;
 	background: transparent;
 }
 .login-page .login-iframe .login-iform {
@@ -420,7 +420,7 @@ hr {
 	position: absolute;
 	top: 0px;
 	width: 100%;
-	min-height: 12vh;
+	min-height: 45vh;
 	max-width: 100%;
 }
 
@@ -474,19 +474,19 @@ hr {
 
 /* size of logo displayed */
 .login-page .login-container .login-form .brand .icon-lg {
-	width: 19vw;
+	width: 12vw;
 	height: auto;
 	margin-right: 10px;
 }
 
 .login-page .login-container .login-form .brand .icon {
-	width: 4vw;
+	width: 7vw;
 	height: auto;
-	margin-right: 5px;
+	margin-right: 10px;
 }
 
 .login-page .login-container .login-form .brand .brand-text {
-	font-size: 1.5vw;
+	font-size: 1.2vw;
 	font-weight: 700;
 	font-family: TypoGraphica;
 }
