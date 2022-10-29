@@ -871,7 +871,7 @@ if [ -n "$CHKPORT" ]; then
 	if [ -e /usr/lib/autoapn/apn.data ]; then
 		apd=1
 	fi
-	if [ "$autoapn" = "1" -a "$apd" -eq 1 ]; then
+	if [ "$autoapn" = "1" -a $apd -eq 1 ]; then
 		isplist=$(grep -F "$mcc6" '/usr/lib/autoapn/apn.data')
 		if [ -z "$isplist" ]; then
 			isplist=$(grep -F "$mcc5" '/usr/lib/autoapn/apn.data')
@@ -882,6 +882,7 @@ if [ -n "$CHKPORT" ]; then
 	else
 		isplist="000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH"
 	fi
+
 	uci set modem.modeminfo$CURRMODEM.isplist="$isplist"
 	uci commit modem
 

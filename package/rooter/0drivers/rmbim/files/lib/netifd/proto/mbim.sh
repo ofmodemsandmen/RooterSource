@@ -306,7 +306,9 @@ _proto_mbim_setup() {
 			log "Connect to network"
 		fi
 		
-		log "$ipt $apn $auth $username $password"
+		if [ ! -e /etc/config/isp ]; then
+			log "$ipt $apn $auth $username $password"
+		fi
 		
 		tidd=0
 		tcnt=4

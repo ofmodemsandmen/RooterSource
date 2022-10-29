@@ -170,6 +170,10 @@ for isp in $isplist
 			log "Connect to network"
 		fi
 		
+		if [ ! -e /etc/config/isp ]; then
+			log "$NAPN $auth $username $password"
+		fi
+		
 		conn=0
 		tidd=0
 		tcnt=4

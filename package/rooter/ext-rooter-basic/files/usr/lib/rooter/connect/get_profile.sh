@@ -280,8 +280,8 @@ apd=0
 if [ -e /usr/lib/autoapn/apn.data ]; then
 	apd=1
 fi
-log "APD $apd"
-if [ $autoapn = "1" -a "$apd" -eq 1 ]; then
+
+if [ $autoapn = "1" -a $apd -eq 1 ]; then
 	MATCH=0
 else
 	autod=$(uci -q get profile.disable.enabled)
@@ -405,7 +405,7 @@ if [ $MATCH = 0 ]; then
 	fi
 
 	uci commit modem
-	if [ "$autoapn" = "1" -a "$apd"-eq 1 ]; then
+	if [ "$autoapn" = "1" -a $apd -eq 1 ]; then
 		log "Automatic APN Used"
 	else
 		log "Default Profile Used"
@@ -414,7 +414,7 @@ if [ $MATCH = 0 ]; then
 fi
 
 if [ ! -e /etc/config/isp ]; then
-	if [ "$autoapn" != "1" -a "$apd" -eq 1 ]; then
+	if [ "$autoapn" != "1" -a $apd -eq 1 ]; then
 		APN=$(uci -q get modem.modeminfo$CURRMODEM.apn)
 		log "APN of profile used is $APN"
 	fi
