@@ -29,4 +29,4 @@ config zerotier 'zerotier'
 	option networkid 'xxxxxxxxxxxxxxxx'
 	
 config logo 'logo'
-	option size 'large'
+	option size 'small'

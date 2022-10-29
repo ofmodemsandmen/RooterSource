@@ -1,6 +1,6 @@
 config iframe 'iframe'
 	option splashpage '1'
-	option splashtitle 'WS1208'
+	option splashtitle 'WS1208V2'
 	
 config login 'login'
 	option logframe '1'
