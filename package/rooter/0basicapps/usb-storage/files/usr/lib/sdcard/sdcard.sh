@@ -40,6 +40,18 @@ ws7915() {
 	fi
 }
 
+ws1688() {
+	if [ $1 = "add" ]; then
+		echo timer > /sys/class/leds/usb/trigger
+		echo 1000  > /sys/class/leds/usb/delay_on
+		echo 0  > /sys/class/leds/usb/delay_off
+	else
+		echo timer > /sys/class/leds/usb/trigger
+		echo 0  > /sys/class/leds/usb/delay_on
+		echo 1000  > /sys/class/leds/usb/delay_off
+	fi
+}
+
 ACTION=$1
 model=$(cat /tmp/sysinfo/model)
 
@@ -56,6 +68,11 @@ case $ACTION in
 		mod=$(echo $model | grep "WS7915")
 		if [ $mod ]; then
 			ws7915 $ACTION
+		fi
+		
+		mod=$(echo $model | grep "WS1688")
+		if [ $mod ]; then
+			ws1688 $ACTION
 		fi
 		;;
 	"detect" )
