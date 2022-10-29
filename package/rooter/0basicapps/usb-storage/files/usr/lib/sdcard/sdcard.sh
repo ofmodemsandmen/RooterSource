@@ -28,11 +28,23 @@ wg1608() {
 	fi
 }
 
+ws7915() {
+	if [ $1 = "add" ]; then
+		echo timer > /sys/class/leds/sys/trigger
+		echo 1000  > /sys/class/leds/sys/delay_on
+		echo 0  > /sys/class/leds/sys/delay_off
+	else
+		echo timer > /sys/class/leds/sys/trigger
+		echo 0  > /sys/class/leds/sys/delay_on
+		echo 1000  > /sys/class/leds/sys/delay_off
+	fi
+}
+
 ACTION=$1
 model=$(cat /tmp/sysinfo/model)
 
 case $ACTION in
-	"add" )
+	"add"|"remove" )
 		mod=$(echo $model | grep "H721")
 		if [ $mod ]; then
 			h721 $ACTION
@@ -41,15 +53,9 @@ case $ACTION in
 		if [ $mod ]; then
 			wg1608 $ACTION
 		fi
-		;;
-	"remove" )
-		mod=$(echo $model | grep "H721")
+		mod=$(echo $model | grep "WS7915")
 		if [ $mod ]; then
-			h721 $ACTION
-		fi
-		mod=$(echo $model | grep "WG1608")
-		if [ $mod ]; then
-			wg1608 $ACTION
+			ws7915 $ACTION
 		fi
 		;;
 	"detect" )
