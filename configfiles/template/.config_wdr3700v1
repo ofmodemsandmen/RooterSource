@@ -4328,6 +4328,7 @@ CONFIG_PACKAGE_luci-mod-system=y
 # CONFIG_PACKAGE_luci-app-clamav is not set
 # CONFIG_PACKAGE_luci-app-commands is not set
 # CONFIG_PACKAGE_luci-app-cshark is not set
+# CONFIG_PACKAGE_luci-app-dawn19 is not set
 # CONFIG_PACKAGE_luci-app-dcwapd is not set
 # CONFIG_PACKAGE_luci-app-ddns is not set
 # CONFIG_PACKAGE_luci-app-diag-core is not set
@@ -4406,7 +4407,6 @@ CONFIG_PACKAGE_luci-app-opkg=y
 # CONFIG_PACKAGE_luci-theme-argon is not set
 # CONFIG_PACKAGE_luci-theme-bootstrap is not set
 # CONFIG_PACKAGE_luci-theme-freifunk-generic is not set
-CONFIG_PACKAGE_luci-theme-material=y
 # CONFIG_PACKAGE_luci-theme-openwrt is not set
 
 #
@@ -5109,6 +5109,7 @@ CONFIG_OPENLDAP_DEBUG=y
 # VPN
 #
 # CONFIG_PACKAGE_chaosvpn is not set
+# CONFIG_PACKAGE_eoip is not set
 # CONFIG_PACKAGE_fastd is not set
 # CONFIG_PACKAGE_ipsec-tools is not set
 # CONFIG_PACKAGE_libreswan is not set
@@ -5266,6 +5267,7 @@ CONFIG_PACKAGE_uhttpd=y
 # CONFIG_PACKAGE_cshark is not set
 # CONFIG_PACKAGE_daemonlogger is not set
 # CONFIG_PACKAGE_darkstat is not set
+# CONFIG_PACKAGE_dawn19 is not set
 # CONFIG_PACKAGE_dhcpcd is not set
 # CONFIG_PACKAGE_dmapd is not set
 # CONFIG_PACKAGE_dnscrypt-proxy2 is not set
@@ -5445,6 +5447,7 @@ CONFIG_PACKAGE_ppp-mod-pppoe=y
 # CONFIG_PACKAGE_softflowd is not set
 # CONFIG_PACKAGE_soloscli is not set
 # CONFIG_PACKAGE_speedtest-netperf is not set
+# CONFIG_PACKAGE_speedtestpp is not set
 # CONFIG_PACKAGE_spoofer is not set
 # CONFIG_PACKAGE_stunnel is not set
 # CONFIG_PACKAGE_tac_plus is not set
@@ -5525,11 +5528,6 @@ CONFIG_PACKAGE_wpad-basic=y
 # CONFIG_PACKAGE_ext-sms is not set
 
 #
-# Custom Apps
-#
-# CONFIG_PACKAGE_customize is not set
-
-#
 # Drivers
 #
 # CONFIG_PACKAGE_rmbim is not set
@@ -5538,14 +5536,25 @@ CONFIG_PACKAGE_wpad-basic=y
 #
 # Optional Applications
 #
+# CONFIG_PACKAGE_bwallocate is not set
 # CONFIG_PACKAGE_bwmon is not set
-# CONFIG_PACKAGE_easycwmp is not set
+# CONFIG_PACKAGE_ext-autoapn is not set
+# CONFIG_PACKAGE_ext-blacklist is not set
+# CONFIG_PACKAGE_ext-blockport is not set
+# CONFIG_PACKAGE_ext-domain is not set
+# CONFIG_PACKAGE_ext-easycwmp is not set
 # CONFIG_PACKAGE_ext-mosquitto is not set
+# CONFIG_PACKAGE_ext-rspeedtest is not set
+# CONFIG_PACKAGE_ext-simplegps is not set
 # CONFIG_PACKAGE_ext-speedtest is not set
+# CONFIG_PACKAGE_ext-texting is not set
+# CONFIG_PACKAGE_ext-throttle is not set
 # CONFIG_PACKAGE_ext-wireguard is not set
 # CONFIG_PACKAGE_ext-yamon3 is not set
 # CONFIG_PACKAGE_ext-zerotier is not set
+# CONFIG_PACKAGE_extramenu is not set
 # CONFIG_PACKAGE_pingtest is not set
+# CONFIG_PACKAGE_portal is not set
 # CONFIG_PACKAGE_qfirehose is not set
 # CONFIG_PACKAGE_qlog is not set
 # CONFIG_PACKAGE_udp-tunnel is not set
@@ -5563,23 +5572,31 @@ CONFIG_PACKAGE_wpad-basic=y
 # CONFIG_PACKAGE_alix2d13 is not set
 # CONFIG_PACKAGE_b1300 is not set
 # CONFIG_PACKAGE_cfe3 is not set
+# CONFIG_PACKAGE_cpe102 is not set
 # CONFIG_PACKAGE_d240 is not set
 # CONFIG_PACKAGE_dir860l is not set
-# CONFIG_PACKAGE_ext-ssh is not set
 # CONFIG_PACKAGE_fscheck is not set
+# CONFIG_PACKAGE_h721 is not set
+# CONFIG_PACKAGE_mofi4500 is not set
 # CONFIG_PACKAGE_mofi5500 is not set
 # CONFIG_PACKAGE_rbm11g is not set
 # CONFIG_PACKAGE_rbm33g is not set
 # CONFIG_PACKAGE_rd05a1 is not set
-# CONFIG_PACKAGE_rpi3bp is not set
+# CONFIG_PACKAGE_taobao is not set
 # CONFIG_PACKAGE_we826 is not set
 # CONFIG_PACKAGE_we826q is not set
 # CONFIG_PACKAGE_wg1608 is not set
+# CONFIG_PACKAGE_wg209 is not set
+# CONFIG_PACKAGE_wg3526 is not set
 # CONFIG_PACKAGE_wrt1900 is not set
+# CONFIG_PACKAGE_ws1208v2 is not set
+# CONFIG_PACKAGE_x750 is not set
 
 #
 # Splash Screens
 #
+# CONFIG_PACKAGE_ext-splash is not set
+# CONFIG_PACKAGE_ext-splashconfig is not set
 # CONFIG_PACKAGE_splash is not set
 # CONFIG_PACKAGE_status is not set
 
@@ -5588,9 +5605,10 @@ CONFIG_PACKAGE_wpad-basic=y
 #
 # CONFIG_PACKAGE_argon-config is not set
 # CONFIG_PACKAGE_ext-login is not set
-# CONFIG_PACKAGE_ext-material is not set
 # CONFIG_PACKAGE_ext-theme is not set
-# CONFIG_PACKAGE_luci-theme-infinity is not set
+# CONFIG_PACKAGE_luci-theme-argondark is not set
+CONFIG_PACKAGE_luci-theme-material=y
+# CONFIG_PACKAGE_luci-theme-materialgrey is not set
 # CONFIG_PACKAGE_luci-theme-tomato is not set
 
 #
@@ -5599,6 +5617,10 @@ CONFIG_PACKAGE_wpad-basic=y
 # CONFIG_PACKAGE_extra-wifi is not set
 # CONFIG_PACKAGE_ext-arc is not set
 # CONFIG_PACKAGE_ext-arc16 is not set
+# CONFIG_PACKAGE_ext-customx is not set
+# CONFIG_PACKAGE_ext-customx16 is not set
+# CONFIG_PACKAGE_ext-huasifei is not set
+# CONFIG_PACKAGE_ext-huasifei16 is not set
 # CONFIG_PACKAGE_ext-ltefix is not set
 # CONFIG_PACKAGE_ext-ltefix16 is not set
 # CONFIG_PACKAGE_ext-rooter-lite is not set

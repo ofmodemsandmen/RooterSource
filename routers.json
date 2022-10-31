@@ -1668,5 +1668,19 @@
 		"ext1": "-upgrade.bin",
 		"ext2": "-factory.bin",
 		"addons": ["readme.pdf"]
+	},
+	"WNDR3700V1": {
+		"details": "Netgear WNDR3700-V1",
+		"type": "2",
+		"build": "1907",
+		"flash": "8",
+		"config": ".config_wndr3700v1",
+		"image1": "openwrt-ath79-generic-netgear_wndr3700-squashfs-factory.img",
+		"image2": "openwrt-ath79-generic-netgear_wndr3700-squashfs-sysupgrade.bin",
+		"imagepath": "/ath79/generic/",
+		"mod": "Netgear-WNDR3700-V1",
+		"ext1": "-factory.img",
+		"ext2": "-update.bin",
+		"addons": ["readme.pdf", "factory.txt"]
 	}
 }
