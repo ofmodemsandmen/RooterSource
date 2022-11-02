@@ -9,7 +9,7 @@ ROOTER_LINK="/tmp/links"
 modeswitch="/usr/bin/usb_modeswitch"
 
 log() {
-	logger -t "usb-modeswitch" "$@"
+	modlog "usb-modeswitch $CURRMODEM" "$@"
 }
 
 sanitize() {

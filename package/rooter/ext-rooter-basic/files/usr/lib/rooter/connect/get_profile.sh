@@ -6,7 +6,7 @@ ROOTER=/usr/lib/rooter
 ROOTER_LINK="/tmp/links"
 
 log() {
-	logger -t "Get Profile" "$@"
+	modlog "Get Profile $CURRMODEM" "$@"
 }
 
 CURRMODEM=$1

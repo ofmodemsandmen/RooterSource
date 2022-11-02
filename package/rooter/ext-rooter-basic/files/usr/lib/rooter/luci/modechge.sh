@@ -6,7 +6,7 @@ MODEMTYPE=$1
 NETMODE=$2
 
 # log() {
-	logger -t "ModeChange" "$@"
+	modlog "ModeChange $CURRMODEM" "$@"
 # }
 
 CURRMODEM=$(uci get modem.general.modemnum)

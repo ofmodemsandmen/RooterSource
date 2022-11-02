@@ -3,7 +3,7 @@
 ROOTER=/usr/lib/rooter
 
 log() {
-	logger -t "Scan Command" "$@"
+	modlog "Scan Command $CURRMODEM" "$@"
 }
 
 fibdecode() {

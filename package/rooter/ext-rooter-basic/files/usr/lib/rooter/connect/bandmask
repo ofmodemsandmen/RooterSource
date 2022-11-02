@@ -3,7 +3,7 @@
 ROOTER=/usr/lib/rooter
 
 log() {
-	logger -t "Band Mask " "$@"
+	modlog "Band Mask $CURRMODEM" "$@"
 }
 
 CURRMODEM=$1

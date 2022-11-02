@@ -11,7 +11,7 @@ ROOTER=/usr/lib/rooter
 ROOTER_LINK="/tmp/links"
 
 log() {
-	logger -t "MBIM Connect" "$@"
+	modlog "MBIM Connect $CURRMODEM" "$@"
 }
 
 enb=$(uci -q get custom.connect.ipv6)

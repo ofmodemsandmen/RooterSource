@@ -3,7 +3,7 @@
 ROOTER=/usr/lib/rooter
 
 log() {
-	logger -t "SimLock " "$@"
+	modlog "SimLock $CURRMODEM" "$@"
 }
 
 CURRMODEM=$1

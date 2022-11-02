@@ -16,7 +16,7 @@ MAX_MODEMS=2
 MODCNT=$MAX_MODEMS
 
 log() {
-	logger -t "ROOter Initialize" "$@"
+	modlog "ROOter Initialize" "$@"
 }
 
 do_zone() {

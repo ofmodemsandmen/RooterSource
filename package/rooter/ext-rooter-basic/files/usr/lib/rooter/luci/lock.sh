@@ -4,7 +4,7 @@ ROOTER=/usr/lib/rooter
 ROOTER_LINK="/tmp/links"
 
 log() {
-	logger -t "Lock Band" "$@"
+	modlog "Lock Band $CURRMODEM" "$@"
 }
 
 RESTART="1"
