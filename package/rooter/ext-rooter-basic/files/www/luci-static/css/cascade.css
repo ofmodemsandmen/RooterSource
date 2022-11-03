@@ -379,7 +379,7 @@ hr {
 	-webkit-box-align: center;
 	align-items: center;
 	color: var(--default);
-	margin: 50px auto 30px 50px;
+	margin: 20px auto 5px 10px;
 }
 
 .login-page .login-container .login-form .brandim {
@@ -489,6 +489,13 @@ hr {
 	font-size: 1.2vw;
 	font-weight: 700;
 	font-family: TypoGraphica;
+}
+
+.login-page .login-container .login-form .brand .brand-textlg {
+	font-size: 1.2vw;
+	font-weight: 700;
+	font-family: TypoGraphica;
+	margin-left: 2vw;
 }
 
 .login-page .login-container .login-form .form-login {

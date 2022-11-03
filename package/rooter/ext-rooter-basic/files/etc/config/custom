@@ -43,7 +43,7 @@ config zerotier 'zerotier'
 	option networkid 'xxxxxxxxxxxxxxxx'
 	
 config logo 'logo'
-	option size 'small'
+	option size 'large'
 	
 config connect 'connect'
 	option ipv6 '1'

@@ -288,11 +288,11 @@ hr {
 	z-index: 5000;
 	cursor: pointer;
 	background-size: contain;
-	background-image: url(../../img/volume_high.svg);
+	background-image: url(../img/volume_high.svg);
 }
 
 .login-page .volume-control.mute {
-	background-image: url(../../img/volume_off.svg);
+	background-image: url(../img/volume_off.svg);
 }
 
 .login-page .main-bg {
@@ -301,7 +301,7 @@ hr {
 	height: 101vh;
 	left: 0;
 	top: 0;
-	background-image: url(../../img/blank.png);
+	background-image: url(../img/blank.png);
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: cover;
@@ -379,7 +379,15 @@ hr {
 	-webkit-box-align: center;
 	align-items: center;
 	color: var(--default);
-	margin: 50px auto 30px 50px;
+	margin: 20px auto 5px 10px;
+}
+
+.login-page .login-container .login-form .brandlg {
+	display: flex;
+	-webkit-box-align: center;
+	align-items: center;
+	color: var(--default);
+	margin: 20px auto 5px 10px;
 }
 
 .login-page .login-container .login-form .brandim {
@@ -479,6 +487,12 @@ hr {
 	margin-right: 10px;
 }
 
+.login-page .login-container .login-form .brandlg .icon-lg {
+	width: 19vw;
+	height: auto;
+	margin-right: 10px;
+}
+
 .login-page .login-container .login-form .brand .icon {
 	width: 7vw;
 	height: auto;
@@ -489,6 +503,20 @@ hr {
 	font-size: 1.2vw;
 	font-weight: 700;
 	font-family: TypoGraphica;
+}
+
+.login-page .login-container .login-form .brand .brand-textlg {
+	font-size: 1.2vw;
+	font-weight: 700;
+	font-family: TypoGraphica;
+	margin-left: 3vw;
+}
+
+.login-page .login-container .login-form .brandlg .brand-textlg {
+	font-size: 1.2vw;
+	font-weight: 700;
+	font-family: Roboto-Regular-webfont;
+	margin-left: 3vw;
 }
 
 .login-page .login-container .login-form .form-login {
