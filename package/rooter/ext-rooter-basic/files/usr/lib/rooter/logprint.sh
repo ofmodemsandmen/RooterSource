@@ -1,5 +1,5 @@
 #!/bin/sh
 #
 
-logger -t "Log Print " "$@"
+modlog "Log Print " "$@"
 exit 0
