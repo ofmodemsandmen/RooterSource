@@ -8,6 +8,12 @@ DATE=$(date +%c)
 modlog="/tmp/modlog.log"
 tmplog="/tmp/tmodlog"
 
+echo "$DATE : $TEXT" >> $modlog
+lua $ROOTER/log/mrotate.lua $modlog $tmplog
+mv $tmplog $modlog
+
+exit 0
+
 wc -l $modlog > /tmp/linecnt
 read lcnt fle < /tmp/linecnt
 rm -f /tmp/linecnt
