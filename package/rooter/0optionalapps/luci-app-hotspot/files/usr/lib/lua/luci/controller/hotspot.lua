@@ -59,13 +59,14 @@ function action_check_spot()
 	if rv["ssid"] == nil then
 		rv["ssid"] = "No Connection"
 	end
-	encr = luci.model.uci.cursor():get("wireless", "wwan", "encryption")
+	fre = luci.model.uci.cursor():get("travelmate", "global", "freq")
+	encr = luci.model.uci.cursor():get("wireless", "wwan" .. fre, "encryption")
 	if encr == "none" then
 		rv["encryp"] = translate("Open")
 	else
 		rv["encryp"] = translate("Encrypted")
 	end
-	rv["disable"] = luci.model.uci.cursor():get("wireless", "wwan", "disabled")
+	rv["disable"] = luci.model.uci.cursor():get("wireless", "wwan" .. fre, "disabled")
 	
 	dual = luci.model.uci.cursor():get("travelmate", "global", "radcnt")
 	rv["dual"] = dual
@@ -75,9 +76,14 @@ function action_check_spot()
 	end
 	rv['freq'] = freq
 
-	device = luci.model.uci.cursor():get("wireless", "wwan", "device")
+	device = luci.model.uci.cursor():get("wireless", "wwan" .. fre, "device")
 	device = string.sub(device, 6, 7)
-	rv["band"] = device
+	if fre == "2" then
+		fre="0"
+	else
+		fre="1"
+	end
+	rv["band"] = fre
 
 	luci.http.prepare_content("application/json")
 	luci.http.write_json(rv)
