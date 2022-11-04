@@ -19,7 +19,7 @@ trm_debug=0
 trm_maxwait=20
 trm_maxretry=1
 trm_iw=1
-trm_auto=0
+trm_auto=$(uci -q get travelmate.global.trm_auto)
 
 check_wwan() {
 	uci set travelmate.global.ssid="0"
@@ -28,6 +28,22 @@ check_wwan() {
 		uci set travelmate.global.freq="2"
 	fi
 	uci commit travelmate
+	while [ ! -e /etc/config/wireless ]
+	do
+		sleep 1
+	done
+	sleep 3
+	f_check "ap"
+	cntx=0
+	while [ "${trm_ifstatus}" != "true" ]; do
+		sleep 1
+		f_check "ap"
+		let cntx=cntx+1
+		if [ $cntx -ge 20 ]; then
+			break
+		fi
+	done
+	f_log "info" "AP Status   ::: $trm_ifstatus"
 }
 
 count_radio() {
@@ -205,9 +221,21 @@ f_main()
 	trm_stalist=""
 	# check if wwan is connected
     f_check "sta"
+	if [ "${trm_ifstatus}" == "true" ]; then
+			wifi down $(uci -q get wireless.wwan$wif.device)
+			f_check "sta"
+			f_log "info" "STA ${trm_ifstatus}"
+			while [ "${trm_ifstatus}" == "true" ]; do
+				sleep 1
+				f_check "sta"
+			done
+		fi
     if [ "${trm_ifstatus}" != "true" ] # not connected
     then
+		uci set travelmate.global.state='1'
+		uci commit travelmate
 		f_check "ap"
+		f_log "info" "AP ${trm_ifstatus}"
 		if [ "${trm_ifstatus}" != "true" ]; then
 			wifi up $(uci -q get wireless.wwan$wif.device)
 			f_check "ap"
@@ -216,13 +244,14 @@ f_main()
 				f_check "ap"
 			done
 		fi
+		uci set travelmate.global.bssid=""
 		uci set travelmate.global.ssid="2"
 		uci commit travelmate
 		uci -q set wireless.wwan$wif.ssid="Hotspot Manager Interface"
 		uci -q set wireless.wwan$wif.encryption="none"
 		uci -q set wireless.wwan$wif.key=
 		uci -q commit wireless
-		ubus call network.interface.wwan up
+		ubus call network.interface.wwan$wif up
 		ubus call network reload
 		wifi up $(uci -q get wireless.wwan$wif.device)
 		sleep 5
@@ -274,6 +303,7 @@ f_main()
 								# see if in scan list
 								if [ -n "$(printf "${ssid_list}" | grep -Fo "${ssidq}")" ]; then
 									# connect to Hotspot
+									uci set travelmate.global.bssid="$ssid"
 									uci set travelmate.global.ssid=">>> $ssid"
 									uci set travelmate.global.connecting="1"
 									uci commit travelmate
@@ -283,7 +313,7 @@ f_main()
 									uci -q set wireless.wwan$wif.disabled=0
 									uci -q commit wireless
 									wifi up $(uci -q get wireless.wwan$wif.device)
-									ubus call network.interface.wwan up
+									ubus call network.interface.wwan$wif up
                             		ubus call network reload
 									f_log "info " "main    ::: wwan interface connected to uplink ${ssid}"
 									sleep 5
@@ -313,19 +343,20 @@ f_main()
 										fi
 										f_log "info" "STA Status ${trm_ifstatus}"
 									done
-									
-									#sleep 10
-									#f_check "sta"
+
 									if [ "${trm_ifstatus}" = "true" ]; then
 										uci set travelmate.global.ssid="$ssid"
 										uci set travelmate.global.connecting="0"
 										uci set travelmate.global.lost="0"
+										uci set travelmate.global.state='2'
+										uci set travelmate.global.key=$key
 										uci commit travelmate
 										# connection good
 										f_log "info" "Connected $ssid"
 										exit 0
 									fi
 									# bad connection try next Hotspot in list
+									uci set travelmate.global.bssid=""
 									uci set travelmate.global.ssid="3"
 									uci commit travelmate
 									uci -q set wireless.wwan$wif.ssid="Hotspot Manager Interface"
@@ -333,7 +364,7 @@ f_main()
 									uci -q set wireless.wwan$wif.key=
 									uci -q set wireless.wwan$wif.disabled=1
 									uci -q commit wireless
-									ubus call network.interface.wwan down
+									ubus call network.interface.wwan$wif down
 									ubus call network reload
 									f_log "info" "Try next in list"
 								fi
@@ -373,6 +404,8 @@ f_main()
 		uci set travelmate.global.trm_enabled="0"
 		uci set travelmate.global.connecting="0"
 		uci set travelmate.global.lost="0"
+		uci set travelmate.global.state='0'
+		uci set travelmate.global.bssid=""
 		uci commit travelmate
 		uci -q set wireless.wwan$wif.ssid="Hotspot Manager Interface"
 		uci -q set wireless.wwan$wif.encryption="none"

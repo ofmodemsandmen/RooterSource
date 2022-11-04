@@ -83,6 +83,7 @@ log "Hotspot Firewall"
 	config_foreach do_radio wifi-device
 	uci set travelmate.global.lost="0"
 	uci set travelmate.global.delay="30"
+	uci set travelmate.global.state='0'
 	uci commit travelmate
 }
 
