@@ -5,7 +5,8 @@ translate = I18N.translate
 
 function index()
 	local page
-	page = entry({"admin", "services", "hotspot"}, template("hotspot/hotspot"), _(translate("Wifi Hotspot Manager")), 34)
+	entry({"admin", "hotspot"}, firstchild(), translate("Wifi Hotspot"), 29).dependent=false
+	page = entry({"admin", "hotspot", "hotspot"}, template("hotspot/hotspot"), _(translate("Hotspot Manager")), 5)
 	page.dependent = true
 
 	entry({"admin", "services", "check_spot"}, call("action_check_spot"))

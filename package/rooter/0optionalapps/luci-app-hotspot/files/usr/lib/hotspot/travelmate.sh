@@ -178,7 +178,7 @@ f_log()
 
     if [ -n "${log_msg}" ] && ([ "${class}" != "debug" ] || [ ${trm_debug} -eq 1 ])
     then
-        logger -t "HOTSPOT-[${trm_ver}] ${class}" "${log_msg}"
+        wifilog "HOTSPOT-[${trm_ver}] ${class}" "${log_msg}"
         if [ "${class}" = "error" ]
         then
 			uci set travelmate.global.ssid="1"
@@ -270,18 +270,25 @@ f_main()
 			# single AP in list
 			for ap in ${ap_list}
 			do
-				f_scan_ap
+				#f_scan_ap
 				# repeat scan and connection
-				cnt=1
-				while [ ${cnt} -lt ${trm_maxretry} ]
+				cnt=0
+				delay=10
+				reconn=$(uci -q get travelmate.global.reconn)
+				while [ ${cnt} -le $reconn ]
 				do
-					#f_scan_ap
+					f_log "info" " Retry Count ${cnt}"
+					if [ $reconn -eq 99 ]; then
+						cnt=0
+					fi
+					f_scan_ap
+					f_log "info" " SSID List ${ssid_list}"
 					# get list of Hotspots present
 					if [ -n "${ssid_list}" ]; then
 						if [ "$trm_auto" = "1" ]; then
 							FILE="/etc/hotspot"
 						else
-							FILE="/tmp/hotman"
+							FILE="/tmp/hotman" > /tmp/hotman
 						fi
 						if [ -f "${FILE}" ]; then
 							# read list of selected Hotspots
@@ -308,22 +315,31 @@ f_main()
 									sleep 5
 									# wait and check for good connection
 									f_check "ap"
-									f_log "info " "AP    ::: $trm_ifstatus"
+									f_log "info" "AP Status   ::: $trm_ifstatus"
+									cntx=0
 									while [ "${trm_ifstatus}" != "true" ]; do
 										sleep 1
 										f_check "ap"
+										let cntx=cntx+1
+										if [ $cntx -ge $delay ]; then
+											break
+										fi
+										f_log "info" "AP Status   ::: $trm_ifstatus"
 									done
-									cnt=0
-									delay=$(uci -q get travelmate.global.delay)
+									cntx=0
+									#delay=$(uci -q get travelmate.global.delay)
 									f_check "sta"
+									f_log "info" "STA Status ${trm_ifstatus}"
 									while [ "${trm_ifstatus}" != "true" ]; do
 										sleep 1
 										f_check "sta"
-										let cnt=cnt+1
-										if [ $cnt -ge $delay ]; then
+										let cntx=cntx+1
+										if [ $cntx -ge $delay ]; then
 											break
 										fi
+										f_log "info" "STA Status ${trm_ifstatus}"
 									done
+									
 									#sleep 10
 									#f_check "sta"
 									if [ "${trm_ifstatus}" = "true" ]; then
@@ -332,6 +348,7 @@ f_main()
 										uci set travelmate.global.lost="0"
 										uci commit travelmate
 										# connection good
+										f_log "info" "Connected $ssid"
 										exit 0
 									fi
 									# bad connection try next Hotspot in list
@@ -344,6 +361,7 @@ f_main()
 									uci -q commit wireless
 									ubus call network.interface.wwan down
 									ubus call network reload
+									f_log "info" "Try next in list"
 								fi
 							done <"${FILE}"
 							wifi up $(uci -q get wireless.wwan.device)
@@ -356,7 +374,10 @@ f_main()
 					fi
 					# No connection to any in list
 					cnt=$((cnt+1))
-					#sleep 10
+					if [ $reconn -gt 0 ]; then
+						f_log "info " "Sleep before retrying"
+						sleep 30
+					fi
 					# repeat scan and connect
 				done
 			done
@@ -367,8 +388,12 @@ f_main()
 		else
 			uci set travelmate.global.ssid="5"
 		fi
+		reconn=$(uci -q get travelmate.global.reconn)
 		lost=$(uci -q get travelmate.global.lost)
-		if [ "$lost" = "1" ]; then
+		if [ $reconn -eq 99 ]; then
+			lost="1"
+		fi
+		if [ $lost -gt $reconn ]; then
 			uci set travelmate.global.ssid="5"
 		fi
 		uci set travelmate.global.trm_enabled="0"
