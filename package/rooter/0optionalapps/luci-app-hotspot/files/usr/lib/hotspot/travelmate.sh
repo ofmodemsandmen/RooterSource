@@ -293,7 +293,7 @@ f_main()
 						if [ "$trm_auto" = "1" ]; then
 							FILE="/etc/hotspot"
 						else
-							FILE="/tmp/hotman" > /tmp/hotman
+							FILE="/tmp/hotman"
 						fi
 						if [ -f "${FILE}" ]; then
 							# read list of selected Hotspots
@@ -350,6 +350,7 @@ f_main()
 										uci set travelmate.global.lost="0"
 										uci set travelmate.global.state='2'
 										uci set travelmate.global.key=$key
+										uci set travelmate.global.trm_auto="1"
 										uci commit travelmate
 										# connection good
 										f_log "info" "Connected $ssid"
@@ -406,6 +407,7 @@ f_main()
 		uci set travelmate.global.lost="0"
 		uci set travelmate.global.state='0'
 		uci set travelmate.global.bssid=""
+		uci set travelmate.global.trm_auto="1"
 		uci commit travelmate
 		uci -q set wireless.wwan$wif.ssid="Hotspot Manager Interface"
 		uci -q set wireless.wwan$wif.encryption="none"
