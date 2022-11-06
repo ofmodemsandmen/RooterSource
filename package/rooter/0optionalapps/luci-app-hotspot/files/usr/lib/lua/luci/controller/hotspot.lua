@@ -5,9 +5,13 @@ translate = I18N.translate
 
 function index()
 	local page
-	entry({"admin", "hotspot"}, firstchild(), translate("Wifi Hotspot"), 29).dependent=false
-	page = entry({"admin", "hotspot", "hotspot"}, template("hotspot/hotspot"), _(translate("Hotspot Manager")), 5)
-	page.dependent = true
+	local multilock = luci.model.uci.cursor():get("custom", "multiuser", "multi") or "0"
+	local rootlock = luci.model.uci.cursor():get("custom", "multiuser", "root") or "0"
+	if (multilock == "0") or (multilock == "1" and rootlock == "1") then
+		entry({"admin", "hotspot"}, firstchild(), translate("Wifi Hotspot"), 29).dependent=false
+		page = entry({"admin", "hotspot", "hotspot"}, template("hotspot/hotspot"), _(translate("Hotspot Manager")), 5)
+		page.dependent = true
+	end
 
 	entry({"admin", "services", "check_spot"}, call("action_check_spot"))
 	entry({"admin", "services", "set_mode"}, call("action_set_mode"))
