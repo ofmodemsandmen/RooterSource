@@ -360,7 +360,7 @@ update()
 
 createFiles() 
 {
-	while [ -e /tmplockbw ]; do
+	while [ -e /tmp/lockbw ]; do
 		sleep 1
 	done
 	echo "0" > /tmp/lockbw
@@ -377,6 +377,7 @@ createFiles()
 	if [ ! -f $dailyUsageBack ]; then
 		rm -f $backPath*"daily_data.js"
 		touch $dailyUsageDB
+		touch $dailyUsageBack
 	else
 		cp -f $dailyUsageBack $dailyUsageDB
 	fi
@@ -386,10 +387,10 @@ createFiles()
 		cp -f $monthlyUsageBack $monthlyUsageDB".bk"
 		sed "/start day $cDay/,/end day $cDay/d" $monthlyUsageDB".bk" > $monthlyUsageDB 
 		cp -f $monthlyUsageBack $monthlyUsageDB".bk"
-		#rm -f $monthlyUsageDB".bk"
 	else
 		rm -f $backPath*"mac_data.js"
 		touch $monthlyUsageDB
+		touch $monthlyUsageBack
 		/usr/lib/bwmon/backup.sh "backup" $cDay $monthlyUsageDB $dailyUsageDB $monthlyUsageBack $dailyUsageBack
 	fi
 	rm -f /tmp/lockbw
