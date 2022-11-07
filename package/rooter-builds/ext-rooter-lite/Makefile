@@ -13,7 +13,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/ext-rooter-lite
   SECTION:=utils
   CATEGORY:=ROOter
-  DEPENDS:=+luci +ext-rooter-basic \
+  DEPENDS:=+luci +ext-rooter-basic +pingtest \
 		+luci-app-ddns +ddns-scripts +ddns-scripts_no-ip_com \
 		+luci-app-rootervpn +ext-wireguard \
 		+bwmon +464xlat +webconsole \
