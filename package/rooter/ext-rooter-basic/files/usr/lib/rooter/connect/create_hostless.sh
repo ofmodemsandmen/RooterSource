@@ -215,19 +215,19 @@ addv6() {
 
 CURRMODEM=$1
 
-MAN=$(uci get modem.modem$CURRMODEM.manuf)
-MOD=$(uci get modem.modem$CURRMODEM.model)
+MAN=$(uci -q get modem.modem$CURRMODEM.manuf)
+MOD=$(uci -q get modem.modem$CURRMODEM.model)
 $ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Connecting"
 $ROOTER/log/logger "Attempting to Connect Modem #$CURRMODEM ($MAN $MOD)"
 
 BASEP=$(uci -q get modem.modem$CURRMODEM.baseport)
-idV=$(uci get modem.modem$CURRMODEM.idV)
-idP=$(uci get modem.modem$CURRMODEM.idP)
+idV=$(uci -q get modem.modem$CURRMODEM.idV)
+idP=$(uci -q get modem.modem$CURRMODEM.idP)
 log " "
 log "Hostless ID $idV:$idP"
 log " "
 
-MATCH="$(uci get modem.modem$CURRMODEM.maxcontrol | cut -d/ -f3- | xargs dirname)"
+MATCH="$(uci -q get modem.modem$CURRMODEM.maxcontrol | cut -d/ -f3- | xargs dirname)"
 OX=$(for a in /sys/class/tty/*; do readlink $a; done | grep "$MATCH" | tr '\n' ' ' | xargs -r -n1 basename)
 TTYDEVS=$(echo "$OX" | grep -o ttyUSB[0-9])
 if [ $? -ne 0 ]; then
@@ -304,7 +304,7 @@ if [ $SP -gt 0 ]; then
 
 	if [ $SP = 5 ]; then
 		clck=$(uci -q get custom.bandlock.cenable$CURRMODEM)
-		if [ $clck = "1" ]; then
+		if [ "$clck" = "1" ]; then
 			ear=$(uci -q get custom.bandlock.earfcn$CURRMODEM)
 			pc=$(uci -q get custom.bandlock.pci$CURRMODEM)
 			ear1=$(uci -q get custom.bandlock.earfcn1$CURRMODEM)
@@ -315,15 +315,15 @@ if [ $SP -gt 0 ]; then
 			pc3=$(uci -q get custom.bandlock.pci3$CURRMODEM)
 			cnt=1
 			earcnt=$ear","$pc
-			if [ $ear1 != "0" -a $pc1 != "0" ]; then
+			if [ "$ear1" != "0" -a $pc1 != "0" ]; then
 				earcnt=$earcnt","$ear1","$pc1
 				let cnt=cnt+1
 			fi
-			if [ $ear2 != "0" -a $pc2 != "0" ]; then
+			if [ "$ear2" != "0" -a $pc2 != "0" ]; then
 				earcnt=$earcnt","$ear2","$pc2
 				let cnt=cnt+1
 			fi
-			if [ $ear3 != "0" -a $pc3 != "0" ]; then
+			if [ "$ear3" != "0" -a $pc3 != "0" ]; then
 				earcnt=$earcnt","$ear3","$pc3
 				let cnt=cnt+1
 			fi
@@ -345,7 +345,7 @@ if [ $SP -gt 0 ]; then
 
 	$ROOTER/connect/bandmask $CURRMODEM 1
 	uci commit modem
-fi
+
 	if [ $SP = 4 ]; then
 		if [ -e /etc/interwave ]; then
 			idP=$(uci -q get modem.modem$CURRMODEM.idP)
@@ -374,11 +374,11 @@ if [ -e /usr/lib/gps/gps.sh ]; then
 	/usr/lib/gps/gps.sh $CURRMODEM &
 fi
 
-INTER=$(uci get modem.modeminfo$CURRMODEM.inter)
-if [ -z $INTER ]; then
+INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
+if [ -z "$INTER" ]; then
 	INTER=$CURRMODEM
 else
-	if [ $INTER = 0 ]; then
+	if [ "$INTER" = 0 ]; then
 		INTER=$CURRMODEM
 	fi
 fi
@@ -387,13 +387,13 @@ OTHER=1
 if [ $CURRMODEM = 1 ]; then
 	OTHER=2
 fi
-EMPTY=$(uci get modem.modem$OTHER.empty)
-if [ $EMPTY = 0 ]; then
-	OINTER=$(uci get modem.modem$OTHER.inter)
-	if [ ! -z $OINTER ]; then
+EMPTY=$(uci -q get modem.modem$OTHER.empty)
+if [ "$EMPTY" = 0 ]; then
+	OINTER=$(uci -q get modem.modem$OTHER.inter)
+	if [ ! -z "$OINTER" ]; then
 		if [ $INTER = $OINTER ]; then
 			INTER=1
-			if [ $OINTER = 1 ]; then
+			if [ "$OINTER" = 1 ]; then
 				INTER=2
 			fi
 			log "Switched Modem $CURRMODEM to WAN$INTER as Modem $OTHER is using WAN$OINTER"
@@ -595,7 +595,7 @@ if [ $SP -gt 1 ]; then
 	ln -s $ROOTER/signal/modemsignal.sh $ROOTER_LINK/getsignal$CURRMODEM
 	$ROOTER_LINK/getsignal$CURRMODEM $CURRMODEM $PROT &
 else
-	VENDOR=$(uci get modem.modem$CURRMODEM.idV)
+	VENDOR=$(uci -q get modem.modem$CURRMODEM.idV)
 	case $VENDOR in
 	"19d2" )
 		TIMEOUT=3
@@ -653,8 +653,8 @@ fi
 CLB=$(uci -q get modem.modeminfo$CURRMODEM.lb)
 if [ -e /etc/config/mwan3 ]; then
 	ENB=$(uci -q get mwan3.wan$INTER.enabled)
-	if [ ! -z $ENB ]; then
-		if [ $CLB = "1" ]; then
+	if [ ! -z "$ENB" ]; then
+		if [ "$CLB" = "1" ]; then
 			uci set mwan3.wan$INTER.enabled=1
 		else
 			uci set mwan3.wan$INTER.enabled=0
