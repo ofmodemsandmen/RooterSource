@@ -269,10 +269,14 @@ setup()
 	C2=$(uci -q get modem.modem2.connected)$C1
 	if [ ! -z $C2 ]; then
 		interfaces="$wan1 $wan2"
+		WW=$(uci -q get bwmon.bwwan.wan)
+		if [ "$WW" = "1" ]; then
+			interfaces=$interfaces $wan" wwan"	
+		fi
 	else
 		WW=$(uci -q get bwmon.bwwan.wan)
 		if [ "$WW" = "1" ]; then
-			interfaces="$wan"
+			interfaces="$wan wwan"
 		else
 			return
 		fi
