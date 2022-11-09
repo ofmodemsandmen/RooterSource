@@ -169,7 +169,7 @@ case $uVid in
 	"2c7c" )
 		MODT="1"
 		if [ -z "$2" ]; then
-			RESTART="0"
+			RESTART="1"
 		fi
 		M5=""
 		M2='AT+QCFG="band",0,'$mask',0,1'

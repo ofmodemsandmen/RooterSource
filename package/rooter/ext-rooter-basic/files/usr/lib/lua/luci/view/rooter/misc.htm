@@ -620,6 +620,8 @@ end
 			bxs = parseInt(bxx);
 			bxx5g = rv.bndstr5g ;
 			bxs5g = parseInt(bxx5g);
+			bxx5gsa = rv.bndstr5gsa ;
+			bxs5gsa = parseInt(bxx5gsa);
 			
 			if ( uVid == "2c7c" )
 			{
@@ -656,7 +658,7 @@ end
 						if ( netm == nsan )
 						{
 							model = rv.model + "<%: SA Mode%>";
-							if ( bxs5g == 0 )
+							if ( bxs5gsa == 0 )
 							{
 								model = model + "<%: ***No 5G Bands selected - will not connect***%>";
 								document.getElementById("mdl").style.color = "red";
