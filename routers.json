@@ -936,7 +936,7 @@
 		"image2": "openwrt-ipq806x-generic-netgear_r7800-squashfs-sysupgrade.bin",
 		"imagepath": "/ipq806x/generic/",
 		"mod": "Netgear-R7800",
-		"ext1": "-factory.bin",
+		"ext1": "-factory.img",
 		"ext2": "-update.bin",
 		"addons": ["readme.pdf", "tftp.txt"]
 	},
