@@ -79,7 +79,7 @@ while [ true ]; do
 	fi
 	let cntr=$cntr+1
 done
-if [ $serialcnt -gt 0 -a $retval = "0" ]; then
+if [ $serialcnt -gt 0 -a $retval -eq 0 ]; then
 	retval=11
 fi
 echo 'retval="'"$retval"'"' > /tmp/proto
