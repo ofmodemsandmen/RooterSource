@@ -5,12 +5,12 @@ log() {
 	logger -t "Status Update" "$@"
 }
 
-levelsper="101,85,70,55,40,25,10,1,0"
+levelsper="101,85,70,55,40,25,0"
 namesper="Perfect,Excellent,Good,Medium,Low,Bad,Dead"
-levelsrssi="113,119,100,90,70,1,0"
-namesrssi="None,Bad,Poor,Medium,High,Perfect"
-levelsrscp="140,136,112,100,90,70,50,1,0"
-namesrscp='None,None (3G) : Poor (4G),Weak (3G) : Medium (4G),Poor (3G) : Good (4G),Medium (3G) : High (4G),High (3G) :High (4G)'
+levelsrssi="1,70,90,100,119,113,0"
+namesrssi="Perfect,High,Medium,Poor,Bad,None"
+levelsrscp="50,70,90,100,112,136,140,0"
+namesrscp='High (3G) :High (4G),Medium (3G) : High (4G),Poor (3G) : Good (4G),Weak (3G) : Medium (4G),None (3G) : Poor (4G)'
 
 level2txt() {
 	tmp="$1"
@@ -25,6 +25,29 @@ level2txt() {
 		tmp=$(echo "$tmp" | sed -e "s/%//g")
 		level=$levelsper
 		namev=$namesper
+		namez=$namev
+		cindex=1
+		nindex=0
+		namev="-"
+		while [ true ]
+		do
+			levelv=$(echo "$level" | cut -d, -f$cindex)
+			if [ $levelv = "0" ]; then
+				namev="-"
+				break
+			fi
+			if [ "$tmp" -ge "$levelv" ]; then
+				nind=$((${nindex}+1))
+				namev=$(echo "$namez" | cut -d, -f$nind)
+				break
+			fi
+			cindex=$((${cindex}+1))
+			nindex=$((${nindex}+1))
+		done
+		css="level_"$nindex
+		desc="<br><i class='msDesc'>"$namev"</i></br>"
+		namev="<b class='"$css"'>""$front$tmp1""</b>"$desc
+		return
 	fi
 	if [ $key = "rssi" ]; then
 		front="-"
@@ -33,6 +56,29 @@ level2txt() {
 		tmp1="$tmp"" "
 		level=$levelsrssi
 		namev=$namesrssi
+		namez=$namev
+		cindex=1
+		nindex=0
+		namev="-"
+		while [ true ]
+		do
+			levelv=$(echo "$level" | cut -d, -f$cindex)
+			if [ $levelv = "0" ]; then
+				namev="-"
+				break
+			fi
+			if [ "$tmp" -le "$levelv" ]; then
+				nindex=$((${nindex}+1))
+				namev=$(echo "$namez" | cut -d, -f$nindex)
+				break
+			fi
+			cindex=$((${cindex}+1))
+			nindex=$((${nindex}+1))
+		done
+		css="level_"$nindex
+		desc="<br><i class='msDesc'>"$namev"</i></br>"
+		namev="<b class='"$css"'>""$front$tmp1""</b>"$desc
+		return
 	fi
 	if [ $key = "rscp" ]; then
 		front=""
@@ -44,6 +90,29 @@ level2txt() {
 		tmp=$(printf %.0f "$tmp")
 		level=$levelsrscp
 		namev=$namesrscp
+		namez=$namev
+		cindex=1
+		nindex=0
+		namev="-"
+		while [ true ]
+		do
+			levelv=$(echo "$level" | cut -d, -f$cindex)
+			if [ $levelv = "0" ]; then
+				namev="-"
+				break
+			fi
+			if [ "$tmp" -le "$levelv" ]; then
+				namev=$(echo "$namez" | cut -d, -f$nindex)
+				nindex=$((${nindex}-1))
+				break
+			fi
+			cindex=$((${cindex}+1))
+			nindex=$((${nindex}+1))
+		done
+		css="level_"$nindex
+		desc="<br><i class='msDesc'>"$namev"</i></br>"
+		namev="<b class='"$css"'>""$front$tmp1""</b>"$desc
+		return
 	fi
 	
 	if [ $key = "single" ]; then
@@ -59,30 +128,6 @@ level2txt() {
 		namev="<b class='level_2'>""$tmp""</b>"$desc
 		return
 	fi
-	
-	namez=$namev
-	cindex=1
-	nindex=6
-	namev="-"
-
-	while [ true ]
-	do
-		levelv=$(echo "$level" | cut -d, -f$cindex)
-		if [ $levelv = "0" ]; then
-			namev="-"
-			break
-		fi
-		if [ "$tmp" -lt "$levelv" ]; then
-			namev=$(echo "$namez" | cut -d, -f$nindex)
-			break
-		fi
-		cindex=$((${cindex}+1))
-		nindex=$((${nindex}-1))
-	done
-
-	css="level_"$nindex
-	desc="<br><i class='msDesc'>"$namev"</i></br>"
-	namev="<b class='"$css"'>""$front$tmp1""</b>"$desc
 }
 
 readstatus() {
