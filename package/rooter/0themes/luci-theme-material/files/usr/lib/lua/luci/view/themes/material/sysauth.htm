@@ -207,8 +207,16 @@ body {
 						<a  class="ifframe"><iframe src="/luci-static/display.html"  id="Iframe" title="Iframe Example" width="100%" height="100%"</iframe></a>
 						</div>
 					</div>
-				<% else %>
-					<a class="brandim" href="/"><img src="<%=ifimg%>" class="icon-im"></a>
+				<% else%> 
+					<%if ( ifloc == "1" ) then%>
+						<div class="login-iframem">
+						<div class="login-iform">
+						<a  class="ifframe"><iframe src="/luci-static/display.html"  id="Iframe" title="Iframe Example" width="100%" height="100%"</iframe></a>
+						</div>
+					</div>
+					<% else%>
+						<a class="brandim" href="/"><img src="<%=ifimg%>" class="icon-im"></a>
+					<% end %>
 				<% end %>
 			<% end %>
 
