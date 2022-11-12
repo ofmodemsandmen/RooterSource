@@ -142,6 +142,18 @@ if [ -n "$PBzero" ]; then
 	ATCMDD="AT\$QCPBMPREF=1"
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 fi
+ATCMDD="AT+CGDCONT?"
+OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+ATCMDD="AT\$QCPDPIMSCFGE?"
+OX=$OX$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+OX=$(echo $OX | tr 'a-z' 'A-Z')
+OX=$(echo "${OX//[ ]/}")
+imsAPN=$(echo $OX | grep -o "+CGDCONT:2,[^,]\+,\"IMS\"")
+ims_on=$(echo $OX | grep -o "\$QCPDPIMSCFGE:2,1,")
+if [ -n "$imsAPN" -a -z "$ims_on" ]; then
+	ATCMDD="AT\$QCPDPIMSCFGE=2,1"
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+fi
 if [ "$IDV" == "2c7c" ]; then
 	ATCMDD="AT+QLWCFG=\"startup\""
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")

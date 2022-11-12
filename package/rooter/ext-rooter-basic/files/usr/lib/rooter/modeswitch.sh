@@ -203,7 +203,7 @@ if [ "$ACTION" = add ]; then
 	# Uncomment the next line to ignore USB-Serial adapters and similar single-port devices
 	# if [ $bNumConfs = 1 -a $bNumIfs = 1 ] && exit 0		
 
-	$ROOTER/proto.sh $CURRMODEM $DEVICENAME
+	$ROOTER/proto.sh $uVid/$uPid $DEVICENAME 0
 	source /tmp/proto
 	rm -f /tmp/proto
 	#cat /sys/kernel/debug/usb/devices > /tmp/wdrv
@@ -381,7 +381,7 @@ if [ "$ACTION" = add ]; then
 
 	#cat /sys/kernel/debug/usb/devices > /tmp/wdrv
 	#lua $ROOTER/protofind.lua $idV $idP 1
-	$ROOTER/proto.sh $CURRMODEM $DEVICENAME
+	$ROOTER/proto.sh $uVid/$uPid $DEVICENAME 1
 	source /tmp/proto
 	rm -f /tmp/proto
 	#retval=$?
