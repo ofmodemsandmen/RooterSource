@@ -1058,6 +1058,8 @@ do
 				ifup wan$INTER
 				[ -f /tmp/ipv6supp$INTER ] && addv6
 			else
+				log "Restart Modem"
+				/usr/lib/rooter/luci/restart.sh $CURRMODEM
 				exit 0
 			fi
 			;;

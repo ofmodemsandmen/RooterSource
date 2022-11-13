@@ -577,7 +577,8 @@ proto_mbim_setup() {
 		CPORT=$(uci get modem.modem$CURRMODEM.commport)
 		ATCMDD="AT+COPS=0"
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		sleep 5
+		log "Restart Modem"
+		/usr/lib/rooter/luci/restart.sh $CURRMODEM
 	}
 
 	exit 0
