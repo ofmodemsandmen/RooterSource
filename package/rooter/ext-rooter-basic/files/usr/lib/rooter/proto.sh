@@ -18,6 +18,7 @@ serialcnt=0
 retval=0
 fcntr=0
 while [ true ]; do
+	DRIVER=""
 	if [ -e $path$ipath$fcntr ]; then
 		cat $path$ipath$fcntr"/uevent" > /tmp/uevent$DEVICENAME
 		source /tmp/uevent$DEVICENAME
