@@ -261,6 +261,12 @@ elif [ $idV = 12d1 -a $idP = 15c1 ]; then
 elif [ $idV = 2cd2 ]; then
 	log "MikroTik R11e ECM"
 	SP=7
+elif [ $idV = 0e8d -a $idP = 7127  ]; then
+	log "RM350 ECM"
+	SP=8
+elif [ $idV = 0e8d -a $idP = 7126  ]; then
+	log "RM350 ECM"
+	SP=9
 else
 	SP=0
 fi
@@ -279,6 +285,10 @@ if [ $SP -gt 0 ]; then
 		PORTN=2
 	elif [ $SP -eq 7 ]; then
 		PORTN=0
+	elif [ $SP -eq 8 ]; then
+		PORTN=3
+	elif [ $SP -eq 9 ]; then
+		PORTN=1
 	else
 		PORTN=1
 	fi
@@ -341,10 +351,10 @@ if [ $SP -gt 0 ]; then
 			log "Cell Lock $OX"
 			sleep 10
 		fi
+		$ROOTER/connect/bandmask $CURRMODEM 1
+		uci commit modem
 	fi
 
-	$ROOTER/connect/bandmask $CURRMODEM 1
-	uci commit modem
 
 	if [ $SP = 4 ]; then
 		if [ -e /etc/interwave ]; then
@@ -369,7 +379,7 @@ fi
 
 if [ -e /tmp/simpin$CURRMODEM ]; then
 	log " SIM Error"
-	exit 0
+	#exit 0
 fi
 if [ -e /usr/lib/gps/gps.sh ]; then
 	/usr/lib/gps/gps.sh $CURRMODEM &
@@ -471,6 +481,31 @@ if [ $SP -eq 4 ]; then
 			get_ip
 		fi
 	done
+fi
+	
+if [ $SP = 8 -o  $SP = 9 ]; then
+	log "FM350 Connection Command"
+	$ROOTER/connect/bandmask $CURRMODEM 2
+	uci commit modem
+	get_connect
+	export SETAPN=$NAPN
+	BRK=1
+	
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-fecm.gcom" "$CURRMODEM")
+		chcklog "$OX"
+		log " "
+		log "Fibocom Connect : $OX"
+		log " "
+		ERROR="ERROR"
+		if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
+		then
+			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
+			log "Failed to Connect"
+		else
+			BRK=0
+			get_ip
+			check_ip
+		fi
 fi
 
 if [ $SP = 5 ]; then
