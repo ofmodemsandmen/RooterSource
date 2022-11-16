@@ -4,21 +4,22 @@ I18N = require "luci.i18n"
 translate = I18N.translate
 
 function index()
-	entry({"admin", "modem"}, firstchild(), translate("Modem"), 25).dependent=false
-	entry({"admin", "modem", "prof"}, cbi("rooter/profiles"), translate("Connection Profile"), 2)
-	entry({"admin", "modem", "nets"}, template("rooter/net_status"), translate("Network Status"), 30)
+	
 	local multilock = uci:get("custom", "multiuser", "multi") or "0"
 	local rootlock = uci:get("custom", "multiuser", "root") or "0"
 	if (multilock == "0") or (multilock == "1" and rootlock == "1") then
+		entry({"admin", "modem"}, firstchild(), translate("Modem"), 25).dependent=false
+		entry({"admin", "modem", "prof"}, cbi("rooter/profiles"), translate("Connection Profile"), 2)
+		entry({"admin", "modem", "nets"}, template("rooter/net_status"), translate("Network Status"), 30)
 		entry({"admin", "modem", "debug"}, template("rooter/debug"), translate("Debug Information"), 50)
 		entry({"admin", "modem", "cust"}, cbi("rooter/customize"), translate("Custom Modem Ports"), 55)
+		entry({"admin", "modem", "log"}, template("rooter/log"), translate("Connection Log"), 60)
+		entry({"admin", "modem", "misc"}, template("rooter/misc"), translate("Miscellaneous"), 40)
 	end
-	entry({"admin", "modem", "log"}, template("rooter/log"), translate("Connection Log"), 60)
-	entry({"admin", "modem", "misc"}, template("rooter/misc"), translate("Miscellaneous"), 40)
+	if (multilock == "1" and rootlock == "0") then
+		entry({"admin", "system", "misc"}, template("rooter/bandlock"), translate("Band Lock and Scan"), 40)
+	end
 	
-	entry({"admin", "modem", "block"},
-		template("rooter/bandlock"))
-
 	entry({"admin", "modem", "get_csq"}, call("action_get_csq"))
 	entry({"admin", "modem", "change_port"}, call("action_change_port"))
 	entry({"admin", "modem", "change_mode"}, call("action_change_mode"))
