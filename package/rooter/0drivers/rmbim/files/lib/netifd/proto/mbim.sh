@@ -467,6 +467,10 @@ _proto_mbim_setup() {
 #	SIGNAL=$(umbim $DBG -n -t $tid -d $device signal)
 #	CSQ=$(echo "$SIGNAL" | awk '/rssi:/ {print $2}')
 
+	if [ -e $ROOTER/modem-led.sh ]; then
+		$ROOTER/modem-led.sh $CURRMODEM 3
+	fi
+
 	$ROOTER/log/logger "Modem #$CURRMODEM Connected"
 	log "Modem $CURRMODEM Connected"
 
