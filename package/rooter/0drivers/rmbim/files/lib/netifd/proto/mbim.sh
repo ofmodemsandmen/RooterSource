@@ -544,7 +544,8 @@ _proto_mbim_setup() {
 			$ROOTER/timezone.sh &
 		fi
 	fi
-	CLB=$(uci -q get modem.modeminfo$CURRMODEM.lb)
+	#CLB=$(uci -q get modem.modeminfo$CURRMODEM.lb)
+	CLB=1
 	if [ -e /etc/config/mwan3 ]; then
 		INTER=$(uci get modem.modeminfo$CURRMODEM.inter)
 		if [ -z $INTER ]; then
