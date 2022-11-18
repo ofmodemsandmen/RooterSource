@@ -7,26 +7,18 @@ log() {
 }
 
 CURRMODEM=$1
-shift 1
-SLOTS="$@"
-log "$SLOTS"
-
 COMMPORT="/dev/ttyUSB"$(uci get modem.modem$CURRMODEM.commport)
-
 SMSLOC=$(uci -q get modem.modem$CURRMODEM.smsloc)
 
 LOCKDIR="/tmp/smslock$CURRMODEM"
 PIDFILE="${LOCKDIR}/PID"
 
-while [ true ]; do
+while [ 1 -lt 6 ]; do
 	if mkdir "${LOCKDIR}" &>/dev/null; then
 		echo "$$" > "${PIDFILE}"
-		for SLOT in $SLOTS
-		do
-			ATCMDD="AT+CPMS=\"$SMSLOC\";+CMGD=$SLOT"
-			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			log "$OX"
-		done
+		ATCMDD="AT+CPMS=\"$SMSLOC\";+CMGD=1,4"
+		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		log "$OX"
 		uci set modem.modem$CURRMODEM.smsnum=999
 		uci commit modem
 		break

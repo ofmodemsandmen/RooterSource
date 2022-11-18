@@ -21,6 +21,7 @@ function index()
 	entry({"admin", "modem", "change_sms"}, call("action_change_sms"))
 	entry({"admin", "modem", "change_smsdn"}, call("action_change_smsdn"))
 	entry({"admin", "modem", "change_smsflag"}, call("action_change_smsflag"))
+	entry({"admin", "modem", "delall_sms"}, call("action_delall_sms"))
 end
 
 function trim(s)
@@ -71,12 +72,16 @@ function action_send_sms()
 	luci.http.write_json(rv)
 end
 
+function action_delall_sms()
+	smsnum = luci.model.uci.cursor():get("modem", "general", "smsnum")
+	os.execute("/usr/lib/sms/delall.sh " .. smsnum)
+end
+
 function action_del_sms()
-	local set = tonumber(luci.http.formvalue("set"))
-	if set ~= nil and set > 0 then
-		set = set - 1;
+	local set = luci.http.formvalue("set")
+	if set ~= nil then
 		smsnum = luci.model.uci.cursor():get("modem", "general", "smsnum")
-		os.execute("/usr/lib/sms/delsms.sh " .. smsnum .. " " .. set)
+		os.execute("/usr/lib/sms/delsms.sh " .. smsnum .. " "  .. set)
 		os.execute("touch /tmp/smswakeup" .. smsnum)
 	end
 end
@@ -122,7 +127,7 @@ function action_check_read()
 									line = file:read("*line")
 									full = full .. line
 									if k < i then
-										full = full .. '<br />'
+										full = full .. '\n'
 									end
 								end
 							else

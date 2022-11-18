@@ -22,7 +22,7 @@
 			if ( ss == "0" )
 			{
 				clearListBox("smsList");
-				document.getElementById('message').innerHTML="";
+				document.getElementById('message').value="";
 				document.getElementById('total').innerHTML="";
 				document.getElementById('used').innerHTML="";
 				document.getElementById('mslots').innerHTML="";
@@ -32,7 +32,7 @@
 			if ( ss == "1" )
 			{
 				clearListBox("smsList");
-				document.getElementById('message').innerHTML="";
+				document.getElementById('message').value="";
 				document.getElementById('total').innerHTML="";
 				document.getElementById('used').innerHTML="";
 				document.getElementById('mslots').innerHTML="";
@@ -86,7 +86,7 @@
 					var i;
 					for(i=0;i<len;i++)
 					{
-						index[indx] = parseInt(arr[i]);
+						index[indx] = arr[i];
 						number[indx] = arr[i+1];
 						ttext[indx] = arr[i+2];
 						var txtline = arr[i+3];
@@ -102,7 +102,7 @@
 						if ( selectline == -1 )
 						{
 							select.value = 0;
-							document.getElementById('message').innerHTML=ttext[0];
+							document.getElementById('message').value=ttext[0];
 							selectline = 0;
 						}
 						else
@@ -112,7 +112,7 @@
 								selectline = indx -1 ;
 							}
 							select.value = selectline;
-							document.getElementById('message').innerHTML=ttext[selectline];
+							document.getElementById('message').value=ttext[selectline];
 						}
 					}
 				}
@@ -120,7 +120,7 @@
 		}
 	);
 
-	document.getElementById('message').innerHTML=" ";
+	document.getElementById('message').value=" ";
 	document.getElementById('total').innerHTML="0";
 	document.getElementById('used').innerHTML="0";
 	document.getElementById('mslots').innerHTML="0";
@@ -167,7 +167,7 @@
 	{
 		var s = document.getElementById("smsList").value;
 		selectline = s;
-		document.getElementById('message').innerHTML=ttext[s];
+		document.getElementById('message').value=ttext[s];
 	}
 
 	function sendsms()
@@ -214,6 +214,92 @@
 			}
 		);
 	}
+	
+	function readcheck()
+	{
+		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "check_read")%>', null,
+		function(x, rv)
+		{
+			var ss = rv.ready;
+			document.getElementById('message').style.color = "initial";
+			document.getElementById('conntype').innerHTML=rv.conntype;
+			if ( ss == "1" )
+			{
+				clearListBox("smsList");
+				document.getElementById('message').value="";
+				document.getElementById('total').innerHTML="";
+				document.getElementById('used').innerHTML="";
+				document.getElementById('supported').innerHTML="<%:Waiting to Read Messages%>";
+			}
+			if ( ss == "3" )
+			{
+				document.getElementById('supported').innerHTML="<%:Message Read Problem%>";
+			}
+			if ( ss == "2" )
+			{
+				document.getElementById('supported').innerHTML="<%:Messages Present%>";
+				clearListBox("smsList");
+				document.getElementById('total').innerHTML=rv.max;
+				document.getElementById('used').innerHTML=rv.used;
+				var line=rv.line;
+				var arr=(line.split("\x1D"));
+				var len = arr.length;
+				indx = 0;
+				var i;
+				for(i=0;i<len;i++)
+				{
+					index[indx] = parseInt(arr[i]);
+					number[indx] = arr[i+1];
+					ttext[indx] = arr[i+2];
+					var txtline = arr[i+3];
+					txtline = txtline.replace(/ /g,"\240");
+
+					var select = document.getElementById("smsList");
+								select.options[select.options.length] = new Option(txtline, indx);
+					i = i + 3;
+					indx = indx + 1;
+				}
+				if ( indx != -1 )
+				{
+					if ( selectline == -1 )
+					{
+						select.value = 0;
+						document.getElementById('message').value=ttext[0];
+						selectline = 0;
+					}
+					else
+					{
+						if ( selectline > indx-1 )
+						{
+							selectline = indx -1 ;
+						}
+						select.value = selectline;
+						document.getElementById('message').value=ttext[selectline];
+					}
+				}
+			}
+		}
+		);
+	}
+	
+	function delallsms()
+	{
+		var r=confirm("<%:Do you really want to delete all SMS?%>");
+		if (r==false)
+  		{
+  			return false;
+  		}
+		clearListBox("smsList");
+		document.getElementById('message').style.color = "red";
+		document.getElementById('message').value="<%:All Messages will be deleted. It may take some time before the list is updated.%>";
+		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "delall_sms")%>',
+			null,
+			function()
+			{
+				readcheck();
+			}
+		);
+	}
 
 	function delsms()
 	{
@@ -228,77 +314,14 @@
   		}
 		var s = document.getElementById("smsList").value;
 		var dx = index[s];
-		dx = dx + 1;
 		clearListBox("smsList");
 		document.getElementById('message').style.color = "red";
-		document.getElementById('message').innerHTML="<%:Message will be deleted. It may take some time before the list is updated.%>";
+		document.getElementById('message').value="<%:Message will be deleted. It may take some time before the list is updated.%>";
 		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "del_sms")%>',
 			{ set: dx },
 			function()
 			{
-				XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "check_read")%>', null,
-				function(x, rv)
-				{
-					var ss = rv.ready;
-					document.getElementById('message').style.color = "initial";
-					document.getElementById('conntype').innerHTML=rv.conntype;
-					if ( ss == "1" )
-					{
-						clearListBox("smsList");
-						document.getElementById('message').innerHTML="";
-						document.getElementById('total').innerHTML="";
-						document.getElementById('used').innerHTML="";
-						document.getElementById('supported').innerHTML="<%:Waiting to Read Messages%>";
-					}
-					if ( ss == "3" )
-					{
-						document.getElementById('supported').innerHTML="<%:Message Read Problem%>";
-					}
-					if ( ss == "2" )
-					{
-						document.getElementById('supported').innerHTML="<%:Messages Present%>";
-						clearListBox("smsList");
-						document.getElementById('total').innerHTML=rv.max;
-						document.getElementById('used').innerHTML=rv.used;
-						var line=rv.line;
-   						var arr=(line.split("\x1D"));
-						var len = arr.length;
-						indx = 0;
-						var i;
-						for(i=0;i<len;i++)
-						{
-							index[indx] = parseInt(arr[i]);
-							number[indx] = arr[i+1];
-							ttext[indx] = arr[i+2];
-							var txtline = arr[i+3];
-							txtline = txtline.replace(/ /g,"\240");
-
-							var select = document.getElementById("smsList");
-                    					select.options[select.options.length] = new Option(txtline, indx);
-							i = i + 3;
-							indx = indx + 1;
-						}
-						if ( indx != -1 )
-						{
-							if ( selectline == -1 )
-							{
-								select.value = 0;
-								document.getElementById('message').innerHTML=ttext[0];
-								selectline = 0;
-							}
-							else
-							{
-								if ( selectline > indx-1 )
-								{
-									selectline = indx -1 ;
-								}
-								select.value = selectline;
-								document.getElementById('message').innerHTML=ttext[selectline];
-							}
-						}
-					}
-				}
-				);
+				readcheck();
 			}
 		);
 	}
@@ -442,6 +465,14 @@
 		<td>&nbsp;</td>
 	</tr>
 	</table>
+	
+	<table width="700"  border="0">
+	<tr>
+		<td width="3%">&nbsp;</td>
+		<td width="17%"><input type="button" id="delallbtn" class="cbi-button cbi-button-remove" value="<%:Delete All Messages%>" onclick="return delallsms()" /></td>
+		<td width="80%">&nbsp;</td>
+	</tr>
+	</table>
 
 	<table width="700"  border="0">
 	<tr>
@@ -466,15 +497,18 @@
 
 	<table width="550"  border="0">
   	<tr>
-    		<td width="15%"><div align="left"><strong><%:Message :%></strong></div></td>
-    		<td width="70%"><ul id="message"></ul></td>
-    		<td width="15%">&nbsp;</td>
+    		<td width="7%"><div align="left"><strong><%:Message :%></strong></div></td>
+    <!--		<td width="70%"><ul id="message"></ul></td> -->
+			<td width="80%">
+				<textarea readonly="readonly" name="message" id="message" rows="6" style="font-size : 20px;width: 600px;" maxlength="160"></textarea>
+			</td>
+    		<td width="13%">&nbsp;</td>
   	</tr>
 	</table>
 
 	<table width="550"  border="0">
 	<tr>
-    		<td width="17%"><input type="button" id="delbtn" class="cbi-button cbi-button-apply" value="<%:Delete Message%>" onclick="return delsms()" /></td>
+    		<td width="17%"><input type="button" id="delbtn" class="cbi-button cbi-button-remove" value="<%:Delete Message%>" onclick="return delsms()" /></td>
 		<td width="17%"><input type="button" id="replybtn" class="cbi-button cbi-button-apply" value="<%:Reply to Message%>" onclick="return replysms()" /></td>
 		<td width="17%"><input type="button" id="newbtn" class="cbi-button cbi-button-apply" value="<%:New Message%>" onclick="return newsms()" /></td>
     		<td width="49%">&nbsp;</td>
