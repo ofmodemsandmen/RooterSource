@@ -301,9 +301,9 @@ if [ $SERVE = "0" ]; then
 else
 	running=$(uci -q get wireguard.settings.client)
 	log "Client running $running"
-	if [ $running = 1 ]; then
-		exit 0
-	fi
+	#if [ $running = 1 ]; then
+		#exit 0
+	#fi
 	INTER=$(uci -q get wireguard."$WG".wginter)
 	if [ -z "$INTER" ]; then
 		INTER=0
