@@ -391,4 +391,5 @@ if [ $RESTART = "0" ]; then
 fi
 rm -f /tmp/bmask
 /usr/lib/rooter/luci/restart.sh $CURRMODEM
+/usr/lib/rooter/connect/bandmask $CURRMODEM $MODT
 exit 0

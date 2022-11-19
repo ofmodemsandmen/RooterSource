@@ -328,6 +328,14 @@ _proto_mbim_setup() {
 		log "Failed to connect to network"
 		return 1
 	fi
+	log "Save Connect Data"
+	uci set modem.modem$CURRMODEM.mdevice=$device
+	uci set modem.modem$CURRMODEM.mapn=$apn
+	uci set modem.modem$CURRMODEM.mipt=$itp
+	uci set modem.modem$CURRMODEM.mauth=$auth
+	uci set modem.modem$CURRMODEM.musername=$username
+	uci set modem.modem$CURRMODEM.mpassword=$password
+	uci commit modem
 	
 	tid=$((tid + 1))
 
