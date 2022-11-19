@@ -378,16 +378,18 @@ fi
 
 $ROOTER/common/gettype.sh $CURRMODEM
 $ROOTER/connect/get_profile.sh $CURRMODEM
-if [ -e $ROOTER/simlock.sh ]; then
-	$ROOTER/simlock.sh $CURRMODEM
-fi
+if [ $SP -gt 0 ]; then
+	if [ -e $ROOTER/simlock.sh ]; then
+		$ROOTER/simlock.sh $CURRMODEM
+	fi
 
-if [ -e /tmp/simpin$CURRMODEM ]; then
-	log " SIM Error"
-	#exit 0
-fi
-if [ -e /usr/lib/gps/gps.sh ]; then
-	/usr/lib/gps/gps.sh $CURRMODEM &
+	if [ -e /tmp/simpin$CURRMODEM ]; then
+		log " SIM Error"
+		#exit 0
+	fi
+	if [ -e /usr/lib/gps/gps.sh ]; then
+		/usr/lib/gps/gps.sh $CURRMODEM &
+	fi
 fi
 
 INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
