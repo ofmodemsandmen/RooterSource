@@ -2,7 +2,7 @@
 . /lib/functions.sh
 
 log() {
-	logger -t "TEXTING" "$@"
+	modlog "TEXTING" "$@"
 }
 
 checktime() {
@@ -96,7 +96,7 @@ checkper() {
 	istime=$(checktime)
 	if [ $istime = '1' ]; then
 		prev=$(uci -q get custom.texting.used)
-		per=$(uci -q get custom.bwallocate.percent)
+		per=$(uci -q get custom.texting.percent)
 		persent=$(uci -q get custom.bwallocate.persent)
 		if [ "$persent" != "1" ]; then
 			getbw
