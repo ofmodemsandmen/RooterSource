@@ -250,7 +250,7 @@ if [ $MODEMTYPE -eq 10 ]; then
 		"9")
 			ATC="AT+CNMP=71" ;;
 		*)
-			ATC="AT+CNMP=1" ;;
+			ATC="AT+CNMP=2" ;;
 	esac
 fi
 
