@@ -16,7 +16,7 @@ CURRMODEM=$1
 CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 INTER=$(uci get modem.modeminfo$CURRMODEM.inter)
 
-if [ "$2" != "9" ]; then
+if [ "$2" != "9" -a "$2" != "11" ]; then
 	PROTO=$(uci get modem.modem$CURRMODEM.proto)
 	if [ "$PROTO" = "3" -o "$PROTO" = "30" ]; then
 		mdevice=$(uci -q get modem.modem$CURRMODEM.mdevice)
@@ -46,7 +46,7 @@ if [ "$2" != "9" ]; then
 	fi
 fi
 
-if [ "$2" != "9" ]; then # disconnect
+if [ "$2" != "9" -a "$2" != "11" ]; then # disconnect
 	uci set modem.modem$CURRMODEM.connected=0
 	uci commit modem
 	jkillall getsignal$CURRMODEM

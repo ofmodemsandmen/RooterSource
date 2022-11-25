@@ -43,6 +43,7 @@ if [ -z "$RDY" ]; then # SIM Locked
 		exit 0
 	fi
 	log "Correct Pin"
+	$ROOTER/common/gettype.sh $CURRMODEM
 else
 	log "Not Locked"
 	sblk=$(uci -q get custom.simpin.block)
