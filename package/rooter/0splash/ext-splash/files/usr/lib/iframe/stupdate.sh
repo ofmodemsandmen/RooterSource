@@ -307,6 +307,13 @@ if [ $splash = "1" ]; then
 	sed -i -e "s!#PORT#!$namev!g" $STEMP
 	level2txt "$tempur" "single"
 	sed -i -e "s!#TEMP#!$namev!g" $STEMP
+	rm -f /tmp/spip; wget -O /tmp/spip http://ipecho.net/plain > /dev/null 2>&1
+	extr=$(cat /tmp/spip)
+	if [ -z "$extr" ]; then
+		extr="-"
+	fi
+	level2txt "$extr" "single"
+	sed -i -e "s!#EXTERNAL#!$namev!g" $STEMP
 	
 	dual=$(uci -q get iframe.iframe.dual)
 	if [ $dual = "1" ]; then
