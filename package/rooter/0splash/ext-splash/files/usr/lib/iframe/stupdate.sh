@@ -300,7 +300,6 @@ if [ $splash = "1" ]; then
 	sed -i -e "s!#MODEM#!$namev!g" $STEMP
 	level2txt "$cops" "single"
 	namev=$(echo "$namev" | tr -d '&')
-	namev="ja! mobil"
 	sed -i -e "s~#PROVIDER#~$namev~g" $STEMP
 	level2txt "$proto" "single"
 	sed -i -e "s!#PROTO#!$namev!g" $STEMP
