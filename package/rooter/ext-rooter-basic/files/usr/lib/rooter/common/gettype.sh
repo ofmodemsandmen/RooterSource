@@ -239,6 +239,10 @@ else
 fi
 uci set modem.modem$CURRMODEM.iccid=$ICCID
 uci commit modem
+if [ -e /etc/config/modeinfo ]; then
+	uci set modeinfo.global.iccid$CURRMODEM=$ICCID
+	uci commit modeinfo
+fi
 echo "$ICCID" >> /tmp/msimdatax$CURRMODEM
 echo "0" >> /tmp/msimdatax$CURRMODEM
 echo "$CNUM" > /tmp/msimnumx$CURRMODEM
