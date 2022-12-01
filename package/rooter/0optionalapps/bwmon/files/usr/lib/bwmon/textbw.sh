@@ -141,7 +141,7 @@ do
 		if [ $running = "1" ]; then
 			EN=$(uci -q get custom.texting.text)
 			if [ $EN = "1" ]; then
-				/usr/lib/bwmon/dotext.sh
+				/usr/lib/bwmon/dotext.sh &
 				sleep $delay
 			fi
 		else
