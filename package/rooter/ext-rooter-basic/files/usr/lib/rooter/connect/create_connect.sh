@@ -303,6 +303,10 @@ chkraw() {
 		RAW=1
 	elif [ $idV = 413c -a $idP = 81d7 ]; then
 		RAW=1
+	elif [ $idV = 413c -a $idP = 81e0 ]; then
+		RAW=1
+	elif [ $idV = 12d1 -a $idP = 1506 ]; then
+		RAW=1
 	fi
 }
 
