@@ -125,7 +125,7 @@ level2txt() {
 		if [ $3 = "1" -o $3 = "0" ];then
 			desc="<br><i class='msDesc'>"."</i></br>"
 		fi
-		namev="<b class='level_2'>""$tmp""</b>"$desc
+		namev="<i class='msText'>""$tmp""</i>"$desc 
 		return
 	fi
 }
