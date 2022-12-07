@@ -277,9 +277,13 @@ buldimage() {
 		if [ ! -z $WPAD ]; then
 			sed -i -e 's/CONFIG_PACKAGE_wpad-mini=y/# CONFIG_PACKAGE_wpad-mini is not set/g' ./.config
 		fi
-		WPAD=$(cat "./.config" | grep "CONFIG_PACKAGE_wpad-mesh-openssl=y")
+		WPAD=$(cat "./.config" | grep "CONFIG_PACKAGE_wpad-openssl=y")
 		if [ ! -z $WPAD ]; then
 			sed -i -e 's/CONFIG_PACKAGE_wpad=y/# CONFIG_PACKAGE_wpad is not set/g' ./.config
+		fi
+		WPAD=$(cat "./.config" | grep "CONFIG_PACKAGE_wpad-basic-wolfssl=y")
+		if [ ! -z $WPAD ]; then
+			sed -i -e 's/CONFIG_PACKAGE_wpad-basic-wolfssl=y/# CONFIG_PACKAGE_wpad-basic-wolfssl is not set/g' ./.config
 		fi
 		WGET=$(cat "./.config" | grep "CONFIG_PACKAGE_wget ")
 		if [ ! -z "$WGET" ]; then
