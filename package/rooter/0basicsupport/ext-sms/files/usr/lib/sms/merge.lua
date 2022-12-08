@@ -28,14 +28,22 @@ repeat
 		message['phone'] = filein:read("*line")
 		nline = filein:read("*line")
 		message['nline'] = nline
+		nline = tonumber(nline)
+		nc = nline
 		ncntr = 1
 		msg=""
 		message['msgnum'] = "xxx"
 		message['msgord'] = "xxx"
 		message['msgmax'] = "xxx"
 		lines = filein:read("*line")
-		s, e = lines:find("Msg# ")
-		if s ~= nil then
+		if lines == nil then
+			s, e = nil
+		else
+			s, e = lines:find("Msg# ")
+		end
+		if s == nil then
+			nc = nc + 1
+		else
 			bs, be = lines:find(",", e+1)
 			msgnum = lines:sub(e+1, be-1)
 			message['msgnum'] = msgnum
@@ -46,7 +54,6 @@ repeat
 			lines = filein:read("*line")
 		end
 		msg = lines
-		nc = tonumber(nline)
 		if nc > 2 then
 			for i=1,nc-2,1
 			do
@@ -62,7 +69,7 @@ repeat
 						end
 					else
 						msg = msg .. "\n"
-						
+
 					end
 				end
 			end
@@ -142,7 +149,7 @@ do
 			end
 			fileout:write(msgtmp, "\n")
 			fileout:write(overall[tostring(i)]['phone'], "\n")
-			
+
 			if mflg ~= 0 then
 				msg = "Partial Message : " .. msg
 				t = short:gsub("%s+", " ")
@@ -161,5 +168,3 @@ do
 	end
 end
 fileout:close()
-
-
