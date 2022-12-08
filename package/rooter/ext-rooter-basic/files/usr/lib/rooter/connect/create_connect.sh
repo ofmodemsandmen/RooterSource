@@ -788,6 +788,9 @@ if [ -n "$CHKPORT" ]; then
 
 	if [ -e /tmp/simpin$CURRMODEM ]; then
 		log " SIM Error"
+		if [ -e $ROOTER/simerr.sh ]; then
+			$ROOTER/simerr.sh $CURRMODEM
+		fi
 		exit 0
 	fi
 	if [ -e /usr/lib/gps/gps.sh ]; then
