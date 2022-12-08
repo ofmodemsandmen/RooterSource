@@ -61,4 +61,3 @@ define Build/Compile
 endef
 
 $(eval $(call BuildPackage,mesh11sd))
-3°
