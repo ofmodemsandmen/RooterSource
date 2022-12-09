@@ -80,4 +80,7 @@ else # restart
 	echo $PORT > /sys/bus/usb/drivers/usb/unbind
 	sleep 35
 	echo $PORT > /sys/bus/usb/drivers/usb/bind
+	if [ -e $ROOTER/modem-led.sh ]; then
+		$ROOTER/modem-led.sh $CURRMODEM 0
+	fi
 fi
