@@ -237,7 +237,7 @@ if [ $splash = "1" ]; then
 	SPSTATUS="/tmp/www/splash.html"
 	rm -f $STEMP
 	cp $STATUS $STEMP
-	button="<div class='rooterPageContentBW'><div class="" id=\"rooterItems\"><a href='cgi-bin/luci'><div class=\"rooterItem\" id=\"rooterItem1\"><div class=\"rooterItemTitle\"><i class='icon icon-cog'></i> Router Login</div><div class=\"rooterItemTitle\"></div></div></a></div></div>"
+	button="<a href='cgi-bin/luci'><div class=\"rooterItem\"><div class=\"rooterItemTitle\"><i class='icon icon-cog'></i>Router Login</div></div></a>"
 	sed -i -e "s!#BUTTON#!$button!g" $STEMP
 	sed -i -e "s!#LUCIS#!luci-static/!g" $STEMP
 	titlebar="<div class='rooterPageHead'><a  href='http://#URL#'><div class=\"rooterHeadTitle\"> #TITLE#</div></a></div>"
