@@ -101,8 +101,12 @@ while true; do
 			fi
 			if [ $USED -eq $(uci get modem.modem$CURRMODEM.smsnum) ] && [ $HH -eq $(date +%H) ]; then
 				if [ $MEM3 == "SM" -a $USED -lt $MAXED -a $MESC -gt 0 -a $(uci -q get modem.sms.menable) == 1 ]; then
-					ATCMDD="AT+CPMS=\"ME\";+CMGR=$MESLOT;+CPMS=\"SM\""
+					ATCMDD="AT+CPMS=\"ME\""
 					OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+					ATCMDD="AT+CMGR=$MESLOT"
+					OX=$OX$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+					ATCMDD="AT+CPMS=\"SM\""
+					OX=$OX$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 					Rstat=$(echo "$OX" | grep -o "+CMGR:[^,]\+" | grep -o "[0-3]")
 					PDU=$(echo "$OX" | grep -o "[0-9A-F]\{30,\}")
 					PDUL=$(echo "$OX" | grep -o "+CMGR:.*" | grep -o ",[0-9]\{1,\}" | grep -o "[0-9]\{1,3\}")
