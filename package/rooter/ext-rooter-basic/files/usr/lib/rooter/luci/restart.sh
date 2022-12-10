@@ -25,13 +25,14 @@ if [ "$2" != "9" -a "$2" != "11" ]; then
 		nauth=$(uci -q get modem.modem$CURRMODEM.mauth)
 		nusername=$(uci -q get modem.modem$CURRMODEM.musername)
 		mpassword=$(uci -q get modem.modem$CURRMODEM.mpassword)
-		log "Disconnect Network"
+		log "MBIM Disconnect"
 		umbim -t 1 -d "$mdevice" disconnect
 		sleep 1
 		exit 0
 	fi
 
 	if [ "$PROTO" = "2" ]; then
+		log "QMI Disconnect"
 		mdevice=$(uci -q get modem.modem$CURRMODEM.mdevice)
 		mapn=$(uci -q get modem.modem$CURRMODEM.mapn)
 		mcid=$(uci -q get modem.modem$CURRMODEM.mcid)

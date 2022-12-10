@@ -82,19 +82,21 @@ if [[ "$RETURN_CODE_1" != "200" &&  "$RETURN_CODE_2" != "200" &&  "$RETURN_CODE_
 		log "Second Bad Ping Test"
 		uci set ping.ping.conn="3"
 		uci commit ping
-		/usr/lib/rooter/luci/restart.sh $CURRMODEM 
+		log "Restart Network"
+		/usr/lib/rooter/luci/restart.sh $CURRMODEM 10
 		sleep $DELAY
 		ptest 3
-		if [ $status -eq 1 ]; then
-			log "Good Ping"
+		if [ $status -eq 0 ]; then
+			log "Good Ping after Network Restart"
 			uci set ping.ping.conn="2"
 			uci commit ping
 			exit 0
 		else
+			log "Hard Restart"
 			/usr/lib/rooter/luci/restart.sh $CURRMODEM 11
 			ptest 9
-			if [ $status -eq 1 ]; then
-				log "Good Ping"
+			if [ $status -eq 0 ]; then
+				log "Good Ping after Hard Restart"
 				uci set ping.ping.conn="2"
 				uci commit ping
 				exit 0
