@@ -157,7 +157,7 @@ check_apn() {
 	CGDCONT2=$(echo $OX | grep "+CGDCONT: 2,")
 	if [ -z "$CGDCONT2" ]; then
 		ATCMDD="AT+CGDCONT=2,\"$IPVAR\",\"ims\""
-		OXy=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	fi
 	if `echo $OX | grep "+CGDCONT: $CID,\"$IPVAR\",\"$NAPN\"," 1>/dev/null 2>&1`
 	then
@@ -1022,6 +1022,10 @@ do
 
 		if [ -e $ROOTER/modem-led.sh ]; then
 			$ROOTER/modem-led.sh $CURRMODEM 2
+		fi
+		
+		if [ -e $ROOTER/connect/chkconn.sh ]; then
+			$ROOTER/connect/chkconn.sh $CURRMODEM &
 		fi
 
 		BRK=0
