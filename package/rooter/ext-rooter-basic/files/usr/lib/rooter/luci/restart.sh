@@ -28,6 +28,8 @@ if [ "$2" != "9" -a "$2" != "11" ]; then
 		log "MBIM Disconnect"
 		umbim -t 1 -d "$mdevice" disconnect
 		sleep 1
+		modtype=$(uci -q get modem.modem$CURRMODEM.modtype)
+		/usr/lib/rooter/connect/bandmask $CURRMODEM $modtype
 		exit 0
 	fi
 
@@ -40,6 +42,8 @@ if [ "$2" != "9" -a "$2" != "11" ]; then
 		nusername=$(uci -q get modem.modem$CURRMODEM.musername)
 		mpassword=$(uci -q get modem.modem$CURRMODEM.mpassword)
 		uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null & sleep 1 ; kill -9 $!
+		modtype=$(uci -q get modem.modem$CURRMODEM.modtype)
+		/usr/lib/rooter/connect/bandmask $CURRMODEM $modtype
 		exit 0
 	fi
 	if [ "$2" = "10" ]; then
