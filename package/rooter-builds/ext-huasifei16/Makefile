@@ -28,7 +28,7 @@ define Package/ext-huasifei16
 		+ext-extra +luci-app-hotspot +luci-app-wol \
 		+usbmuxd +libusbmuxd-utils +libimobiledevice-utils +kmod-usb-net-ipheth \
 		+qlog +luci-ssl +usbutils +openssl-util +irqbalance +ext-splashconfig \
-		+nano +picocom +wpad +wget +qfirehose 
+		+nano +picocom +wpad +wget +qfirehose  +ext-simplegps
   TITLE:=ROOter support w/o MWan3 for Huasifei
   PKGARCH:=all
 endef
