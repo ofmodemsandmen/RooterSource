@@ -123,7 +123,7 @@ level2txt() {
 			tmp=$(echo "$tmp" | sed -e "s/-//g")
 		fi
 		if [ $3 = "1" -o $3 = "0" ];then
-			desc="<br><i class='msDesc'>"."</i></br>"
+			desc="<br><i class='msDot'>"."</i></br>"
 		fi
 		namev="<i class='msText'>""$tmp""</i>"$desc 
 		return

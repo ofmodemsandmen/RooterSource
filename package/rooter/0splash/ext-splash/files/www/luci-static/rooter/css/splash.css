@@ -117,6 +117,10 @@
 	margin-left: 10px;
 	margin-top: 5px;
 }
+/*Erase Dot*/
+.msDot{
+	font-size: 0px;
+}
 /*Levels_Text_Except_Strenghth_RSSI_RSRP*/
 .msText{
 	color: #333;
