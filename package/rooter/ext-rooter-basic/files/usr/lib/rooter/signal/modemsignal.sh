@@ -216,7 +216,7 @@ while [ 1 = 1 ]; do
 				;;
 			"413c" )
 				case $PROD in
-					"81d7"|"81d8"|"81e0" )
+					"81d7"|"81d8" )
 						$ROOTER/common/t77data.sh $CURRMODEM $COMMPORT
 					;;
 					* )
@@ -277,11 +277,13 @@ while [ 1 = 1 ]; do
 		NETSPEED=10
 	fi
 	CURRTIME=$(date +%s)
-	let ELAPSE=CURRTIME-STARTIMEX
-	while [ $ELAPSE -lt $NETSPEED ]; do
+	SLEEPTIME=$(($(echo $NETSPEED) - ($(echo $CURRTIME) - $(echo $STARTIMEX))))
+	if [ $SLEEPTIME -gt $NETSPEED ]; then
+		sleep $NETSPEED
+	elif [ $SLEEPTIME -lt 1 ]; then
 		sleep 2
-		CURRTIME=$(date +%s)
-		let ELAPSE=CURRTIME-STARTIMEX
-	done
-	STARTIMEX=$CURRTIME
+	else
+		sleep $SLEEPTIME
+	fi
+	STARTIMEX=$(date +%s)
 done
