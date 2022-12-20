@@ -119,6 +119,10 @@ idP=$(uci get modem.modem$CURRMODEM.idP)
 
 $ROOTER/connect/get_profile.sh $CURRMODEM
 
+if [ -e $ROOTER/modem-led.sh ]; then
+	$ROOTER/modem-led.sh $CURRMODEM 3
+fi
+		
 INTER=$(uci get modem.modeminfo$CURRMODEM.inter)
 if [ -z $INTER ]; then
 	INTER=$CURRMODEM
