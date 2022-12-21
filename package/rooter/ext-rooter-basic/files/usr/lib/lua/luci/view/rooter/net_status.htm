@@ -78,7 +78,32 @@ end
 				phonenx = "";
 			}
 			
-			simerr = rv.simerr;
+
+			reslt=rv.result
+
+			portx=rv.port
+			if (portx == "-" )
+			{
+				document.getElementById('inc1').style.display="none";
+				document.getElementById('dec1').style.display="none";
+			}
+			else
+			{
+				document.getElementById('inc1').style.display="block";
+				document.getElementById('dec1').style.display="block";
+			}
+			document.getElementById('idvp').innerHTML=rv.modid;
+			document.getElementById('imei').innerHTML=rv.imei;
+			document.getElementById('imsi').innerHTML=rv.imsi;
+			document.getElementById("imsi").style.color = "inherit";
+			document.getElementById('iccid').innerHTML=rv.iccid;
+			host = rv.host;
+			if(host == "1")
+			{
+				document.getElementById("pho").disabled=true;
+			}
+			
+						simerr = rv.simerr;
 			if (simerr == "0")
 			{
 				document.getElementById("simwarn").style.display="none";
@@ -108,30 +133,10 @@ end
 						}
 					}
 				}
+				document.getElementById('imsi').innerHTML=document.getElementById("simsg").innerHTML;
+				document.getElementById("imsi").style.color = "red";
 			}
 
-			reslt=rv.result
-
-			portx=rv.port
-			if (portx == "-" )
-			{
-				document.getElementById('inc1').style.display="none";
-				document.getElementById('dec1').style.display="none";
-			}
-			else
-			{
-				document.getElementById('inc1').style.display="block";
-				document.getElementById('dec1').style.display="block";
-			}
-			document.getElementById('idvp').innerHTML=rv.modid;
-			document.getElementById('imei').innerHTML=rv.imei;
-			document.getElementById('imsi').innerHTML=rv.imsi;
-			document.getElementById('iccid').innerHTML=rv.iccid;
-			host = rv.host;
-			if(host == "1")
-			{
-				document.getElementById("pho").disabled=true;
-			}
 		}
 	);
 
