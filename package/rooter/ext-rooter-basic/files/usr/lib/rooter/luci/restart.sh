@@ -4,7 +4,7 @@ ROOTER=/usr/lib/rooter
 ROOTER_LINK="/tmp/links"
 
 log() {
-	modlog "Modem Restart/Disconnect $CURRMODEM" "$@"
+	modlog "Modem Restart/Diisconnect $CURRMODEM" "$@"
 }
 
 ifname1="ifname"
@@ -25,13 +25,16 @@ if [ "$2" != "9" -a "$2" != "11" ]; then
 		nauth=$(uci -q get modem.modem$CURRMODEM.mauth)
 		nusername=$(uci -q get modem.modem$CURRMODEM.musername)
 		mpassword=$(uci -q get modem.modem$CURRMODEM.mpassword)
-		log "Disconnect Network"
+		log "MBIM Disconnect"
 		umbim -t 1 -d "$mdevice" disconnect
 		sleep 1
+		modtype=$(uci -q get modem.modem$CURRMODEM.modtype)
+		/usr/lib/rooter/connect/bandmask $CURRMODEM $modtype
 		exit 0
 	fi
 
 	if [ "$PROTO" = "2" ]; then
+		log "QMI Disconnect"
 		mdevice=$(uci -q get modem.modem$CURRMODEM.mdevice)
 		mapn=$(uci -q get modem.modem$CURRMODEM.mapn)
 		mcid=$(uci -q get modem.modem$CURRMODEM.mcid)
@@ -39,6 +42,8 @@ if [ "$2" != "9" -a "$2" != "11" ]; then
 		nusername=$(uci -q get modem.modem$CURRMODEM.musername)
 		mpassword=$(uci -q get modem.modem$CURRMODEM.mpassword)
 		uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null & sleep 1 ; kill -9 $!
+		modtype=$(uci -q get modem.modem$CURRMODEM.modtype)
+		/usr/lib/rooter/connect/bandmask $CURRMODEM $modtype
 		exit 0
 	fi
 	if [ "$2" = "10" ]; then
@@ -65,6 +70,17 @@ else # restart
 		fi
 		log "Hard modem reset done"
 	#fi
+	bn=$(cat /tmp/sysinfo/board_name)
+	bn=$(echo "$bn" | grep "mk01k21")
+	if [ ! -z "$bn" ]; then
+		i=496
+		echo $i > /sys/class/gpio/export
+		echo "out" > /sys/class/gpio/gpio$i/direction
+		echo "1" > /sys/class/gpio/gpio$i/value
+		sleep 5
+		echo "0" > /sys/class/gpio/gpio$i/value
+		log "Power Toggle"
+	fi
 	ifdown wan$INTER
 	uci delete network.wan$CURRMODEM
 	uci set network.wan$CURRMODEM=interface
