@@ -51,6 +51,7 @@ if [ "$2" != "9" -a "$2" != "11" ]; then
 	fi
 fi
 
+jkillall chkconn.sh
 if [ "$2" != "9" -a "$2" != "11" ]; then # disconnect
 	uci set modem.modem$CURRMODEM.connected=0
 	uci commit modem

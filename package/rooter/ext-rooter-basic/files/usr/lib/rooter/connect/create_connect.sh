@@ -1025,6 +1025,7 @@ do
 		fi
 		
 		if [ -e $ROOTER/connect/chkconn.sh ]; then
+			jkillall chkconn.sh
 			$ROOTER/connect/chkconn.sh $CURRMODEM &
 		fi
 
