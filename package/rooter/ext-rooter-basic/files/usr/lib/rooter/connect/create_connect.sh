@@ -611,6 +611,10 @@ uci commit modem.modem$CURRMODEM
 							fi
 							mbimcport
 						;;
+						"1e0e" )
+							get_tty 02
+							mbimcport
+						;; 
 						"2cb7" )
 							get_tty_fix 0
 							lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
