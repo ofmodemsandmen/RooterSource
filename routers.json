@@ -560,29 +560,25 @@
 	},
 	"RB951": {
 		"details": "Mikrotik RB951Ui-2nD (hAP)",
-		"type": "2",
+		"type": "1",
 		"build": "1907",
 		"config": ".config_rb951",
-		"image1": "openwrt-ar71xx-mikrotik-rb-nor-flash-16M-squashfs-sysupgrade.bin",
-		"image2": "openwrt-ar71xx-mikrotik-rb-nor-flash-16M-initramfs-kernel.bin",
+		"image": "openwrt-ar71xx-mikrotik-rb-nor-flash-16M-squashfs-sysupgrade.bin",
 		"imagepath": "/ar71xx/mikrotik/",
 		"mod": "Mikrotik-RB951Ui-2nD",
-		"ext1": "-upgrade.bin",
-		"ext2": "-kernel.bin",
-		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.pdf"]
+		"ext": "-upgrade.bin",
+		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.pdf", "rb912-initramfs-kernel.bin"]
 	},
 	"RB9125": {
 		"details": "Mikrotik RB912UAG-5HPnD",
-		"type": "2",
+		"type": "1",
 		"build": "1907",
 		"config": ".config_rb9125",
-		"image1": "openwrt-ar71xx-mikrotik-vmlinux-initramfs.elf",
-		"image2": "openwrt-ar71xx-mikrotik-nand-large-squashfs-sysupgrade.bin",
+		"image": "openwrt-ar71xx-mikrotik-nand-large-squashfs-sysupgrade.bin",
 		"imagepath": "/ar71xx/mikrotik/",
 		"mod": "Mikrotik-RB912UAG-5HPnD",
 		"ext1": "-upgrade.bin",
-		"ext2": "-initramfs.elf",
-		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.pdf"]
+		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.pdf", "rb912-initramfs-kernel.bin"]
 	},
 	"RTAC68U": {
 		"details": "Asus RT-AC68U",
