@@ -261,7 +261,7 @@ case $uVid in
 		log " "
 		if [ $RESTART = "1" ]; then
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			sleep 10
+			#sleep 10
 		fi
 	;;
 	"1199" )
@@ -391,5 +391,6 @@ if [ $RESTART = "0" ]; then
 fi
 rm -f /tmp/bmask
 /usr/lib/rooter/luci/restart.sh $CURRMODEM
-/usr/lib/rooter/connect/bandmask $CURRMODEM $MODT
+sleep 10
+#/usr/lib/rooter/connect/bandmask $CURRMODEM $MODT
 exit 0

@@ -46,6 +46,16 @@ if [ "$2" != "9" -a "$2" != "11" ]; then
 		/usr/lib/rooter/connect/bandmask $CURRMODEM $modtype
 		exit 0
 	fi
+	if [ "$PROTO" = "5" ]; then
+		log "Hostless Hard Reset by AT Command"
+		jkillall getsignal$CURRMODEM
+		jkillall processsms$CURRMODEM
+		ATCMDD="AT+CFUN=4"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		ATCMDD="AT+CFUN=1,1"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		exit 0
+	fi
 	if [ "$2" = "10" ]; then
 		exit 0
 	fi
