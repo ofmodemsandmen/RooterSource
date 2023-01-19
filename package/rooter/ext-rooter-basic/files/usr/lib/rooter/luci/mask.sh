@@ -136,6 +136,25 @@ case $uVid in
 				CA="em060-2xbands"
 				CA3=""
 			;;
+			"6005" ) # EC200-A
+				M1='ATI'
+				OX=$($ROOTER/gcom/gcom-locked "$CPORT" "run-at.gcom" "$CURRMODEM" "$M1")
+				REV=$(echo $OX" " | grep -o "Revision: .\+ OK " | tr " " ",")
+				MODL=$(echo $REV | cut -d, -f2)
+				EC25AF=$(echo $MODL | grep "EC200AAU")
+				if [ ! -z "$EC25AF" ]; then # AU
+					M2='11111011000000000000000000010000000000010000000000000000000000000100'
+				else
+					EC25AF=$(echo $MODL | grep "EC200AEU")
+					if [ ! -z "$EC25AF" ]; then # EU
+						M2='1010101100000000000100000001000000000101100'
+					else # CN
+						M2='1010100100000000000000000000000001000111100'
+					fi
+				fi
+				CA=""
+				CA3=""
+			;;
 			"0512" ) # EM12-G
 				EM12=$(echo $model | grep "EG18")
 				if [ -z "$EM12" ]; then

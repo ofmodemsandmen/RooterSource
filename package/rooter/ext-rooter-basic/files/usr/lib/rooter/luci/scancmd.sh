@@ -132,6 +132,10 @@ case $uVid in
 				M3="420000A7E23B0E38DF"
 				M4='AT+QCFG="band",0,'$M3',0'
 			;;
+			"6005" ) # EM060
+				M3="0x200000080080000df"
+				M4='AT+QCFG="band",0,'$M3',0'
+			;;
 			"0512" ) # EM12-G
 				EM12=$(echo $model | grep "EG18")
 				if [ -z "$EM12" ]; then
