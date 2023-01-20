@@ -868,7 +868,11 @@ if [ -n "$CHKPORT" ]; then
 	if [ -z "$ttl" ]; then
 		ttl="0"
 	fi
-	$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl" &
+	ttloption=$(uci -q get modem.modeminfo$CURRMODEM.ttloption)
+	if [ -z "$ttloption" ]; then
+		ttloption="0"
+	fi
+	$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl" "$ttloption" &
 
 	if [ -e $ROOTER/changedevice.sh ]; then
 		$ROOTER/changedevice.sh $ifname

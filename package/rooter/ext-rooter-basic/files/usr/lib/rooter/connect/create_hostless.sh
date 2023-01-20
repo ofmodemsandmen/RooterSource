@@ -447,11 +447,15 @@ ttl=$(uci -q get modem.modeminfo$CURRMODEM.ttl)
 if [ -z "$ttl" ]; then
 	ttl="0"
 fi
+ttloption=$(uci -q get modem.modeminfo$CURRMODEM.ttloption)
+if [ -z "$ttloption" ]; then
+	ttloption="0"
+fi
 hostless=$(uci -q get modem.modeminfo$CURRMODEM.hostless)
 if [ "$ttl" != "0" -a "$ttl" != "1" -a "$ttl" != "TTL-INC 1" -a "$hostless" = "1" ]; then
 	let "ttl=$ttl+1"
 fi
-$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl"
+$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl" "$ttloption" &
 
 if [ $SP -eq 2 ]; then
 	get_connect

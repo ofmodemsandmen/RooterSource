@@ -62,6 +62,13 @@ tt:value("117", "TTL 117")
 tt:value("TTL-INC 1", "TTL-INC 1")
 tt.default = "0"
 
+tnl = di:taboption(this_tab, ListValue, "ttloption", translate("TTL Settings"));
+tnl:value("0", translate("POSTROUTING and PREROUTING (Default)"))
+tnl:value("1", translate("POSTROUTING only"))
+tnl:value("2", translate("POSTROUTING with ICMP passthrough (May use minimal hotspot data)"))
+tnl.default=0
+
+
 ynl = di:taboption(this_tab, ListValue, "hostless", translate("Adjust TTL for Hostless Modem"));
 ynl:value("0", "No")
 ynl:value("1", translate("Yes"))
@@ -505,6 +512,12 @@ tt:value("67", "TTL 67")
 tt:value("117", "TTL 117")
 tt:value("TTL-INC 1", "TTL-INC 1")
 tt.default = "0"
+
+ttnl = s:taboption(this_ctab, ListValue, "ttloption", translate("TTL Settings"));
+ttnl:value("0", translate("POSTROUTING and PREROUTING (Default)"))
+ttnl:value("1", translate("POSTROUTING only"))
+ttnl:value("2", translate("POSTROUTING with ICMP passthrough (May use minimal hotspot data)"))
+ttnl.default=0
 
 nl = s:taboption(this_ctab, ListValue, "hostless", translate("Adjust TTL for Hostless Modem"));
 nl:value("0", translate("No"))

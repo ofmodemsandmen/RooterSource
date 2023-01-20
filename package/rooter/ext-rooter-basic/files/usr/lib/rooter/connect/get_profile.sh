@@ -213,6 +213,11 @@ do_custom() {
 						ttl="0"
 					fi
 					uci set modem.modeminfo$CURRMODEM.ttl="$ttl"
+					config_get ttloption $1 ttloption
+					if [ -z "$ttloption" ]; then
+						ttloption="0"
+					fi
+					uci set modem.modeminfo$CURRMODEM.ttloption="$ttloption"
 					config_get hostless $1 hostless
 					if [ -z "$hostless" ]; then
 						hostless="0"
@@ -359,6 +364,11 @@ if [ $MATCH = 0 ]; then
 		ttl="0"
 	fi
 	uci set modem.modeminfo$CURRMODEM.ttl="$ttl"
+	ttloption=$(uci -q get profile.default.ttloption)
+	if [ -z "$ttloption" ]; then
+		ttloption="0"
+	fi
+	uci set modem.modeminfo$CURRMODEM.ttloption="$ttloption"
 	hostless=$(uci -q get profile.default.hostless)
 	if [ -z "$hostless" ]; then
 		hostless="0"
