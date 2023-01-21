@@ -65,7 +65,7 @@ DB="/tmp/usage.db"
 mode=
 
 log() {
-	logger -t "wrtbwmon" "$@"
+	modlog "wrtbwmon" "$@"
 }
 
 header="#mac,ip,iface,in,out,total,first_date,last_date"
@@ -233,6 +233,8 @@ accounting(){
 		then
 			iptables -w -I FORWARD -i ${WAN_IFACE} -j ACCOUNTING_IN
 			iptables -w -I FORWARD -o ${WAN_IFACE} -j ACCOUNTING_OUT
+			#log "iptables -w -I FORWARD -i ${WAN_IFACE} -j ACCOUNTING_IN"
+			#log "iptables -w -I FORWARD -o ${WAN_IFACE} -j ACCOUNTING_OUT"
 		fi
 		iptables -w -I FORWARD -j ACCOUNTING_BLOCK
 	fi
@@ -245,12 +247,16 @@ accounting(){
 		if [ $? -ne 0 ]; then
 			iptables -w -I ACCOUNTING_IN -d ${IP} -s ${INTERNAL_NETMASK} -j RETURN
 			iptables -w -I ACCOUNTING_IN -d ${IP} ! -s ${INTERNAL_NETMASK} -j RETURN
+			#log " acc1 iptables -w -I ACCOUNTING_IN -d ${IP} -s ${INTERNAL_NETMASK} -j RETURN"
+			#log " acci ptables -w -I ACCOUNTING_IN -d ${IP} ! -s ${INTERNAL_NETMASK} -j RETURN"
 		fi
 
 		iptables -w -nL ACCOUNTING_OUT | grep "${IP} " > /dev/null
 		if [ $? -ne 0 ]; then
 			iptables -w -I ACCOUNTING_OUT -s ${IP} -d ${INTERNAL_NETMASK} -j RETURN
 			iptables -w -I ACCOUNTING_OUT -s ${IP} ! -d ${INTERNAL_NETMASK} -j RETURN
+			#log " acc2 iptables -w -I ACCOUNTING_OUT -s ${IP} -d ${INTERNAL_NETMASK} -j #RETURN"
+			#log " acc2 iptables -w -I ACCOUNTING_OUT -s ${IP} ! -d ${INTERNAL_NETMASK} -j RETURN"
 		fi
 	done
 }
@@ -260,27 +266,31 @@ setup()
 	for chain in $chains; do
 	    newChain $chain
 	done
-
+	
+	interfaces=""
+	
 	wan=$(detectWAN)
 	checkWAN
 	wan1=$(detectIF wan1)
 	wan2=$(detectIF wan2)
 	C1=$(uci -q get modem.modem1.connected)
-	C2=$(uci -q get modem.modem2.connected)$C1
-	if [ ! -z $C2 ]; then
-		interfaces="$wan1 $wan2"
-		WW=$(uci -q get bwmon.bwwan.wan)
-		if [ "$WW" = "1" ]; then
-			interfaces=$interfaces $wan" wwan"	
-		fi
-	else
-		WW=$(uci -q get bwmon.bwwan.wan)
-		if [ "$WW" = "1" ]; then
-			interfaces="$wan wwan"
-		else
-			return
-		fi
+	C2=$(uci -q get modem.modem2.connected)
+	if [ "$C1" = "1" ]; then
+		interfaces="$wan1"
 	fi
+	if [ "$C2" = "1" ]; then
+		interfaces="$interfaces $wan2"
+	fi
+	#log "Modem Interfaces  $interfaces"
+	WW=$(uci -q get bwmon.bwwan.wan)
+	if [ "$WW" -eq 1 ]; then
+		interfaces="$interfaces $wan wwan"
+	fi
+	if [ -z "$interfaces" ]; then
+		return
+	fi
+
+	#log "Interfaces  $interfaces"
 
 	# track local data
 	for chain in INPUT OUTPUT; do
@@ -319,18 +329,22 @@ update()
 	
 	while read L1
 	do
+		#log "updateL1 $L1"
 	  MAC=$(echo ${L1} | cut -f1 -d, )
 	  if [ $MAC != "#mac" ]; then
+	    #log "updateMAC $MAC"
 		MAC=$(echo ${L1} | cut -f1 -d, )
 		IP=$(echo ${L1} | cut -f2 -d, )
 		IN=$(echo ${L1} | cut -f4 -d, )
-		IN=$((${IN}/1000))
+		#IN=$((${IN}/1000))
 		OUT=$(echo ${L1} | cut -f5 -d, )
-		OUT=$((${OUT}/1000))
+		#OUT=$((${OUT}/1000))
 		TOTAL=$(echo ${L1} | cut -f6 -d, )
-		TOTAL=$((${TOTAL}/1000))
+		#TOTAL=$((${TOTAL}/1000))
 		let PERTOTAL=PERTOTAL+TOTAL
+		#log "Total $PERTOTAL $TOTAL"
 		if [ $TOTAL -gt 0 -a $IP != "NA" ]; then
+			log "$IP $MAC $IN $OUT $TOTAL"
 			for USERSFILE in /tmp/dhcp.leases /tmp/dnsmasq.conf /etc/dnsmasq.conf /etc/hosts; do
 				[ -e "$USERSFILE" ] || continue
 				case $USERSFILE in
@@ -352,6 +366,7 @@ update()
 			fi
 		
 			echo "\"mac\":\""${MAC}"\"","\"down\":\""${IN}"\"","\"up\":\""${OUT}"\"","\"offdown\":\""0"\"","\"offup\":\""0"\"","\"ip\":\""${IP}"\"","\"name\":\""${NAME}"\"" >> ${1}
+			#log "\"mac\":\""${MAC}"\"","\"down\":\""${IN}"\"","\"up\":\""${OUT}"\"","\"offdown\":\""0"\"","\"offup\":\""0"\"","\"ip\":\""${IP}"\"","\"name\":\""${NAME}"\""
 		fi
 	  fi
 	done < $DB

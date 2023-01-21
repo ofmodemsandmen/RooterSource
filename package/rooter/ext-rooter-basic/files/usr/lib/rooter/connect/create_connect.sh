@@ -474,6 +474,12 @@ case $PROT in
 	uci set modem.modem$CURRMODEM.interface=$ifname
 	uci commit modem
 	;;
+	"28" )
+	OX="$(for a in /sys/class/net/*; do readlink $a; done | grep "$MATCH" | grep ".6/net/")"
+	ifname=$(basename $OX)
+	uci set modem.modem$CURRMODEM.interface=$ifname
+	uci commit modem
+	;;
 esac
 
 OX=$(for a in /sys/class/tty/*; do readlink $a; done | grep "$MATCH" | tr '\n' ' ' | xargs -r -n1 basename)
