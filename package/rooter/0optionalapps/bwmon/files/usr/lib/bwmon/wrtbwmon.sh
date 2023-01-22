@@ -338,13 +338,13 @@ update()
 		IN=$(echo ${L1} | cut -f4 -d, )
 		#IN=$((${IN}/1000))
 		OUT=$(echo ${L1} | cut -f5 -d, )
-		#OUT=$((${OUT}/1000))
+		OUT=$((${OUT}/10))
 		TOTAL=$(echo ${L1} | cut -f6 -d, )
 		#TOTAL=$((${TOTAL}/1000))
 		let PERTOTAL=PERTOTAL+TOTAL
 		#log "Total $PERTOTAL $TOTAL"
 		if [ $TOTAL -gt 0 -a $IP != "NA" ]; then
-			log "$IP $MAC $IN $OUT $TOTAL"
+			#log "$IP $MAC $IN $OUT $TOTAL"
 			for USERSFILE in /tmp/dhcp.leases /tmp/dnsmasq.conf /etc/dnsmasq.conf /etc/hosts; do
 				[ -e "$USERSFILE" ] || continue
 				case $USERSFILE in
