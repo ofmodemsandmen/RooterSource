@@ -83,8 +83,8 @@ case $uVid in
 				#EC EC25ECGAR
 				#E EC25EFAR		B1/B3/B5/B7/B8/B20/B38/B40/B41
 				#AU EC25AUGCR
-				#AF-FD EC25AFFDR	B2/B4/B5/B12/B13/B14/B66/B71 
-				#AF EC25AFFAR		B2/B4/B5/B12/B13/B14/B66/B71 
+				#AF-FD EC25AFFDR	B2/B4/B5/B12/B13/B14/B66/B71
+				#AF EC25AFFAR		B2/B4/B5/B12/B13/B14/B66/B71
 				#A EC25AFAR
 				CA=""
 				M1='ATI'
@@ -134,25 +134,6 @@ case $uVid in
 			"030b" ) # EM060
 				M2='111110110001110001110000110111000100011111100101000000000000000001000010'
 				CA="em060-2xbands"
-				CA3=""
-			;;
-			"6005" ) # EC200-A
-				M1='ATI'
-				OX=$($ROOTER/gcom/gcom-locked "$CPORT" "run-at.gcom" "$CURRMODEM" "$M1")
-				REV=$(echo $OX" " | grep -o "Revision: .\+ OK " | tr " " ",")
-				MODL=$(echo $REV | cut -d, -f2)
-				EC25AF=$(echo $MODL | grep "EC200AAU")
-				if [ ! -z "$EC25AF" ]; then # AU
-					M2='11111011000000000000000000010000000000010000000000000000000000000100'
-				else
-					EC25AF=$(echo $MODL | grep "EC200AEU")
-					if [ ! -z "$EC25AF" ]; then # EU
-						M2='1010101100000000000100000001000000000101100'
-					else # CN
-						M2='1010100100000000000000000000000001000111100'
-					fi
-				fi
-				CA=""
 				CA3=""
 			;;
 			"0512" ) # EM12-G
@@ -286,9 +267,22 @@ case $uVid in
 		esac
 	;;
 	"8087" )
-		M2='111110110001100011110000010111000000011110000000000000000000000001'
-		CA="l850-2xbands"
-		CA3="l850-3xbands"
+		M1='AT+CGMM'
+		OX=$($ROOTER/gcom/gcom-locked "$CPORT" "run-at.gcom" "$CURRMODEM" "$M1")
+		FMODEL=$(echo "$OX" | grep -o "L8[56]0.* LTE")
+		if [ "$FMODEL" == "L860-GL-16 LTE" ]; then
+			M2='111110110001110011110000110111000100011111100101000000000000000001000010'
+			CA="l860-16-2xbands"
+			CA3="l860-16-3xbands"
+		elif [ "$FMODEL" == "L860 LTE" ]; then
+			M2="111110110001110011110000110111010000011111000100000000000000000001"
+			CA="l850-2xbands"
+			CA3="l850-3xbands"
+		else
+			M2='111110110001100011110000010111000000011110000000000000000000000001'
+			CA="l850-2xbands"
+			CA3="l850-3xbands"
+		fi
 	;;
 	"2cb7" )
 		FM150=$(echo "$model" | grep "FM150")

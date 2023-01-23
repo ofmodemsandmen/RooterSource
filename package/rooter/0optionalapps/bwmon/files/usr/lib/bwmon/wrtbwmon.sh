@@ -320,9 +320,11 @@ update()
     for chain in $chains; do
 	iptables -nvxL RRDIPT_$chain -t mangle -Z >> /tmp/iptables_$$.tmp
     done
+	#iptmp=$(cat /tmp/iptables_$$.tmp)
+	#log "$iptmp"
     # the iptables and readDB commands have to be separate. Otherwise,
     # they will fight over iptables locks
-    awk -v mode="$mode" -v interfaces=\""$interfaces"\" -f $binDir/readDB.awk \
+    awk -v mode="$mode" -v interfaces="\"$interfaces\"" -f $binDir/readDB.awk \
 	$DB \
 	/proc/net/arp \
 	/tmp/iptables_$$.tmp
@@ -336,11 +338,11 @@ update()
 		MAC=$(echo ${L1} | cut -f1 -d, )
 		IP=$(echo ${L1} | cut -f2 -d, )
 		IN=$(echo ${L1} | cut -f4 -d, )
-		#IN=$((${IN}/1000))
+		IN=$((${IN}/1000))
 		OUT=$(echo ${L1} | cut -f5 -d, )
-		OUT=$((${OUT}/10))
+		OUT=$((${OUT}/1000))
 		TOTAL=$(echo ${L1} | cut -f6 -d, )
-		#TOTAL=$((${TOTAL}/1000))
+		TOTAL=$((${TOTAL}/1000))
 		let PERTOTAL=PERTOTAL+TOTAL
 		#log "Total $PERTOTAL $TOTAL"
 		if [ $TOTAL -gt 0 -a $IP != "NA" ]; then
