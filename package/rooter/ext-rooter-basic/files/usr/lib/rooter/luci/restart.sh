@@ -54,6 +54,9 @@ if [ "$2" != "9" -a "$2" != "11" ]; then
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		ATCMDD="AT+CFUN=1,1"
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		if [ -e $ROOTER/connect/chkconn.sh ]; then
+			jkillall chkconn.sh
+		fi
 		exit 0
 	fi
 	if [ "$2" = "10" ]; then
@@ -102,6 +105,9 @@ else # restart
 	/etc/init.d/network reload
 	echo "1" > /tmp/modgone
 	log "Hard USB reset done"
+	if [ -e $ROOTER/connect/chkconn.sh ]; then
+		jkillall chkconn.sh
+	fi
 
 	PORT="usb$CURRMODEM"
 	echo $PORT > /sys/bus/usb/drivers/usb/unbind

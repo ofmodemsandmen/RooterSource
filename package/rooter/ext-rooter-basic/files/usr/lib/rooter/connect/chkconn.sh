@@ -18,7 +18,7 @@ while [ $timeout -ge 0 ]; do
 	fi
 	log "$timeout"
 	timeout=$((timeout-1))
-	sleep 30
+	sleep 10
 done
 log "Modem Restart"
 $ROOTER/luci/restart.sh $CURRMODEM 11

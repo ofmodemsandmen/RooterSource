@@ -572,6 +572,9 @@ if [ "$ACTION" = remove ]; then
 			if [ -e /usr/lib/gps/gpskill.sh ]; then
 				/usr/lib/gps/gpskill.sh $retresult
 			fi
+			if [ -e $ROOTER/connect/chkconn.sh ]; then
+				jkillall chkconn.sh
+			fi
 			$ROOTER/signal/status.sh $retresult "No Modem Present"
 			$ROOTER/log/logger "Disconnect (Removed) Modem #$retresult"
 			display_top; display "Remove : $DEVICENAME : Modem $retresult"; display_bottom
