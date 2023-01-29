@@ -9,10 +9,5 @@ start() {
 		uci set bwmon.general.enabled=1
 		uci commit bwmon
 	fi
-	/usr/lib/bwmon/wrtbwmon.sh &
-	/usr/lib/bwmon/create.sh &
-}
-
-stop() {
-	rmdir -f /tmp/WRTbmon
+	/usr/lib/bwmon/bwmon.sh &
 }

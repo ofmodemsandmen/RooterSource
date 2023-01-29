@@ -1,5 +1,7 @@
 #!/usr/bin/lua
 
+bytes=arg[1]
+
 function ltrim(s)
   return s:match'^%s*(.*)'
 end
@@ -7,9 +9,10 @@ end
 function calc(total)
 	if total < 1000000 then
 		tstr = string.format("%.2f", total)
+		tstr = string.format("%.2f", total/1000)
 		tfm = " K"
 	else
-		if total < 1000000 then
+		if total < 1000000000 then
 			tstr = string.format("%.2f", total/1000000)
 			tfm = " MB"
 		else
@@ -21,16 +24,7 @@ function calc(total)
 	return ltrim(str)
 end
 
-aamt = arg[1]
-uamt = arg[2]
-if uamt > aamt then
-	amt = uamt - aamt
-	amts = calc(amt)
-	amts = "-" .. amts
-else
-	amt = aamt - uamt
-	amts = calc(math.abs(amt))
-end
-tfile = io.open("/tmp/amtleft", "w")
-tfile:write(amts, "\n")
+conbytes = "BYTES='" .. calc(tonumber(bytes)) .. "'"
+tfile = io.open("/tmp/bytes", "w")
+tfile:write(conbytes, "\n")
 tfile:close()
