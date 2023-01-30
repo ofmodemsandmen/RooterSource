@@ -110,10 +110,10 @@ update() {
 		let txval=$txval+$tval
 	done
 	
-log "Offset $offsetotal $offsetrx $offsettx"
+#log "Offset $offsetotal $offsetrx $offsettx"
 	let xval=$rxval+$txval
 	let val=$val+$xval
-log "Update $val $rxval $txval"
+#log "Update $val $rxval $txval"
 	let rxval=$rxval-$offsetrx
 	let txval=$txval-$offsettx
 	let val=$val-$offsetotal
@@ -186,7 +186,7 @@ checkTime()
 	pMonth=$(date +%m)
 #pDay=$(uci -q get bwmon.backup.tday)
 	if [ "$cDay" -ne "$pDay" ]; then
-log "Day Changed"
+#log "Day Changed"
 		# save to periodic
 		/usr/lib/bwmon/createdata.lua	
 		bt=$(uci -q get custom.bwday)
@@ -207,7 +207,7 @@ log "Day Changed"
 		offsetotal=$rtxval
 		offsetrx=$rxval
 		offsettx=$txval
-log "Offset $offsetotal $offsetrx $offsettx"
+#log "Offset $offsetotal $offsetrx $offsettx"
 		uci set bwmon.backup.montotal=$mtotal
 		uci set bwmon.backup.monrx=$mrx
 		uci set bwmon.backup.montx=$mtx
@@ -236,7 +236,7 @@ log "Offset $offsetotal $offsetrx $offsettx"
 		roll=$(uci -q get custom.bwallocate.rollover)
 		[ -z $roll ] && roll=1
 		if [ "$roll" -eq "$pDay" ]; then
-log "Month Change"
+#log "Month Change"
 			# clear monthly
 			basemontotal='0'
 			mtotal='0'
@@ -284,7 +284,7 @@ checkBackup()
 			uci set bwmon.backup.day=$cDay
 			# total days
 			uci commit bwmon
-log "Backup $mtotal $val"
+#log "Backup $mtotal $val"
 		fi
 	fi
 }
@@ -345,6 +345,6 @@ while [ true ] ; do
 	checkTime
 	checkBackup
 	createGUI
-log "$(convert_bytes $mtotal) $(convert_bytes $mrx) $(convert_bytes $mtx)     $(convert_bytes $val) $(convert_bytes $rxval) $(convert_bytes $txval)"
+#log "$(convert_bytes $mtotal) $(convert_bytes $mrx) $(convert_bytes $mtx)     $(convert_bytes $val) $(convert_bytes $rxval) $(convert_bytes $txval)"
 	sleep $update_time
 done
