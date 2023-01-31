@@ -9,5 +9,10 @@ start() {
 		uci set bwmon.general.enabled=1
 		uci commit bwmon
 	fi
+	WX=$(uci -q get bwmon.backup)
+	if [ -z "$WX" ]; then
+		uci set bwmon.backup='backup'
+		uci commit bwmon
+	fi
 	/usr/lib/bwmon/bwmon.sh &
 }
