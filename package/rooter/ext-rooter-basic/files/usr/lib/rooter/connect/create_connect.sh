@@ -195,6 +195,7 @@ chcklog() {
 
 get_connect() {
 	NAPN=$(uci -q get modem.modeminfo$CURRMODEM.apn)
+	NAPN2=$(uci -q get modem.modeminfo$CURRMODEM.apn2)
 	NUSER=$(uci -q get modem.modeminfo$CURRMODEM.user)
 	NPASS=$(uci -q get modem.modeminfo$CURRMODEM.passw)
 	NAUTH=$(uci -q get modem.modeminfo$CURRMODEM.auth)
@@ -224,6 +225,7 @@ get_connect() {
 	esac
 
 	uci set modem.modem$CURRMODEM.apn=$NAPN
+	uci set modem.modem$CURRMODEM.apn2=$NAPN2
 	uci set modem.modem$CURRMODEM.user=$NUSER
 	uci set modem.modem$CURRMODEM.passw=$NPASS
 	uci set modem.modem$CURRMODEM.auth=$NAUTH
@@ -898,10 +900,16 @@ if [ -n "$CHKPORT" ]; then
 			isplist=$(grep -F "$mcc5" '/usr/lib/autoapn/apn.data')
 			if [ -z "$isplist" ]; then
 				isplist="000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH"
+				if [ ! -z "$NAPN2" ]; then
+					isplist=$isplist" 000000,$NAPN2,Default,$NPASS,$CID,$NUSER,$NAUTH"
+				fi
 			fi
 		fi
 	else
 		isplist="000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH"
+		if [ ! -z "$NAPN2" ]; then
+			isplist=$isplist" 000000,$NAPN2,Default,$NPASS,$CID,$NUSER,$NAUTH"
+		fi
 	fi
 
 	uci set modem.modeminfo$CURRMODEM.isplist="$isplist"
