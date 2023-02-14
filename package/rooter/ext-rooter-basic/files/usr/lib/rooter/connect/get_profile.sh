@@ -32,6 +32,81 @@ fi
 
 MATCH=0
 
+country() {
+	ispdata=$(uci -q get country.general.ispdata)
+	uci set modem.modeminfo$CURRMODEM.apn2=""
+	uci set modem.modeminfo$CURRMODEM.apn=$(echo $ispdata | cut -d, -f2)
+	user=$(echo $ispdata | cut -d, -f6)
+	if [ "$user" = "~" ]; then
+		user=""
+	fi
+	uci set modem.modeminfo$CURRMODEM.user=$user
+	passw=$(echo $ispdata | cut -d, -f4)
+	if [ "$passw" = "~" ]; then
+		passw=""
+	fi
+	uci set modem.modeminfo$CURRMODEM.passw=$passw
+	uci set modem.modeminfo$CURRMODEM.context=$(echo $ispdata | cut -d, -f5)
+	auth=$(echo $ispdata | cut -d, -f7)
+	if [ "$auth" = "~" ]; then
+		auth="0"
+	fi
+	uci set modem.modeminfo$CURRMODEM.auth=$auth
+	pdp=$(echo $ispdata | cut -d, -f8)
+	if [ $pdp = "0" ]; then
+		pdp=""
+	fi
+	uci set modem.modeminfo$CURRMODEM.pdptype=$pdp
+	
+	uci set modem.modeminfo$CURRMODEM.ppp='0'
+	uci set modem.modeminfo$CURRMODEM.inter=0
+	uci set modem.modeminfo$CURRMODEM.delay='0'
+	uci set modem.modeminfo$CURRMODEM.lock=$(uci -q get country.global.roaming)
+	uci set modem.modeminfo$CURRMODEM.mcc=$(uci -q get country.global.mcc)
+	uci set modem.modeminfo$CURRMODEM.mnc=$(uci -q get country.global.mnc)
+	uci set modem.modeminfo$CURRMODEM.dns1=$(uci -q get country.global.ip1)
+	uci set modem.modeminfo$CURRMODEM.dns2=$(uci -q get country.global.ip2)
+	uci set modem.modeminfo$CURRMODEM.dns3=$(uci -q get country.global.ip3)
+	uci set modem.modeminfo$CURRMODEM.dns4=''
+	uci set modem.modeminfo$CURRMODEM.log='0'
+	uci set modem.modeminfo$CURRMODEM.lb='1'
+	uci set modem.modeminfo$CURRMODEM.at=''
+	uci set modem.modeminfo$CURRMODEM.atc=''
+	uci set modem.modeminfo$CURRMODEM.tzone=$(uci -q get country.global.autoset)
+	uci set modem.modeminfo$CURRMODEM.mtu=$(uci -q get country.global.mtu)	
+	uci set modem.modeminfo$CURRMODEM.nodhcp='1'
+	ttl=$(uci -q get country.global.ttl)
+	if [ "$ttl" = "255" ]; then
+		ttl='TTL-INC 1'
+	fi
+	uci set modem.modeminfo$CURRMODEM.ttl=$ttl
+	uci set modem.modeminfo$CURRMODEM.ttloption="0"
+	uci set modem.modeminfo$CURRMODEM.hostless="0"
+	uci set modem.modeminfo$CURRMODEM.bwday='0'
+	uci set modem.modeminfo$CURRMODEM.bwphone="0"
+	uci set modem.modeminfo$CURRMODEM.bwdelay='0'
+	
+	uci delete modem.pinginfo$CURRMODEM
+	uci set modem.pinginfo$CURRMODEM=pinfo$CURRMODEM
+	uci set modem.pinginfo$CURRMODEM.alive=$(uci -q get country.global.status)
+	uci add_list modem.pinginfo$CURRMODEM.trackip=$(uci -q get country.global.ip1)
+	uci add_list modem.pinginfo$CURRMODEM.trackip=$(uci -q get country.global.ip2)
+	uci add_list modem.pinginfo$CURRMODEM.trackip=$(uci -q get country.global.ip3)
+
+	uci set modem.pinginfo$CURRMODEM.reliability='1'
+	uci set modem.pinginfo$CURRMODEM.count='1'
+	uci set modem.pinginfo$CURRMODEM.pingtime=$(uci -q get country.global.interval)
+	uci set modem.pinginfo$CURRMODEM.pingwait=$(uci -q get country.global.timeout)
+	uci set modem.pinginfo$CURRMODEM.packetsize='52'
+	uci set modem.pinginfo$CURRMODEM.down=$(uci -q get country.global.check)
+	uci set modem.pinginfo$CURRMODEM.up=$(uci -q get country.global.check)
+	uci commit modem
+	log "Selected ISP $(echo $ispdata | cut -d, -f3)"
+	log "APN of profile used is $(echo $ispdata | cut -d, -f2)"
+
+	touch /tmp/profile$CURRMODEM
+}
+
 do_custom() {
 	local config=$1
 	local select name enabled select1
@@ -279,6 +354,13 @@ do_custom() {
 		fi
 	fi
 }
+
+cselect=$(uci -q get country.general.selected)
+if [ "$cselect" = "1" ]; then
+	log "Using Country Selected ISP"
+	country
+	exit 0
+fi
 
 autoapn=$(uci -q get profile.disable.autoapn)
 apd=0
