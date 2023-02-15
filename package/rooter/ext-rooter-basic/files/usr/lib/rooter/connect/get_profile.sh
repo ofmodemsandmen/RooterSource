@@ -405,7 +405,7 @@ if [ $MATCH = 0 ]; then
 	uci set modem.modeminfo$CURRMODEM.apn=$apn
 	uci set modem.modeminfo$CURRMODEM.apn2=$apn2
 	if [ -n "$ICCID" ]; then
-		iccid="891490"
+		iccid="891223"
 		case $ICCID in
 		"$iccid"*)
 			uci set modem.modeminfo$CURRMODEM.apn2=""
