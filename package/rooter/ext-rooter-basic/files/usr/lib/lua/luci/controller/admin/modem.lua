@@ -581,16 +581,22 @@ end
 function action_externalip()
 	local rv ={}
 
-	os.execute("rm -f /tmp/ipip; wget -O /tmp/ipip http://ipecho.net/plain > /dev/null 2>&1")
+	os.execute("rm -f /tmp/ipip; curl https://api64.ipify.org?format=json > /tmp/ipip")
 	file = io.open("/tmp/ipip", "r")
 	if file == nil then
 		rv["extip"] = translate("Not Available")
 	else
-		rv["extip"] = file:read("*line")
+		line = file:read("*line")
+		s, e = line:find("ip\":\"")
+		cs, ce = line:find("\"", e+1)
+		rv["extip"] = line:sub(e+1, cs-1)
+		file:close()
+		tfile = io.open("/tmp/ipip", "w")
+		tfile:write(rv["extip"], "\n")
+		tfile:close()
 		if rv["extip"] == nil then
 			rv["extip"] = translate("Not Available")
 		end
-		file:close()
 	end
 
 	luci.http.prepare_content("application/json")
