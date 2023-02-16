@@ -409,7 +409,7 @@ if [ $MATCH = 0 ]; then
 		case $ICCID in
 		"$iccid"*)
 			uci set modem.modeminfo$CURRMODEM.apn2=""
-			uci set modem.modeminfo$CURRMODEM.apn="internet.freedommobile.ca"
+			uci set modem.modeminfo$CURRMODEM.apn="sp.koodo.com"
 			;;
 		esac
 	fi

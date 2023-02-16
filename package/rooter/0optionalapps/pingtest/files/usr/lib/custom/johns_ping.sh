@@ -64,8 +64,17 @@ ptest() {
 }
 
 ipv41=$(uci -q get ping.ping.ipv41)
+if [ -z "$ipv41" ]; then
+	ipv41="http://www.google.com/"
+fi
 ipv42=$(uci -q get ping.ping.ipv42)
+if [ -z "$ipv42" ]; then
+	ipv42="https://github.com"
+fi
 ipv6=$(uci -q get ping.ping.ipv6)
+if [ -z "$ipv6" ]; then
+	ipv6="http://ipv6.google.com"
+fi
 uci set ping.ping.conn="4"
 uci commit ping
 	
