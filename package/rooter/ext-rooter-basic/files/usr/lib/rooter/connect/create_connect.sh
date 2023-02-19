@@ -650,7 +650,7 @@ uci commit modem.modem$CURRMODEM
 #
 	"4"|"6"|"7"|"24"|"26"|"27" )
 		if [ "$idV" = "2c7c" -a "$idP" = "0900" ]; then
-			ATCMDD='AT+QCFG="usbnet",2'
+			ATCMDD='AT+QCFG="usbnet",1'
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB2" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			ATCMDD='AT+CFUN=1,1'
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB2" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
