@@ -23,9 +23,9 @@ doping() {
 	TYPE=$(uci get ping.ping.type)
 	if [ $TYPE = "1" ]; then
 	log "Curl"
-		RETURN_CODE_1=$(curl -m 10 -s -o /dev/null -w "%{http_code}" $ipv41)
-		RETURN_CODE_2=$(curl --ipv6 -m 10 -s -o /dev/null -w "%{http_code}" $ipv6)
-		RETURN_CODE_3=$(curl -m 10 -s -o /dev/null -w "%{http_code}" $ipv42)
+		RETURN_CODE_1=$(curl -s -m 10 -s -o /dev/null -w "%{http_code}" $ipv41)
+		RETURN_CODE_2=$(curl -s --ipv6 -m 10 -s -o /dev/null -w "%{http_code}" $ipv6)
+		RETURN_CODE_3=$(curl -s -m 10 -s -o /dev/null -w "%{http_code}" $ipv42)
 	else
 	log "Ping"
 		tping "$ipv41"; RETURN_CODE_1=$tmp
