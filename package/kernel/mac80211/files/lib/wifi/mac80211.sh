@@ -144,6 +144,9 @@ detect_mac80211() {
 		else
 			SSID="$SSID5G"
 		fi
+		if [ "$channel" = 36 ]; then
+			channel=44
+		fi
 
 		uci -q batch <<-EOF
 			set wireless.radio${devidx}=wifi-device
