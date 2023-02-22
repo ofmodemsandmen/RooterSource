@@ -1086,16 +1086,21 @@ do
 	# QMI connect script
 	#
 		"2" )
-			check_apn
-			$ROOTER/qmi/connectqmi.sh $CURRMODEM cdc-wdm$WDMNX $NAUTH $NAPN $NUSER $NPASS $RAW $DHCP $PINC
-			if [ $? = 0 ]; then
-				ifup wan$INTER
-				[ -f /tmp/ipv6supp$INTER ] && addv6
-			else
-				#log "Restart Modem"
-				#/usr/lib/rooter/luci/restart.sh $CURRMODEM
-				exit 0
+			if [ -n "$CPORT" ]; then
+				check_apn
 			fi
+			log "Using Netifd Method"
+
+			uci delete network.wan$INTER
+			uci set network.wan$INTER=interface
+			uci set network.wan$INTER.proto=qmi
+			uci set network.wan$INTER.device=/dev/cdc-wdm$WDMNX
+			uci set network.wan$INTER.metric=$INTER"0"
+			uci set network.wan$INTER.currmodem=$CURRMODEM
+			uci -q commit network
+			rm -f /tmp/usbwait
+			ifup wan$INTER
+			exit 0
 			;;
 	#
 	# NCM connect script
