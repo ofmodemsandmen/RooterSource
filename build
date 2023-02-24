@@ -293,6 +293,10 @@ buldimage() {
 				make defconfig
 			fi
 		fi
+		UQMI=$(cat "./.config" | grep "CONFIG_PACKAGE_uqmi=y")
+		if [ ! -z $UQMI ]; then
+			sed -i -e 's/CONFIG_PACKAGE_uqmi=y/# CONFIG_PACKAGE_uqmi is not set/g' ./.config
+		fi
 
 	}
 
