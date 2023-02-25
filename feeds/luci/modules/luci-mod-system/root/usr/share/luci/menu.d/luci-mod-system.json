@@ -98,14 +98,5 @@
 			"type": "view",
 			"path": "system/flash"
 		}
-	},
-
-	"admin/system/reboot": {
-		"title": "Reboot",
-		"order": 90,
-		"action": {
-			"type": "view",
-			"path": "system/reboot"
-		}
 	}
 }
