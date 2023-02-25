@@ -704,6 +704,17 @@ if [ -e $ROOTER/connect/preconnect.sh ]; then
 	fi
 fi
 
+if [ $idV = 413c -a $idP = 81d8 ]; then
+	ATCMDD="AT+CFUN?"
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	if `echo $OX | grep -o "5" >/dev/null 2>&1`; then
+		ATCMDD='at^nv=2497,1,"01";+reset'
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		/usr/lib/rooter/luci/restart.sh $CURRMODEM 11
+		exit 0
+	fi
+fi
+
 if $QUECTEL; then
 	if [ "$RECON" != "2" ]; then
 		ATCMDD="AT+CNMI?"

@@ -185,6 +185,19 @@
 		"ext2": "-initramfs.elf",
 		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.pdf"]
 	},	
+	"RBM11G": {
+		"details": "Mikrotik RBM11G",
+		"type": "2",
+		"build": "1907",
+		"config": ".config_rbm11g",
+		"image1": "openwrt-ramips-mt7621-mikrotik_rbm11g-initramfs-kernel.bin",
+		"image2": "openwrt-ramips-mt7621-mikrotik_rbm11g-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "Mikrotik-RBM11G",
+		"ext1": "-factory.bin",
+		"ext2": "-update.bin",
+		"addons": ["flash-rbm33.pdf", "tftpd32.chm", "tftpd32.exe", "tftpd32.ini", "readme.pdf"]
+	},
 	"RT-N56U": {
 		"details": "Asus RT-N56U",
 		"type": "1",
