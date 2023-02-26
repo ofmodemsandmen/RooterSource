@@ -172,7 +172,7 @@ case $uVid in
 			RESTART="1"
 		fi
 		M5=""
-		M2='AT+QCFG="band",0,'$mask',0,1'
+		M2='AT+QCFG="band",0,'$mask',0'
 		if [ $uPid = 0620 ]; then
 			EM20=$(echo $model | grep "EM20")
 			if [ -z "$EM20" ]; then #EM160
@@ -393,7 +393,11 @@ if [ $RESTART = "0" ]; then
 	exit 0
 fi
 rm -f /tmp/bmask
-/usr/lib/rooter/luci/restart.sh $CURRMODEM 11
+if [ $3 = "12" ]; then
+	/usr/lib/rooter/luci/restart.sh $CURRMODEM 11
+else
+	/usr/lib/rooter/luci/restart.sh $CURRMODEM 11
+fi
 sleep 10
 #/usr/lib/rooter/connect/bandmask $CURRMODEM $MODT
 exit 0
