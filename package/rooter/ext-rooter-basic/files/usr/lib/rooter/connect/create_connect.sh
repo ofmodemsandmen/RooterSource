@@ -813,6 +813,9 @@ if [ -n "$CHKPORT" ]; then
 		log " SIM Error"
 		if [ -e $ROOTER/simerr.sh ]; then
 			$ROOTER/simerr.sh $CURRMODEM
+			if [ -e $ROOTER/connect/chkconn.sh ]; then
+				jkillall chkconn.sh
+			fi
 		fi
 		exit 0
 	fi
