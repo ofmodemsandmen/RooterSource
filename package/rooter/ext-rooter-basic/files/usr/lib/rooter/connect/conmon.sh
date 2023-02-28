@@ -72,7 +72,7 @@ if [ $ACTIVE = "0" ]; then
 	echo 'MONSTAT="'"Disabled"'"' > /tmp/monstat$CURRMODEM
 	exit
 fi
-
+sleep 5
 track_ips=
 IFNAME=$(uci get modem.modem$CURRMODEM.interface)
 TIMEOUT=$(uci get modem.pinginfo$CURRMODEM.pingwait)
