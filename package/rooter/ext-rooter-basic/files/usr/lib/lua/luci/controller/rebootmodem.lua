@@ -18,5 +18,5 @@ function index()
 end
 
 function action_doreboot()
-     os.execute("/usr/lib/rooter/luci/restart.sh 1 11; /usr/lib/rooter/luci/restart.sh 2 11; reboot -f")
+     os.execute("/usr/lib/rooter/luci/rebootmodem.sh")
 end

@@ -26,7 +26,7 @@
 			
 			img.src = target + '<%=resource%>/icons/loading.gif?' + Math.random();
 			
-		}, 5000);
+		}, 20000);
 		XHR.get('<%=luci.dispatcher.build_url("admin", "system", "do_reboot")%>',
 			null,
 			function()
