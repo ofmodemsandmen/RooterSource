@@ -46,12 +46,12 @@ function ConBytes(line)
 	if bs == nil then
 		bs, be = line:find("MB", e+1)
 		if bs == nil then
-			val = tonumber(line:sub(1, e-1)) * 1000000
+			val = tonumber(line:sub(1, e-1)) * 1000000000
 		else
-			val = tonumber(line:sub(1, e-1)) * 1000
+			val = tonumber(line:sub(1, e-1)) * 1000000
 		end
 	else
-		val = tonumber(line:sub(1, e-1))
+		val = tonumber(line:sub(1, e-1)) * 1000
 	end
 	return val
 end
