@@ -111,7 +111,10 @@ update() {
 	done
 	
 #log "Offset $offsetotal $offsetrx $offsettx"
+	orxval=$rxval
+	otxval=$txval
 	let xval=$rxval+$txval
+	otot=$xval
 	let val=$val+$xval
 #log "Update $val $rxval $txval"
 	let rxval=$rxval-$offsetrx
@@ -142,6 +145,9 @@ update() {
 		alloc=$alloc"000000000"
 	fi
 	/usr/lib/bwmon/excede.sh $mtotal $alloc
+	if [ -e /usr/lib/bwmon/period.sh ]; then
+		/usr/lib/bwmon/period.sh "$mtotal"
+	fi
 }
 
 createAmt() 
@@ -174,9 +180,15 @@ createAmt()
 	basemontotal=$(uci -q get bwmon.backup.montotal)
 	basemonrx=$(uci -q get bwmon.backup.monrx)
 	basemontx=$(uci -q get bwmon.backup.montx)
-	offsetotal='0'
-	offsetrx='0'
-	offsettx='0'
+	if [ -z "$1" ]; then
+		offsetotal='0'
+		offsetrx='0'
+		offsettx='0'
+	else
+		offsetotal=$otot
+		offsetrx=$orxval
+		offsettx=$otxval
+	fi
 }
 
 checkTime() 
@@ -342,6 +354,22 @@ update_time=20
 createAmt
 while [ true ] ; do
 	update
+	if [ -e /tmp/bwchange ]; then
+		newamt=$(cat /tmp/bwchange)
+		rm -f /tmp/bwchange
+		uci set bwmon.backup.dailytotal=$newamt
+		uci set bwmon.backup.dailyrx=$newamt
+		uci set bwmon.backup.dailytx=0
+		uci set bwmon.backup.montotal=$newamt
+		uci set bwmon.backup.monrx=$newamt
+		uci set bwmon.backup.montx=0
+		uci commit bwmon
+		createAmt 1
+		mtotal=0
+		mrx=0
+		mtx=0
+		createGUI
+	fi
 	checkTime
 	checkBackup
 	createGUI
