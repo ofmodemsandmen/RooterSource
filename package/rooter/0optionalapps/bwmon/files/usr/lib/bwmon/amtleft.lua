@@ -6,7 +6,7 @@ end
 
 function calc(total)
 	if total < 1000000 then
-		tstr = string.format("%.2f", total)
+		tstr = string.format("%.2f", total/1000)
 		tfm = " K"
 	else
 		if total < 1000000 then
@@ -21,8 +21,8 @@ function calc(total)
 	return ltrim(str)
 end
 
-aamt = arg[1]
-uamt = arg[2]
+aamt = tonumber(arg[1])
+uamt = tonumber(arg[2])
 if uamt > aamt then
 	amt = uamt - aamt
 	amts = calc(amt)

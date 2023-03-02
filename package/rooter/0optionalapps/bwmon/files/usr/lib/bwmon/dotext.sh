@@ -2,7 +2,7 @@
 . /lib/functions.sh
 
 log() {
-	modlog "TEXTING" "$@" 
+	logger -t "TEXTING" "$@"
 }
 
 getbw() {
@@ -28,7 +28,6 @@ getbw() {
 
 sendmsg() {
 	getbw
-	log "$alloc $used"
 	/usr/lib/bwmon/amtleft.lua $alloc $used
 	bwleft=$(cat /tmp/amtleft)
 	
@@ -79,5 +78,5 @@ sendmsg() {
 	fi
 	
 }
-log "Send Message"
+
 sendmsg
