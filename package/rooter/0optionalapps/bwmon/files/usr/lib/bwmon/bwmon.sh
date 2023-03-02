@@ -97,7 +97,7 @@ update() {
 	fi
 	WW=$(uci -q get bwmon.bwwan.wan)
 	if [ "$WW" -eq 1 ]; then
-		interfaces="$interfaces $wan wwan2 wwan5"
+		interfaces="$interfaces wan wwan2 wwan5"
 	fi
 
 	val="0"
