@@ -173,6 +173,13 @@ if [ "$IDV" == "2c7c" ]; then
 		ATCMDD="AT+QCFG=\"ims\",1"
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	fi
+	ATCMDD="AT+QCFG=\"ims/ut\""
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	IMSussd=$(echo "$OX" | grep "[01],[01],0")
+	if [ -n "$IMSussd" ]; then
+		ATCMDD="AT+QCFG=\"ims/ut\",1,1,1"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	fi
 fi
 ATCMDD="AT+CIMI"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
