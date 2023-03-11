@@ -226,14 +226,17 @@ do_custom() {
 					dapn=$(echo "$apn" | grep "|")
 					if [ -z $dapn ]; then
 						apn2=""
+						apn3=""
 					else
 						fapn=$apn"|"
 						fapn=$(echo $fapn" " | tr "|" ",")
 						apn=$(echo $fapn | cut -d, -f1)
 						apn2=$(echo $fapn | cut -d, -f2)
+						apn3=$(echo $fapn | cut -d, -f3)
 					fi
 					uci set modem.modeminfo$CURRMODEM.apn=$apn
 					uci set modem.modeminfo$CURRMODEM.apn2=$apn2
+					uci set modem.modeminfo$CURRMODEM.apn3=$apn3
 					config_get mtu $1 mtu
 					uci set modem.modeminfo$CURRMODEM.mtu=$mtu
 					config_get context $1 context
@@ -356,6 +359,7 @@ do_custom() {
 }
 
 cselect=$(uci -q get country.general.selected)
+cselect=0
 if [ "$cselect" = "1" ]; then
 	log "Using Country Selected ISP"
 	country
@@ -395,26 +399,25 @@ if [ $MATCH = 0 ]; then
 		dapn=$(echo "$apn" | grep "|")
 		if [ -z $dapn ]; then
 			apn2=""
+			apn3=""
 		else
 			fapn=$apn"|"
 			fapn=$(echo $fapn" " | tr "|" ",")
 			apn=$(echo $fapn | cut -d, -f1)
 			apn2=$(echo $fapn | cut -d, -f2)
+			apn3=$(echo $fapn | cut -d, -f3)
 		fi
 	fi
 	uci set modem.modeminfo$CURRMODEM.apn=$apn
 	uci set modem.modeminfo$CURRMODEM.apn2=$apn2
+	uci set modem.modeminfo$CURRMODEM.apn3=$apn3
 	if [ -n "$ICCID" ]; then
 		iccid="891223"
-		iccid2="891490"
 		case $ICCID in
 		"$iccid"*)
 			uci set modem.modeminfo$CURRMODEM.apn2=""
+			uci set modem.modeminfo$CURRMODEM.apn3=""
 			uci set modem.modeminfo$CURRMODEM.apn="sp.koodo.com"
-			;;
-		"$iccid2"*)
-			uci set modem.modeminfo$CURRMODEM.apn2=""
-			uci set modem.modeminfo$CURRMODEM.apn="internet.freedommobile.ca"
 			;;
 		esac
 	fi

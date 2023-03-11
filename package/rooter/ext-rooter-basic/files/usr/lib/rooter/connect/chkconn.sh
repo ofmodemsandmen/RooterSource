@@ -9,7 +9,7 @@ log() {
 CURRMODEM=$1
 
 log "Check Conn running"
-timeout=5
+timeout=7
 while [ $timeout -ge 0 ]; do
 	conn=$(uci -q get modem.modem$CURRMODEM.connected)
 	if [ "$conn" = '1' ]; then
