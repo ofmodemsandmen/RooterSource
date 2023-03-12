@@ -359,7 +359,6 @@ do_custom() {
 }
 
 cselect=$(uci -q get country.general.selected)
-cselect=0
 if [ "$cselect" = "1" ]; then
 	log "Using Country Selected ISP"
 	country
