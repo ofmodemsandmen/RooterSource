@@ -139,6 +139,16 @@ mnc:depends("lock", "2")
 
 this_taba = "advance"
 
+mf1 = di:taboption(this_taba, ListValue, "watchdog", translate("Disable Connection Watchdog :"));
+mf1:value("0", translate("No"))
+mf1:value("1", translate("Yes"))
+mf1.default=0
+
+mf2 = di:taboption(this_taba, ListValue, "detect", translate("Stop after Detection :"));
+mf2:value("0", translate("No"))
+mf2:value("1", translate("Yes"))
+mf2.default=0
+
 mf = di:taboption(this_taba, ListValue, "ppp", translate("Force Modem to PPP Protocol :"));
 mf:value("0", translate("No"))
 mf:value("1", translate("Yes"))
@@ -594,6 +604,17 @@ cmnc:depends("lock", "1")
 cmnc:depends("lock", "2")
 
 this_ctaba = "cadvanced"
+
+
+mf1 = s:taboption(this_ctaba, ListValue, "watchdog", translate("Disable Connection Watchdog :"));
+mf1:value("0", translate("No"))
+mf1:value("1", translate("Yes"))
+mf1.default=0
+
+mf2 = s:taboption(this_ctaba, ListValue, "detect", translate("Stop after Detection :"));
+mf2:value("0", translate("No"))
+mf2:value("1", translate("Yes"))
+mf2.default=0
 
 cmf = s:taboption(this_ctaba, ListValue, "ppp", translate("Force Modem to PPP Protocol :"));
 cmf:value("0", translate("No"))

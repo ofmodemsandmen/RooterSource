@@ -251,6 +251,10 @@ do_custom() {
 					uci set modem.modeminfo$CURRMODEM.auth=$auth
 					config_get ppp $1 ppp
 					uci set modem.modeminfo$CURRMODEM.ppp=$ppp
+					config_get watchdog $1 watchdog
+					uci set modem.modeminfo$CURRMODEM.watchdog=$watchdog
+					config_get detect $1 detect
+					uci set modem.modeminfo$CURRMODEM.detect=$detect
 					config_get inter $1 inter
 					uci set modem.modeminfo$CURRMODEM.inter=$inter
 					config_get delay $1 delay
@@ -427,6 +431,8 @@ if [ $MATCH = 0 ]; then
 	uci set modem.modeminfo$CURRMODEM.context=$(uci -q get profile.default.context)
 	uci set modem.modeminfo$CURRMODEM.auth=$(uci get profile.default.auth)
 	uci set modem.modeminfo$CURRMODEM.ppp=$(uci get profile.default.ppp)
+	uci set modem.modeminfo$CURRMODEM.watchdog=$(uci get profile.default.watchdog)
+	uci set modem.modeminfo$CURRMODEM.detect=$(uci get profile.default.detect)
 	uci set modem.modeminfo$CURRMODEM.inter=0
 	uci set modem.modeminfo$CURRMODEM.delay=$(uci get profile.default.delay)
 	uci set modem.modeminfo$CURRMODEM.lock=$(uci get profile.default.lock)

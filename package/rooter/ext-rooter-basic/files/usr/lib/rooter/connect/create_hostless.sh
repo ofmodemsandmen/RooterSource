@@ -390,6 +390,11 @@ if [ $SP -gt 0 ]; then
 		fi
 		#exit 0
 	fi
+	detect=$(uci -q get modem.modeminfo$CURRMODEM.detect)
+	if [ "$detect" = "1" ]; then
+		log "Stopped after detection"
+		exit 0
+	fi
 	if [ -e /usr/lib/gps/gps.sh ]; then
 		/usr/lib/gps/gps.sh $CURRMODEM &
 	fi
