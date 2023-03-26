@@ -309,6 +309,9 @@ f_main()
 									uci commit travelmate
 									uci -q set wireless.wwan$wif.ssid="$ssid"
 									uci -q set wireless.wwan$wif.encryption=$encrypt
+									if [ "$encrypt" = "none" ]; then
+										key=""
+									fi
 									uci -q set wireless.wwan$wif.key=$key
 									uci -q set wireless.wwan$wif.disabled=0
 									uci -q commit wireless

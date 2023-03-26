@@ -581,7 +581,7 @@ end
 function action_externalip()
 	local rv ={}
 
-	os.execute("rm -f /tmp/ipip; curl -s https://api64.ipify.org?format=json > /tmp/ipip")
+	--os.execute("curl -s https://api64.ipify.org?format=json > /tmp/ipip")
 	file = io.open("/tmp/ipip", "r")
 	if file == nil then
 		rv["extip"] = translate("Not Available")
