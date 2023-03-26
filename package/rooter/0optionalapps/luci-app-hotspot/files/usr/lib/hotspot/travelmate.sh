@@ -280,7 +280,7 @@ f_main()
 				cnt=0
 				delay=10
 				reconn=$(uci -q get travelmate.global.reconn)
-				while [ ${cnt} -lt $reconn ]
+				while [ ${cnt} -le $reconn ]
 				do
 					f_log "info" " Retry Count ${cnt}"
 					if [ $reconn -eq 99 ]; then
