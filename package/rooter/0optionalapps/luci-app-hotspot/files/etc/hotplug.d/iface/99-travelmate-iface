@@ -37,6 +37,10 @@ if [ "$ACTION" = ifdown -a "$INTERFACE" = "wwan$wif" ]; then
 						uci set travelmate.global.delay="30"
 						uci commit travelmate
 						sleep 10
+						PID=$(ps |grep "travelmate.sh" | grep -v grep |head -n 1 | awk '{print $1}')
+						if [ ! -z "$PID" ]; then
+							kill -9 $PID
+						fi
 						/usr/lib/hotspot/travelmate.sh &
 						exit 0
 					fi
@@ -45,6 +49,10 @@ if [ "$ACTION" = ifdown -a "$INTERFACE" = "wwan$wif" ]; then
 		else
 			uci set travelmate.global.ssid="9"
 			uci commit travelmate
+			PID=$(ps |grep "travelmate.sh" | grep -v grep |head -n 1 | awk '{print $1}')
+			if [ ! -z "$PID" ]; then
+				kill -9 $PID
+			fi
 			/usr/lib/hotspot/travelmate.sh &
 			exit 0
 		fi
