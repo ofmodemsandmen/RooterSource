@@ -12,7 +12,7 @@ watch=$(uci -q get modem.modem$CURRMODEM.watchdog)
 if [ -z "$watch" ]; then
 	watch="0"
 fi
-if [ "watch" = "0" ]; then
+if [ "$watch" = "0" ]; then
 	log "Check Conn running"
 	timeout=7
 	while [ $timeout -ge 0 ]; do
