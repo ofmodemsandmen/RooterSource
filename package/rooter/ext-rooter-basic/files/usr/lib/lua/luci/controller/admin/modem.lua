@@ -590,14 +590,18 @@ function action_externalip()
 			rv["extip"] = translate("Not Available")
 		else
 			s, e = line:find("ip\":\"")
-			cs, ce = line:find("\"", e+1)
-			rv["extip"] = line:sub(e+1, cs-1)
-			file:close()
-			tfile = io.open("/tmp/ipip", "w")
-			tfile:write(rv["extip"], "\n")
-			tfile:close()
-			if rv["extip"] == nil then
+			if s == nil then
 				rv["extip"] = translate("Not Available")
+			else
+				cs, ce = line:find("\"", e+1)
+				rv["extip"] = line:sub(e+1, cs-1)
+				file:close()
+				tfile = io.open("/tmp/ipip", "w")
+				tfile:write(rv["extip"], "\n")
+				tfile:close()
+				if rv["extip"] == nil then
+					rv["extip"] = translate("Not Available")
+				end
 			end
 		end
 	end
