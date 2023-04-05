@@ -581,21 +581,24 @@ end
 function action_externalip()
 	local rv ={}
 
-	--os.execute("curl -s https://api64.ipify.org?format=json > /tmp/ipip")
 	file = io.open("/tmp/ipip", "r")
 	if file == nil then
 		rv["extip"] = translate("Not Available")
 	else
 		line = file:read("*line")
-		s, e = line:find("ip\":\"")
-		cs, ce = line:find("\"", e+1)
-		rv["extip"] = line:sub(e+1, cs-1)
-		file:close()
-		tfile = io.open("/tmp/ipip", "w")
-		tfile:write(rv["extip"], "\n")
-		tfile:close()
-		if rv["extip"] == nil then
+		if line == nil then
 			rv["extip"] = translate("Not Available")
+		else
+			s, e = line:find("ip\":\"")
+			cs, ce = line:find("\"", e+1)
+			rv["extip"] = line:sub(e+1, cs-1)
+			file:close()
+			tfile = io.open("/tmp/ipip", "w")
+			tfile:write(rv["extip"], "\n")
+			tfile:close()
+			if rv["extip"] == nil then
+				rv["extip"] = translate("Not Available")
+			end
 		end
 	end
 
