@@ -67,9 +67,13 @@ restart() {
 
 CURRMODEM=$1
 CURSOR="-"
-ACTIVE=$(uci get modem.pinginfo$CURRMODEM.alive)
-if [ $ACTIVE = "0" ]; then
+ACTIVE=$(uci -q get modem.pinginfo$CURRMODEM.alive)
+if [ "$ACTIVE" = "0" ]; then
 	echo 'MONSTAT="'"Disabled"'"' > /tmp/monstat$CURRMODEM
+	CP=$(uci -q get ping.ping.enable)
+	if [ "$CP" = "1" ]; then
+		echo 'MONSTAT="'"Custom Ping Test"'"' > /tmp/monstat$CURRMODEM
+	fi
 	exit
 fi
 sleep 5
@@ -93,7 +97,7 @@ config_list_foreach "pinginfo$CURRMODEM" "trackip" list_track_ips
 
 while [ true ]; do
 	CP=$(uci -q get ping.ping.enable)
-	if [ $CP = "1" ]; then
+	if [ "$CP" = "1" ]; then
 		echo 'MONSTAT="'"Custom Ping Test"'"' > /tmp/monstat$CURRMODEM
 		sleep 60
 	else
