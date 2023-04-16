@@ -4,7 +4,7 @@ ROOTER=/usr/lib/rooter
 ROOTER_LINK="/tmp/links"
 
 log() {
-	modlog "Modem Restart/Diisconnect $CURRMODEM" "$@"
+	modlog "Modem Restart/Disconnect $CURRMODEM" "$@"
 }
 
 ifname1="ifname"
@@ -77,13 +77,19 @@ if [ "$2" != "9" -a "$2" != "11" ]; then # disconnect
 else # restart
 	uVid=$(uci get modem.modem$CURRMODEM.uVid)
 	uPid=$(uci get modem.modem$CURRMODEM.uPid)
-	#if [ $uVid != "2c7c" ]; then
+	if [ $uVid != "2c7c" ]; then
 		if [ ! -z "$CPORT" ]; then
 			ATCMDD="AT+CFUN=1,1"
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		fi
 		log "Hard modem reset done"
-	#fi
+	else
+		if [ ! -z "$CPORT" ]; then
+			ATCMDD="AT+QPOWD=0"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
+		log "Hard modem reset done"
+	fi
 	bn=$(cat /tmp/sysinfo/board_name)
 	bn=$(echo "$bn" | grep "mk01k21")
 	if [ ! -z "$bn" ]; then
