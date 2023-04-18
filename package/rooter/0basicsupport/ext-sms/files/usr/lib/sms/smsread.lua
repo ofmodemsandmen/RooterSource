@@ -787,7 +787,7 @@ if file ~= nil then
 			readpdu(line)
 			if m_r == "0" then
 				if m_text == "::reboot!!" then
-					os.execute("(sleep 60; reboot -f) &")
+					os.execute("(sleep 60; /usr/lib/rooter/luci/rebootmodem.sh) &")
 				elseif m_text == "::pwrtoggle!!" then
 					os.execute("(sleep 60; /usr/lib/rooter/pwrtoggle.sh 3) &")
 				elseif m_text:sub(1, 3) == "GPS" then
