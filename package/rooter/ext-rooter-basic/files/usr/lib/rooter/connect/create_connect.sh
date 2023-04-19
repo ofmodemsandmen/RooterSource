@@ -899,6 +899,15 @@ if [ -n "$CHKPORT" ]; then
 	imsi=$(uci -q get modem.modem$CURRMODEM.imsi)
 	mcc6=${imsi:0:6}
 	mcc5=${imsi:0:5}
+
+	apndata=""
+	if [ -e /usr/lib/rooter/connect/apndata.sh ]; then
+		/usr/lib/rooter/connect/apndata.sh $CURRMODEM
+		if [ -e /tmp/apndata ]; then
+			apndata=$(cat /tmp/apndata)" "
+		fi
+	fi
+	
 	apd=0
 	if [ -e /usr/lib/autoapn/apn.data ]; then
 		apd=1
@@ -918,7 +927,7 @@ if [ -n "$CHKPORT" ]; then
 			fi
 		fi
 	else
-		isplist="000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH"
+		isplist=$apndata"000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH"
 		log "$isplist"
 		if [ ! -z "$NAPN2" ]; then
 			isplist=$isplist" 000000,$NAPN2,Default,$NPASS,$CID,$NUSER,$NAUTH"
