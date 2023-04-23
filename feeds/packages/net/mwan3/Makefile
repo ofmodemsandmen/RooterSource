@@ -23,7 +23,6 @@ define Package/mwan3
      +rpcd \
      +ip \
      +ipset \
-     +iptables \
      +iptables-mod-conntrack-extra \
      +iptables-mod-ipopt \
      +jshn
