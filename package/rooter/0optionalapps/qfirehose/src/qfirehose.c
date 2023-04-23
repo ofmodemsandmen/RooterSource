@@ -197,7 +197,8 @@ int main(int argc, char* argv[])
     char *firehose_mbn = NULL;
     char *module_port_name = malloc(MAX_PATH);
     char *module_sys_path = malloc(MAX_PATH);
-    int xhci_usb3_to_usb2_cause_syspatch_chage = 1;
+    int usb3_speed;
+    struct timespec usb3_atime;
     int usb2tcp_port = 0;
     char filename[128] = {'\0'};
     const char *usbmon_logfile = NULL;
@@ -207,7 +208,7 @@ int main(int argc, char* argv[])
     /* set file priviledge mask 0 */
     umask(0);
     /*build V1.0.8*/
-    dbg_time("Version: QFirehose_Linux_Android_V1.4.11\n"); //when release, rename to V1.X
+    dbg_time("Version: QFirehose_Linux_Android_V1.4.13\n"); //when release, rename to V1.X
 #ifndef __clang__
     dbg_time("Builded: %s %s\n", __DATE__,__TIME__);
 #endif
@@ -250,7 +251,6 @@ int main(int argc, char* argv[])
                 }
             break;
             case 's':
-                xhci_usb3_to_usb2_cause_syspatch_chage = 0;
                 strncpy(module_sys_path, optarg, MAX_PATH);
                 if (module_sys_path[strlen(optarg)-1] == '/')
                     module_sys_path[strlen(optarg)-1] = '\0';
@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
     //hunter.lv add check dir 2018-07-28
 
     if (module_port_name[0] && !strncmp(module_port_name, "/dev/mhi", strlen("/dev/mhi"))) {
-        if (qpcie_open(firehose_dir, firehose_mbn)) {
+        if (qpcie_open(firehose_dir, firehose_mbn, module_port_name)) {
             update_transfer_bytes(-1);
             error_return();
         }      
@@ -347,7 +347,7 @@ _usb2tcp_start:
     }
 
     if (module_sys_path[0] == '\0') {
-        int module_count = auto_find_quectel_modules(module_sys_path, MAX_PATH);
+        int module_count = auto_find_quectel_modules(module_sys_path, MAX_PATH, NULL, NULL);
         if (module_count <= 0) {
             dbg_time("Quectel module not found\n");
             update_transfer_bytes(-1);
@@ -364,33 +364,23 @@ _usb2tcp_start:
     }
 
 __edl_retry:
+    qusb_read_speed_atime(module_sys_path, &usb3_atime, &usb3_speed);
     while (edl_retry-- > 0) {
         usb_handle = qusb_noblock_open(module_sys_path, &idVendor, &idProduct, &interfaceNum);
-        if (usb_handle == NULL && module_sys_path[0] == '/') {
+
+        if (usb_handle) {
+            clock_gettime(CLOCK_REALTIME, &usb3_atime);
+        }
+        else {
             sleep(1); //in reset sate, wait connect
-            if (xhci_usb3_to_usb2_cause_syspatch_chage && access(module_sys_path, R_OK) && errno_nodev()) {
-                auto_find_quectel_modules(module_sys_path, MAX_PATH);
-            }
-            else if (access(module_sys_path, R_OK) && errno_nodev()) {
-                int busidx = strlen("/sys/bus/usb/devices/");
-                char busnum = module_sys_path[busidx];
-
-                module_sys_path[busidx] = busnum-1;
-                if (access(module_sys_path, R_OK) && errno_nodev())
-                    module_sys_path[busidx] = busnum+1;
-
-                if (!access(module_sys_path, R_OK)) {
-                    usb_handle = qusb_noblock_open(module_sys_path, &idVendor, &idProduct, &interfaceNum);
-                    if (usb_handle && (idVendor != 0x05c6 || idProduct != 0x9008)) {
-                        qusb_noblock_close(usb_handle);
-                        usb_handle = NULL;  
-                    }
+            if (usb3_speed >= 5000 && access(module_sys_path, R_OK) && errno_nodev()) {
+                if (auto_find_quectel_modules(module_sys_path, MAX_PATH, "5c6/9008/", &usb3_atime) > 1) {
+                    dbg_time("There are multiple quectel EDL modules in system!\n");
+                    update_transfer_bytes(-1);
+                    error_return();
                 }
-                module_sys_path[busidx] = busnum;
             }
-
-            if (usb_handle == NULL)
-                continue;
+            continue;
         }
 
         if (idVendor == 0x2c7c && interfaceNum > 1) {

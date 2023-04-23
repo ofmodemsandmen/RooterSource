@@ -927,14 +927,18 @@ if [ -n "$CHKPORT" ]; then
 			fi
 		fi
 	else
-		isplist=$apndata"000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH"
-		log "$isplist"
-		if [ ! -z "$NAPN2" ]; then
-			isplist=$isplist" 000000,$NAPN2,Default,$NPASS,$CID,$NUSER,$NAUTH"
+		if [ -z "$apndata" ]; then
+			isplist=$apndata"000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH"
+			if [ ! -z "$NAPN2" ]; then
+				isplist=$isplist" 000000,$NAPN2,Default,$NPASS,$CID,$NUSER,$NAUTH"
+			fi
+			if [ ! -z "$NAPN3" ]; then
+				isplist=$isplist" 000000,$NAPN3,Default,$NPASS,$CID,$NUSER,$NAUTH"
+			fi
+		else
+			isplist=$apndata
 		fi
-		if [ ! -z "$NAPN3" ]; then
-			isplist=$isplist" 000000,$NAPN3,Default,$NPASS,$CID,$NUSER,$NAUTH"
-		fi
+		 log "$isplist"
 	fi
 
 	uci set modem.modeminfo$CURRMODEM.isplist="$isplist"

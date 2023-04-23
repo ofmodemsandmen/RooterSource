@@ -71,6 +71,33 @@ static struct quectel_usb_device quectel_9x07;
 static int tcp_socket_fd = -1;
 static int usb_dm_interface = 0;
 
+typedef struct {
+   char diag[32];
+   char edl[32];
+   char bhi[32];
+}pcie_port_classification;
+
+typedef struct {
+   pcie_port_classification pcie_port_one[10];
+   int pcie_port_number;
+}pcie_port;
+
+static pcie_port pcie_port_defult = {
+    {
+        {"/dev/mhi_DIAG", "/dev/mhi_EDL", "/dev/mhi_BHI"},
+        {"/dev/mhi_DIAG1", "/dev/mhi_EDL1", "/dev/mhi_BHI1"},
+        {"/dev/mhi_DIAG2", "/dev/mhi_EDL2", "/dev/mhi_BHI2"},
+        {"/dev/mhi_DIAG3", "/dev/mhi_EDL3", "/dev/mhi_BHI3"},
+        {"/dev/mhi_DIAG4", "/dev/mhi_EDL4", "/dev/mhi_BHI4"},
+        {"/dev/mhi_DIAG5", "/dev/mhi_EDL5", "/dev/mhi_BHI5"},
+        {"/dev/mhi_DIAG6", "/dev/mhi_EDL6", "/dev/mhi_BHI6"},
+        {"/dev/mhi_DIAG7", "/dev/mhi_EDL7", "/dev/mhi_BHI7"},
+        {"/dev/mhi_DIAG8", "/dev/mhi_EDL8", "/dev/mhi_BHI8"},
+        {"/dev/mhi_DIAG9", "/dev/mhi_EDL9", "/dev/mhi_BHI9"}
+    },
+    10
+};
+
 static int strStartsWith(const char *line, const char *prefix)
 {
     if (!prefix || prefix[0] == '\0')
@@ -95,6 +122,16 @@ static int strEndsWith(const char *line, const char *suffix)
     a = strlen(line);
     b = strlen(suffix);
     return (a >= b) && (strcmp(line + (a -b), suffix) == 0);
+}
+
+static const char *ctimespec(const struct timespec *ts, char *time_name, size_t len) {
+    time_t ltime = ts->tv_sec;
+    struct tm *currtime = localtime(&ltime);
+
+    snprintf(time_name, len, "%04d%02d%02d_%02d:%02d:%02d",
+    	(currtime->tm_year+1900), (currtime->tm_mon+1), currtime->tm_mday,
+    	currtime->tm_hour, currtime->tm_min, currtime->tm_sec);
+    return time_name;
 }
 
 static int quectel_get_sysinfo_by_uevent(const char *uevent, MODULE_SYS_INFO *pSysInfo) {
@@ -140,7 +177,7 @@ static int quectel_get_sysinfo_by_uevent(const char *uevent, MODULE_SYS_INFO *pS
 }
 
 // the return value is the number of quectel modules
-int auto_find_quectel_modules(char *module_sys_path, unsigned size)
+int auto_find_quectel_modules(char *module_sys_path, unsigned size, const char *product, const struct timespec *atime)
 {
     const char *base = "/sys/bus/usb/devices";
     DIR *busdir = NULL;
@@ -178,13 +215,37 @@ int auto_find_quectel_modules(char *module_sys_path, unsigned size)
             || strStartsWith(sysinfo.PRODUCT, "5c6/9008")
             || strStartsWith(sysinfo.PRODUCT, "5c6/901f")
             || strStartsWith(sysinfo.PRODUCT, "5c6/9091")
-            || strStartsWith(sysinfo.PRODUCT, "3763/3c93/318"))) {
+            || strStartsWith(sysinfo.PRODUCT, "3c93/ffff")
+            || strStartsWith(sysinfo.PRODUCT, "3763/3c93"))) {
             continue;
         }
 
         if ((strStartsWith(sysinfo.PRODUCT, "2c7c/6") || strStartsWith(sysinfo.PRODUCT, "2c7c/8"))
             && (sysinfo.PRODUCT[strlen("2c7c/6000")] == '/')) //skip ASR&HISI modules
             continue;
+
+        if (product && !strStartsWith(sysinfo.PRODUCT, product)) {
+            dbg_time("skip %.24s/%s for PRODUCT %s is not %s\n", base, de->d_name,
+                sysinfo.PRODUCT, product);
+            continue;
+        }
+
+        if (atime) {
+            struct timespec this_atime;
+            int speed;
+ 
+            snprintf(uevent, sizeof(uevent), "%.24s/%.16s", base, de->d_name);
+            if (qusb_read_speed_atime(uevent, &this_atime, &speed)) {
+                if ((this_atime.tv_sec < atime->tv_sec)
+                    || (this_atime.tv_sec == atime->tv_sec && this_atime.tv_nsec < atime->tv_nsec)) {
+                    char t1[64], t2[64];
+                    
+                    dbg_time("skip %.24s/%s for atime {%s} old than {%s}\n", base, de->d_name,
+                        ctimespec(&this_atime, t1, sizeof(t1)), ctimespec(atime, t2, sizeof(t2)));
+                    continue;
+                }
+            }
+        }
 
         snprintf(module_sys_path, size, "%.24s/%s", base, de->d_name);
         count++;
@@ -406,7 +467,8 @@ static void quectel_get_usb_device_info(const char *module_sys_path, struct quec
         || (udev->idVendor == 0x2c7c && udev->idProduct == 0x0310)    //EM05-CN       Laptop
         || (udev->idVendor == 0x2c7c && udev->idProduct == 0x030a)    //EM05-G        Laptop
         || (udev->idVendor == 0x2c7c && udev->idProduct == 0x0309)    //EM05E-EDU     Laptop
-        || (udev->idVendor == 0x2c7c && udev->idProduct == 0x030d))   //EM05G-FCCL    Laptop
+        || (udev->idVendor == 0x2c7c && udev->idProduct == 0x030d)   //EM05G-FCCL    Laptop
+        || (udev->idVendor == 0x3c93 && udev->idProduct == 0xffff))   //EC20 GW  ttyUSB0  interface 08
     {
 
         if ((udev->idVendor == 0x2c7c && udev->idProduct == 0x0127)       //EM05CEFC-LNV  Laptop
@@ -418,6 +480,9 @@ static void quectel_get_usb_device_info(const char *module_sys_path, struct quec
 
         if (udev->idVendor == 0x2c7c && udev->idProduct == 0x0514)   //EG060K-EA
             usb_dm_interface = 2;
+
+        if (udev->idVendor == 0x3c93 && udev->idProduct == 0xffff)   //EG060K-EA
+            usb_dm_interface = 8;
     }
 }
 
@@ -713,9 +778,10 @@ static int detect_xhci_usb_zero_packet_bug_not_fix(const char *module_sys_path) 
     *driver = '\0';
 
     tmp = readlink(buf, driver, sizeof(buf) - tmp);
-    dbg_time("tmp=%s, driver=%s\n", buf, driver);
     if (tmp <= 0)
         return 0;
+    driver[tmp] = '\0';
+    dbg_time("tmp=%s, driver=%s\n", buf, driver);
 
     if (!strstr(driver, "xhci"))
         return 0;
@@ -870,6 +936,35 @@ int qusb_use_usbfs_interface(const void *handle) {
     struct quectel_usb_device *udev = &quectel_9x07;
 
     return (handle == udev && udev->ttyfd <= 0 && udev->desc > 0);
+}
+
+int qusb_read_speed_atime(const char *module_sys_path, struct timespec *out_time, int *out_speed) {
+    char speed[256];
+    int fd;
+    struct stat stat;
+
+    snprintf(speed, sizeof(speed), "%s/speed", module_sys_path);
+    fd = open(speed, O_RDONLY);
+    if (fd == -1)
+        return 0;
+
+    if (read(fd, speed, sizeof(speed))) {}
+    fstat(fd, &stat);
+    close(fd);
+
+    *out_speed = atoi(speed);
+
+    #ifdef ANDROID
+    struct timespec out_time_tmp;
+    memset(&out_time_tmp, 0, sizeof(struct timespec));
+    out_time_tmp.tv_sec = stat.st_atime;
+    *out_time = out_time_tmp;
+    #else
+    *out_time = stat.st_atim;
+    #endif
+
+    dbg_time("%s speed: %d, st_atime: %s\n", __func__, *out_speed, ctimespec(out_time, speed, sizeof(speed)));
+    return 1;
 }
 
 int qusb_noblock_read(const void *handle, void *pbuf, int max_size, int min_size, int timeout_msec) {
@@ -1041,7 +1136,7 @@ const char * firehose_get_time(void) {
 //     fflush(stdout);
 // }
 
-int qpcie_open(const char *firehose_dir, const char *firehose_mbn) {
+int qpcie_open(const char *firehose_dir, const char *firehose_mbn, const char *module_port_name) {
     int bhifd, edlfd, diagfd;
     long ret;
     FILE *fp;
@@ -1049,6 +1144,7 @@ int qpcie_open(const char *firehose_dir, const char *firehose_mbn) {
     char prog_firehose_sdx24[256+32];
     size_t filesize;
     void *filebuf;
+    int cur_number = 0;
 
     snprintf(prog_firehose_sdx24, sizeof(prog_firehose_sdx24), "%.255s/%s", firehose_dir, firehose_mbn);
     fp = fopen(prog_firehose_sdx24, "rb");
@@ -1066,14 +1162,30 @@ int qpcie_open(const char *firehose_dir, const char *firehose_mbn) {
     if (fread((uint8_t *)filebuf+sizeof(filesize), 1, filesize, fp) == (size_t)0) { };
     fclose(fp);
 
-    diagfd = open("/dev/mhi_DIAG", O_RDWR | O_NOCTTY);
+	int i;
+    for (i=0; i<pcie_port_defult.pcie_port_number; i++)
+    {
+        if (!strncasecmp(module_port_name, pcie_port_defult.pcie_port_one[i].bhi, 28))
+        {
+            cur_number = i;
+            break;
+        }
+    }
+
+    if (i == pcie_port_defult.pcie_port_number)
+    {
+        dbg_time("PCIE port assignment error\n");
+        error_return();
+    }
+
+    diagfd = open(pcie_port_defult.pcie_port_one[cur_number].diag, O_RDWR | O_NOCTTY);
     if (diagfd > 0)
     {
        int edl_retry = 30; //SDX55 require long time by now 20190412
        void *usb_handle = &edl_pcie_mhifd;
        edl_pcie_mhifd = diagfd;
 
-        while (access("/dev/mhi_DIAG", R_OK) == 0 && edl_retry-- > 0) {
+        while (access(pcie_port_defult.pcie_port_one[cur_number].diag, R_OK) == 0 && edl_retry-- > 0) {
             dbg_time("switch_to_edl_mode\n");
             switch_to_edl_mode(usb_handle);
             sleep(1);
@@ -1084,7 +1196,7 @@ int qpcie_open(const char *firehose_dir, const char *firehose_mbn) {
     }
 
     sleep(1); //see https://ticket.quectel.com/browse/FAE-39737
-    bhifd = open("/dev/mhi_BHI", O_RDWR | O_NOCTTY);
+    bhifd = open(pcie_port_defult.pcie_port_one[cur_number].bhi, O_RDWR | O_NOCTTY);
     if (bhifd <= 0) {
         dbg_time("fail to open %s, errno: %d (%s)\n", "/dev/mhi_BHI", errno, strerror(errno));
         error_return();
@@ -1115,9 +1227,9 @@ int qpcie_open(const char *firehose_dir, const char *firehose_mbn) {
     free(filebuf);
 
     sleep(1);
-    edlfd = open("/dev/mhi_EDL", O_RDWR | O_NOCTTY);
+    edlfd = open(pcie_port_defult.pcie_port_one[cur_number].edl, O_RDWR | O_NOCTTY);
     if (edlfd <= 0) {
-        dbg_time("fail to access %s, errno: %d (%s)\n", "/dev/mhi_EDL", errno, strerror(errno));
+        dbg_time("fail to access %s, errno: %d (%s)\n", pcie_port_defult.pcie_port_one[cur_number].edl, errno, strerror(errno));
         error_return();
     }
 

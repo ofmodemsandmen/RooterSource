@@ -40,6 +40,7 @@ void * qusb_noblock_open(const char *module_sys_path, int *idVendor, int *idProd
 int qusb_noblock_close(void *handle);
 int qusb_noblock_write(const void *handle, void *pbuf, int max_size, int min_size, int timeout_msec, int need_zlp);
 int qusb_noblock_read(const void *handle, void *pbuf, int max_size, int min_size, int timeout_msec);
+int qusb_read_speed_atime(const char *module_sys_path, struct timespec *out_time, int *out_speed);
 int qfile_find_file(const char *dir, const char *prefix, const char *suffix, char** filename);
 #define errno_nodev() (errno == ENOENT || errno == ENODEV)
 // void dbg_time (const char *fmt, ...);
@@ -68,7 +69,7 @@ double get_now();
 void get_duration(double start);
 int update_transfer_bytes(long long bytes_cur);
 void set_transfer_allbytes(long long bytes);
-int auto_find_quectel_modules(char *module_sys_path, unsigned size);
+int auto_find_quectel_modules(char *module_sys_path, unsigned size, const char *product, const struct timespec *atime);
 void quectel_get_syspath_name_by_ttyport(const char *module_port_name, char *module_sys_path, unsigned size);
 void quectel_get_ttyport_by_syspath(const char *module_sys_path, char *module_port_name, unsigned size);
 #define error_return()  do {dbg_time("%s %s %d fail\n", __FILE__, __func__, __LINE__); return __LINE__; } while(0)
@@ -121,7 +122,7 @@ enum MHI_EE {
    MHI_EE_DISABLE_TRANSITION = 0x9,
    MHI_EE_MAX
 };
-int qpcie_open(const char *firehose_dir, const char *firehose_mbn);
+int qpcie_open(const char *firehose_dir, const char *firehose_mbn, const char *module_port_name);
 
 #define Q_USB2TCP_VERSION 0x12345678
 typedef struct {

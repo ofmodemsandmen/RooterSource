@@ -240,7 +240,7 @@ static int receive_packet(void)
 		{
 			//timeout may be error
 			dbg_time("%s timeout\n", __FUNCTION__);
-			return 0;
+			break;
 		}
 		//dump_buffer(&buff[idx], bytesread);
 		idx += bytesread;			
@@ -326,7 +326,7 @@ static int handle_security_mode(unsigned char trusted) {
 			if(timeout==0)
 			{
 				dbg_time("%s timeout\n", __FUNCTION__);
-				return 0;
+				break; //return 0; -Werror,-Wunreachable-code-return
 			}
 		}
     }while(1);
@@ -519,11 +519,11 @@ static int handle_openmulti(uint32_t size,unsigned char* data)
             if(timeout == 0)
             {
             	dbg_time("%s timeout\n", __FUNCTION__);
-                return 0;
+                break;
             }
         }
     } while (1);
-    return 1;    
+    return 0;
 }
 
 /******pkt_write_multi_image*******/
@@ -566,7 +566,7 @@ start_send_packet:
                 break;
             default:
                 goto retry_send_packet;
-                return 0;
+                //return 0;
             }
         }
         else
@@ -612,7 +612,7 @@ static int handle_close(void) {
             if(timeout == 0)
             {
             	dbg_time("%s timeout\n", __FUNCTION__);
-                return 0;
+                break;
             }
         }
     }while(1);
