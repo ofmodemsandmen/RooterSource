@@ -23,7 +23,6 @@ echo "$mcc6" > $mccfile
 echo "$mcc5" >> $mccfile
 ATCMDD="at+cgdcont?"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-log "$OX"
 echo "$OX" >> $mccfile
 
 while IFS= read -r line; do
