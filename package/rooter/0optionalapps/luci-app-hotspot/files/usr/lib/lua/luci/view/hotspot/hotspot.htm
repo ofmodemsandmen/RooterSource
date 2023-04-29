@@ -296,16 +296,16 @@ end
 					document.getElementById('ssid').innerHTML="<%:Disconnected%>";
 					document.getElementById('encrypted').innerHTML="";
 				}
-				reconn = rv.reconn;
-				document.getElementById('reconn').value=reconn
-			/*	if ( reconn == "0" )
+				reconn = rv.signal;
+				document.getElementById('signal').value=rv.signal;
+				if ( reconn == "0" )
 				{
-					document.getElementById('reconn').checked=false;
+					document.getElementById('signal').checked=false;
 				}
 				else
 				{
-					document.getElementById('reconn').checked=true;
-				} */
+					document.getElementById('signal').checked=true;
+				} 
 
 				dual = rv.dual;
 				freq = rv.freq
@@ -335,7 +335,7 @@ end
 					document.getElementById('runbtn').value="<%:Disconnect from Hotspot%>";
 					document.getElementById('runbtn').className="cbi-button cbi-button-remove";
 					runbtn = "1";
-				}
+				} 
 			}
 			var ssid = rv.ssid;
 			switch(ssid) {
@@ -906,6 +906,21 @@ end
 			}
 		);
 	}
+	
+	function sortsignal(btn)
+	{
+		dx = 0;
+		if ( btn.checked == true )
+		{
+			dx = 1;
+		}
+		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "set_signal")%>',
+			{ set: dx },
+			function()
+			{
+			}
+		);
+	}
 
 //		document.getElementById("attxt").value=dx;
 	
@@ -936,6 +951,7 @@ end
 		   background-color: blue;
 		   color: white;
 		}
+		
 	</style>
 </head>
 <fieldset class="cbi-section" id="cbi-read">
@@ -967,6 +983,12 @@ end
 		<!--	<input type="checkbox" id="reconn" onclick="reconnenable(this)" /> -->
 		</td>
 		<td width="58%">&nbsp;</td>
+	</tr>
+	<tr>
+		<td><strong><%:Connect to Hotspot with Strongest Signal%></strong></td>
+		<td>
+			<input type="checkbox" id="signal" onclick="sortsignal(this)">
+		</td> 
 	</tr>
 	</table>
 	

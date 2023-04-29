@@ -24,6 +24,7 @@ val:value("64", "64")
 val:value("65", "65")
 val:value("66", "66")
 val:value("67", "67")
+val:value("88", "88")
 val:value("117", "117")
 val:value("0", "TTL-INC 1")
 

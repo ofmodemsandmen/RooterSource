@@ -67,6 +67,7 @@ tt:value("64", "TTL 64")
 tt:value("65", "TTL 65")
 tt:value("66", "TTL 66")
 tt:value("67", "TTL 67")
+tt:value("88", "TTL 88")
 tt:value("117", "TTL 117")
 tt:value("TTL-INC 1", "TTL-INC 1")
 tt.default = "0"
@@ -524,6 +525,7 @@ if profsave == "0" then
 		tt:value("65", "TTL 65")
 		tt:value("66", "TTL 66")
 		tt:value("67", "TTL 67")
+		tt:value("88", "TTL 88")
 		tt:value("117", "TTL 117")
 		tt:value("TTL-INC 1", "TTL-INC 1")
 		tt.default = "0"

@@ -26,6 +26,7 @@ function index()
 	entry({"admin", "services", "mancon"}, call("action_mancon"))
 	entry({"admin", "services", "bandchange"}, call("action_bandchange"))
 	entry({"admin", "services", "reconn"}, call("action_reconn"))
+	entry({"admin", "services", "set_signal"}, call("action_set_signal"))
 end
 
 function readhot()
@@ -57,6 +58,10 @@ function action_check_spot()
 	rv["reconn"] = luci.model.uci.cursor():get("travelmate", "global", "reconn")
 	if rv["reconn"] == nil then
 		rv["reconn"] = "0"
+	end
+	rv["signal"] = luci.model.uci.cursor():get("travelmate", "global", "signal")
+	if rv["signal"] == nil then
+		rv["signal"] = "0"
 	end
 
 	rv["ssid"] = luci.model.uci.cursor():get("travelmate", "global", "ssid")
@@ -304,4 +309,9 @@ end
 function action_reconn()
 	local set = luci.http.formvalue("set")
 	os.execute("/usr/lib/hotspot/reconn.sh \"" .. set .. "\"")
+end
+
+function action_set_signal()
+	local set = luci.http.formvalue("set")
+	os.execute("/usr/lib/hotspot/signal.sh \"" .. set .. "\"")
 end

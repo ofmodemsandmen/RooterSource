@@ -295,6 +295,17 @@ f_main()
 						else
 							FILE="/tmp/hotman"
 						fi
+						
+						sgn=$(uci -q get travelmate.global.signal)
+						if [ "$sgn" = "1" ]; then
+							rm -f /tmp/hotspot
+							echo "$ssid_list" > /tmp/ssidlist
+							/usr/lib/hotspot/sort.lua
+							if [ -e /tmp/hotspot ]; then
+								FILE="/tmp/hotspot"
+							fi
+						fi
+						
 						if [ -f "${FILE}" ]; then
 							# read list of selected Hotspots
 							while IFS='|' read -r ssid encrypt key
