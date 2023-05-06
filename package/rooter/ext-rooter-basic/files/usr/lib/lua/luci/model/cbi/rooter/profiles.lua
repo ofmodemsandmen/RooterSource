@@ -21,9 +21,8 @@ m.on_after_commit = function(self)
 end
 
 if profsave == "1" then
-	m:section(SimpleSection).template = "rooter/country"
-	
 	if fs.stat("/usr/lib/country/mccdata") then
+		m:section(SimpleSection).template = "rooter/country"
 		dda = m:section(TypedSection, "disable", translate("Automatic APN"), translate("Automatic APN will use data from the SIM to connect. If that fails it will use the Default Profile"))
 		dda.anonymous = true
 		aenabled = dda:option(Flag, "mccapn", translate("Enabled"))
