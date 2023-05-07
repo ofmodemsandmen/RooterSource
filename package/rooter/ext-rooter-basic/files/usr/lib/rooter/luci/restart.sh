@@ -75,6 +75,7 @@ if [ "$2" != "9" -a "$2" != "11" ]; then # disconnect
 	ifdown wan$INTER
 	$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
 else # restart
+	echo "0" > /tmp/usbwait
 	uVid=$(uci get modem.modem$CURRMODEM.uVid)
 	uPid=$(uci get modem.modem$CURRMODEM.uPid)
 	if [ $uVid != "2c7c" ]; then
@@ -118,9 +119,13 @@ else # restart
 
 		PORT="usb$CURRMODEM"
 		echo $PORT > /sys/bus/usb/drivers/usb/unbind
-		sleep 35
+		while [ -e /tmp/usbwait ]
+		do
+			sleep 1
+		done
+		echo $PORT > /sys/bus/usb/drivers/usb/bind
 	fi
-	echo $PORT > /sys/bus/usb/drivers/usb/bind
+	
 	if [ -e $ROOTER/modem-led.sh ]; then
 		$ROOTER/modem-led.sh $CURRMODEM 0
 	fi
