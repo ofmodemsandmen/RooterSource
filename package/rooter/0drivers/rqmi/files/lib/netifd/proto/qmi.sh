@@ -118,7 +118,7 @@ proto_qmi_setup() {
 		/sbin/ip link set dev $ifname mtu $mtu
 	}
 
-	timeout=1
+	timeout=3
 
 	# Cleanup current state if any
 	#uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null 2>&1
@@ -181,10 +181,12 @@ proto_qmi_setup() {
 		else
 			# registration_state is 'registration_denied' or 'unknown' or ''
 			log "Network registration failed (reason: '$registration_state')"
+			/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 &
 		fi
 
 		proto_notify_error "$interface" NETWORK_REGISTRATION_FAILED
 		proto_block_restart "$interface"
+		/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 &
 		return 1
 	done
 
