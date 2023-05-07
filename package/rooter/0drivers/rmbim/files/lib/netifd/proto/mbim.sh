@@ -231,11 +231,12 @@ _proto_mbim_setup() {
 	fi
 
 	log "Register with network"
-	for i in $(seq 30); do
+	for i in $(seq 4); do
 		tid=$((tid + 1))
 		REG=$(umbim $DBG -n -t $tid -d $device registration)
 		retq=$?
 		[ $retq -ne 2 ] && break
+		log "Registering"
 		sleep 2
 	done
 	if [ $retq != 0 ]; then
@@ -245,6 +246,7 @@ _proto_mbim_setup() {
 			return 1
 		fi
 	fi
+	log "Registered"
 	MCCMNC=$(echo "$REG" | awk '/provider_id:/ {print $2}')
 	PROV=$(echo "$REG" | awk '/provider_name:/ {print $2}')
 	MCC=${MCCMNC:0:3}
@@ -326,6 +328,7 @@ _proto_mbim_setup() {
 	done
 	if [ $tidd -gt $tcnt ]; then
 		log "Failed to connect to network"
+		/usr/lib/rooter/luci/restart.sh $CURRMODEM 11
 		return 1
 	fi
 	log "Save Connect Data"

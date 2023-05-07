@@ -1,9 +1,9 @@
 #!/bin/sh /etc/rc.common
 # Copyright (C) 2006 OpenWrt.org
 
-START=99
+START=30
 
 start() {
-	/usr/lib/rooter/initialize.sh
+	/usr/lib/rooter/initialize.sh &
 }
 
