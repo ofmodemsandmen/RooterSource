@@ -198,38 +198,6 @@ _proto_mbim_setup() {
 
 	get_connect
 
-	log "Checking PIN state"
-	tid=$((tid + 1))
-	umbim $DBG -n -t $tid -d $device pinstate
-	retq=$?
-	if [ $retq -eq 2 ]; then
-		log "PIN is required"
-		if [ ! -z $pincode ]; then
-			log "Sending PIN"
-			tid=$((tid + 1))
-			umbim $DBG -n -t $tid -d $device unlock "$pincode" 2>/dev/null
-			retq=$?
-			if [ $retq -ne 0 ]; then
-				log "PIN unlock failed"
-				exit 1
-			else
-				log "PIN unlocked"
-				sleep 3
-				CHKPORT=$(uci get modem.modem$CURRMODEM.commport)
-				if [ ! -z $CHKPORT ]; then
-					$ROOTER/common/gettype.sh $CURRMODEM
-				else
-					get_sub
-				fi
-			fi
-		else
-			log "PIN is missing in the profile"
-			exit 1
-		fi
-	else
-		log "PIN is not required"
-	fi
-
 	log "Register with network"
 	for i in $(seq 4); do
 		tid=$((tid + 1))
@@ -243,6 +211,7 @@ _proto_mbim_setup() {
 		if [ $retq != 4 ]; then
 			log "Subscriber registration failed"
 			proto_notify_error "$interface" NO_REGISTRATION
+			/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 &
 			return 1
 		fi
 	fi

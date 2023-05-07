@@ -60,11 +60,11 @@ save_variables() {
 bootdelay() {
 	if [ ! -f /tmp/bootend.file ]; then
 		log "Delay for boot up"
-		sleep 10
+		sleep 1
 		while [ ! -f /tmp/bootend.file ]; do
 			sleep 1
 		done
-		sleep 10
+		sleep 1
 	fi
 }
 

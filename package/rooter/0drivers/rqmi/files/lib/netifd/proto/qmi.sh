@@ -127,8 +127,8 @@ proto_qmi_setup() {
 	#uqmi -s -d "$device" --set-device-operating-mode online > /dev/null 2>&1
 
 	# Set IP format
-	uqmi -s -d "$device" --set-data-format 802.3 > /dev/null 2>&1
-	uqmi -s -d "$device" --wda-set-data-format 802.3 > /dev/null 2>&1
+	#uqmi -s -d "$device" --set-data-format 802.3 > /dev/null 2>&1
+	#uqmi -s -d "$device" --wda-set-data-format 802.3 > /dev/null 2>&1
 	if [ $RAW -eq 1 ]; then
 		dataformat='"raw-ip"'
 	else
@@ -181,7 +181,6 @@ proto_qmi_setup() {
 		else
 			# registration_state is 'registration_denied' or 'unknown' or ''
 			log "Network registration failed (reason: '$registration_state')"
-			/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 &
 		fi
 
 		proto_notify_error "$interface" NETWORK_REGISTRATION_FAILED
