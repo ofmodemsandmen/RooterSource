@@ -2,7 +2,7 @@
 
 . /lib/functions.sh
 
-START=98
+START=30
 
 log() {
 	wifilog "Hotspot Initialize" "$@"
