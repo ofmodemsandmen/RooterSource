@@ -148,6 +148,11 @@ mnc:depends("lock", "2")
 
 this_taba = "advance"
 
+mf1 = di:taboption(this_taba, ListValue, "watchdog", translate("Disable Connection Watchdog :"));
+mf1:value("0", translate("No"))
+mf1:value("1", translate("Yes"))
+mf1.default=0
+		
 mf = di:taboption(this_taba, ListValue, "ppp", translate("Force Modem to PPP Protocol :"));
 mf:value("0", translate("No"))
 mf:value("1", translate("Yes"))
