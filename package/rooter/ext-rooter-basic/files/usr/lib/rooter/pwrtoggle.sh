@@ -178,4 +178,5 @@ power_toggle() {
 	fi
 }
 
-power_toggle $1
+/usr/lib/rooter/connect/reconnect.sh $1
+#power_toggle $1
