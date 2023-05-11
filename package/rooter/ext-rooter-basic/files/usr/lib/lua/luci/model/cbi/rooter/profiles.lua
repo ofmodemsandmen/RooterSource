@@ -16,7 +16,7 @@ m = Map("profile", translate("Modem Connection Profiles"),
 
 m.on_after_commit = function(self)
 	if profsave == "1" then
-		--luci.sys.call("/usr/lib/profile/restart.sh &")
+		luci.sys.call("/usr/lib/profile/restart.sh &")
 	end
 end
 
@@ -28,6 +28,8 @@ if profsave == "1" then
 		aenabled = dda:option(Flag, "mccapn", translate("Enabled"))
 		aenabled.default="0"
 		aenabled.optional=false;
+	else
+		m:section(SimpleSection).template = "rooter/profile"
 	end
 
 	ds = m:section(TypedSection, "simpin", translate("Default SIM Pin"), translate("Used if no SIM Pin value in Profile"))
@@ -398,6 +400,7 @@ if profsave == "0" then
 		bwdelay:value("11", translate("11 hour"))
 		bwdelay:value("12", translate("12 hour"))
 	end
+end
 
 	if fs.stat("/usr/lib/autoapn/apn.data") then
 		dda = m:section(TypedSection, "disable", translate("Use Automatic APN"), translate("Enable the use of the Automatic APN selection. This disables Custom Profiles."))
@@ -872,7 +875,7 @@ if profsave == "0" then
 			bwdelay:value("11", translate("11 hour"))
 			bwdelay:value("12", translate("12 hour"))
 		end
-	end
+	--end
 end
 return m
 
