@@ -92,7 +92,7 @@ end
 function action_connect()
 	local set = luci.http.formvalue("set")
 	miscnum = luci.model.uci.cursor():get("modem", "general", "miscnum")
-	os.execute("/tmp/links/reconnect" .. miscnum .. " " .. miscnum)
+	os.execute("/usr/lib/rooter/connect/reconnect.sh " .. miscnum)
 end
 
 function action_pwrtoggle()

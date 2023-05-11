@@ -279,6 +279,12 @@ else
 	echo 'BOOTTIME="'"$(date +%s)"'"' > /tmp/boottime
 fi
 
+modis=$(uci -q get basic.basic.modem)
+if [ ! -z $modis ]; then
+	uci set basic.basic.modem="1"
+	uci commit basic
+fi
+
 #
 # Added modems to various drivers
 #
