@@ -2,7 +2,7 @@
 
 . /lib/functions.sh
 
-START=30
+START=60
 
 log() {
 	wifilog "Z-Hotspot " "$@"
