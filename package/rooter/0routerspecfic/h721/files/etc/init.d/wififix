@@ -1,0 +1,117 @@
+#!/bin/sh /etc/rc.common
+. /lib/functions.sh
+
+START=59
+
+count_radio() {
+	local config=$1
+	local channel
+
+	let radcnt=radcnt+1
+}
+
+start()
+{
+	if [ -e /etc/fixradio ]; then
+		exit 0
+	fi
+	radcnt=0
+
+	config_load wireless
+	config_foreach count_radio wifi-device
+	if [ "$radcnt" -eq 2 ]; then
+		for i in $(seq $radcnt); do
+			let j=$i-1
+			info=$(iwinfo wlan$j info)
+			echo "$info" > /tmp/info
+			while IFS= read -r line; do
+				read -r line
+				read -r line
+				chan=$(echo "$line"  | tr " " ",")
+				chan=$(echo $chan | cut -d, -f5)
+				
+				if [ "$j" -eq 0 ]; then
+					chan0=$chan
+				else
+					chan1=$chan
+				fi
+				read -r line
+				read -r line
+				read -r line
+				read -r line
+				read -r line
+				read -r line
+				ac=$(echo "$line" | grep "802.11ac")
+				if [ ! -z "$ac" ]; then
+					if [ "$j" -eq 0 ]; then
+						ac0="AC"
+					else
+						ac1="AC"
+					fi
+				else
+					if [ "$j" -eq 0 ]; then
+						ac0="N"
+					else
+						ac1="N"
+					fi
+				fi
+				break
+			done < /tmp/info
+		done
+		if [ "$ac0" = "AC" -a "$chan0" -gt 15 ]; then
+			uci set wireless.radio1.channel='7'
+			uci set wireless.radio1.band='2g'
+			uci set wireless.radio1.htmode='HT20'
+			echo "1"
+			ssid=$(uci -q get wireless.default_radio1.ssid)
+			fg=$(echo $ssid | grep "5G")
+			echo "2"
+			if [ ! -z "$fg" ]; then
+				ssid=$( echo "$ssid" | sed -e "s!5G!2G!g")
+				uci set wireless.default_radio1.ssid="$ssid"
+				echo "3"
+			fi
+			uci commit wireless
+		else
+			if [ "$ac0" = "N" -a "$ac1" = "AC" ]; then
+				uci set wireless.radio1.channel='44'
+				uci set wireless.radio1.band='5g'
+				uci set wireless.radio1.htmode='VHT80'
+				ssid=$(uci -q get wireless.default_radio1.ssid)
+				fg=$(echo $ssid | grep "2G")
+				if [ ! -z "$fg" ]; then
+					ssid=$( echo "$ssid" | sed -e "s!2G!5G!g")
+					uci set wireless.default_radio1.ssid=$ssid
+				fi
+				uci set wireless.radio0.channel='7'
+				uci set wireless.radio0.band='2g'
+				uci set wireless.radio0.htmode='HT20'
+				ssid=$(uci -q get wireless.default_radio0.ssid)
+				fg=$(echo $ssid | grep "5G")
+				if [ ! -z "$fg" ]; then
+					ssid=$( echo "$ssid" | sed -e "s!5G!2G!g")
+					uci set wireless.default_radio0.ssid=$ssid
+				fi
+				uci commit wireless
+			else
+				uci set wireless.radio1.channel='44'
+				uci set wireless.radio1.band='5g'
+				uci set wireless.radio1.htmode='VHT80'
+				if [ ! -z "$fg" ]; then
+					ssid=$( echo "$ssid" | sed -e "s!2G!5G!g")
+					uci set wireless.default_radio1.ssid=$ssid
+				fi
+				uci set wireless.radio0.channel='7'
+				uci set wireless.radio0.band='2g'
+				uci set wireless.radio0.htmode='HT20'
+				if [ ! -z "$fg" ]; then
+					ssid=$( echo "$ssid" | sed -e "s!5G!2G!g")
+					uci set wireless.default_radio0.ssid=$ssid
+				fi
+				uci commit wireless
+			fi
+		fi
+		wifi up
+	fi
+	echo "0" > /etc/fixradio
+}
