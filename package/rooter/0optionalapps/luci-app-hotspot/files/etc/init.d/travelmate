@@ -2,7 +2,7 @@
 
 . /lib/functions.sh
 
-START=30
+START=59
 
 log() {
 	wifilog "Hotspot Initialize" "$@"
@@ -64,7 +64,9 @@ do_radio() {
 start()
 {
 log "Hotspot Firewall"
-
+	if [ -e /usr/lib/custom/wififix ]; then
+		/usr/lib/custom/wififix
+	fi
 	PRO=$(uci get network.wwan2.proto)
 	if [ -z $PRO ]; then
 		uci set network.wwan2=interface
