@@ -542,7 +542,7 @@ _proto_mbim_setup() {
 			uci set mwan3.wan$INTER.family='ipv6'
 			uci delete mwan3.wan$INTER.track_ip
 			uci add_list mwan3.wan$INTER.track_ip='ipv6.google.com'
-			uci set mwan3.CLAT$INTER.enabled=1
+			uci set mwan3.CLAT$INTER.enabled=0
 			log "IPv6"
 		else
 			uci set mwan3.wan$INTER.family='ipv4'
