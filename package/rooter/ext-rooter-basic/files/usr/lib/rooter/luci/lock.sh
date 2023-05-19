@@ -133,6 +133,9 @@ fi
 #log "$mask"
 #log "$mask5g"
 #log "$mask5gsa"
+maskxx=$mask
+mask5gxx=$mask5g
+mask5gsaxx=$mask5gsa
 
 encode $mask
 mask=$maskz
@@ -273,10 +276,11 @@ case $uVid in
 		if [ -z $mask64 ]; then
 			mask64="0"
 		fi
+		flg="0"
 		case $uPid in
 
 			"68c0"|"9041"|"901f" ) # MC7354 EM/MC7355
-				M2='AT!BAND=11,"Test",0,'$mask64,0
+				M2="AT!BAND=11,\"Test\",0,$mask64,0"
 			;;
 			"9070"|"9071"|"9078"|"9079"|"907a"|"907b" ) # EM/MC7455
 				M2='AT!BAND=11,"Test",0,'$mask64,0
@@ -287,20 +291,61 @@ case $uVid in
 			"9090"|"9091"|"90b1" )
 				M2='AT!BAND=11,"Test",0,'$mask64','$maskl2',0,0,0'
 			;;
+			"90d2"|"90d3" )
+				OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M1")
+				log "$OX"
+				m64=${maskxx:0:64}
+				m32=${maskxx:64}
+				encode $m64
+				m64="0000000000000000"$maskz
+				m64=${m64: -16}
+				encode $m32
+				m32="0000000000000000"$maskz
+				m32=${m32: -16}
+				M2="AT!BAND=11,1,\"Test\",1,$m64,$m32"
+				OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M2")
+				log "$OX"
+				m64=${mask5gxx:0:64}
+				m32=${mask5gxx:64}
+				encode $m64
+				m64="0000000000000000"$maskz
+				m64=${m64: -16}
+				encode $m32
+				m32="0000000000000000"$maskz
+				m32=${m32: -16}
+				M2="AT!BAND=11,1,\"Test\",3,$m64,$m32"
+				OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M2")
+				log "$OX"
+				m64=${mask5gsaxx:0:64}
+				m32=${mask5gsaxx:64}
+				encode $m64
+				m64="0000000000000000"$maskz
+				m64=${m64: -16}
+				encode $m32
+				m32="0000000000000000"$maskz
+				m32=${m32: -16}
+				M2="AT!BAND=11,1,\"Test\",4,$m64,$m32"
+				OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M2")
+				log "$OX"
+				flg="1"
+			;;
+			
 		esac
 		log "$M2"
 		if [ -e /etc/fake ]; then
 			exit 0
 		fi
-		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M1")
-		log "$OX"
-		ATCMDD="AT+CFUN=1,1"
-		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M2")
-		log "$OX"
+		if "$flg" = "0" ]; then
+			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M1")
+			log "$OX"
+			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M2")
+			log "$OX"
+		fi
 		M2='AT!BAND=00;!BAND=11'
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M2")
 		log "$OX"
 		if [ $RESTART = "1" ]; then
+			ATCMDD="AT+CFUN=1,1"
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			ATCMDD='AT!ENTERCND="AWRONG"'
 		fi

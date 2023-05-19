@@ -23,6 +23,57 @@ sierrabandmask() {
 		log " "
 	fi
 	OX=$(echo $OX | tr " " '\x0a')
+	echo "$OX" > /tmp/sierrabm
+	idP=$(uci get modem.modem$CURRMODEM.idP)
+	if [ "$idP" = "90d3" -o "$idP" = "90d2" ]; then
+		while IFS= read -r line; do
+			for i in $(seq 14); do
+				read -r line
+				if [ "$line" = "LTE:" ]; then
+					read -r line
+					break
+				fi
+			done
+			ltel=$line
+			read -r line
+			lteh=$line
+			a=$lteh$ltel
+			L1=${a:10}
+			for i in $(seq 4); do
+				read -r line
+			done
+			ltel=$line
+			read -r line
+			lteh=$line
+			a=$lteh$ltel
+			L5=${a:10}
+			for i in $(seq 4); do
+				read -r line
+			done
+			ltel=$line
+			read -r line
+			lteh=$line
+			a=$lteh$ltel
+			L6=${a:10}
+			break
+		done < /tmp/sierrabm
+		
+		log " "
+		log "EM9191 LTE Band Mask : $L1"
+		log "EM9191 5G NSA Band Mask : $L5"
+		log "EM9191 5G NA Band Mask : $L6"
+		log " "
+
+		uci set modem.modem$CURRMODEM.GW=""
+		uci set modem.modem$CURRMODEM.L1="$L1"
+		uci set modem.modem$CURRMODEM.L5="$L5"
+		uci set modem.modem$CURRMODEM.L6="$L6"
+		uci commit modem
+		ATCMDD='AT!ENTERCND="AWRONG"'
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		$ROOTER/luci/mask.sh
+		exit 0
+	fi
 	line=$OX
 	Unk=$(echo $line | grep "Unknown")
 	if [ "$Unk" ]; then
