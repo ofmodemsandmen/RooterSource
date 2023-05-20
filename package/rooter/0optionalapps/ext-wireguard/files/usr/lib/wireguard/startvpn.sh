@@ -280,7 +280,7 @@ else
 	uci set firewall.wglforward.src="wg"
 	uci commit firewall
 fi
-etc/init.d/firewall restart
+/etc/init.d/firewall restart
 
 config_load network
 SERVE=$(uci -q get wireguard."$WG".client)
