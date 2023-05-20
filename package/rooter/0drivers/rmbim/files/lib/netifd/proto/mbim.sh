@@ -14,6 +14,13 @@ log() {
 	modlog "MBIM Connect $CURRMODEM" "$@"
 }
 
+handle_ip() {
+    local value="$1"
+	if [ "$value" = "ipv6.google.com" ]; then
+		ipv6=1
+	fi
+}
+
 enb=$(uci -q get custom.connect.ipv6)
 if [ -z $enb ]; then
 	enb="1"
@@ -540,14 +547,16 @@ _proto_mbim_setup() {
 		log "Check IPv6 Only"
 		if [ "$ipv6only" = "1" ]; then
 			uci set mwan3.wan$INTER.family='ipv6'
-			uci delete mwan3.wan$INTER.track_ip
-			uci add_list mwan3.wan$INTER.track_ip='ipv6.google.com'
+			ipv6=0
+			config_load mwan3
+			config_list_foreach wan1 track_ip handle_ip
+			if [ "$ipv6" = 0 ]; then
+				uci add_list mwan3.wan$INTER.track_ip='ipv6.google.com'
+			fi
 			uci set mwan3.CLAT$INTER.enabled=0
 			log "IPv6"
 		else
 			uci set mwan3.wan$INTER.family='ipv4'
-			uci delete mwan3.wan$INTER.track_ip
-			uci add_list mwan3.wan$INTER.track_ip='8.8.8.8'
 			uci set mwan3.CLAT$INTER.enabled=0
 		fi
 		uci commit mwan3
