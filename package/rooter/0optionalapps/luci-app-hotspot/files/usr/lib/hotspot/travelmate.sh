@@ -33,6 +33,9 @@ check_wwan() {
 		sleep 1
 	done
 	sleep 3
+	if [ -e /usr/lib/custom/mt1300 ]; then
+		/usr/lib/custom/mt1300
+	fi
 	f_check "ap"
 	cntx=0
 	while [ "${trm_ifstatus}" != "true" ]; do
