@@ -58,6 +58,7 @@ while IFS= read -r line; do
 	fi
 done < /usr/lib/country/mccdata
 
+apndata=""
 cfnd="0"
 if [ "$fnd" = "1" ]; then
 	tmp=$(echo "$ldata" | cut -d! -f2 )
@@ -90,13 +91,14 @@ if [ "$fnd" = "1" ]; then
 			else
 				cmnc=$mnc5
 			fi
-			if [ "$mnc" = "$cmnc" -a "$apn" = "$capn" ]; then
+			
+			if [ "$mnc" = "$cmnc" ]; then
+				apndata=$apndata"$mcc","$capn","$cname","$cuser","$ccid","$cpass","$cauth "
 				cfnd="1"
-				break
 			fi
 		done
 		if [ "$cfnd" = "1" ]; then
-			apndata="$mcc","$apn","$cname","$cuser","$ccid","$cpass","$cauth"
+			#apndata="$mcc","$apn","$cname","$cuser","$ccid","$cpass","$cauth"
 			echo "$apndata" > /tmp/apndata
 		fi
 	fi
