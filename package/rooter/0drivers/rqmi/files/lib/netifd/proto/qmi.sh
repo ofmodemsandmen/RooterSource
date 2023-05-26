@@ -198,19 +198,31 @@ proto_qmi_setup() {
 
 	[ -n "$modes" ] && uqmi -s -d "$device" --set-network-modes "$modes" > /dev/null 2>&1
 	
-	pdptype="ipv4v6"
-	IPVAR=$(uci -q get modem.modem$CURRMODEM.pdptype)
-	case "$IPVAR" in
-		"IP" )
-			pdptype="ipv4"
-		;;
-		"IPV6" )
-			pdptype="ipv6"
-		;;
-		"IPV4V6" )
-			pdptype="ipv4v6"
-		;;
-	esac
+	COMMPORT=$(uci get modem.modem$CURRMODEM.commport)
+	ATCMDD="at+creg?"
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	REGV=$(echo "$OX" | grep -o "+CREG: [0-2],[0-5]")
+	creg=$(echo "$REGV" | cut -d, -f2)
+	pipv4=$(uci -q get profile.roaming.ipv4)
+	if [ "$pipv4" = "1" -a "$creg" = "5" ]; then
+		pdptype="ipv4"
+		log "Roaming"
+	else
+		log "Not Roaming"
+		pdptype="ipv4v6"
+		IPVAR=$(uci -q get modem.modem$CURRMODEM.pdptype)
+		case "$IPVAR" in
+			"IP" )
+				pdptype="ipv4"
+			;;
+			"IPV6" )
+				pdptype="ipv6"
+			;;
+			"IPV4V6" )
+				pdptype="ipv4v6"
+			;;
+		esac
+	fi
 			
 	pdptype=$(echo "$pdptype" | awk '{print tolower($0)}')
 	[ "$pdptype" = "ip" -o "$pdptype" = "ipv6" -o "$pdptype" = "ipv4v6" ] || pdptype="ip"
