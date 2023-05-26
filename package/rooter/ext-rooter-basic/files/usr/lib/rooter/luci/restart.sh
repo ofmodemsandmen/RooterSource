@@ -13,6 +13,10 @@ if [ -e /etc/newstyle ]; then
 fi
 
 CURRMODEM=$1
+empty=$(uci -q get modem.modem$CURRMODEM.empty)
+if [ "$empty" = "1" ]; then
+	exit 0
+fi
 CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 INTER=$(uci get modem.modeminfo$CURRMODEM.inter)
 
