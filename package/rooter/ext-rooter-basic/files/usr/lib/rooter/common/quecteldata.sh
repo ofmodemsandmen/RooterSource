@@ -287,14 +287,14 @@ if [ -n "$QRSRP" ] && [ "$RAT" != "WCDMA" ]; then
 			fi
 		else
 			RSCP=$RSRPLTE
-			if [ -n "$QRSRP1" -a "$QRSRP1" != "-32768" ]; then
+			if [ -n "$QRSRP1" -a "$QRSRP1" != "-32768" -a "$QRSRP1" != "-44" ]; then
 				RSCP=$RSCP" (4G) dBm<br />"$QRSRP1
-				if [ -n "$QRSRP2" -a "$QRSRP2" != "-32768" ]; then
-					RSCP="$RSCP,$QRSRP2"
-					if [ -n "$QRSRP3" -a "$QRSRP3" != "-32768" ]; then
-						RSCP="$RSCP,$QRSRP3"
-						if [ -n "$QRSRP4" -a "$QRSRP4" != "-32768" ]; then
-							RSCP="$RSCP,$QRSRP4"
+				if [ -n "$QRSRP2" -a "$QRSRP2" != "-32768" -a "$QRSRP2" != "-44" ]; then
+					RSCP="$RSCP, $QRSRP2"
+					if [ -n "$QRSRP3" -a "$QRSRP3" != "-32768" -a "$QRSRP3" != "-44" ]; then
+						RSCP="$RSCP, $QRSRP3"
+						if [ -n "$QRSRP4" -a "$QRSRP4" != "-32768" -a "$QRSRP4" != "-44" ]; then
+							RSCP="$RSCP, $QRSRP4"
 						fi
 					fi
 					RSCP=$RSCP" (5G) "
