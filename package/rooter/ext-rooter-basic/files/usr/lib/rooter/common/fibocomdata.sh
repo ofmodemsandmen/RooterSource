@@ -59,10 +59,7 @@ OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "fibocominfo.gcom" "$CURRMODEM")
 
 OX=$(echo $OX | tr 'a-z' 'A-Z')
 
-SERVING=$(echo $OX | grep -o "+GTCCINFO:.\+COPN:")
-if [ -z "$SERVING" ]; then
-	SERVING=$(echo $OX | grep -o "+GTCCINFO:.\+GTRAT")
-fi
+SERVING=$(echo $OX | grep -o "+GTCCINFO:.\+GTRAT")
 
 REGXa="[12],[249],[0-9]\{3\},[0-9]\{2,3\},[0-9A-F]\{0,5\},[0-9A-F]\{0,10\},[0-9A-F]\{1,8\},[0-9A-F]\{1,8\},[15][0-9]\{1,4\},[0-9]\{1,3\},[-0-9]\{1,5\},[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\}"
 
@@ -160,7 +157,17 @@ if [ -n "$GTCCDATA" ]; then
 	COPS_MCC=$(echo $GTCCDATA | cut -d, -f3)
 	COPS_MNC=$(echo $GTCCDATA | cut -d, -f4)
 	COPX=""
-	COPN=$(echo $OX" " | grep -o "+COPN: .\+ OK " | tr " " "," | tr -d '"' )
+	if [ -e /tmp/copn.at ]; then
+		COPN=$(cat /tmp/copn.at)
+	else
+		ATCMDD="AT+COPN"
+		OXc=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		COPN=$OXc
+		if [ ${#COPN} -gt 50 ]; then
+			echo $COPN > /tmp/copn.at
+		fi
+	fi
+	COPN=$(echo $COPN | tr " " "," | tr -d '"' )
 	if [ -n "$COPN" ]; then
 		COPP=$(echo $COPN" " | sed "s/.*\($COPS_MCC$COPS_MNC,.*\)\,/\1/")
 		if [ -n "$COPP" ]; then
@@ -275,8 +282,10 @@ if [ -n "$XLDATA" ]; then
 		BW=$(echo $XLEC | cut -d, -f3)
 		RAWLIST=$(echo $XLEC | grep -o "BAND_LTE_[0-9]\{1,2\}.\+" | grep -o "[,0-9]*" | tr ',' ' ')
 		BANDLIST=""
+		NUMBR=0
 		for BAND in $(echo "$RAWLIST"); do
 			if [ -n "$BAND" -a "$BAND" != "0" ]; then
+				NUMBR=$(($(echo $NUMBR) + 1))
 				if [ -n "$BANDLIST" ]; then
 					BANDLIST="$BANDLIST,$BAND"
 				else
@@ -288,7 +297,6 @@ if [ -n "$XLDATA" ]; then
 		if [ "$BAND" = "$LBAND" ]; then
 			decode_bw
 			LBAND=$LBAND" (Bandwidth $BW MHz)"
-			NUMBR=$(echo $XLEC | cut -d, -f2)
 			for JJ in $(seq 2 $NUMBR); do
 				BAND=$(echo $BANDLIST | cut -d, -f$JJ)
 				if [ -n "$BAND" -a "$BAND" != "0" ]; then
@@ -320,10 +328,12 @@ if [ -n "$XLDATA" ]; then
 	if [ -n "$SINR" ] && [ "$SINR" != "255" ]; then
 		SINR=$(($SINR / 2))" dB"
 	fi
-	RSSI=$(rsrp2rssi $RSCP $BW)
-	CSQ_PER=$((100 - (($RSSI + 51) * 100/-62)))"%"
-	CSQ=$((($RSSI + 113) / 2))
-	CSQ_RSSI=$RSSI" dBm"
+	if [ -n "$BW" ]; then
+		RSSI=$(rsrp2rssi $RSCP $BW)
+		CSQ_PER=$((100 - (($RSSI + 51) * 100/-62)))"%"
+		CSQ=$((($RSSI + 113) / 2))
+		CSQ_RSSI=$RSSI" dBm"
+	fi
 fi
 if [ -n "$XUDATA" ]; then
 	MODE="UMTS"
