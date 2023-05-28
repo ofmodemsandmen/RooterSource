@@ -17,7 +17,11 @@ if [ "$watch" = "0" ]; then
 	if [ -e /usr/lib/autoapn/apn.data ]; then
 		timeout=10
 	else
-		timeout=7
+		if [ -e /usr/lib/country/mccdata ]; then
+			timeout=10
+		else
+			timeout=7
+		fi
 	fi
 	while [ $timeout -ge 0 ]; do
 		conn=$(uci -q get modem.modem$CURRMODEM.connected)
