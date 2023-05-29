@@ -86,8 +86,8 @@ if [ "$fnd" = "1" ]; then
 				cauth="0"
 			fi
 			cpdp=$(echo "$ispdata" | cut -d, -f8)
-			if [ "$cpdp" = "~" ]; then
-				cpdp="0"
+			if [ "$cpdp" = "~" -o "$cpdp" = "0" ]; then
+				cpdp="1"
 			fi
 			size=${#mnc} 
 			if [ "$size" = "3" ]; then
