@@ -85,6 +85,10 @@ if [ "$fnd" = "1" ]; then
 			if [ "$cauth" = "~" ]; then
 				cauth="0"
 			fi
+			cpdp=$(echo "$ispdata" | cut -d, -f8)
+			if [ "$cpdp" = "~" ]; then
+				cpdp="0"
+			fi
 			size=${#mnc} 
 			if [ "$size" = "3" ]; then
 				cmnc=$mnc6
@@ -93,7 +97,7 @@ if [ "$fnd" = "1" ]; then
 			fi
 			
 			if [ "$mnc" = "$cmnc" ]; then
-				apndata=$apndata"$mcc","$capn","$cname","$cuser","$ccid","$cpass","$cauth "
+				apndata=$apndata"$mcc","$capn","$cname","$cuser","$ccid","$cpass","$cauth","$cpdp "
 				cfnd="1"
 			fi
 		done
