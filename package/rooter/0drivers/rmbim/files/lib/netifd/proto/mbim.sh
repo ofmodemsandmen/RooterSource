@@ -50,9 +50,7 @@ get_connect() {
 
 	if [ "$pipv4" = "1" -a "$creg" = "5" ]; then
 		ipt="ipv4:"
-		log "Roaming"
 	else
-		log "Not Roaming"
 		if [ "$PDPT" = 0 ]; then
 			ipt=""
 		else
@@ -263,6 +261,24 @@ _proto_mbim_setup() {
 		CID=$(echo $isp | cut -d, -f5)
 		NUSER=$(echo $isp | cut -d, -f6)
 		NAUTH=$(echo $isp | cut -d, -f7)
+		if [ "$pipv4" = "1" -a "$creg" = "5" ]; then
+			ipt="ipv4:"
+			log "Roaming"
+		else
+			log "Not Roaming"
+			IPVAR=$(echo $isp | cut -d, -f8)
+			case "$IPVAR" in
+				"IP" )
+					ipt="ipv4:"
+				;;
+				"IPV6" )
+					ipt="ipv6:"
+				;;
+				"IPV4V6" )
+					ipt="ipv4v6:"
+				;;
+			esac
+		fi
 		if [ "$NPASS" = "nil" ]; then
 			NPASS="NIL"
 		fi

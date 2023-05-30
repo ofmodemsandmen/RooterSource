@@ -87,7 +87,19 @@ if [ "$fnd" = "1" ]; then
 			fi
 			cpdp=$(echo "$ispdata" | cut -d, -f8)
 			if [ "$cpdp" = "~" -o "$cpdp" = "0" ]; then
-				cpdp="1"
+				cpdp="IP"
+			else
+				case $cpdp in
+					"1" )
+					cpdp="IP"
+					;;
+					"2" )
+					cpdp="IPV6"
+					;;
+					"3" )
+					cpdp="IPV4V6"
+					;;
+				esac
 			fi
 			size=${#mnc} 
 			if [ "$size" = "3" ]; then
@@ -97,7 +109,7 @@ if [ "$fnd" = "1" ]; then
 			fi
 			
 			if [ "$mnc" = "$cmnc" ]; then
-				apndata=$apndata"$mcc","$capn","$cname","$cuser","$ccid","$cpass","$cauth","$cpdp "
+				apndata=$apndata"$mcc","$capn","Default","$cuser","$ccid","$cpass","$cauth","$cpdp "
 				cfnd="1"
 			fi
 		done

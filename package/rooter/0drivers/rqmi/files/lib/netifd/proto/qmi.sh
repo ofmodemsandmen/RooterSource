@@ -128,18 +128,18 @@ proto_qmi_setup() {
 	timeout=3
 
 	# Cleanup current state if any
-	#uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null 2>&1
+	uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null 2>&1
 
 	# Go online
-	#uqmi -s -d "$device" --set-device-operating-mode online > /dev/null 2>&1
+	uqmi -s -d "$device" --set-device-operating-mode online > /dev/null 2>&1
 
 	# Set IP format
-	#uqmi -s -d "$device" --set-data-format 802.3 > /dev/null 2>&1
-	#uqmi -s -d "$device" --wda-set-data-format 802.3 > /dev/null 2>&1
+	uqmi -s -d "$device" --set-data-format 802.3 > /dev/null 2>&1
+	uqmi -s -d "$device" --wda-set-data-format 802.3 > /dev/null 2>&1
 	if [ $RAW -eq 1 ]; then
 		dataformat='"raw-ip"'
 	else
-		if [ $idV = 1199 -a $idP = 9055 ]; then
+		if [ "$idV" = "1199" -a "$idP" = "9055" ]; then
 			$ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "reset.gcom" "$CURRMODEM"
 			dataformat='"802.3"'
 			uqmi -s -d "$device" --set-data-format 802.3
@@ -204,35 +204,7 @@ proto_qmi_setup() {
 	REGV=$(echo "$OX" | grep -o "+CREG: [0-2],[0-5]")
 	creg=$(echo "$REGV" | cut -d, -f2)
 	pipv4=$(uci -q get profile.roaming.ipv4)
-	if [ "$pipv4" = "1" -a "$creg" = "5" ]; then
-		pdptype="ipv4"
-		log "Roaming"
-	else
-		log "Not Roaming"
-		pdptype="ipv4v6"
-		IPVAR=$(uci -q get modem.modem$CURRMODEM.pdptype)
-		case "$IPVAR" in
-			"IP" )
-				pdptype="ipv4"
-			;;
-			"IPV6" )
-				pdptype="ipv6"
-			;;
-			"IPV4V6" )
-				pdptype="ipv4v6"
-			;;
-		esac
-	fi
 			
-	pdptype=$(echo "$pdptype" | awk '{print tolower($0)}')
-	[ "$pdptype" = "ip" -o "$pdptype" = "ipv6" -o "$pdptype" = "ipv4v6" ] || pdptype="ip"
-	if [ "$pdptype" = "ip" ]; then
-		[ -z "$autoconnect" ] && autoconnect=1
-		[ "$autoconnect" = 0 ] && autoconnect=""
-	else
-		[ "$autoconnect" = 1 ] || autoconnect=""
-	fi
-	
 	isplist=$(uci -q get modem.modeminfo$CURRMODEM.isplist)
 	apn2=$(uci -q get modem.modeminfo$CURRMODEM.apn2)
 	for isp in $isplist 
@@ -243,10 +215,16 @@ proto_qmi_setup() {
 			NUSER=$(echo $isp | cut -d, -f6)
 			NAUTH=$(echo $isp | cut -d, -f7)
 			if [ "$NPASS" = "nil" ]; then
-				NPASS="NIL"
+				NPASS=""
 			fi
 			if [ "$NUSER" = "nil" ]; then
-				NUSER="NIL"
+				NUSER=""
+			fi
+			if [ "$NPASS" = "NIL" ]; then
+				NPASS=""
+			fi
+			if [ "$NUSER" = "NIL" ]; then
+				NUSER=""
 			fi
 			if [ "$NAUTH" = "nil" ]; then
 				NAUTH="0"
@@ -269,6 +247,33 @@ proto_qmi_setup() {
 					auth="none"
 				;;
 			esac
+			IPVAR=$(echo $isp | cut -d, -f8)
+			pdptype="ipv4v6"
+			if [ "$pipv4" = "1" -a "$creg" = "5" ]; then
+				pdptype="ipv4"
+				log "Roaming"
+			else
+				log "Not Roaming"
+				case "$IPVAR" in
+					"IP" )
+						pdptype="ipv4"
+					;;
+					"IPV6" )
+						pdptype="ipv6"
+					;;
+					"IPV4V6" )
+						pdptype="ipv4v6"
+					;;
+				esac
+			fi
+			pdptype=$(echo "$pdptype" | awk '{print tolower($0)}')
+			[ "$pdptype" = "ip" -o "$pdptype" = "ipv6" -o "$pdptype" = "ipv4v6" ] || pdptype="ip"
+			if [ "$pdptype" = "ip" ]; then
+				[ -z "$autoconnect" ] && autoconnect=1
+				[ "$autoconnect" = 0 ] && autoconnect=""
+			else
+				[ "$autoconnect" = 1 ] || autoconnect=""
+			fi
 			
 			
 			if [ ! -e /etc/config/isp ]; then
@@ -278,7 +283,7 @@ proto_qmi_setup() {
 			fi
 			
 			if [ ! -e /etc/config/isp ]; then
-				log "Connection Parameters : $NAPN $auth $username $password"
+				log "Connection Parameters : $NAPN $auth $username $password $pdptype"
 			fi
 			conn=0
 			
@@ -287,7 +292,7 @@ proto_qmi_setup() {
 				if ! [ "$cid_4" -eq "$cid_4" ] 2> /dev/null; then
 					log "Unable to obtain client ID"
 				fi
-			}
+			
 			uqmi -s -d "$device" --set-client-id wds,"$cid_4" --set-ip-family ipv4 > /dev/null 2>&1
 			v4s=0	
 			pdh_4=$(uqmi -s -d "$device" --set-client-id wds,"$cid_4" \
@@ -309,14 +314,14 @@ proto_qmi_setup() {
 				v4s=1
 				conn=1
 			fi
-
+			}
 			[ "$pdptype" = "ipv6" -o "$pdptype" = "ipv4v6" ] && {
 				cid_6=$(uqmi -s -d "$device" --get-client-id wds)
 				if ! [ "$cid_6" -eq "$cid_6" ] 2> /dev/null; then
 					log "Unable to obtain client ID"
 					#proto_notify_error "$interface" NO_CID
 				fi
-			}
+			
 
 			uqmi -s -d "$device" --set-client-id wds,"$cid_6" --set-ip-family ipv6 > /dev/null 2>&1
 			v6s=0
@@ -340,6 +345,7 @@ proto_qmi_setup() {
 				v6s=1
 				conn=1
 			fi
+			}
 			if [ $conn -eq 1 ]; then
 				break;
 			fi

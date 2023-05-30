@@ -913,28 +913,41 @@ if [ -n "$CHKPORT" ]; then
 	if [ -e /usr/lib/autoapn/apn.data ]; then
 		apd=1
 	fi
+	pdptype="ipv4v6"
+	IPVAR=$(uci -q get modem.modem$CURRMODEM.pdptype)
+	case "$IPVAR" in
+		"IP" )
+			pdptype="ipv4"
+		;;
+		"IPV6" )
+			pdptype="ipv6"
+		;;
+		"IPV4V6" )
+			pdptype="ipv4v6"
+		;;
+	esac
 	if [ "$autoapn" = "1" -a $apd -eq 1 ]; then
 		isplist=$(grep -F "$mcc6" '/usr/lib/autoapn/apn.data')
 		if [ -z "$isplist" ]; then
 			isplist=$(grep -F "$mcc5" '/usr/lib/autoapn/apn.data')
 			if [ -z "$isplist" ]; then
-				isplist="000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH"
+				isplist="000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
 				if [ ! -z "$NAPN2" ]; then
-					isplist=$isplist" 000000,$NAPN2,Default,$NPASS,$CID,$NUSER,$NAUTH"
+					isplist=$isplist" 000000,$NAPN2,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
 				fi
 				if [ ! -z "$NAPN3" ]; then
-					isplist=$isplist" 000000,$NAPN3,Default,$NPASS,$CID,$NUSER,$NAUTH"
+					isplist=$isplist" 000000,$NAPN3,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
 				fi
 			fi
 		fi
 	else
 		if [ -z "$apndata" ]; then
-			isplist=$apndata"000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH"
+			isplist=$apndata"000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
 			if [ ! -z "$NAPN2" ]; then
-				isplist=$isplist" 000000,$NAPN2,Default,$NPASS,$CID,$NUSER,$NAUTH"
+				isplist=$isplist" 000000,$NAPN2,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
 			fi
 			if [ ! -z "$NAPN3" ]; then
-				isplist=$isplist" 000000,$NAPN3,Default,$NPASS,$CID,$NUSER,$NAUTH"
+				isplist=$isplist" 000000,$NAPN3,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
 			fi
 		else
 			isplist=$apndata
