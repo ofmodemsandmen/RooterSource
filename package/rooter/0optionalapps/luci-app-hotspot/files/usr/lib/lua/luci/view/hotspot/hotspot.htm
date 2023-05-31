@@ -259,6 +259,8 @@ function get_networks()
 	numnet = k
 end
 
+finload = 0
+
 -%>
 <%+header%>
 
@@ -329,13 +331,18 @@ end
 					document.getElementById('runbtn').value="<%:Connect to Hotspot%>";
 					document.getElementById('runbtn').className="cbi-button cbi-button-success";
 					runbtn = "0";
+					document.getElementById('rad1').disabled=false;
 				}
 				else
 				{
 					document.getElementById('runbtn').value="<%:Disconnect from Hotspot%>";
 					document.getElementById('runbtn').className="cbi-button cbi-button-remove";
 					runbtn = "1";
+					document.getElementById('rad1').disabled=true;
 				} 
+				document.getElementById('runbtn').disabled=false;
+				document.getElementById('reconn').disabled=false;
+				document.getElementById('signal').disabled=false;
 			}
 			var ssid = rv.ssid;
 			switch(ssid) {
@@ -959,7 +966,7 @@ end
 	<table width="550"  border="0">
   	<tr>
 		<td width="17%">&nbsp;</td>
-		<td width="10%"><input type="button" id="runbtn" class="cbi-button cbi-button-success" value="<%:Connect to Hotspot%>" onclick="return btnenable(this)"</td>
+		<td width="10%"><input type="button" id="runbtn" class="cbi-button cbi-button-success" value="<%:Connect to Hotspot%>" onclick="return btnenable(this)" disabled </td>
 		<td width="73%">&nbsp;</td>
 	</tr>
 	</table>
@@ -974,7 +981,7 @@ end
   	<tr>
 		<td width="17%"><strong><%:Reconnection Attempts on Dropped Connection%></strong></td>
 		<td width="25%">
-			<select style="auto" name="reconn" id="reconn" onchange="reconnenable(this)">
+			<select style="auto" name="reconn" id="reconn" disabled onchange="reconnenable(this)">
 			<option value="1"><%:1%></option>
 			<option value="5" selected="selected"><%:5%></option>
 			<option value="99"><%:Continuous%></option>
@@ -986,7 +993,7 @@ end
 	<tr>
 		<td><strong><%:Connect to Hotspot with Strongest Signal%></strong></td>
 		<td>
-			<input type="checkbox" id="signal" onclick="sortsignal(this)">
+			<input type="checkbox" disabled id="signal" onclick="sortsignal(this)">
 		</td> 
 	</tr>
 	</table>
@@ -1009,7 +1016,7 @@ end
   	<tr>
     		<td width="17%"><div align="right"><strong><%:Wifi Radio Frequency :%></strong></div></td>
     		<td width="25%">
-				<select name="nrad" id="rad1" onchange="changeradio()" style="width:200px;">
+				<select name="nrad" id="rad1" disabled onchange="changeradio()" style="width:200px;">
 				</select>
 			</td>
 			<td width="66%">&nbsp;</td>
@@ -1116,7 +1123,7 @@ end
   	</tr>
 	</table>
 
-	<% get_networks() %>
+	<% get_networks() %> 
 	
 	<table width="15%"  border="0">
   	<tr>
