@@ -72,13 +72,15 @@ firstboot() {
 	fi
 	tone=$(echo "$DISTRIB_RELEASE" | grep "21.02")
 	
-	uci set dhcp.lan.master='1'
-	uci set dhcp.lan.ra='hybrid'
-	uci set dhcp.lan.ra_flags='none'
-	uci set dhcp.lan.dhcpv6='hybrid'
-	uci set dhcp.lan.ra_management='1'
-	uci commit dhcp
-	/etc/init.d/dnsmasq restart
+	if [ ! -e /etc/ipv6disable ]; then
+		uci set dhcp.lan.master='1'
+		uci set dhcp.lan.ra='hybrid'
+		uci set dhcp.lan.ra_flags='none'
+		uci set dhcp.lan.dhcpv6='hybrid'
+		uci set dhcp.lan.ra_management='1'
+		uci commit dhcp
+		/etc/init.d/dnsmasq restart
+	fi
 }
 
 if [ -e /tmp/installing ]; then
