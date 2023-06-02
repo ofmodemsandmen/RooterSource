@@ -78,9 +78,14 @@ firstboot() {
 		uci set dhcp.lan.ra_flags='none'
 		uci set dhcp.lan.dhcpv6='hybrid'
 		uci set dhcp.lan.ra_management='1'
-		uci commit dhcp
-		/etc/init.d/dnsmasq restart
+	else
+		uci set dhcp.lan.ra=''
+		uci set dhcp.lan.dhcpv6=''
+		uci set dhcp.lan.ra_management=''
+		uci set dhcp.lan.ra_flags='none'
 	fi
+	uci commit dhcp
+	/etc/init.d/dnsmasq restart
 }
 
 if [ -e /tmp/installing ]; then
