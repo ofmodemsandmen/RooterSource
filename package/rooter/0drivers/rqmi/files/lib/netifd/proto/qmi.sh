@@ -20,8 +20,6 @@ handle_ip() {
 	fi
 }
 
-log "Starting QMI"
-
 proto_qmi_init_config() {
 	available=1
 	no_device=1
@@ -45,6 +43,9 @@ proto_qmi_init_config() {
 }
 
 proto_qmi_setup() {
+
+	log "Starting QMI"
+
 	local interface="$1"
 	local dataformat connstat plmn_mode mcc mnc
 	local device apn auth username password pincode delay modes pdptype
