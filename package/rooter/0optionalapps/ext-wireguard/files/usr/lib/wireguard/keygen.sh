@@ -2,10 +2,15 @@
 . /lib/functions.sh
 
 log() {
-	logger -t "Wireguard KeyGen" "$@"
+	modlog "Wireguard KeyGen" "$@"
 }
 
 WG=$1
+
+ww=$(echo "$WG" | grep "https")
+if [ ! -z "$ww" ]; then
+	exit 0
+fi
 echo "$WG" > /tmp/wginst
 
 sleep 5
