@@ -8,6 +8,14 @@ released)
 		passwd -d root
 		reboot -f
 	fi
+	if [ "$SEEN" -gt 15 -a "$SEEN" -lt 25 ]
+	then
+		passwd -d root
+		uci set network.lan.ipaddr="192.168.1.1"
+		uci commit network
+		/etc/init.d/network restart
+		reboot -f
+	fi
 ;;
 esac
 return 0		
