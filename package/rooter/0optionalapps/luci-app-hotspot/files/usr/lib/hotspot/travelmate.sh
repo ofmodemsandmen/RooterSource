@@ -370,7 +370,10 @@ f_main()
 										uci set travelmate.global.trm_auto="1"
 										uci commit travelmate
 										# connection good
-										f_log "info" "Connected $ssid"
+										f_log "info" "Connected $ssid $wif"
+										if [ -e /usr/lib/hotspot/ledshow ]; then
+											/usr/lib/hotspot/ledshow $wif
+										fi
 										exit 0
 									fi
 									# bad connection try next Hotspot in list

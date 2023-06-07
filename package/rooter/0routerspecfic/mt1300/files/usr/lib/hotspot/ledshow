@@ -1,0 +1,24 @@
+#!/bin/sh 
+
+log() {
+	wifilog "Wifi Led" "$@"
+}
+
+
+wlan=$1
+
+SM=$(uci get system.wifi)
+if [ -z "$SM" ]; then
+	uci set system.wifi=led
+	uci set system.wifi.name="wifiled"
+	uci set system.wifi.sysfs="blue:run"
+	uci set system.wifi.trigger="netdev"
+	uci set system.wifi.mode="link tx rx"
+fi
+if [ "$wlan" = "2" ]; then
+	uci set system.wifi.dev="wlan0"
+else
+	uci set system.wifi.dev="wlan1"
+fi
+uci commit system
+/etc/init.d/led restart
