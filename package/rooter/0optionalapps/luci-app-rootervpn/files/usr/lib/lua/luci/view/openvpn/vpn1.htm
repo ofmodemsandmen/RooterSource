@@ -85,14 +85,14 @@
 		}
 	}
 	
-	XHR.get('<%=luci.dispatcher.build_url("admin", "vpn", "vpnstatus")%>', null,
+/*	XHR.get('<%=luci.dispatcher.build_url("admin", "vpn", "vpnstatus")%>', null,
 		function(x, rv)
 		{
 			__data2elements(x, rv); 
 		}
-	);
+	); */
 
-	XHR.poll(20, '<%=luci.dispatcher.build_url("admin", "vpn", "vpnstatus")%>', null,
+	XHR.poll(10, '<%=luci.dispatcher.build_url("admin", "vpn", "vpnstatus")%>', null,
 		function(x, rv)
 		{
 			__data2elements(x, rv); 
