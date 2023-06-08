@@ -7,6 +7,39 @@ log() {
 	modlog "Autoapn" "$@"
 }
 
+sortapn() {
+	while IFS= read -r line; do
+		read -r line
+		read -r line
+		read -r line
+		cgd=$line
+		break
+	done < /tmp/simmcc
+	qapn=$(echo "$cgd" | cut -d, -f3)
+	apn=$(echo "$qapn" | tr -d \" )
+
+	match=""
+	isplist=$( cat /tmp/apndata)
+	for isp in $isplist 
+	do
+		mapn=$(echo "$isp" | cut -d, -f2)
+		if [ "$mapn" = "$apn" ]; then
+			match="$isp"
+			break
+		fi
+	done
+	if [ ! -z "$match" ]; then
+		list="$match "
+		for isp in $isplist 
+		do
+			if [ "$isp" != "$match" ]; then
+				list=$list$isp" "
+			fi
+		done
+		echo "$list" > /tmp/apndata
+	fi
+}
+
 apnmcc=$(uci -q get profile.disable.mccapn)
 if [ "$apnmcc" != "1" ]; then
 	rm -f /tmp/apndata
@@ -114,8 +147,8 @@ if [ "$fnd" = "1" ]; then
 			fi
 		done
 		if [ "$cfnd" = "1" ]; then
-			#apndata="$mcc","$apn","$cname","$cuser","$ccid","$cpass","$cauth"
 			echo "$apndata" > /tmp/apndata
+			sortapn
 		fi
 	fi
 fi

@@ -215,18 +215,13 @@ proto_qmi_setup() {
 			CID=$(echo $isp | cut -d, -f5)
 			NUSER=$(echo $isp | cut -d, -f6)
 			NAUTH=$(echo $isp | cut -d, -f7)
-			if [ "$NPASS" = "nil" ]; then
-				NPASS=""
+			if [ "$NPASS" = "nil" -o "$NPASS" = "" ]; then
+				NPASS="NIL"
 			fi
-			if [ "$NUSER" = "nil" ]; then
-				NUSER=""
+			if [ "$NUSER" = "nil" -o "$NUSER" = "" ]; then
+				NUSER="NIL"
 			fi
-			if [ "$NPASS" = "NIL" ]; then
-				NPASS=""
-			fi
-			if [ "$NUSER" = "NIL" ]; then
-				NUSER=""
-			fi
+			
 			if [ "$NAUTH" = "nil" ]; then
 				NAUTH="0"
 			fi
@@ -252,6 +247,7 @@ proto_qmi_setup() {
 			pdptype="ipv4v6"
 			if [ "$pipv4" = "1" -a "$creg" = "5" ]; then
 				pdptype="ipv4"
+				IPVAR="IP"
 				log "Roaming"
 			else
 				log "Not Roaming"
@@ -267,6 +263,14 @@ proto_qmi_setup() {
 					;;
 				esac
 			fi
+			ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\""
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=$CFUNOFF")
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")
+			sleep 3
+			ATCMDD="AT+CGDCONT?"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			log "$OX"
 
 			pdptype=$(echo "$pdptype" | awk '{print tolower($0)}')
 			[ "$pdptype" = "ip" -o "$pdptype" = "ipv6" -o "$pdptype" = "ipv4v6" ] || pdptype="ip"

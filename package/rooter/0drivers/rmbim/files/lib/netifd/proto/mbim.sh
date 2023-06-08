@@ -263,6 +263,7 @@ _proto_mbim_setup() {
 		NAUTH=$(echo $isp | cut -d, -f7)
 		if [ "$pipv4" = "1" -a "$creg" = "5" ]; then
 			ipt="ipv4:"
+			IPVAR="IP"
 			log "Roaming"
 		else
 			log "Not Roaming"
@@ -279,10 +280,18 @@ _proto_mbim_setup() {
 				;;
 			esac
 		fi
-		if [ "$NPASS" = "nil" ]; then
+		ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\""
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=$CFUNOFF")
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")
+		sleep 3
+		ATCMDD="AT+CGDCONT?"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		log "$OX"
+		if [ "$NPASS" = "nil" -o "$NPASS" = "" ]; then
 			NPASS="NIL"
 		fi
-		if [ "$NUSER" = "nil" ]; then
+		if [ "$NUSER" = "nil" -o "$NUSER" = "" ]; then
 			NUSER="NIL"
 		fi
 		if [ "$NAUTH" = "nil" ]; then
