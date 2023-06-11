@@ -355,39 +355,7 @@ proto_qmi_setup() {
 			if [ $conn -eq 1 ]; then
 				break;
 			fi
-			log "Stop Network"
-			uqmi -s -d "$device" --stop-network 0xffffffff --autoconnect > /dev/null 2>&1
-			uqmi -s -d "$device" --sync > /dev/null 2>&1
-			uqmi -s -d "$device" --network-register > /dev/null 2>&1
-			sleep 3
-			registration_timeout=0
-			registration_state=""
-			while true; do
-				registration_state=$(uqmi -s -d "$device" --get-serving-system 2>/dev/null | jsonfilter -e "@.registration" 2>/dev/null)
-				log "Registration State : $registration_state"
-				[ "$registration_state" = "registered" ] && break
 
-				if [ "$registration_state" = "searching" ] || [ "$registration_state" = "not_registered" ]; then
-					if [ "$registration_timeout" -lt "$timeout" ] || [ "$timeout" = "0" ]; then
-						[ "$registration_state" = "searching" ] || {
-							log "Device stopped network registration. Restart network registration"
-							uqmi -s -d "$device" --network-register > /dev/null 2>&1
-						}
-						let registration_timeout++
-						sleep 1
-						continue
-					fi
-					log "Network registration failed, registration timeout reached"
-				else
-					# registration_state is 'registration_denied' or 'unknown' or ''
-					log "Network registration failed (reason: '$registration_state')"
-				fi
-
-				proto_notify_error "$interface" NETWORK_REGISTRATION_FAILED
-				proto_block_restart "$interface"
-				/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 &
-				return 1
-			done
 		done
 
 	if [ $conn -eq 0 ]; then
