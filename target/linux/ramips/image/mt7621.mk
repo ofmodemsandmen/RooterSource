@@ -790,6 +790,6 @@ define Device/dualq-h721-256m-16m
   IMAGE_SIZE := 16064k
   DEVICE_TITLE := DualQ H721 (256M RAM/16M flash)
   DEVICE_PACKAGES := kmod-ata-core kmod-ata-ahci kmod-sdhci-mt7620 kmod-usb3
-  SUPPORTED_DEVICES += h721-256M-16M
+  SUPPORTED_DEVICES += dualq-h721-256m-16m
 endef
 TARGET_DEVICES += dualq-h721-256m-16m

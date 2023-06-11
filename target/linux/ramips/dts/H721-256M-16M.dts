@@ -40,7 +40,7 @@
 #include <dt-bindings/input/input.h>
 
 / {
-	compatible = "dualq,h721-256m-16m", "dualq,h721", "mediatek,mt7621-soc";
+	compatible = "dualq-h721-256m-16m", "dualq,h721", "mediatek,mt7621-soc";
 	model = "DualQ H721 (256M RAM/16M flash)";
 
 	memory@0 {

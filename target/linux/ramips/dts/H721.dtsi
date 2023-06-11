@@ -38,7 +38,7 @@
 #include <dt-bindings/input/input.h>
 
 / {
-	compatible = "dualq,h721", "mediatek,mt7621-soc";
+	compatible = "dualq-h721-256m-16m", "mediatek,mt7621-soc";
 
 	aliases {
 		led-boot = &led_status;
