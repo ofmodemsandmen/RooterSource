@@ -14,9 +14,7 @@ define Package/h721
   SECTION:=utils
   CATEGORY:=ROOter
   SUBMENU:=Router Specific
-  DEPENDS:=+kmod-ath10k +kmod-ath9k \
-	 +ath10k-firmware-qca988x +ath10k-firmware-qca9984 \
-	 +ath10k-firmware-qca99x0 +ath10k-firmware-qca9888
+  DEPENDS:=+kmod-ath10k-ct +kmod-ath9k
   TITLE:=Install scripts for Dual-Q H721
   PKGARCH:=all
 endef

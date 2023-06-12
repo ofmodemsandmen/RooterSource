@@ -1612,17 +1612,17 @@ CONFIG_ZABBIX_POSTGRESQL=y
 # CONFIG_PACKAGE_ath10k-firmware-qca9887 is not set
 # CONFIG_PACKAGE_ath10k-firmware-qca9887-ct is not set
 # CONFIG_PACKAGE_ath10k-firmware-qca9887-ct-htt is not set
-CONFIG_PACKAGE_ath10k-firmware-qca9888=y
-# CONFIG_PACKAGE_ath10k-firmware-qca9888-ct is not set
+# CONFIG_PACKAGE_ath10k-firmware-qca9888 is not set
+CONFIG_PACKAGE_ath10k-firmware-qca9888-ct=y
 # CONFIG_PACKAGE_ath10k-firmware-qca9888-ct-htt is not set
-CONFIG_PACKAGE_ath10k-firmware-qca988x=y
-# CONFIG_PACKAGE_ath10k-firmware-qca988x-ct is not set
+# CONFIG_PACKAGE_ath10k-firmware-qca988x is not set
+CONFIG_PACKAGE_ath10k-firmware-qca988x-ct=y
 # CONFIG_PACKAGE_ath10k-firmware-qca988x-ct-htt is not set
-CONFIG_PACKAGE_ath10k-firmware-qca9984=y
-# CONFIG_PACKAGE_ath10k-firmware-qca9984-ct is not set
+# CONFIG_PACKAGE_ath10k-firmware-qca9984 is not set
+CONFIG_PACKAGE_ath10k-firmware-qca9984-ct=y
 # CONFIG_PACKAGE_ath10k-firmware-qca9984-ct-htt is not set
-CONFIG_PACKAGE_ath10k-firmware-qca99x0=y
-# CONFIG_PACKAGE_ath10k-firmware-qca99x0-ct is not set
+# CONFIG_PACKAGE_ath10k-firmware-qca99x0 is not set
+CONFIG_PACKAGE_ath10k-firmware-qca99x0-ct=y
 # CONFIG_PACKAGE_ath10k-firmware-qca99x0-ct-htt is not set
 # CONFIG_PACKAGE_ath6k-firmware is not set
 # CONFIG_PACKAGE_ath9k-htc-firmware is not set
@@ -2344,7 +2344,7 @@ CONFIG_ATH_USER_REGD=y
 # CONFIG_PACKAGE_ATH_DEBUG is not set
 CONFIG_PACKAGE_ATH_DFS=y
 # CONFIG_PACKAGE_ATH_DYNACK is not set
-CONFIG_PACKAGE_kmod-ath10k=y
+# CONFIG_PACKAGE_kmod-ath10k is not set
 CONFIG_ATH10K_LEDS=y
 # CONFIG_ATH10K_THERMAL is not set
 CONFIG_PACKAGE_kmod-ath10k-ct=y
