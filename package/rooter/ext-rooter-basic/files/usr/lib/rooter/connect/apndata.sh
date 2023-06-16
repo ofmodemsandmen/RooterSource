@@ -40,9 +40,13 @@ sortapn() {
 	fi
 }
 
+rm -f /tmp/apndata
+sel=$(uci -q get country.general.selected)
+if [ "$sel" = "1" ]; then
+	exit 0
+fi
 apnmcc=$(uci -q get profile.disable.mccapn)
 if [ "$apnmcc" != "1" ]; then
-	rm -f /tmp/apndata
 	exit 0
 fi
 CURRMODEM=$1
