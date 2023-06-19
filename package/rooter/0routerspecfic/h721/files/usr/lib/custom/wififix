@@ -1,6 +1,10 @@
 #!/bin/sh
 . /lib/functions.sh
 
+log() {
+	modlog "Wififix" "$@"
+}
+
 cnt_radio() {
 	let CNT=$CNT+1
 }
@@ -33,13 +37,13 @@ gather() {
 	if [ ! -z "$chk" ]; then
 		cap="AC"
 	fi
-	echo "$RAD $PHY $band"
+	#log "$RAD $PHY $band"
 }
 
 set2() {
 	srad=$1
 	chan=$(uci -q get wireless.radio$srad.channel)
-	if [ "$chan" -gt 20 ]; then
+	#if [ "$chan" -gt 20 ]; then
 		uci set wireless.radio$srad.channel='3'
 		uci set wireless.radio$srad.htmode='HT40'
 		uci set wireless.radio$srad.band='2g'
@@ -48,7 +52,7 @@ set2() {
 		uci set wireless.default_radio$srad.ssid="$ssid"
 		uci commit wireless
 		cflg=1
-	fi
+	#fi
 }
 
 set5() {
@@ -108,37 +112,37 @@ if [ "$CNT" -eq 2 ]; then
 	gather 1
 	band1=$band
 	cap1=$cap
-echo "$band0 $cap0 $band1 $cap1"
+#log "$band0 $cap0 $band1 $cap1"
 	if [ "$band0" -eq 1 ]; then # 2.4ghz
 		if [ "$band1" -ne 1 ]; then
-			echo "2.4Ghz radio 0 2.4Ghz  Radio 1 5Ghz"
+			log "2.4Ghz radio 0 2.4Ghz  Radio 1 5Ghz"
 			process 0 1
 		fi
 	else
 		if [ "$band0" -eq 2 ]; then # 5Ghz
 			if [ "$band1" -eq 1 ]; then
-				echo "5Ghz radio 0 5Ghz  Radio 1 2.4Ghz"
+				log "5Ghz radio 0 5Ghz  Radio 1 2.4Ghz"
 				process 1 0
 			else
 				if [ "$band1" -ne 2 ]; then
-					echo "5Ghz radio 0 5Ghz  Radio 1 2.4Ghz"
+					log "5Ghz radio 0 5Ghz  Radio 1 2.4Ghz"
 					process 1 0
 				fi
 			fi
 		else # dual
 			if [ "$band1" -eq 1 ]; then
-				echo "Dual radio 0 5Ghz  2.4Ghz Radio 1 2.4Ghz"
+				log "Dual radio 0 5Ghz  2.4Ghz Radio 1 2.4Ghz"
 				process 1 0
 			else
 				if [ "$band1" -eq 2 ]; then
-					echo "Dual radio 0 2.4Ghz  5Ghz Radio 1 5Ghz"
+					log "Dual radio 0 2.4Ghz  5Ghz Radio 1 5Ghz"
 					process 0 1
 				else
 					if [ "$cap0" = "AC" ]; then
-						echo "Dual AC radio 0 5Ghz  Dual Radio 1 2.4Ghz"
+						log "Dual AC radio 0 5Ghz  Dual Radio 1 2.4Ghz"
 						process 1 0
 					else
-						echo "Dual N radio 0 2.4Ghz  Dual Radio 1 5Ghz"
+						log "Dual N radio 0 2.4Ghz  Dual Radio 1 5Ghz"
 						process 0 1
 					fi
 				fi
