@@ -1,120 +1,150 @@
 #!/bin/sh
 . /lib/functions.sh
 
-log() {
-	modlog "Custom Ping Test " "$@"
+cnt_radio() {
+	let CNT=$CNT+1
 }
 
-count_radio() {
-	local config=$1
-	local channel
-
-	let radcnt=radcnt+1
-}
-
-
-	if [ -e /etc/fixradio ]; then
-		exit 0
+gather() {
+	RAD=$1
+	PHY=$(uci -q get wireless.radio$RAD.phy)
+	info=$( iw phy $PHY info)
+	b24=0
+	chk=$(echo "$info" | grep "Band 1:")
+	if [ ! -z "$chk" ]; then
+		b24=1
 	fi
-	radcnt=0
+	b58=0
+	chk=$(echo "$info" | grep "Band 2:")
+	if [ ! -z "$chk" ]; then
+		b58=1
+	fi
+	if [ "$b24" -eq 1 -a "$b58" -eq 0 ]; then
+		band=1
+	fi
+	if [ "$b24" -eq 0 -a "$b58" -eq 1 ]; then
+		band=2
+	fi
+	if [ "$b24" -eq 1 -a "$b58" -eq 1 ]; then
+		band=3
+	fi
+	cap="N"
+	chk=$(echo "$info" | grep "VHT Capabilities")
+	if [ ! -z "$chk" ]; then
+		cap="AC"
+	fi
+	echo "$RAD $PHY $band"
+}
 
-	config_load wireless
-	config_foreach count_radio wifi-device
-	if [ "$radcnt" -eq 2 ]; then
-		for i in $(seq $radcnt); do
-			let j=$i-1
-			info=$(iwinfo wlan$j info)
-			echo "$info" > /tmp/info
-			while IFS= read -r line; do
-				read -r line
-				read -r line
-				chan=$(echo "$line"  | tr " " ",")
-				chan=$(echo $chan | cut -d, -f5)
-				
-				if [ "$j" -eq 0 ]; then
-					chan0=$chan
-				else
-					chan1=$chan
-				fi
-				read -r line
-				read -r line
-				read -r line
-				read -r line
-				read -r line
-				read -r line
-				ac=$(echo "$line" | grep "802.11ac")
-				if [ ! -z "$ac" ]; then
-					if [ "$j" -eq 0 ]; then
-						ac0="AC"
-					else
-						ac1="AC"
-					fi
-				else
-					if [ "$j" -eq 0 ]; then
-						ac0="N"
-					else
-						ac1="N"
-					fi
-				fi
-				break
-			done < /tmp/info
-		done
-		if [ "$ac0" = "AC" -a "$chan0" -gt 15 ]; then
-			uci set wireless.radio1.channel='7'
-			uci set wireless.radio1.band='2g'
-			uci set wireless.radio1.htmode='HT20'
-			ssid=$(uci -q get wireless.default_radio1.ssid)
-			fg=$(echo $ssid | grep "5G")
-			if [ ! -z "$fg" ]; then
-				ssid=$( echo "$ssid" | sed -e "s!5G!2G!g")
-				uci set wireless.default_radio1.ssid="$ssid"
-			fi
-			uci commit wireless
-		else
-			if [ "$ac0" = "N" -a "$ac1" = "AC" ]; then
-				uci set wireless.radio1.channel='44'
-				uci set wireless.radio1.band='5g'
-				uci set wireless.radio1.htmode='VHT80'
-				ssid=$(uci -q get wireless.default_radio1.ssid)
-				fg=$(echo $ssid | grep "2G")
-				if [ ! -z "$fg" ]; then
-					ssid=$( echo "$ssid" | sed -e "s!2G!5G!g")
-					uci set wireless.default_radio1.ssid="$ssid"
-				fi
-				uci set wireless.radio0.channel='7'
-				uci set wireless.radio0.band='2g'
-				uci set wireless.radio0.htmode='HT20'
-				ssid=$(uci -q get wireless.default_radio0.ssid)
-				fg=$(echo $ssid | grep "5G")
-				if [ ! -z "$fg" ]; then
-					ssid=$( echo "$ssid" | sed -e "s!5G!2G!g")
-					uci set wireless.default_radio0.ssid="$ssid"
-				fi
-				uci commit wireless
-			else
-				uci set wireless.radio1.channel='44'
-				uci set wireless.radio1.band='5g'
-				uci set wireless.radio1.htmode='VHT80'
-				ssid=$(uci -q get wireless.default_radio1.ssid)
-				fg=$(echo $ssid | grep "2G")
-				if [ ! -z "$fg" ]; then
-					ssid=$( echo "$ssid" | sed -e "s!2G!5G!g")
-					uci set wireless.default_radio1.ssid="$ssid"
-				fi
-				uci set wireless.radio0.channel='7'
-				uci set wireless.radio0.band='2g'
-				uci set wireless.radio0.htmode='HT20'
-				ssid=$(uci -q get wireless.default_radio0.ssid)
-				fg=$(echo $ssid | grep "5G")
-				if [ ! -z "$fg" ]; then
-					ssid=$( echo "$ssid" | sed -e "s!5G!2G!g")
-					uci set wireless.default_radio0.ssid="$ssid"
-				fi
+set2() {
+	srad=$1
+	chan=$(uci -q get wireless.radio$srad.channel)
+	if [ "$chan" -gt 20 ]; then
+		uci set wireless.radio$srad.channel='3'
+		uci set wireless.radio$srad.htmode='HT40'
+		uci set wireless.radio$srad.band='2g'
+		ssid=$(uci -q get wireless.default_radio$srad.ssid)
+		ssid=$(echo "$ssid" | sed "s/5G/2G/g")
+		uci set wireless.default_radio$srad.ssid="$ssid"
 		uci commit wireless
+		cflg=1
+	fi
+}
+
+set5() {
+	srad=$1
+	chan=$(uci -q get wireless.radio$srad.channel)
+	capw=$cap0
+	if [ "$srad" -eq 1 ]; then
+		capw=$cap1
+	fi
+	if [ "$capw" = "N" ]; then
+		uci set wireless.radio$srad.channel='44'
+		uci set wireless.radio$srad.htmode='HT40'
+		uci set wireless.radio$srad.band='5g'
+	else
+		uci set wireless.radio$srad.channel='44'
+		uci set wireless.radio$srad.htmode='VHT80'
+		uci set wireless.radio$srad.band='5g'
+		uci set wireless.radio$srad.cell_density='0'
+	fi
+	ssid=$(uci -q get wireless.default_radio$srad.ssid)
+	ssid=$(echo "$ssid" | sed "s/2G/5G/g")
+	uci set wireless.default_radio$srad.ssid="$ssid"
+	uci commit wireless
+	cflg=1
+}
+
+process() {
+	cflg=0
+	rad0=$1
+	rad1=$2
+	if [ "$rad0" = "0" ]; then
+		set2 0
+	else
+		set5 0
+	fi
+	if [ "$rad1" = "0" ]; then
+		set2 1
+	else
+		set5 1
+	fi
+	if [ "$cflg" -eq 1 ]; then
+		wifi reload
+	fi
+}
+
+if [ -e /etc/wififix ]; then
+	exit 0
+fi
+CNT=0
+config_load wireless
+config_foreach cnt_radio wifi-device
+
+if [ "$CNT" -eq 2 ]; then
+	gather 0
+	band0=$band
+	cap0=$cap
+	gather 1
+	band1=$band
+	cap1=$cap
+echo "$band0 $cap0 $band1 $cap1"
+	if [ "$band0" -eq 1 ]; then # 2.4ghz
+		if [ "$band1" -ne 1 ]; then
+			echo "2.4Ghz radio 0 2.4Ghz  Radio 1 5Ghz"
+			process 0 1
+		fi
+	else
+		if [ "$band0" -eq 2 ]; then # 5Ghz
+			if [ "$band1" -eq 1 ]; then
+				echo "5Ghz radio 0 5Ghz  Radio 1 2.4Ghz"
+				process 1 0
+			else
+				if [ "$band1" -ne 2 ]; then
+					echo "5Ghz radio 0 5Ghz  Radio 1 2.4Ghz"
+					process 1 0
+				fi
+			fi
+		else # dual
+			if [ "$band1" -eq 1 ]; then
+				echo "Dual radio 0 5Ghz  2.4Ghz Radio 1 2.4Ghz"
+				process 1 0
+			else
+				if [ "$band1" -eq 2 ]; then
+					echo "Dual radio 0 2.4Ghz  5Ghz Radio 1 5Ghz"
+					process 0 1
+				else
+					if [ "$cap0" = "AC" ]; then
+						echo "Dual AC radio 0 5Ghz  Dual Radio 1 2.4Ghz"
+						process 1 0
+					else
+						echo "Dual N radio 0 2.4Ghz  Dual Radio 1 5Ghz"
+						process 0 1
+					fi
+				fi
 			fi
 		fi
-		wifi up
-	fi
-	echo "0" > /etc/fixradio
-	sleep 10
 
+	fi
+fi
+echo "0" > /etc/wififix

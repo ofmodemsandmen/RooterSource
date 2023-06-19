@@ -80,7 +80,7 @@ detect_mac80211() {
 		channel="11"
 		htmode=""
 		ht_capab=""
-
+		wphy="$dev"
 		iw phy "$dev" info | grep -q 'Capabilities:' && htmode=HT40
 
 		iw phy "$dev" info | grep -q '5180 MHz' && {
@@ -159,6 +159,7 @@ detect_mac80211() {
 			set wireless.radio${devidx}.noscan=1
 			set wireless.radio${devidx}.country='US'
 			set wireless.radio${devidx}.txpower=20
+			set wireless.radio${devidx}.phy="$wphy"
 
 			set wireless.default_radio${devidx}=wifi-iface
 			set wireless.default_radio${devidx}.device=radio${devidx}
