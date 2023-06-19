@@ -243,7 +243,7 @@ return view.extend({
 					]));
 
 				if (allow_backup)
-					keep.checked = true;
+					keep.checked = false;
 				else
 					keep.disabled = true;
 
