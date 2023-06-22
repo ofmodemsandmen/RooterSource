@@ -470,12 +470,8 @@ msgstr "Gespeicherte Zeiträume"
 
 #: applications/luci-app-nlbwmon/luasrc/model/cbi/nlbw/config.lua:13
 msgid ""
-"The Netlink Bandwidth Monitor (nlbwmon) is a lightweight, efficient traffic "
-"accounting program keeping track of bandwidth usage per host and protocol."
-msgstr ""
-"Der Netlink-Bandbreitenmonitor (nlbwmon) ist ein leichtes, effizientes "
-"Programm zur Datenverkehrsabrechnung, das die Bandbreitennutzung pro Host "
-"und Protokoll verfolgt."
+"Configure Usage Statistics"
+msgstr "Konfigurieren Sie die Nutzungsstatistik"
 
 #: applications/luci-app-nlbwmon/luasrc/controller/nlbw.lua:216
 msgid "The following database files have been restored: %s"
