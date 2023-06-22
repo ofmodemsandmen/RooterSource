@@ -14,6 +14,7 @@ define Package/bwmon
   SECTION:=utils
   CATEGORY:=ROOter
   SUBMENU:=Optional Applications
+  DEPENDS:=+luci-app-nlbwmon
   TITLE:=Install Bandwidth Monitor
   PKGARCH:=all
 endef

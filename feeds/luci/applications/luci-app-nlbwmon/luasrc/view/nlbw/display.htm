@@ -5,12 +5,12 @@
 
 <%+header%>
 
-<link rel="stylesheet" href="<%=resource%>/view/nlbw.css" />
+<link rel="stylesheet" href="<%=resource%>/view/nlbw.css?v=git-123.168.52625-8e8b461" />
 
-<script type="text/javascript" src="<%=resource%>/nlbw.chart.min.js"></script>
-<script type="text/javascript" src="<%=resource%>/view/nlbw.js"></script>
+<script type="text/javascript" src="<%=resource%>/nlbw.chart.min.js?v=git-123.168.52625-8e8b461"></script>
+<script type="text/javascript" src="<%=resource%>/view/nlbw.js?v=git-123.168.52625-8e8b461"></script>
 
-<h2 name="content"><%:Netlink Bandwidth Monitor%></h2>
+<h2 name="content"><%:Usage Statistics%></h2>
 
 <p>
 	<%:Select accounting period:%>
@@ -134,6 +134,12 @@
 				</div>
 			</div>
 		</div>
+	</div>
+
+	<div class="cbi-page-actions right">
+		<form class="inline" action="<%=REQUEST_URI%>" method="get">
+			<input class="cbi-button cbi-button-add cbi-input-find" type="submit" value="<%:Refresh Statistics%>" />
+		</form>
 	</div>
 
 	<div class="cbi-section" data-tab="export" data-tab-title="<%:Export%>">

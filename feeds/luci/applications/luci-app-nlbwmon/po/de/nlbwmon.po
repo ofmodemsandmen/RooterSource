@@ -385,16 +385,16 @@ msgstr ""
 "unbeschränkt."
 
 #: applications/luci-app-nlbwmon/luasrc/view/nlbw/display.htm:13
-msgid "Netlink Bandwidth Monitor"
-msgstr "Netlink-Bandbreitenmonitor"
+msgid "Usage Statistics"
+msgstr "Nutzungsstatistiken"
 
 #: applications/luci-app-nlbwmon/luasrc/view/nlbw/backup.htm:9
-msgid "Netlink Bandwidth Monitor - Backup / Restore"
-msgstr "Netlink-Bandbreitenmonitor - Sichern/Wiederherstellen"
+msgid "Backup / Restore"
+msgstr "Sichern/Wiederherstellen"
 
 #: applications/luci-app-nlbwmon/luasrc/model/cbi/nlbw/config.lua:12
-msgid "Netlink Bandwidth Monitor - Configuration"
-msgstr "Netlink-Bandbreitenmonitor - Konfiguration"
+msgid "Configuration"
+msgstr "Konfiguration"
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw.js:475
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw.js:533
@@ -568,3 +568,5 @@ msgstr "kein Datenverkehr"
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw.js:522
 msgid "other"
 msgstr "anderes"
+msgid "Refresh Statistics"
+msgstr "Statistiken aktualisieren"
