@@ -31,6 +31,7 @@ var backflg = "0";
 		rollover = rv.rollover;
 		enabled = rv.enabled;
 		bwenabled = rv.bwenabled;
+		usenabled = rv.usenabled;
 		if ( rv.bwwan == "0" )
 		{
 			document.getElementById('wwanf').checked=false;
@@ -52,6 +53,12 @@ var backflg = "0";
 					bwe = false
 				}
 				document.getElementById('bwenb').checked=bwe;
+				ue = true;
+				if ( usenabled == "0" )
+				{
+					ue = false
+				}
+				document.getElementById('usenb').checked=ue;
 				if ( bwlock == 1 )
 				{
 					document.getElementById("allocate").style.visibility="visible";
@@ -278,6 +285,21 @@ var backflg = "0";
 		);
 	}
 	
+	function usenable(btn)
+	{
+		dx = 0;
+		if ( btn.checked == true )
+		{
+			dx = 1;
+		}
+		XHR.get('<%=luci.dispatcher.build_url("admin", "nlbw", "change_usenable")%>',
+			{ set: dx },
+			function()
+			{
+			}
+		);
+	}
+	
 	function applyb(btn)
 	{
 		bspd=document.getElementById("bwinter").value;
@@ -370,6 +392,13 @@ var backflg = "0";
 	</div>
 	
 	<table border="0" id="totalc">
+		<tr>
+			<td width="20%"><div align="right" style="font-size : 17px" id="enableus"><strong><%:Enable User Statistics%></strong></div></td>
+			<td width="15%"><div align="center" id="usflag"><input type="checkbox" id="usenb" onclick="usenable(this)" /></div></td>
+			<td width="15%"></td>
+			<td width="15%"></td>
+			<td width="35%"></td>
+		</tr>
 		<tr>
 			<td width="20%"><div align="right" style="font-size : 17px" id="enablebw"><strong><%:Enable Data Backup%></strong></div></td>
 			<td width="15%"><div align="center" id="bwflag"><input type="checkbox" id="bwenb" onclick="bwenable(this)" /></div></td>
