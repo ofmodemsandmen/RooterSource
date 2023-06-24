@@ -208,7 +208,9 @@ proto_qmi_setup() {
 			
 	isplist=$(uci -q get modem.modeminfo$CURRMODEM.isplist)
 	apn2=$(uci -q get modem.modeminfo$CURRMODEM.apn2)
-	for isp in $isplist 
+	for wcnt in 1 2 3
+	do
+		for isp in $isplist 
 		do
 			NAPN=$(echo $isp | cut -d, -f2)
 			NPASS=$(echo $isp | cut -d, -f4)
@@ -357,6 +359,7 @@ proto_qmi_setup() {
 			fi
 
 		done
+	done
 
 	if [ $conn -eq 0 ]; then
 		proto_notify_error "$interface" CALL_FAILED

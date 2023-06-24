@@ -254,91 +254,94 @@ _proto_mbim_setup() {
 
 	tid=$((tid + 1))
 
-	for isp in $isplist 
+	for wcnt in 1 2 3
 	do
-		NAPN=$(echo $isp | cut -d, -f2)
-		NPASS=$(echo $isp | cut -d, -f4)
-		CID=$(echo $isp | cut -d, -f5)
-		NUSER=$(echo $isp | cut -d, -f6)
-		NAUTH=$(echo $isp | cut -d, -f7)
-		if [ "$pipv4" = "1" -a "$creg" = "5" ]; then
-			ipt="ipv4:"
-			IPVAR="IP"
-			log "Roaming"
-		else
-			log "Not Roaming"
-			IPVAR=$(echo $isp | cut -d, -f8)
-			case "$IPVAR" in
-				"IP" )
-					ipt="ipv4:"
+		for isp in $isplist 
+		do
+			NAPN=$(echo $isp | cut -d, -f2)
+			NPASS=$(echo $isp | cut -d, -f4)
+			CID=$(echo $isp | cut -d, -f5)
+			NUSER=$(echo $isp | cut -d, -f6)
+			NAUTH=$(echo $isp | cut -d, -f7)
+			if [ "$pipv4" = "1" -a "$creg" = "5" ]; then
+				ipt="ipv4:"
+				IPVAR="IP"
+				log "Roaming"
+			else
+				log "Not Roaming"
+				IPVAR=$(echo $isp | cut -d, -f8)
+				case "$IPVAR" in
+					"IP" )
+						ipt="ipv4:"
+					;;
+					"IPV6" )
+						ipt="ipv6:"
+					;;
+					"IPV4V6" )
+						ipt="ipv4v6:"
+					;;
+				esac
+			fi
+			ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\""
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=$CFUNOFF")
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")
+			sleep 3
+			ATCMDD="AT+CGDCONT?"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			log "$OX"
+			if [ "$NPASS" = "nil" -o "$NPASS" = "" ]; then
+				NPASS="NIL"
+			fi
+			if [ "$NUSER" = "nil" -o "$NUSER" = "" ]; then
+				NUSER="NIL"
+			fi
+			if [ "$NAUTH" = "nil" ]; then
+				NAUTH="0"
+			fi
+			apn=$NAPN
+			username="$NUSER"
+			password="$NPASS"
+			auth=$NAUTH
+			case $auth in
+				"0" )
+					auth="none"
 				;;
-				"IPV6" )
-					ipt="ipv6:"
+				"1" )
+					auth="pap"
 				;;
-				"IPV4V6" )
-					ipt="ipv4v6:"
+				"2" )
+					auth="chap"
+				;;
+				"*" )
+					auth="none"
 				;;
 			esac
-		fi
-		ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\""
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=$CFUNOFF")
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")
-		sleep 3
-		ATCMDD="AT+CGDCONT?"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		log "$OX"
-		if [ "$NPASS" = "nil" -o "$NPASS" = "" ]; then
-			NPASS="NIL"
-		fi
-		if [ "$NUSER" = "nil" -o "$NUSER" = "" ]; then
-			NUSER="NIL"
-		fi
-		if [ "$NAUTH" = "nil" ]; then
-			NAUTH="0"
-		fi
-		apn=$NAPN
-		username="$NUSER"
-		password="$NPASS"
-		auth=$NAUTH
-		case $auth in
-			"0" )
-				auth="none"
-			;;
-			"1" )
-				auth="pap"
-			;;
-			"2" )
-				auth="chap"
-			;;
-			"*" )
-				auth="none"
-			;;
-		esac
-		
-		if [ ! -e /etc/config/isp ]; then
-			log "Connect to network using $apn"
-		else
-			log "Connect to network"
-		fi
-		
-		if [ ! -e /etc/config/isp ]; then
-			log "$ipt $apn $auth $username $password"
-		fi
-		
-		tidd=0
-		tcnt=4
-		while ! umbim $DBG -n -t $tid -d $device connect "$ipt""$apn" "$auth" "$username" "$password"; do
-			tid=$((tid + 1))
-			sleep 1;
-			tidd=$((tidd + 1))
-			if [ $tidd -gt $tcnt ]; then
-				break;
+			
+			if [ ! -e /etc/config/isp ]; then
+				log "Connect to network using $apn"
+			else
+				log "Connect to network"
+			fi
+			
+			if [ ! -e /etc/config/isp ]; then
+				log "$ipt $apn $auth $username $password"
+			fi
+			
+			tidd=0
+			tcnt=4
+			while ! umbim $DBG -n -t $tid -d $device connect "$ipt""$apn" "$auth" "$username" "$password"; do
+				tid=$((tid + 1))
+				sleep 1;
+				tidd=$((tidd + 1))
+				if [ $tidd -gt $tcnt ]; then
+					break;
+				fi
+			done
+			if [ $tidd -le $tcnt ]; then
+				break
 			fi
 		done
-		if [ $tidd -le $tcnt ]; then
-			break
-		fi
 	done
 	if [ $tidd -gt $tcnt ]; then
 		log "Failed to connect to network"
