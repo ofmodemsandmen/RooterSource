@@ -114,7 +114,7 @@ else # restart
 	uci set network.wan$CURRMODEM.metric=$CURRMODEM"0"
 	uci commit network
 	/etc/init.d/network reload
-	if [ "$2" != "9" ]; then
+	#if [ "$2" != "9" ]; then
 		echo "1" > /tmp/modgone
 		log "Hard USB reset done"
 		if [ -e $ROOTER/connect/chkconn.sh ]; then
@@ -128,7 +128,7 @@ else # restart
 			sleep 1
 		done
 		echo $PORT > /sys/bus/usb/drivers/usb/bind
-	fi
+	#fi
 	
 	if [ -e $ROOTER/modem-led.sh ]; then
 		$ROOTER/modem-led.sh $CURRMODEM 0
