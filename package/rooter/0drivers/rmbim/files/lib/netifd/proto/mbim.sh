@@ -342,6 +342,9 @@ _proto_mbim_setup() {
 				break
 			fi
 		done
+		if [ $tidd -le $tcnt ]; then
+			break
+		fi
 	done
 	if [ $tidd -gt $tcnt ]; then
 		log "Failed to connect to network"

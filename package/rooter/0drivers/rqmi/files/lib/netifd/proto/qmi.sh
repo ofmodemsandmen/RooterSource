@@ -359,6 +359,9 @@ proto_qmi_setup() {
 			fi
 
 		done
+		if [ $conn -eq 1 ]; then
+			break;
+		fi
 	done
 
 	if [ $conn -eq 0 ]; then
