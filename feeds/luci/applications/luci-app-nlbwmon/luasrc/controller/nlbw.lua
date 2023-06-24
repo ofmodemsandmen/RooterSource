@@ -4,17 +4,20 @@
 module("luci.controller.nlbw", package.seeall)
 
 function index()
-	entry({"admin", "nlbw", "usage"}, alias("admin", "nlbw", "usage", "display"), _("Usage Statistics"), 60)
-	
-	entry({"admin", "nlbw", "usage", "display"}, template("nlbw/display"), _("Display"), 1).leaf=true
-	entry({"admin", "nlbw", "usage", "config"}, cbi("nlbw/config"), _("Configuration"), 2).leaf=true
-	entry({"admin", "nlbw", "usage", "backup"}, template("nlbw/backup"), _("Backup"), 3).leaf=true
-	entry({"admin", "nlbw", "data"}, call("action_data"), nil, 4)
-	entry({"admin", "nlbw", "list"}, call("action_list"), nil, 5)
-	entry({"admin", "nlbw", "ptr"}, call("action_ptr"), nil, 6).leaf = true
-	entry({"admin", "nlbw", "download"}, call("action_download"), nil, 7)
-	entry({"admin", "nlbw", "restore"}, post("action_restore"), nil, 8)
-	entry({"admin", "nlbw", "commit"}, call("action_commit"), nil, 9)
+	local lock = luci.model.uci.cursor():get("nlbwmon", "nlbwmon", "enabled") or "0"
+	if lock == "1" then
+		entry({"admin", "nlbw", "usage"}, alias("admin", "nlbw", "usage", "display"), _("Usage Statistics"), 60)
+		
+		entry({"admin", "nlbw", "usage", "display"}, template("nlbw/display"), _("Display"), 1).leaf=true
+		entry({"admin", "nlbw", "usage", "config"}, cbi("nlbw/config"), _("Configuration"), 2).leaf=true
+		entry({"admin", "nlbw", "usage", "backup"}, template("nlbw/backup"), _("Backup"), 3).leaf=true
+		entry({"admin", "nlbw", "data"}, call("action_data"), nil, 4)
+		entry({"admin", "nlbw", "list"}, call("action_list"), nil, 5)
+		entry({"admin", "nlbw", "ptr"}, call("action_ptr"), nil, 6).leaf = true
+		entry({"admin", "nlbw", "download"}, call("action_download"), nil, 7)
+		entry({"admin", "nlbw", "restore"}, post("action_restore"), nil, 8)
+		entry({"admin", "nlbw", "commit"}, call("action_commit"), nil, 9)
+	end
 end
 
 local function exec(cmd, args, writer)
