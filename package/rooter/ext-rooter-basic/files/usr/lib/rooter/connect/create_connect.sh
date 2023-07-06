@@ -707,6 +707,17 @@ if [ -e $ROOTER/connect/preconnect.sh ]; then
 	fi
 fi
 
+if [ -e /etc/config/wizard]; then
+	wiz=$(uci -q get wizard.basic.wizard)
+	if [ "$wiz" = "1" ]; then
+		uci set wizard.basic.detect="2"
+		uci commit wizard
+		exit 0
+	fi
+	uci set wizard.basic.detect="1"
+	uci commit wizard
+fi
+
 if $QUECTEL; then
 	if [ "$RECON" != "2" ]; then
 		ATCMDD="AT+CNMI?"
@@ -805,6 +816,10 @@ if [ -n "$CHKPORT" ]; then
 		log " SIM Error"
 		if [ -e $ROOTER/simerr.sh ]; then
 			$ROOTER/simerr.sh $CURRMODEM
+		fi
+		if [ -e /etc/config/wizard]; then
+			uci set wizard.basic.detect="2"
+			uci commit wizard
 		fi
 		exit 0
 	fi

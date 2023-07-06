@@ -193,7 +193,18 @@ proto_qmi_setup() {
 
 		proto_notify_error "$interface" NETWORK_REGISTRATION_FAILED
 		proto_block_restart "$interface"
-		/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 &
+		if [ -e /etc/config/wizard ]; then
+			wiz=$(uci -q get wizard.basic.wizard)
+			if [ "$wiz" = "1" ]; then
+				PID=$(ps |grep "chkconn.sh" | grep -v grep |head -n 1 | awk '{print $1}')
+				kill -9 $PID
+				ifdown wan1
+			else
+				/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 1
+			fi
+		else
+			/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 1
+		fi
 		return 1
 	done
 

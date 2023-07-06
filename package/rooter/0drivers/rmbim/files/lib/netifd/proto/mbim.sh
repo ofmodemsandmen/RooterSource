@@ -220,7 +220,18 @@ _proto_mbim_setup() {
 		if [ $retq != 4 ]; then
 			log "Subscriber registration failed"
 			proto_notify_error "$interface" NO_REGISTRATION
-			/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 &
+			if [ -e /etc/config/wizard ]; then
+				wiz=$(uci -q get wizard.basic.wizard)
+				if [ "$wiz" = "1" ]; then
+					PID=$(ps |grep "chkconn.sh" | grep -v grep |head -n 1 | awk '{print $1}')
+					kill -9 $PID
+					ifdown wan1
+				else
+					/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 1
+				fi
+			else
+				/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 1
+			fi
 			return 1
 		fi
 	fi
@@ -348,7 +359,18 @@ _proto_mbim_setup() {
 	done
 	if [ $tidd -gt $tcnt ]; then
 		log "Failed to connect to network"
-		/usr/lib/rooter/luci/restart.sh $CURRMODEM 11
+		if [ -e /etc/config/wizard ]; then
+			wiz=$(uci -q get wizard.basic.wizard)
+			if [ "$wiz" = "1" ]; then
+				PID=$(ps |grep "chkconn.sh" | grep -v grep |head -n 1 | awk '{print $1}')
+				kill -9 $PID
+				ifdown wan1
+			else
+				/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 1
+			fi
+		else
+			/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 1
+		fi
 		return 1
 	fi
 	log "Save Connect Data"

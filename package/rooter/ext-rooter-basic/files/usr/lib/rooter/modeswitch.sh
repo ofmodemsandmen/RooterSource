@@ -437,6 +437,10 @@ if [ "$ACTION" = add ]; then
 	PID=$(ps |grep "chkconn.sh" | grep -v grep |head -n 1 | awk '{print $1}')
 	kill -9 $PID
 
+	if [ -e /etc/config/wizard]; then
+		uci set wizard.basic.detect="0"
+		uci commit wizard
+	fi
 	
 #
 # Handle specific modem models
