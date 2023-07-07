@@ -707,7 +707,7 @@ if [ -e $ROOTER/connect/preconnect.sh ]; then
 	fi
 fi
 
-if [ -e /etc/config/wizard]; then
+if [ -e /etc/config/wizard ]; then
 	wiz=$(uci -q get wizard.basic.wizard)
 	if [ "$wiz" = "1" ]; then
 		uci set wizard.basic.detect="2"
