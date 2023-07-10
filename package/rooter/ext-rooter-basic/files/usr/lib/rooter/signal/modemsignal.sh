@@ -224,7 +224,7 @@ while [ 1 = 1 ]; do
 					;;
 				esac
 				;;
-			"0489" |"03f0" )
+			"0489"|"03f0"|"1e2d" )
 				$ROOTER/common/t77data.sh $CURRMODEM $COMMPORT
 				;;
 			"1e0e" )

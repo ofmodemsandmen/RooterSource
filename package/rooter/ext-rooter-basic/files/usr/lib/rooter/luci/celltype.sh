@@ -474,7 +474,7 @@ case $idV in
 		;;
 	esac
 	;;
-"0489" |"03f0" )
+"0489"|"03f0"|"1e2d" )
 	telit_type
 	;;
 "1e0e" )

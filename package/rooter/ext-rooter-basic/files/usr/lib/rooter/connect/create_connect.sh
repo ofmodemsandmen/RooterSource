@@ -268,7 +268,9 @@ chktelitmbim() {
 
 chkT77() {
 	T77=0
-	if [ $idV = 413c -a $idP = 81d7 ]; then
+	if [ $idV = 1e2d ]; then
+		T77=1
+	elseif [ $idV = 413c -a $idP = 81d7 ]; then
 		T77=1
 	elif [ $idV = 413c -a $idP = 81d8 ]; then
 		T77=1
@@ -286,7 +288,9 @@ chkT77() {
 
 chkraw() {
 	RAW=0
-	if [ $idV = 03f0 -a $idP = 0857 ]; then
+	if [ $idV = 1e2d ]; then
+		RAW=1
+	elif [ $idV = 03f0 -a $idP = 0857 ]; then
 		RAW=1
 	elif [ $idV = 1bc7 -a $idP = 1900 ]; then
 		RAW=1
