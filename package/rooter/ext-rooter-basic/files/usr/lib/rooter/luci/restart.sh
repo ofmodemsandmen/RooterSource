@@ -120,14 +120,14 @@ else # restart
 		if [ -e $ROOTER/connect/chkconn.sh ]; then
 			jkillall chkconn.sh
 		fi
-
-		PORT="usb$CURRMODEM"
-		echo $PORT > /sys/bus/usb/drivers/usb/unbind
+		
+		dev=$(uci -q get modem.modem$CURRMODEM.device)
+		echo $dev > /sys/bus/usb/drivers/usb/unbind
 		while [ -e /tmp/usbwait ]
 		do
 			sleep 1
 		done
-		echo $PORT > /sys/bus/usb/drivers/usb/bind
+		echo $dev > /sys/bus/usb/drivers/usb/bind
 	#fi
 	
 	if [ -e $ROOTER/modem-led.sh ]; then
