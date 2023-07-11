@@ -1,4 +1,4 @@
-#!/bin/sh
+ #!/bin/sh
 
 ROOTER=/usr/lib/rooter
 ROOTER_LINK="/tmp/links"
@@ -270,7 +270,7 @@ chkT77() {
 	T77=0
 	if [ $idV = 1e2d ]; then
 		T77=1
-	elseif [ $idV = 413c -a $idP = 81d7 ]; then
+	elif [ $idV = 413c -a $idP = 81d7 ]; then
 		T77=1
 	elif [ $idV = 413c -a $idP = 81d8 ]; then
 		T77=1
@@ -417,7 +417,7 @@ mbimcport() {
 CURRMODEM=$1
 RECON=$2
 SIERRAID=0
-
+log "Start Connection"
 MAN=$(uci -q get modem.modem$CURRMODEM.manuf)
 MOD=$(uci -q get modem.modem$CURRMODEM.model)
 PROT=$(uci -q get modem.modem$CURRMODEM.proto)
