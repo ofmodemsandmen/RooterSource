@@ -148,6 +148,7 @@ change_bconf() {
 #
 # Add Modem and connect
 #
+#log "$ACTION"
 if [ "$ACTION" = add ]; then
 	bootdelay
 	CNTR=0
@@ -520,11 +521,13 @@ if [ "$ACTION" = remove ]; then
 	if echo $DEVICENAME | grep -q ":" ; then
 		exit 0
 	fi
+	log "Remove $DEVICENAME"
 	find_device $DEVICENAME
 	if [ $retresult -gt 0 ]; then
 		IDP=$(uci get modem.modem$retresult.idP)
 		IDV=$(uci get modem.modem$retresult.idV)
-		if [ $uVid = $IDV ]; then
+		#if [ $uVid = $IDV ]; then
+		if [ 0 -eq 1 ]; then
 			exit 0
 		else
 			INTER=$(uci get modem.modem$retresult.inter)
