@@ -2,7 +2,7 @@
 . /lib/functions.sh
 
 log() {
-	logger -t "excede BW " "$@"
+	modlog "excede BW " "$@"
 }
 
 do_throttle() {
@@ -30,7 +30,8 @@ if [ "$bb" != "1" ]; then
 		if [ $enb = '1' ]; then
 			allocate=$2
 			total=$1
-			/usr/lib/bwmon/block 0
+			#/usr/lib/bwmon/block 0
+			/usr/lib/throttle/throttle.sh stop
 			action=$(uci -q get custom.bwallocate.action)
 			if [ -z $action ]; then
 				action=0
@@ -41,14 +42,12 @@ if [ "$bb" != "1" ]; then
 			uci set custom.bwallocate.status='0'
 			uci commit custom
 			if [ $action != "2" ]; then
+				log "Exceed $action $allocate $total"
 				if [ $total -gt $allocate ]; then
+					log "Throttle"
 					if [ $action = "0" ]; then
-						if [ -e /etc/nodogsplash/control ]; then
-							/etc/nodogsplash/control block
-						else
-							/usr/lib/bwmon/block 1
-						fi
-						uci set custom.bwallocate.status='1'
+						/usr/lib/throttle/throttle.sh start 500 500 1
+						uci set custom.bwallocate.status='2'
 						uci commit custom
 					else
 						down=$(uci -q get custom.bwallocate.down)
@@ -59,7 +58,7 @@ if [ "$bb" != "1" ]; then
 						if [ -z $up ]; then
 							up=2
 						fi
-						/usr/lib/throttle/throttle.sh start $down $up
+						/usr/lib/throttle/throttle.sh start $up $down
 						uci set custom.bwallocate.status='2'
 						uci commit custom
 					fi
@@ -70,7 +69,7 @@ if [ "$bb" != "1" ]; then
 					if [ -e /etc/nodogsplash/control ]; then
 						/etc/nodogsplash/control unblock
 					fi
-					/usr/lib/bwmon/block 0
+					#/usr/lib/bwmon/block 0
 				fi
 			else
 				meth=$(uci -q get custom.bwallocate.meth)

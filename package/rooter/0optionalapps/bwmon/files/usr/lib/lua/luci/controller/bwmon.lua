@@ -50,7 +50,7 @@ function action_check_bw()
 				end
 				rv['maclist'] = maclist
 			end
-		end
+			end
 		file:close()
 		os.execute("/usr/lib/bwmon/genline.sh")
 		file = io.open("/tmp/monlist", "r")
@@ -70,7 +70,19 @@ function action_check_bw()
 			rv['gendays'] = '0'
 		end
 	else
-		rv['days'] = 0
+		rv['days'] = "0"
+		rv['total'] = "--"
+		rv['ctotal'] = "--"
+		rv['totaldown'] = "--"
+		rv['ctotaldown'] = "--"
+		rv['totalup'] = "--"
+		rv['ctotalup'] = "--"
+		rv['ptotal'] = "--"
+		rv['cptotal'] = "--"
+		rv['atotal'] = "--"
+		rv['catotal'] = "--"
+		rv['password'] = "--"
+		rv['gendays'] = '0'
 	end
 	local multilock = luci.model.uci.cursor():get("custom", "multiuser", "multi") or "0"
 	local rootlock = luci.model.uci.cursor():get("custom", "multiuser", "root") or "0"

@@ -172,6 +172,7 @@ var backflg = "0";
 			gendays = rv.gendays;
 			if ( gendays != '0' )
 			{
+				document.getElementById("day30").style.visibility="visible";
 				genline = rv.genline;
 				gendwn = rv.gendwn;
 				genup = rv.genupn
@@ -183,6 +184,7 @@ var backflg = "0";
 			else
 			{
 				document.getElementById("stdate").innerHTML="<strong>" + "No Data" + "</strong>";
+				document.getElementById("datar2").innerHTML="---";
 			}
 	}
 
@@ -524,7 +526,7 @@ var backflg = "0";
 
 </fieldset>
 
-<fieldset>
+<fieldset  id="day30" style="visibility:hidden;">
 	<h2> <%:Last 30 Day Bandwidth Usage%> <span class="msCell"><span></span></span></h2>
 	<style>
 		hr {
@@ -541,8 +543,8 @@ var backflg = "0";
 			<td width="340" ></td>
 		</tr>
 		<tr>
-			<td><div align="center" id="stdate"></div></td>
-			<td><div align="center" id="bdwn"></div></td>
+			<td><div align="center" id="stdate">---</div></td>
+			<td><div align="center" id="bdwn">---</div></td>
 			<td></td>
 			<td></td>
 			<td></td>
