@@ -81,7 +81,7 @@ end
 monlist[0] = "first"
 --
 -- numeric data
-print(ktotal, kdwn, kup)
+
 k = 2
 tfile = io.open(monthly, "r")
 if tfile ~= nil then
@@ -98,9 +98,7 @@ if tfile ~= nil then
 	ktotal1 = tfile:read("*line")
 	ktotal1=ConBytes(ktotal1)
 	ktotal = (ktotal1 + ktotal)
-	print(ktotal , kdwn, kup)
-	
-	print(monlist[1])
+
 	repeat
 		line = tfile:read("*line")
 		if line == nil then
@@ -110,7 +108,6 @@ if tfile ~= nil then
 		ymd = line:sub(1, s-1)
 		monline[ymd] = line
 		monlist[k] = ymd
-		print(monlist[k], monline[monlist[k]])
 		k = k + 1
 	until 1==0
 	tfile:close()

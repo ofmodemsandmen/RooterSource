@@ -103,13 +103,13 @@ update() {
 	let currdailytotal=$totval-$dailyoffsettotal+$basedailytotal
 	let currdailyrx=$rxval-$dailyoffsetrx+$basedailyrx
 	let currdailytx=$txval-$dailyoffsettx+$basedailytx
-	log "Current Daily $currdailytotal $currdailytx $currdailyrx"
+	#log "Current Daily $currdailytotal $currdailytx $currdailyrx"
 	#echo "Update Daily $dailyoffsettotal $dailyoffsettx $dailyoffsetrx"
 	# current month totals
 	let currmontotal=$totval-$monoffsettotal+$basemontotal
 	let currmonrx=$rxval-$monoffsetrx+$basemonrx
 	let currmontx=$txval-$monoffsettx+$basemontx
-	log "Current Monthly $currmontotal $currmontx $currmonrx"
+	#log "Current Monthly $currmontotal $currmontx $currmonrx"
 	#echo "Update Monthly $monoffsettotal $monoffsettx $monoffsetrx"
 	# values in bytes
 	
@@ -132,7 +132,7 @@ checkTime()
 	if [ "$cDay" -ne "$pDay" ]; then # day change
 	
 		# save as daily totals
-log "Daily Amt Saved $currdailytotal $currdailytx $currdailyrx"
+#log "Daily Amt Saved $currdailytotal $currdailytx $currdailyrx"
 		echo "$currdailytotal" > $dataPath"daily.js"
 		echo "$currdailytx" >> $dataPath"daily.js"
 		echo "$currdailyrx" >> $dataPath"daily.js"
@@ -177,7 +177,7 @@ log "Daily Amt Saved $currdailytotal $currdailytx $currdailyrx"
 			let monoffsettotal=$currmontotal+$monoffsettotal
 			let monoffsetrx=$currmonrx+$monoffsetrx
 			let monoffsettx=$currmontx+$monoffsettx
-log "Last Month $currmontotal $currmonrx $currmontx"
+#log "Last Month $currmontotal $currmonrx $currmontx"
 		fi
 		# increase days
 		days=$(uci -q get bwmon.backup.days)
@@ -202,7 +202,7 @@ checkBackup()
 	if [ "$en" = '1' ]; then
 		if [ $ELAPSE -gt $backup_time ]; then
 			BSTARTIME=$CURRTIME
-log "Backup"
+#log "Backup"
 			uci set bwmon.backup.dailytotal=$currdailytotal
 			uci set bwmon.backup.dailyrx=$currdailyrx
 			uci set bwmon.backup.dailytx=$currdailytx

@@ -42,9 +42,9 @@ if [ "$bb" != "1" ]; then
 			uci set custom.bwallocate.status='0'
 			uci commit custom
 			if [ $action != "2" ]; then
-				log "Exceed $action $allocate $total"
+				#log "Exceed $action $allocate $total"
 				if [ $total -gt $allocate ]; then
-					log "Throttle"
+					#log "Throttle"
 					if [ $action = "0" ]; then
 						/usr/lib/throttle/throttle.sh start 500 500 1
 						uci set custom.bwallocate.status='2'
@@ -89,7 +89,7 @@ if [ "$bb" != "1" ]; then
 					/usr/lib/bwmon/float.lua "$speed"
 					source /tmp/float
 					/usr/lib/throttle/throttle.sh start $SPEED $SPEED 1
-					log "Throttled to $speed Mbps"
+					#log "Throttled to $speed Mbps"
 					uci set custom.bwallocate.status='2'
 					uci commit custom
 				else
