@@ -7,6 +7,10 @@ log() {
 
 checktime() {
 	SHOUR=$(uci -q get custom.texting.time)
+	if [ "$SHOUR" = "-1" ]; then
+		istime="1"
+		return
+	fi
 	EHOUR=`expr $SHOUR + 1`
 	if [ $EHOUR -gt 95 ]; then
 		EHOUR=0
@@ -118,7 +122,7 @@ checkper() {
 	fi
 }
 
-delay=900
+delay=10
 while true
 do
 	EN=$(uci -q get custom.bwallocate.enabled)
@@ -130,20 +134,24 @@ do
 			daysdate="${daysdate#"${daysdate%%[!0]*}"}"
 			remain=$((daysdate % days))
 			if [ $remain -eq 0 ]; then
-				running=$(checktime)
+				checktime
+				running=$istime
 			else
 				running="0"
 			fi
 		else
 			if [ $MT = '1' ]; then
+#log "Check Amt"
 				checkamt
 			else
+#log "Check Percent"
 				checkper
 			fi
 		fi
 		if [ $running = "1" ]; then
 			EN=$(uci -q get custom.texting.text)
 			if [ $EN = "1" ]; then
+#log "Text"
 				/usr/lib/bwmon/dotext.sh &
 				sleep $delay
 			fi
