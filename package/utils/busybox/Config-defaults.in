@@ -871,7 +871,7 @@ config BUSYBOX_DEFAULT_UUDECODE
 	default n
 config BUSYBOX_DEFAULT_BASE64
 	bool
-	default n
+	default y
 config BUSYBOX_DEFAULT_UUENCODE
 	bool
 	default n
