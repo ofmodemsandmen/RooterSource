@@ -92,6 +92,20 @@
 		"ext2": "-upgrade.bin",
 		"addons": ["readme.pdf", "factory.txt"]
 	},
+	"GL6416": {
+		"details": "Gl.iNet GL6416",
+		"type": "2",
+		"build": "1907",
+		"flash": "8",
+		"config": ".config_gl6416",
+		"image1": "openwrt-ar71xx-generic-gl-inet-6416A-v1-squashfs-factory.bin",
+		"image2": "openwrt-ar71xx-generic-gl-inet-6416A-v1-squashfs-sysupgrade.bin",
+		"imagepath": "/ar71xx/generic/",
+		"mod": "Gl.iNet-GL6416",
+		"ext1": "-factory.bin",
+		"ext2": "-upgrade.bin",
+		"addons": ["readme.pdf", "factory.txt", "tmp-6416A-v1-squashfs-sysupgrade.bin"]
+	},
 	"H721": {
 		"details": "DualQ H721",
 		"type": "1",
