@@ -73,7 +73,6 @@ if file ~= nil then
 	up = calc(tonumber(up))
 	total = calc(tonumber(total))
 	dataline = lin .. "|" .. dwn .. "|" .. up .. "|" .. total
-	print(dataline)
 	monline[lin] = dataline
 	monlist[1] = lin
 	ksize = 1

@@ -100,11 +100,17 @@ update() {
 	done
 	let totval=$rxval+$txval
 	# current day totals
+#	log "Raw Daily $totval $txval $rxval"
 	let currdailytotal=$totval-$dailyoffsettotal+$basedailytotal
 	let currdailyrx=$rxval-$dailyoffsetrx+$basedailyrx
 	let currdailytx=$txval-$dailyoffsettx+$basedailytx
-	#log "Current Daily $currdailytotal $currdailytx $currdailyrx"
-	#echo "Update Daily $dailyoffsettotal $dailyoffsettx $dailyoffsetrx"
+	let cdailytotal=$totval+$basedailytotal
+	let cdailyrx=$rxval+$basedailyrx
+	let cdailytx=$txval+$basedailytx
+#	log "Full Daily $cdailytotal $cdailytx $cdailyrx"
+#	log "Current Daily $currdailytotal $currdailytx $currdailyrx"
+#	log "Daily Offset $dailyoffsettotal $dailyoffsettx $dailyoffsetrx"
+#	log " "
 	# current month totals
 	let currmontotal=$totval-$monoffsettotal+$basemontotal
 	let currmonrx=$rxval-$monoffsetrx+$basemonrx
@@ -165,18 +171,18 @@ checkTime()
 		basedailytotal=0
 		basedailyrx=0
 		basedailytx=0
-		let dailyoffsettotal=$currdailytotal+$dailyoffsettotal
-		let dailyoffsetrx=$currdailyrx+$dailyoffsetrx
-		let dailyoffsettx=$currdailytx+$dailyoffsettx
+		let dailyoffsettotal=$totval
+		let dailyoffsetrx=$rxval
+		let dailyoffsettx=$txval
 		roll=$(uci -q get custom.bwallocate.rollover)
 		[ -z $roll ] && roll=1
-		if [ "$roll" -ge "$pDay" ]; then # new month
+		if [ "$roll" -le "$pDay" ]; then # new month
 			basemontotal=0
 			basemonrx=0
 			basemontx=0
-			let monoffsettotal=$currmontotal+$monoffsettotal
-			let monoffsetrx=$currmonrx+$monoffsetrx
-			let monoffsettx=$currmontx+$monoffsettx
+			let monoffsettotal=$totval
+			let monoffsetrx=$rxval
+			let monoffsettx=$txval
 #log "Last Month $currmontotal $currmonrx $currmontx"
 		fi
 		# increase days
