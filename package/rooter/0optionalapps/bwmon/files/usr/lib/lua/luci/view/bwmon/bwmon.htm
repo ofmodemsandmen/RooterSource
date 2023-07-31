@@ -23,6 +23,7 @@ var lockb = 0;
 var rollover = 1;
 var enabled = "0";
 var backflg = "0";
+var rollflg = "0";
 
 	function display(rv)
 	{
@@ -119,23 +120,27 @@ var backflg = "0";
 					document.getElementById("changeroll").style.visibility="visible";
 				} 
 				
-				document.getElementById("rollday").selectedIndex = rollover - 1;
-				en =  "th";
-				if ( rv.rollover == "1" )
+				if ( rollflg == "0" )
 				{
-					en = "st";
+					document.getElementById("rollday").selectedIndex = rollover - 1;
+					en =  "th";
+					if ( rv.rollover == "1" )
+					{
+						en = "st";
+					}
+					if ( rv.rollover == "2" )
+					{
+						en = "nd";
+					}
+					if ( rv.rollover == "3" )
+					{
+						en = "rd";
+					}
+					document.getElementById("rolld").innerHTML=rv.rollover + en;
+					document.getElementById("rolld").style.fontWeight = "bold" ;
+					rollflg = "1";
 				}
-				if ( rv.rollover == "2" )
-				{
-					en = "nd";
-				}
-				if ( rv.rollover == "3" )
-				{
-					en = "rd";
-				}
-				document.getElementById("rolld").innerHTML=rv.rollover + en;
-				document.getElementById("rolld").style.fontWeight = "bold" ;
-
+				
 				document.getElementById("total").innerHTML=rv.ctotal;
 				document.getElementById("total").style.fontWeight = "bold" ;
 				document.getElementById("ptotal").innerHTML=rv.cptotal;
@@ -238,6 +243,7 @@ var backflg = "0";
 	{
 		var s = document.getElementById("rollday").value;
 		allo = s.toString();
+		rollflg = "0";
 		XHR.get('<%=luci.dispatcher.build_url("admin", "nlbw", "change_roll")%>',
 			{ set: allo },
 			function(x, rv)
