@@ -183,6 +183,9 @@ checkTime()
 			let monoffsettotal=$totval
 			let monoffsetrx=$rxval
 			let monoffsettx=$txval
+			uci set custom.texting.used="0"
+			uci set custom.bwallocate.persent="0"
+			uci commit custom
 #log "Last Month $currmontotal $currmonrx $currmontx"
 		fi
 		# increase days
