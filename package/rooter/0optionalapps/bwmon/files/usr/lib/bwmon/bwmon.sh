@@ -183,6 +183,10 @@ checkTime()
 			let monoffsettotal=$totval
 			let monoffsetrx=$rxval
 			let monoffsettx=$txval
+			let currmontotal=0
+			let currmonrx=0
+			let currmontx=0
+			createGUI
 			uci set custom.texting.used="0"
 			uci set custom.bwallocate.persent="0"
 			uci commit custom
