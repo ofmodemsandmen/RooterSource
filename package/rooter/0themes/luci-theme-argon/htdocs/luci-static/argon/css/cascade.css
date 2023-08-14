@@ -379,7 +379,7 @@ hr {
 	-webkit-box-align: center;
 	align-items: center;
 	color: var(--default);
-	margin: 20px auto 5px 10px;
+	margin: 100px auto 5px 10px;
 }
 
 .login-page .login-container .login-form .brandlg {
@@ -387,7 +387,7 @@ hr {
 	-webkit-box-align: center;
 	align-items: center;
 	color: var(--default);
-	margin: 20px auto 5px 10px;
+	margin: 50px auto 5px 10px;
 }
 
 .login-page .login-container .login-form .brandim {

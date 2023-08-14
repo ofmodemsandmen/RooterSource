@@ -213,7 +213,7 @@ select {
 .btn,button,select,input,.cbi-dropdown {
 	line-height: 1.5rem;
 	color: #8898aa;
-	border: 1px solid #dee2e6;
+	border: 4px solid #dee2e6;
 	border-radius: .25rem;
 	outline: 0;
 	background-image: none;
@@ -379,7 +379,7 @@ hr {
 	-webkit-box-align: center;
 	align-items: center;
 	color: var(--default);
-	margin: 20px auto 5px 10px;
+	margin: 100px auto 5px 10px;
 }
 
 .login-page .login-container .login-form .brandlg {
@@ -387,7 +387,7 @@ hr {
 	-webkit-box-align: center;
 	align-items: center;
 	color: var(--default);
-	margin: 20px auto 5px 10px;
+	margin: 50px auto 5px 10px;
 }
 
 .login-page .login-container .login-form .brandim {
@@ -2649,7 +2649,7 @@ input[name="ping"],input[name="traceroute"],input[name="nslookup"] {
 input[type="checkbox"] {
 	appearance: none!important;
 	-webkit-appearance: none!important;
-	border: 1px solid #dee2e6;
+	border: 4px solid var(--primary);
 	width: 16px!important;
 	height: 16px!important;
 	cursor: pointer;

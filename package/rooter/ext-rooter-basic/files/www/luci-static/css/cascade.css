@@ -379,7 +379,15 @@ hr {
 	-webkit-box-align: center;
 	align-items: center;
 	color: var(--default);
-	margin: 20px auto 5px 10px;
+	margin: 100px auto 5px 10px;
+}
+
+.login-page .login-container .login-form .brandlg {
+	display: flex;
+	-webkit-box-align: center;
+	align-items: center;
+	color: var(--default);
+	margin: 50px auto 5px 10px;
 }
 
 .login-page .login-container .login-form .brandim {
@@ -534,7 +542,14 @@ hr {
 	font-size: 1.2vw;
 	font-weight: 700;
 	font-family: TypoGraphica;
-	margin-left: 2vw;
+	margin-left: 3vw;
+}
+
+.login-page .login-container .login-form .brandlg .brand-textlg {
+	font-size: 1.2vw;
+	font-weight: 700;
+	font-family: Roboto-Regular-webfont;
+	margin-left: 3vw;
 }
 
 .login-page .login-container .login-form .form-login {

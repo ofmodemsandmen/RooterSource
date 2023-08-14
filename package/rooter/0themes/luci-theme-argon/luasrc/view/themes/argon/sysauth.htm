@@ -116,8 +116,18 @@
 	else
 		ifr = false
 	end
+	
+	file = io.open("/etc/shadow", "r")
+	line = file:read("*line")
+	if line == "root::0:0:99999:7:::" then
+		placeholder="no_password_is_set"
+	else
+		placeholder="enter_password"
+	end
+	file:close()
 
 %>
+<link rel="stylesheet" href="<%=resource%>/buttons/buttons.css">
 <style type="text/css">
 body {
   overflow: scroll; /* Show scrollbars */
@@ -172,11 +182,11 @@ body {
 	<div class="login-container">
 		<div class="login-form">
 		<%if logosize == "small"  then%>
-			<a class="brand" href="/"><img src="/luci-static/img/open.png" class="icon"><span
-					class="brand-text"><%=striptags( (headername or "?") .. ( (node and node.title) and ' - ' .. translate(node.title) or '')) %></span></a>
+			<a class="brand"><img src="/luci-static/img/open.png" class="icon"><span
+					class="brand-text"><%= (headername or "?") .. ( (node and node.title) and ' - ' .. translate(node.title) or '') %></span></a>
 		<%else%>
-			<a class="brand" href="/"><img src="/luci-static/img/open.png" class="icon-lg"></a>
-			<a class="brandlg" ><span class="brand-textlg"><%=striptags( (headername or "?") .. ( (node and node.title) and ' - ' .. translate(node.title) or '')) %></span></a>
+			<a class="brand" ><img src="/luci-static/img/open.png" class="icon-lg"></a>
+			<a class="brandlg" ><span class="brand-textlg"><%= (headername or "?") .. ( (node and node.title) and ' - ' .. translate(node.title) or '') %></span></a>
 		<% end %>
 			
 			<form class="form-login" method="post" action="<%=pcdata(luci.http.getenv("REQUEST_URI"))%>">
@@ -186,17 +196,16 @@ body {
 				<% end -%>
 
 				<div class="input-container">
-					<div class="input-group user-icon">
+					<div class="input-group user-icon" style="visibility:hidden;display:none">
 						<input class="cbi-input-user" id="cbi-input-user" type="text" name="luci_username" value="<%=duser%>" />
 						<label class="border" for="cbi-input-user"></label>
 					</div>
 					<div class="input-group pass-icon">
-						<input class="cbi-input-password" id="cbi-input-password" type="password" name="luci_password" />
+						<input class="cbi-input-password" id="cbi-input-password" type="password" name="luci_password" placeholder=<%=placeholder%>  style="color: #FFFFFF;" />
 						<label class="border" for="cbi-input-password"></label>
 					</div>
-				</div>
 				<div>
-					<input type="submit" value="<%:Login%>" class="cbi-button cbi-button-apply" />
+					<input type="submit" value="<%:Login%>"  class="button-61" role="button"  style="font-size: 25px;text-align: center;width: 275px"/>
 				</div>
 			</form>
 			
