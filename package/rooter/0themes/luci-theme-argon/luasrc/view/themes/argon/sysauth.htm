@@ -119,7 +119,7 @@
 	
 	file = io.open("/etc/shadow", "r")
 	line = file:read("*line")
-	if line == "root::0:0:99999:7:::" then
+	if line == "root::0:0:99999:7:::" or line == "root:::0:99999:7:::" then
 		placeholder="no_password_is_set"
 	else
 		placeholder="enter_password"
@@ -127,7 +127,7 @@
 	file:close()
 
 %>
-<link rel="stylesheet" href="<%=resource%>/buttons/buttons.css">
+<link rel="stylesheet" href="<%=resource%>/buttons/buttons.css?v=2.2.5">
 <style type="text/css">
 body {
   overflow: scroll; /* Show scrollbars */
