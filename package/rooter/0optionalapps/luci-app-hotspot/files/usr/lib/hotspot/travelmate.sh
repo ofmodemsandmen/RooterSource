@@ -374,6 +374,9 @@ f_main()
 										if [ -e /usr/lib/hotspot/ledshow ]; then
 											/usr/lib/hotspot/ledshow $wif
 										fi
+										if [ -e /usr/lib/hotspot/ping.sh ]; then
+											/usr/lib/hotspot/ping.sh &
+										fi
 										exit 0
 									fi
 									# bad connection try next Hotspot in list

@@ -3,6 +3,7 @@
 
 wif=$(uci -q get travelmate.global.freq)
 rm -f /tmp/hotman
+rm -f /tmp/hotping
 uci set travelmate.global.ssid="7"
 uci set travelmate.global.state=''
 uci set travelmate.global.bssid=""

@@ -19,6 +19,7 @@ if [ "$ACTION" = ifdown -a "$INTERFACE" = "wwan$wif" ]; then
 		uci -q set wireless.wwan$wif.disabled=1
 		uci -q commit wireless
 		wifilog "HOTSPOT" "Lost Connection"
+		rm -f /tmp/hotping
 		ubus call network reload
 		disa=$(uci -q get travelmate.global.ssid)
 		# check for disconnect or lost connection
