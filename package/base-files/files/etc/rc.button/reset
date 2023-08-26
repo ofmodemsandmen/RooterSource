@@ -16,6 +16,11 @@ released)
 		/etc/init.d/network restart
 		reboot -f
 	fi
+	if [ "$SEEN" -gt 30 ]
+	then
+		firstboot
+		reboot -f
+	fi
 ;;
 esac
 return 0		
