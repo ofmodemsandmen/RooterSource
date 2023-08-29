@@ -1,0 +1,118 @@
+{
+	"MASTER3526": {
+		"details": "ZBT WG3526",
+		"type": "1",
+		"build": "2203",
+		"package": "ext-mesh-master",
+		"config": ".config_wg3526",
+		"image": "openwrt-ramips-mt7621-zbt-wg3526-16M-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "Mesh-Master-WG3526",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf"],
+		"custom": {
+			"wifi": {
+				"SSID2G": "Mesh 2G",
+				"SSID5G": "Mesh 5G",
+				"Password": "rooter2017"
+			},
+			"image": {
+				"Material": "header.png",
+				"Argon": "rosy.png",
+				"Tomato": "rosy.png"
+			},
+			"name": {
+				"model": "Mesh Master WG3526",
+				"hostname": "Mesh Master"
+			},
+			"files": "/Mesh/files-master/"
+		}
+	},
+	"NODE3526": {
+		"details": "ZBT WG3526",
+		"type": "1",
+		"build": "2203",
+		"package": "ext-mesh-node",
+		"config": ".config_wg3526",
+		"image": "openwrt-ramips-mt7621-zbt-wg3526-16M-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "Mesh-Node-WG3526",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf"],
+		"custom": {
+			"wifi": {
+				"SSID2G": "Mesh 2G",
+				"SSID5G": "Mesh 5G",
+				"Password": "rooter2017"
+			},
+			"image": {
+				"Material": "header.png",
+				"Argon": "rosy.png",
+				"Tomato": "rosy.png"
+			},
+			"name": {
+				"model": "Mesh Node WG3526",
+				"hostname": "Mesh Node"
+			},
+			"files": "/Mesh/files-node/"
+		}
+	},
+	"MASTERH721": {
+		"details": "H721",
+		"type": "1",
+		"build": "2203",
+		"package": "ext-mesh-master",
+		"config": ".config_h721",
+		"image": "openwrt-ramips-mt7621-dualq-h721-256m-16m-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "Mesh-Master-H721",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf"],
+		"custom": {
+			"wifi": {
+				"SSID2G": "Mesh 2G",
+				"SSID5G": "Mesh 5G",
+				"Password": "rooter2017"
+			},
+			"image": {
+				"Material": "header.png",
+				"Argon": "rosy.png",
+				"Tomato": "rosy.png"
+			},
+			"name": {
+				"model": "Mesh Master DualQ H721",
+				"hostname": "Mesh Master"
+			},
+			"files": "/Mesh/files-master/"
+		}
+	},
+	"NODEH721": {
+		"details": "H721",
+		"type": "1",
+		"build": "2203",
+		"package": "ext-mesh-node",
+		"config": ".config_h721",
+		"image": "openwrt-ramips-mt7621-dualq-h721-256m-16m-squashfs-sysupgrade.bin",
+		"imagepath": "/ramips/mt7621/",
+		"mod": "Mesh-Node-H721",
+		"ext": "-upgrade.bin",
+		"addons": ["readme.pdf"],
+		"custom": {
+			"wifi": {
+				"SSID2G": "Mesh 2G",
+				"SSID5G": "Mesh 5G",
+				"Password": "rooter2017"
+			},
+			"image": {
+				"Material": "header.png",
+				"Argon": "rosy.png",
+				"Tomato": "rosy.png"
+			},
+			"name": {
+				"model": "Mesh Node H721",
+				"hostname": "Mesh Node"
+			},
+			"files": "/Mesh/files-node/"
+		}
+	}
+}

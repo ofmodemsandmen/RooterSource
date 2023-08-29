@@ -1,0 +1,112 @@
+<%+header%>
+
+<script type="text/javascript" src="<%=resource%>/xhr.js"></script>
+<script type="text/javascript">//<![CDATA[
+
+	var s1 = "<table width=\"900\" border=\"1\"><tr><td width=\"150\"><div style=\"font-size : 25px\" align=\"left\" ><strong>Station</strong></div></td><td width=\"100\">&nbsp;</td><td width=\"120\">&nbsp;</td><td width=\"480\">&nbsp;</td></tr><tr><td><div style=\"font-size : 18px\" align=\"right\" ><strong>MAC Address</strong></div></td><td><div align=\"left\" style=\"font-size : 18px\">" ;
+	var s2 = "</div></td></tr><tr><td><div style=\"font-size : 18px\" align=\"right\" ><strong>Signal Strength</strong></div></td><td><div align=\"left\" style=\"font-size : 18px\">" ;
+	var s3 = " dBm</div></td></tr><tr><td><div style=\"font-size : 18px\" align=\"right\" ><strong>RX Bytes</strong></div></td><td><div align=\"left\" style=\"font-size : 18px\">"
+	var s4 = "<div></td></tr><tr><td><div style=\"font-size : 18px\" align=\"right\" ><strong>TX Bytes</strong></div></td><td><div align=\"left\" style=\"font-size : 18px\">";
+	var s5 = "</div></td></tr></table><table width=\"900\" border=\"0\"><tr><td width=\"150\">	<div style=\"font-size : 18px\" align=\"right\" ><strong>RX Bitrate</strong></div>			</td><td width=\"750\"><div align=\"left\" style=\"font-size : 18px\">";
+	var s6 = "</div></td></tr><tr><td><div style=\"font-size : 18px\" align=\"right\" ><strong>TX Bitrate</strong></div></td><td><div align=\"left\" style=\"font-size : 18px\">";
+	var s7 = "</div></td></tr><tr><td><div style=\"font-size : 18px\" align=\"right\" ><strong>Expected Throughput</strong></div></td><td><div align=\"left\" style=\"font-size : 18px\">";
+	var s9 = "</div></td></tr></table>";
+	
+	function disply(data) {
+		var arr=(data.split("|"));
+		var len = arr.length - 1;
+		document.getElementById("waiting").style.display="none";
+		document.getElementById("waiting").style.visibility="hidden";
+		document.getElementById("table0").style.display="block";
+		document.getElementById("table0").style.visibility="visible";
+
+		mc="";
+		for (var i = 0; i < len-1; i=i+7) {
+			rxb = parseFloat(arr[i+1]);
+			txb = parseFloat(arr[i+2]);
+			tho = arr[i+6];
+			tho = tho.replace("Mbps", " Mbps");
+			mc = mc + s1 + arr[i] + s2 + arr[i+3] + s3 + calc(rxb) + s4 + calc(txb) + s5 + arr[i+5] + s6;
+			mc = mc + arr[i+4] + s7 + tho + s9;
+		}
+		document.getElementById("datar2").innerHTML=mc;  
+	}
+	
+	function calc(bytes) {
+		if ( bytes < 1000000 )
+		{
+			bytes = bytes / 1000;
+			bytes = bytes.toFixed(2);
+			return bytes.toString() + " KB";
+		}
+		if ( bytes < 1000000000 )
+		{
+			bytes = bytes / 1000000;
+			bytes = bytes.toFixed(2);
+			return bytes.toString() + " MB";
+		}
+		else
+		{
+			bytes = bytes / 1000000000;
+			bytes = bytes.toFixed(2);
+			return bytes.toString() + " GB";
+		}
+	}
+	
+	XHR.poll(10, '<%=luci.dispatcher.build_url("admin", "status", "mesh_stat")%>',
+	null,
+		function(x, rv)
+		{
+			disply(rv.mesh);
+		}
+	);
+	
+
+//]]></script>
+
+<form method="post" action="<%=REQUEST_URI%>">
+<div class="cbi-map" id="cbi-hot">
+<h2><a id="content" name="content"><%:Mesh Status%></a></h2>
+<div class="cbi-map-descr"><%:Status of all Mesh Nodes%></div>
+<head>
+
+</head>
+
+<fieldset class="cbi-section" id="cbi-read">
+
+	<table width="900" border="0" id="table1">
+		<tr id="openpage">
+			<td width="700">
+				<div style="font-size : 25px"><strong><%:Mesh Nodes%></strong></div>
+			</td>
+			<td width="200">&nbsp;</td>
+		</tr>
+				<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+	</table>
+	
+	<table width="100%" cellspacing="10" id="waiting">
+		<tr><td width="33%">&nbsp;</td><td><img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>" style="vertical-align:middle" /> Collecting data...</td></tr>
+	</table>
+	
+	<fieldset id="table0" style="visibility:hidden;display:none">
+		
+	<table width="1000" border="0" id="datar2" >
+		<tr>
+		</tr>
+	</table>
+	
+</fieldset>
+	
+	<table id="cmdtxt" width="700"  border="0" style="display:table;visibility:hidden;display:none">
+		<tr>
+				<td width="100%">
+			<textarea readonly="readonly" name="attxt" id="attxt" rows="6" style="width: 600px;" maxlength="160"></textarea>
+			</td>
+		</tr>
+	</table>
+
+</form>
+<%+footer%>

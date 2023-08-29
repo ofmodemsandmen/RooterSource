@@ -1,0 +1,47 @@
+#!/bin/sh /etc/rc.common
+. /lib/functions.sh
+
+log() {
+	logger -t "ADD MESH" "$@"
+}
+
+START=90
+
+do_radio() {
+	local config=$1
+	local channel
+	config_get channel $1 channel
+	if [ $channel -gt 20 ]; then
+		mdev=$config
+	fi
+}
+
+start() {
+	log "add Mesh"
+	mdev=""
+	config_load wireless
+	config_foreach do_radio wifi-device
+	me=$(uci -q get wireless.mesh)
+	if [ -z "$me" ]; then
+		uci set wireless.mesh=wifi-iface
+		uci set wireless.mesh.device="$mdev"
+		uci set wireless.mesh.ifname='mesh0'
+		uci set wireless.mesh.network='lan'
+		uci set wireless.mesh.mode='mesh'
+		uci set wireless.mesh.mesh_id='MeshCloud'
+		uci set wireless.mesh.encryption='none'
+		
+		ch=$(uci -q get wireless.$mdev.channel)
+		if [ "$ch" -ne 44 ]; then
+			uci set wireless.$mdev.channel='44'
+		fi
+	
+		uci commit wireless
+		wifi
+	fi
+	
+	uci set dhcp.lan.force='1'
+	uci commit dhcp
+	/etc/init.d/dnsmasq restart
+
+}

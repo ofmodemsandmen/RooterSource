@@ -1,0 +1,26 @@
+#!/bin/sh
+
+configout=$1
+
+configin=$configout
+
+rm -f ./.config
+
+fullconfig=".config_"$configin
+if [ -e ./configfiles/template_mesh/$fullconfig ]; then
+	cp ./configfiles/template_mesh/$fullconfig ./.config
+	echo "template_custom configuration "$fullconfig
+else
+	rm -f ./.config
+	echo "No configuration "$fullconfig
+fi
+
+make menuconfig
+
+fullconfig=".config_"$configout
+if [ ! -z $configout ]; then
+	mv ./.config ./configfiles/template_mesh/$fullconfig
+	echo "Rename and move .config as "$fullconfig" to template_mesh"
+else
+	echo "No target for .config"
+fi
