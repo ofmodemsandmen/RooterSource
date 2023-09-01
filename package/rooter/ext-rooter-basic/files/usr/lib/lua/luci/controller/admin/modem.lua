@@ -482,10 +482,12 @@ function action_get_csq()
 		rv["rscp1"] = " (" .. rscp1 .. " dBm)"
 	end
 
-	if not nixio.fs.access("/etc/netspeed") then
-		rv["crate"] = translate("Fast (updated every 10 seconds)")
+	file = io.open("/etc/netspeed", "r")
+	if file == nil then
+		rv["crate"] = "60"
 	else
-		rv["crate"] = translate("Slow (updated every 60 seconds)")
+		rv["crate"] = file:read("*line")
+		file:close()
 	end
 
 	stat = "/tmp/msimdata" .. modnum
@@ -555,11 +557,7 @@ end
 
 function action_change_rate()
 	local set = luci.http.formvalue("set")
-	if set == "1" then
-		os.execute("rm -f /etc/netspeed")
-	else
-		os.execute("echo \"0\" > /etc/netspeed")
-	end
+	os.execute("echo \"" .. set .. "\" > /etc/netspeed")
 end
 
 function action_change_phone()

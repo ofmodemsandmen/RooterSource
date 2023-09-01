@@ -271,10 +271,10 @@ while [ 1 = 1 ]; do
 			fi
 		fi
 	fi
-	if [ -e /etc/netspeed ]; then
+	if [ ! -e /etc/netspeed ]; then
 		NETSPEED=60
 	else
-		NETSPEED=10
+		NETSPEED=$(cat /etc/netspeed)
 	fi
 	CURRTIME=$(date +%s)
 	SLEEPTIME=$(($(echo $NETSPEED) - ($(echo $CURRTIME) - $(echo $STARTIMEX))))

@@ -57,7 +57,24 @@ end
 			document.getElementById('long').innerHTML=rv.long;
 			<% end %>
 
-			document.getElementById('crate').innerHTML=rv.crate;
+			crate = rv.crate;
+			switch(crate)
+			{
+				case "1":
+					mode = "<%:1 Second%>";
+				break;
+				case "5":
+					mode = "<%:5 Seconds%>";
+				break;
+				case "10":
+					mode = "<%:10 Seconds%>";
+				break;
+				case "60":
+					mode = "<%:60 Seconds%>";
+				break;
+			}
+			document.getElementById('crate').innerHTML=mode;
+			
 			if (phonenx == "")
 			{
 				document.getElementById('phone').value=rv.phone;
@@ -551,8 +568,10 @@ end
     		<td><div align="right"><%:Change Refresh Rate :%></div></td>
     		<td>
 		<select name="nrate" id="rate1" style="width:100px;">
-			<option value="1" selected="selected"><%:Fast    %></option>
-			<option value="2"><%:Slow    %></option>
+			<option value="60" selected="selected"><%:60 sec    %></option>
+			<option value="10"><%:10 sec    %></option>
+			<option value="5"><%:5 sec    %></option>
+			<option value="1"><%:1 sec    %></option>
 		</select>
 		</td>
 		<td><input type="button" id="apply1" class="cbi-button cbi-button-apply" value="<%:Apply Rate Change%>" onclick="return applyc(this)" /></td>
