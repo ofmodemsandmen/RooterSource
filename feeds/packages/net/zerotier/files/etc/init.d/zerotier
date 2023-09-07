@@ -1,5 +1,9 @@
 #!/bin/sh /etc/rc.common
 
+log() {
+	modlog "Zerotier" "$@"
+}
+
 START=90
 
 USE_PROCD=1
@@ -16,6 +20,21 @@ start_instance() {
 	local cfg="$1"
 	local port secret config_path local_conf copy_config_path path
 	local args=""
+	
+	config_get secret $cfg 'secret'
+	if [ -z "$secret" ]; then
+		log "Generate secret - please wait..."
+		local sf="/tmp/zt.$cfg.secret"
+
+		zerotier-idtool generate "$sf" > /dev/null
+		[ $? -ne 0 ] && return 1
+
+		secret="$(cat $sf)"
+		rm "$sf"
+		
+		uci set zerotier.$cfg.secret="$secret"
+		uci commit zerotier
+	fi
 
 	if ! section_enabled "$cfg"; then
 		echo "disabled in config"
@@ -60,21 +79,8 @@ start_instance() {
 		args="$args -p${port}"
 	fi
 
-	if [ -z "$secret" ]; then
-		echo "Generate secret - please wait..."
-		local sf="/tmp/zt.$cfg.secret"
-
-		zerotier-idtool generate "$sf" > /dev/null
-		[ $? -ne 0 ] && return 1
-
-		secret="$(cat $sf)"
-		rm "$sf"
-
-		uci set zerotier.$cfg.secret="$secret"
-		uci commit zerotier
-	fi
-
 	if [ -n "$secret" ]; then
+		log "$secret"
 		echo "$secret" > $path/identity.secret
 		# make sure there is not previous identity.public
 		rm -f $path/identity.public
@@ -99,6 +105,7 @@ start_instance() {
 }
 
 start_service() {
+	log "Start Zerotier"
 	config_load 'zerotier'
 	config_foreach start_instance 'zerotier'
 }
