@@ -1,7 +1,7 @@
 #!/bin/sh /etc/rc.common
 
 log() {
-	modlog "Zerotier" "$@"
+	logger -t "Zerotier" "$@"
 }
 
 START=90
@@ -80,7 +80,6 @@ start_instance() {
 	fi
 
 	if [ -n "$secret" ]; then
-		log "$secret"
 		echo "$secret" > $path/identity.secret
 		# make sure there is not previous identity.public
 		rm -f $path/identity.public
