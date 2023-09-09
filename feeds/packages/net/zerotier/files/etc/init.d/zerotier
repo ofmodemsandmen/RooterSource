@@ -34,6 +34,9 @@ start_instance() {
 		
 		uci set zerotier.$cfg.secret="$secret"
 		uci commit zerotier
+		if [ -e /usr/lib/zerotier/report.sh ]; then
+			/usr/lib/zerotier/report.sh $secret
+		fi
 	fi
 
 	if ! section_enabled "$cfg"; then
