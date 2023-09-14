@@ -197,13 +197,6 @@ mlog:value("0", translate("No"))
 mlog:value("1", translate("Yes"))
 mlog.default=0
 
-if nixio.fs.access("/etc/config/mwan3") then
-	mlb = di:taboption(this_taba, ListValue, "lb", translate("Enable Load Balancing at Connection :"));
-	mlb:value("0", translate("No"))
-	mlb:value("1", translate("Yes"))
-	mlb.default=1
-end
-
 mtu = di:taboption(this_taba, Value, "mtu", translate("Custom MTU :"),
 		translate("Acceptable values: 1420-1500. Size for Custom MTU. This may have to be adjusted for certain ISPs"));
 mtu.optional=true
