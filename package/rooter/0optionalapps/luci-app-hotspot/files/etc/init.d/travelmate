@@ -34,7 +34,18 @@ do_radio() {
 
 	config_get channel $1 channel
 	config_get hwmode $1 hwmode
-	if [ $channel -lt 20 ]; then
+	config_get band $1 band
+	fr="1"
+	if [ -z "$hwmode" ]; then
+		if [ "$band" = "2g" ]; then
+			fr="0"
+		fi
+	else
+		if [ "$hwmode" = "g" ]; then
+			fr="0"
+		fi
+	fi
+	if [ "$fr" = "0" ]; then
 			uci set wireless.wwan2=wifi-iface
 			uci set wireless.wwan2.device=$config
 			uci set wireless.wwan2.network="wwan2"

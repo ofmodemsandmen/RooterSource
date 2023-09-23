@@ -54,7 +54,19 @@ count_radio() {
 	local channel
 
 	config_get channel $1 channel
-	if [ $channel -gt 15 ]; then
+	config_get hwmode $1 hwmode
+	config_get band $1 band
+	fr="1"
+	if [ -z "$hwmode" ]; then
+		if [ "$band" = "2g" ]; then
+			fr="0"
+		fi
+	else
+		if [ "$hwmode" = "g" ]; then
+			fr="0"
+		fi
+	fi
+	if [ "$fr" = "1" ]; then
 		uci set travelmate.global.radio5="5.8 Ghz"
 	else
 		uci set travelmate.global.radio2="2.4 Ghz"
