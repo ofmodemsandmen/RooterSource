@@ -91,7 +91,7 @@ case $uVid in
 				OX=$($ROOTER/gcom/gcom-locked "$CPORT" "run-at.gcom" "$CURRMODEM" "$M1")
 				REV=$(echo $OX" " | grep -o "Revision: .\+ OK " | tr " " ",")
 				MODL=$(echo $REV | cut -d, -f2)
-				EC25AF=$(echo $MODL | grep "EC25AFF")
+				EC25AF=$(echo $MODL | grep "EC25AF[^A]")
 				if [ ! -z "$EC25AF" ]; then # EC25-AF
 					M2='01011000000111000000000000000000000000000000000000000000000000000100001'
 				else
