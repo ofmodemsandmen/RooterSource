@@ -32,7 +32,6 @@ nr_bw() {
 }
 
 OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "quectelinfo.gcom" "$CURRMODEM")
-
 OX=$(echo $OX | tr 'a-z' 'A-Z')
 
 RSRP=""
@@ -262,6 +261,21 @@ case $RAT in
 				CSQ_RSSI=$RSSI" dBm"
 			fi
 			SINR=$(echo $QENG5 | cut -d, -f15 | grep -o "[0-9]\{1,3\}")" dB"
+		fi
+		if [ -n "$QCA" ]; then
+			QCA=$(echo $QCA | grep -o "\"S[CS]\{2\}\",[0-9]\{6\},[0-9]\{1,2\},\"NR5G,BAND,[0-9]\{1,3\}\",2,\+")
+			for QCAL in $(echo "$QCA"); do
+				SLBV=$(echo $QCAL | cut -d, -f6 | grep -o "[0-9]\{1,3\}")
+				LBAND=$LBAND"<br />n"$SLBV
+				BWD=$(echo $QCAL | cut -d, -f3 | grep -o "[0-9]\{1,2\}")
+				BWsave="$BW"
+				BW="$BWD"
+				nr_bw
+				LBAND=$LBAND" ("CA", Bandwidth "$(echo $BW)" MHz)"
+				BW="$BWsave"
+				LBAND=$LBAND
+				PCI="$PCI, "$(echo $QCAL | cut -d, -f8)
+			done
 		fi
 		;;
 esac
