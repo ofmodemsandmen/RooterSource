@@ -41,7 +41,8 @@ do_radio() {
 			fr="0"
 		fi
 	else
-		if [ "$hwmode" = "g" ]; then
+		hw=$(echo "$hwmode" | grep "g")
+		if [ ! -z "$hw" ]; then
 			fr="0"
 		fi
 	fi
