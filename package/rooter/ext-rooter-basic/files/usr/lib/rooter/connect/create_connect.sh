@@ -705,12 +705,6 @@ elif [ "$idV" = "05c6" ]; then
 	fi
 fi
 
-if [ -e $ROOTER/connect/preconnect.sh ]; then
-	if [ "$RECON" != "2" ]; then
-		$ROOTER/connect/preconnect.sh $CURRMODEM
-	fi
-fi
-
 if [ -e /etc/config/wizard ]; then
 	wiz=$(uci -q get wizard.basic.wizard)
 	if [ "$wiz" = "1" ]; then
@@ -720,6 +714,12 @@ if [ -e /etc/config/wizard ]; then
 	fi
 	uci set wizard.basic.detect="1"
 	uci commit wizard
+fi
+
+if [ -e $ROOTER/connect/preconnect.sh ]; then
+	if [ "$RECON" != "2" ]; then
+		$ROOTER/connect/preconnect.sh $CURRMODEM
+	fi
 fi
 
 if $QUECTEL; then
