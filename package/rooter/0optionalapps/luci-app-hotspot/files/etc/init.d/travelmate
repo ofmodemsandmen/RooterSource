@@ -41,8 +41,7 @@ do_radio() {
 			fr="0"
 		fi
 	else
-		hw=$(echo "$hwmode" | grep "g")
-		if [ ! -z "$hw" ]; then
+		if [ "$hwmode" = "g" ]; then
 			fr="0"
 		fi
 	fi
@@ -81,6 +80,9 @@ log "Hotspot Firewall"
 		uci set network.wwan26=interface
 		uci set network.wwan26.proto=dhcpv6 
 		uci set network.wwan26.metric='2'
+		uci set network.wwan26.device='@wwan2'
+		uci set network.wwan26.reqaddress='try'
+		uci set network.wwan26.reqprefix='auto'
 	fi
 	PRO=$(uci get network.wwan5.proto)
 	if [ -z $PRO ]; then
@@ -90,6 +92,9 @@ log "Hotspot Firewall"
 		uci set network.wwan56=interface
 		uci set network.wwan56.proto=dhcpv6 
 		uci set network.wwan56.metric='2'
+		uci set network.wwan56.device='@wwan5'
+		uci set network.wwan56.reqaddress='try'
+		uci set network.wwan56.reqprefix='auto'
 		uci commit network
 	fi
 	config_load firewall

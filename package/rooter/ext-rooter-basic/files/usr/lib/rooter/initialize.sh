@@ -197,11 +197,17 @@ while [ $COUNTER -le $MODCNT ]; do
 	uci set network.wan$COUNTER.proto=dhcp
 	uci set network.wan$COUNTER.metric=$COUNTER"0"
 	uci set network.wan$COUNTER.${ifname1}="wan"$COUNTER
+	
+	uci -q delete network.wan$COUNTER"_6"
+	uci set network.wan$COUNTER'_6'=interface
+	uci set network.wan$COUNTER'_6'.proto=none
+	uci set network.wan$COUNTER'_6'.device="@wan$COUNTER"
+	uci set network.wan$COUNTER'_6'.metric=$COUNTER"0"
 
 	if [ -e /etc/config/mwan3 ]; then
 		ENB=$(uci -q get mwan3.wan$COUNTER.enabled)
 		if [ ! -z $ENB ]; then
-			uci set mwan3.wan$COUNTER.enabled=0
+			uci set mwan3.wan$COUNTER.enabled=1
 		fi
 	fi
 
