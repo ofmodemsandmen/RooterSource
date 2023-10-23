@@ -39,6 +39,17 @@ d1:value("100", "100 seconds")
 d1:value("120", "120 seconds")
 d1.default=40
 
+d1x = d:option(ListValue, "timeout", translate("Ping Timeout"),translate("Seconds to wait for a ping response. Increase if under heavy load"));
+d1x:value("1", "1 second")
+d1x:value("2", "2 seconds")
+d1x:value("3", "3 seconds")
+d1x:value("5", "5 seconds")
+d1x:value("10", "10 seconds")
+d1x:value("15", "15 seconds")
+d1x:value("20", "20 seconds")
+d1x:value("25", "25 seconds")
+d1x.default=5
+
 ipv41 = d:option(Value, "ipv41", translate("IPv4 Server :"), translate("First IPv4 server to ping")); 
 ipv41.rmempty = true;
 ipv41.optional=false;

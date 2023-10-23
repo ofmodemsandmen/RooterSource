@@ -10,7 +10,7 @@ logger -t "Custom Ping Test " "$@"
 }
 
 tping() {
-	hp=$(httping $2 -c 3 -s $1)
+	hp=$(httping $2 -t $TIMEOUT -c 3 -s $1)
 	pingg=$(echo $hp" " | grep -o "round-trip .\+ ms ")
 	if [ -z "$pingg" ]; then
 		tmp=0
@@ -23,9 +23,9 @@ doping() {
 	TYPE=$(uci get ping.ping.type)
 	if [ $TYPE = "1" ]; then
 	log "Curl"
-		RETURN_CODE_1=$(curl -s -m 10 -s -o /dev/null -w "%{http_code}" $ipv41)
-		RETURN_CODE_2=$(curl -s --ipv6 -m 10 -s -o /dev/null -w "%{http_code}" $ipv6)
-		RETURN_CODE_3=$(curl -s -m 10 -s -o /dev/null -w "%{http_code}" $ipv42)
+		RETURN_CODE_1=$(curl -s --connect-timeout $TIMEOUT -m 10 -s -o /dev/null -w "%{http_code}" $ipv41)
+		RETURN_CODE_2=$(curl -s --connect-timeout $TIMEOUT --ipv6 -m 10 -s -o /dev/null -w "%{http_code}" $ipv6)
+		RETURN_CODE_3=$(curl -s --connect-timeout $TIMEOUT -m 10 -s -o /dev/null -w "%{http_code}" $ipv42)
 	else
 	log "Ping"
 		tping "$ipv41"; RETURN_CODE_1=$tmp
@@ -81,6 +81,7 @@ uci commit ping
 CURRMODEM=1
 CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 DELAY=$(uci get ping.ping.delay)
+TIMEOUT=$(uci get ping.ping.timeout)
 
 doping
 
