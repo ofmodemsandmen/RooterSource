@@ -159,7 +159,7 @@ end
 				document.getElementById("modpin").value = pinn;
 				loadpin = "1";
 			} 
-
+			
 			if ( stat == "0" )
 			{
 				bnds = "0" ;
@@ -822,6 +822,16 @@ end
 						document.getElementById("celllock3").style.display = "none";
 					} 
 					
+					enab = rv.mrestart;
+					if ( enab == "0" )
+					{
+						document.getElementById('enab').checked=false;
+					}
+					else
+					{
+						document.getElementById('enab').checked=true;
+					}
+
 				
 					var ix = -1;
 					var j = 1;
@@ -1976,6 +1986,21 @@ end
 		return true;
 	}
 	
+	function enable(btn)
+	{
+		dx = 0;
+		if ( btn.checked == true )
+		{
+			dx = 1;
+		}
+		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "setrestart")%>',
+			{ set: dx },
+			function()
+			{
+			}
+		);
+	}
+	
 //]]></script>
 
 <form method="post" action="<%=REQUEST_URI%>">
@@ -1983,6 +2008,7 @@ end
 <h2><a id="content" name="content"><%:Miscellaneous Modem Features%></a></h2>
 <div class="cbi-map-descr"><%:A Collection of Modem Features%></div>
 <head>
+	<link rel="stylesheet" href="<%=resource%>/buttons/buttons.css">
      <style>
       input {
         vertical-align: bottom;
@@ -2165,10 +2191,21 @@ end
 	</table>
 	
 	<table width="700" border="0" id="tab6">
-	<tr>
+		<tr>
 		<td width="12%">&nbsp;</td>
 		<td width="20%"><input type="button" id="setbnd" class="cbi-button cbi-button-apply" value="<%:Lock Modem to Selected Bands%>" onclick="return lockbnd()" /></td>
 		<td width="68%">&nbsp;</td>
+		</tr>
+		<tr>
+			<td align="right">
+			<div>
+				<label class="switch">
+					<input type="checkbox" id="enab" onclick="enable(this)">
+					<span class="slider round"></span>
+				</label>
+			</div></td>
+			<td><div align="left" style="font-size : 18px; width: 100%; height: 25px;"><strong><%:Restart Modem after Locking%></strong></div></td>
+			<td>&nbsp;</td>
 		</tr>
 	</table>
 	

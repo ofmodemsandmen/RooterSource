@@ -44,6 +44,7 @@ function index()
 	entry({"admin", "modem", "change_cell"}, call("action_change_cell"))
 	entry({"admin", "modem", "change_proto"}, call("action_change_proto"))
 	entry({"admin", "modem", "setpin"}, call("action_setpin"))
+	entry({"admin", "modem", "setrestart"}, call("action_setrestart"))
 end
 
 function trim(s)
@@ -164,6 +165,10 @@ function action_check_misc()
 				file:close()
 			end
 			
+			rv["mrestart"] = luci.model.uci.cursor():get("custom", "bandlock", "restart")
+			if rv["mrestart"] == nil then
+				rv["mrestart"] = "1"
+			end
 			rv["cenable"] = luci.model.uci.cursor():get("custom", "bandlock", "cenable" .. miscnum)
 			if rv["cenable"] == nil then
 				rv["cenable"] = "0"
@@ -673,4 +678,10 @@ end
 function action_setpin()
 	local set = luci.http.formvalue("set")
 	os.execute("uci set modem.general.pin=" .. set .. "; uci commit modem")
+end
+
+
+function action_setrestart()
+	local set = luci.http.formvalue("set")
+	os.execute("uci set custom.bandlock.restart=" .. set .. "; uci commit custom")
 end

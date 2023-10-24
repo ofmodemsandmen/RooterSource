@@ -7,7 +7,14 @@ log() {
 	modlog "Lock Band $CURRMODEM" "$@"
 }
 
+restart=$(uci -q get custom.bandlock.restart)
+if [ -z "$restart" ]; then
+	restart="1"
+fi
 RESTART="1"
+if [ "$restart" = "0" ]; then
+	RESTART="0"
+fi
 
 ifname1="ifname"
 if [ -e /etc/newstyle ]; then
@@ -171,9 +178,9 @@ export TIMEOUT="5"
 case $uVid in
 	"2c7c" )
 		MODT="1"
-		if [ -z "$2" ]; then
-			RESTART="1"
-		fi
+		#if [ -z "$2" ]; then
+		#	RESTART="1"
+		#fi
 		M5=""
 		M2='AT+QCFG="band",0,'$mask',0'
 		if [ $uPid = 0620 ]; then
