@@ -82,6 +82,9 @@ CURRMODEM=1
 CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 DELAY=$(uci get ping.ping.delay)
 TIMEOUT=$(uci get ping.ping.timeout)
+if [ -z "$TIMEOUT" ]; then
+	TIMEOUT=5
+fi
 
 doping
 
