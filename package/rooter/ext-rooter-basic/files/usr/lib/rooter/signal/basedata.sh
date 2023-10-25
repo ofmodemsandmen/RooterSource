@@ -76,7 +76,17 @@ case $pval in
 	;;
 esac
 
+INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
+if [ -z "$INTER" ]; then
+	INTER=$CURRMODEM
+else
+	if [ $INTER = 0 ]; then
+		INTER=$CURRMODEM
+	fi
+fi
+
 echo 'MODEM="'"$MODEM"'"' >> /tmp/base$CURRMODEM.file
 echo 'DOWN="'"$DOWN"'"' >> /tmp/base$CURRMODEM.file
 echo 'UP="'"$UP"'"' >> /tmp/base$CURRMODEM.file
 echo 'PROTO="'"$PROTO"'"' >> /tmp/base$CURRMODEM.file
+echo 'INTER="'"$INTER"'"' >> /tmp/base$CURRMODEM.file

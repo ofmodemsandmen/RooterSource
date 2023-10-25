@@ -54,6 +54,8 @@ make_connect() {
 		echo "-"
 		echo "-"
 		echo "-"
+		echo "-"
+		echo "-"
 	} > /tmp/statusx$CURRMODEM.file
 	mv -f /tmp/statusx$CURRMODEM.file /tmp/status$CURRMODEM.file
 }
@@ -100,6 +102,7 @@ make_signal() {
 		echo "$SINR"
 		echo "$LATITUDE"
 		echo "$LONGITUDE"
+		echo "$INTER"
 	} > /tmp/statusx$CURRMODEM.file
 	mv -f /tmp/statusx$CURRMODEM.file /tmp/status$CURRMODEM.file
 	if [ -e $ROOTER/modem-led.sh ]; then

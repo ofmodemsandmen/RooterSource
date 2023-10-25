@@ -52,6 +52,14 @@ end
 			document.getElementById('proto').innerHTML=rv.proto;
 			document.getElementById('pci').innerHTML=rv.pci;
 			document.getElementById('sinr').innerHTML=rv.sinr;
+			if ( rv.inter == "-" )
+			{
+				document.getElementById('inter').innerHTML=rv.inter;
+			}
+			else
+			{
+				document.getElementById('inter').innerHTML="WAN" + rv.inter;
+			}
 			<% if havegps == 1 then %>
 			document.getElementById('lat').innerHTML=rv.lat;
 			document.getElementById('long').innerHTML=rv.long;
@@ -396,6 +404,12 @@ end
     		<td><div align="right"><%:Protocol : %></div></td>
     		<td><ul id="proto"></ul></td>
     		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+  	</tr>
+	<tr>
+    	<td><div align="right"><%:Interface : %></div></td>
+    	<td><ul id="inter"></ul></td>
+    	<td>&nbsp;</td>
 		<td>&nbsp;</td>
   	</tr>
 	</table>

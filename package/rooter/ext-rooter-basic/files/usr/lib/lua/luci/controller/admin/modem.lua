@@ -447,6 +447,7 @@ function action_get_csq()
 	rv["sinr"] = file:read("*line")
 	rv["lat"] = file:read("*line")
 	rv["long"] = file:read("*line")
+	rv["inter"] = file:read("*line")
 
 	file:close()
 

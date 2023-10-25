@@ -44,3 +44,5 @@ echo "-" >> /tmp/status$CURRMODEM.file
 echo "-" >> /tmp/status$CURRMODEM.file
 echo "-" >> /tmp/status$CURRMODEM.file
 echo "-" >> /tmp/status$CURRMODEM.file
+echo "-" >> /tmp/status$CURRMODEM.file
+echo "-" >> /tmp/status$CURRMODEM.file
