@@ -33,7 +33,7 @@ if [ $uVid != "2c7c" ]; then
 	log "Hard modem reset done $OX"
 else
 	if [ ! -z "$CPORT" ]; then
-		ATCMDD="AT+QPOWD=0"
+		ATCMDD="AT+QPOWD=0;+CFUN=1,1"
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	fi
 	log "Hard modem reset done $OX"
