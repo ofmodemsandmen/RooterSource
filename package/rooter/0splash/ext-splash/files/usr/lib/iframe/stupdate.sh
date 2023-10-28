@@ -200,6 +200,12 @@ modd=$1
 		pci="$line"
 		read -r line
 		sinr="$line"
+		read -r line
+		lat="$line"
+		read -r line
+		long="$line"
+		read -r line
+		inter="$line"
 		break
 	done < /tmp/status$modd.file
 }
@@ -331,6 +337,11 @@ if [ $splash = "1" ]; then
 	fi
 	level2txt "$extr" "single"
 	sed -i -e "s!#EXTERNAL#!$namev!g" $STEMP
+	level2txt "$inter" "single"
+	if [ "$namev" != "<b class='level_2'>--</b>" ]; then
+		namev="<i class='msText'>WAN$namev</i>"
+	fi
+	sed -i -e "s!#INTER#!$namev!g" $STEMP
 		
 	routid=$(uci -q get zerotier.zerotier.secret)
 	if [ -z "$routid" ]; then
@@ -398,6 +409,11 @@ if [ $splash = "1" ]; then
 		sed -i -e "s!#PORT#!$namev!g" $STEMP2
 		level2txt "$tempur" "single"
 		sed -i -e "s!#TEMP#!$namev!g" $STEMP2
+		level2txt "$inter" "single"
+		if [ "$namev" != "<b class='level_2'>--</b>" ]; then
+			namev="<i class='msText'>WAN$namev</i>"
+		fi
+		sed -i -e "s!#INTER2#!$namev!g" $STEMP2
 		
 		MODEM2=$(cat $STEMP2)
 		sed -i -e "s!#MODEM2#!$MODEM2!g" $STEMP
