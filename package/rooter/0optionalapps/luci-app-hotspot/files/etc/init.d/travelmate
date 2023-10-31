@@ -8,6 +8,11 @@ log() {
 	wifilog "Hotspot Initialize" "$@"
 }
 
+ifname1="ifname"
+if [ -e /etc/newstyle ]; then
+	ifname1="device"
+fi
+
 do_zone() {
 	local config=$1
 	local name
@@ -81,7 +86,7 @@ log "Hotspot Firewall"
 		uci set network.wwan26=interface
 		uci set network.wwan26.proto=dhcpv6 
 		uci set network.wwan26.metric='2'
-		uci set network.wwan26.device='@wwan2'
+		uci set network.wwan26.${ifname1}='@wwan2'
 		uci set network.wwan26.reqaddress='try'
 		uci set network.wwan26.reqprefix='auto'
 	fi
@@ -93,7 +98,7 @@ log "Hotspot Firewall"
 		uci set network.wwan56=interface
 		uci set network.wwan56.proto=dhcpv6 
 		uci set network.wwan56.metric='2'
-		uci set network.wwan56.device='@wwan5'
+		uci set network.wwan56.${ifname1}='@wwan5'
 		uci set network.wwan56.reqaddress='try'
 		uci set network.wwan56.reqprefix='auto'
 		uci commit network

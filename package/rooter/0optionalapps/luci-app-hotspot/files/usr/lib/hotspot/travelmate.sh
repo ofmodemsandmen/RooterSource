@@ -159,6 +159,12 @@ f_check()
         if [ "${mode}" = "sta" ]
         then
 			trm_ifstatus="$(ubus -S call network.interface dump | jsonfilter -e "@.interface[@.device=\"${ifname}\"].up")"
+			trr=$(echo ${trm_ifstatus} | grep "true")
+			if [ ! -z "$trr" ]; then
+				trm_ifstatus="true"
+			else
+				trm_ifstatus="false"
+			fi
         else
             trm_ifstatus="$(ubus -S call network.wireless status | jsonfilter -l1 -e '@.*.up')"
         fi
@@ -362,7 +368,7 @@ f_main()
 									cntx=0
 									#delay=$(uci -q get travelmate.global.delay)
 									f_check "sta"
-									f_log "info" "STA Status ${trm_ifstatus}"
+									f_log "info" "STA Status **${trm_ifstatus}**"
 									while [ "${trm_ifstatus}" != "true" ]; do
 										sleep 1
 										f_check "sta"
