@@ -43,4 +43,9 @@ else
 	uci -q commit wireless
 	ubus call network.interface.wwan down
     ubus call network reload
+	z81=$(cat /tmp/sysinfo/board_name)
+	z8=$(echo "z81" | grep "8102")
+	if [ ! -z "z8" ]; then
+		/etc/init.d/network restart
+	fi
 fi

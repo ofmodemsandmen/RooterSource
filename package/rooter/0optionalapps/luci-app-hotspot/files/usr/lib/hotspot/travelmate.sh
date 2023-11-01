@@ -275,7 +275,13 @@ f_main()
 		ubus call network.interface.wwan$wif up
 		ubus call network reload
 		wifi up $(uci -q get wireless.wwan$wif.device)
-		sleep 5
+		z81=$(cat /tmp/sysinfo/board_name)
+		z8=$(echo "z81" | grep "8102")
+		if [ ! -z "z8" ]; then
+			/etc/init.d/network restart
+		fi
+
+		#sleep 5
 
 		# set disabled for wwan iface
         config_load wireless
@@ -284,6 +290,11 @@ f_main()
         then
             uci -q commit wireless
             ubus call network reload
+			z81=$(cat /tmp/sysinfo/board_name)
+			z8=$(echo "z81" | grep "8102")
+			if [ ! -z "z8" ]; then
+				/etc/init.d/network restart
+			fi
         fi
 		# check if AP working
 		f_working_ap
@@ -350,6 +361,11 @@ f_main()
 									wifi up $(uci -q get wireless.wwan$wif.device)
 									ubus call network.interface.wwan$wif up
                             		ubus call network reload
+									z81=$(cat /tmp/sysinfo/board_name)
+									z8=$(echo "z81" | grep "8102")
+									if [ ! -z "z8" ]; then
+										/etc/init.d/network restart
+									fi
 									f_log "info " "main    ::: wwan interface connected to uplink ${ssid}"
 									sleep 5
 									# wait and check for good connection
@@ -378,7 +394,11 @@ f_main()
 										fi
 										f_log "info" "STA Status ${trm_ifstatus}"
 									done
-
+									z81=$(cat /tmp/sysinfo/board_name)
+									z8=$(echo "z81" | grep "8102")
+									if [ ! -z "z8" ]; then
+										/etc/init.d/network restart
+									fi
 									if [ "${trm_ifstatus}" = "true" ]; then
 										uci set travelmate.global.ssid="$ssid"
 										uci set travelmate.global.connecting="0"
