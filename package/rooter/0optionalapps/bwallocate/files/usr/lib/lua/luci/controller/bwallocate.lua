@@ -19,4 +19,11 @@ function index()
 			end
 		end
 	end
+	
+	entry({"admin", "adminmenu", "bwreset"}, call("action_bwreset"))
+end
+
+function action_bwreset()
+	local set = luci.http.formvalue("set")
+	os.execute("/usr/lib/bwmon/bwreset.sh \"" .. set .. "\"")
 end

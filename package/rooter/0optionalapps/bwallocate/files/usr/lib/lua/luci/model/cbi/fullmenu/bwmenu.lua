@@ -70,6 +70,10 @@ up.datatype = "and(uinteger,min(1),max(999))"
 up:depends("action", "1")
 up.default = "2"
 
+
+m:section(SimpleSection).template = "fullmenu/bwreset"
+
+
 s = m:section(TypedSection, "texting", translate("Text/Email Settings"))
 s.anonymous = true
 s.addremove = false

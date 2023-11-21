@@ -1,0 +1,42 @@
+
+<script type="text/javascript" src="<%=resource%>/xhr.js"></script>
+<script type="text/javascript">//<![CDATA[
+
+	function sendbw(btn)
+	{
+		dx = document.getElementById('bwval').value;
+		XHR.get('<%=luci.dispatcher.build_url("admin", "adminmenu", "bwreset")%>',
+			{ set: dx },
+			function()
+			{
+				alert("<%:Bandwidth Used Amount has been changed%>");
+			}
+		);
+	}
+	
+//]]></script>
+
+<head>
+	<link rel="stylesheet" href="<%=resource%>/buttons/buttons.css">
+     <style>
+
+    </style>
+</head>
+
+<fieldset class="cbi-section" id="cbi-family">
+	<legend><%:Bandwidth Reset%></legend>
+	<table width="100%"  border="0">
+		<tr>
+			<td width="25%"><div align="right"><%:New Bandwidth Used Amount%> : &nbsp;&nbsp;</div></td>
+			<td width="15%"><input id="bwval" type="text" value="0" /></td>
+			<td width="15%"><div style="color:black;width:200px" id="sendbw" class="button-33" role="button" onclick="return sendbw(this)"><%:Change%></div></td>
+			<td width="55%"></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><div align="left"><%:New Amount in Megabytes%></div></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</table>
+</fieldset>

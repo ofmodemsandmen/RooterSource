@@ -20,6 +20,8 @@ m.on_after_commit = function(self)
 	end
 end
 
+m:section(SimpleSection).template = "rooter/profile"
+
 if profsave == "1" then
 	if fs.stat("/usr/lib/country/mccdata") then
 		m:section(SimpleSection).template = "rooter/country"

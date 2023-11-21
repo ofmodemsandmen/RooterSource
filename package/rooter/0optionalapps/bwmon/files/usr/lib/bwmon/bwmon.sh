@@ -129,6 +129,33 @@ update() {
 	
 }
 
+checkreset()
+{
+	if [ -e /tmp/bwreset ]; then
+		newbw=$(cat /tmp/bwreset)
+		uci set bwmon.backup.dailytotal='0'
+		uci set bwmon.backup.dailyrx='0'
+		uci set bwmon.backup.dailytx='0'
+		uci set bwmon.backup.montotal="$newbw"
+		uci set bwmon.backup.monrx="$newbw"
+		uci set bwmon.backup.montx='0'
+		uci commit bwmon
+		basedailytotal=0
+		basedailyrx=0
+		basedailytx=0
+		basemontotal="$newbw"
+		basemonrx="$newbw"
+		basemontx=0
+		let dailyoffsettotal=$totval
+		let dailyoffsetrx=$rxval
+		let dailyoffsettx=$txval
+		let monoffsettotal=$totval
+		let monoffsetrx=$rxval
+		let monoffsettx=$txval
+		rm -f /tmp/bwreset
+	fi
+}
+
 checkTime() 
 {
 	pDay=$(date +%d)
@@ -305,6 +332,7 @@ update_time=10 # check each seconds
 createAmt
 while [ true ] ; do
 	update
+	checkreset
 	checkTime
 	checkBackup
 	createGUI
