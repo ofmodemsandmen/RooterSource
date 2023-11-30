@@ -67,10 +67,11 @@ firstboot() {
 	config_foreach do_zone zone
 
 	source /etc/openwrt_release
-	if [ $DISTRIB_RELEASE = "SNAPSHOT" ]; then
-		DISTRIB_RELEASE="21.02.2"
+	DR=$DISTRIB_RELEASE
+	if [ $DR = "SNAPSHOT" ]; then
+		DR="21.02.2"
 	fi
-	tone=$(echo "$DISTRIB_RELEASE" | grep "2")
+	tone=$(echo "$DR" | grep "2")
 }
 
 if [ -e /tmp/installing ]; then
@@ -96,7 +97,7 @@ uci commit modem
 source /etc/openwrt_release
 rm -f /etc/openwrt_release
 if [ $DISTRIB_RELEASE = "SNAPSHOT" ]; then
-	DISTRIB_RELEASE="21.02.2"
+	DISTRIB_RELEASE="Master"
 fi
 if [ -e /etc/custom ]; then
 	lua $ROOTER/customname.lua
