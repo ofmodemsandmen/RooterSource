@@ -1,0 +1,20 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006 OpenWrt.org
+
+START=35
+
+start() {
+	NP=$(grep -c ^processor /proc/cpuinfo )
+	if [ "$NP" -gt 1 ]; then
+		INTERRUPT=$(ls /proc/irq/ | sed '/default/d')
+		USB_NUMBER=$(grep "xhci-hcd" /proc/interrupts | awk -F: '{print $1}' | sed 's/^ //')
+
+		for I in ${INTERRUPT}; do
+			if [[ ${I} = ${USB_NUMBER} ]]; then
+					echo 2 > /proc/irq/${I}/smp_affinity 2>/dev/null
+				else
+					echo 1 > /proc/irq/${I}/smp_affinity 2>/dev/null
+				fi
+		done
+	fi
+}
