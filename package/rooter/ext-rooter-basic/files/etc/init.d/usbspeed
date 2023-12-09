@@ -10,10 +10,10 @@ start() {
 		USB_NUMBER=$(grep "xhci-hcd" /proc/interrupts | awk -F: '{print $1}' | sed 's/^ //')
 
 		for I in ${INTERRUPT}; do
-			if [[ ${I} = ${USB_NUMBER} ]]; then
-					echo 2 > /proc/irq/${I}/smp_affinity 2>/dev/null
+			if [[ "${I}" = "${USB_NUMBER}" ]]; then
+					echo "3" > /proc/irq/${I}/smp_affinity 2>/dev/null
 				else
-					echo 1 > /proc/irq/${I}/smp_affinity 2>/dev/null
+					echo "1" > /proc/irq/${I}/smp_affinity 2>/dev/null
 				fi
 		done
 	fi
