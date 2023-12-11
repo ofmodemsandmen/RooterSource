@@ -252,6 +252,7 @@ if [ "$ACTION" = add ]; then
 			log "Modem found"
 		else
 			log "Found USB Storage"
+			rm -f /tmp/usbwait
 			exit 0
 		fi
 	fi
