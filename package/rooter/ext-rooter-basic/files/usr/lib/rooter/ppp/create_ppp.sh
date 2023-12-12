@@ -115,10 +115,10 @@ case $PROT in
 	;;
 "11"|"12" )
 	if [ $retval -eq 0 ]; then
-		DP=2
+		DP=3
 		CP=2
 	else
-		DP=2
+		DP=3
 		CP=2
 	fi
 	;;
@@ -178,6 +178,14 @@ fi
 
 log "PPP Comm Port : /dev/ttyUSB$CPORT"
 log "PPP Data Port : /dev/ttyUSB$DPORT"
+
+if [ -e $ROOTER/mhi2usb.sh ]; then
+	$ROOTER/mhi2usb.sh $CURRMODEM 2
+fi
+
+if [ -e /tmp/mhiusb ]; then
+	exit 0
+fi
 
 if [ -z "$idV" ]; then
 	idV=$(uci -q get modem.modem$CURRMODEM.idV)
