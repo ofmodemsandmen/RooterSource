@@ -8,36 +8,6 @@ log() {
 	modlog "Disconnect Modem $CURRMODEM" "$@"
 }
 
-handle_timeout(){
-	local wget_pid="$1"
-	local count=0
-	res=1
-	if [ -d /proc/${wget_pid} ]; then
-		res=0
-	fi
-	while [ "$res" = 0 -a $count -lt "$((TIMEOUT))" ]; do
-		sleep 1
-		count=$((count+1))
-		res=1
-		if [ -d /proc/${wget_pid} ]; then
-			res=0
-		fi
-	done
-
-	if [ "$res" = 0 ]; then
-		log "Killing process on timeout"
-		kill "$wget_pid" 2> /dev/null
-		res=1
-		if [ -d /proc/${wget_pid} ]; then
-			res=0
-		fi
-		if [ "$res" = 0 ]; then
-			log "Killing process on timeout"
-			kill -9 $wget_pid 2> /dev/null	
-		fi
-	fi
-}
-
 CURRMODEM=$(uci get modem.general.miscnum)
 uci set modem.modem$CURRMODEM.connected=0
 uci commit modem
@@ -71,3 +41,8 @@ case $PROT in
 esac
 
 $ROOTER/log/logger "Modem #$CURRMODEM was Manually Disconnected"
+log "Modem #$CURRMODEM was Manually Disconnected"
+
+if [ -e $ROOTER/modem-led.sh ]; then
+	$ROOTER/modem-led.sh $CURRMODEM 0
+fi
