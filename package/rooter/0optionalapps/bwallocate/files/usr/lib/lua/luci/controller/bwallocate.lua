@@ -20,7 +20,6 @@ function index()
 		end
 	end
 	
-	entry({"admin", "adminmenu", "bwreset"}, call("action_bwreset"))
 end
 
 function action_bwreset()
