@@ -13,22 +13,8 @@ include $(INCLUDE_DIR)/package.mk
 define Package/ext-rooter16
   SECTION:=utils
   CATEGORY:=ROOter
-  DEPENDS:=+luci +ext-rooter-basic +pingtest +ext-logo \
-		+luci-app-mwan3 +luci-app-dnsmasq-ipset \
-		+luci-app-ddns +ddns-scripts +ddns-scripts_no-ip_com \
-		+luci-app-rootervpn +ext-wireguard \
-		+bwmon +464xlat +webconsole \
-		+ext-theme +luci-theme-argon +luci-theme-argondark \
-		+luci-theme-tomato +ext-login \
-		+ca-bundle +ca-certificates \
-		+luci-app-ksmbd +usb-storage \
-		+ext-p910nd +luci-app-sqm +kmod-sched-cake +luci-app-nft-qos \
-		+ext-command +ext-speedtest +luci-app-guestwifi \
-		+openvpn-easy-rsa +openvpn-openssl \
-		+ext-extra +luci-app-hotspot +luci-app-wol \
-		+usbmuxd +libusbmuxd-utils +libimobiledevice-utils +kmod-usb-net-ipheth \
-		+qlog +luci-ssl +usbutils +openssl-util +irqbalance +ext-splashconfig \
-		+nano +picocom +wpad-openssl +wget +qfirehose +luci-app-vpnbypass +ext-simplegps
+  DEPENDS:=+ext-rooter-lite \
+		+luci-app-mwan3 +luci-app-dnsmasq-ipset 
   TITLE:=ROOter support for 16meg and larger routers with MWan3
   PKGARCH:=all
 endef
