@@ -156,6 +156,11 @@ mf1 = di:taboption(this_taba, ListValue, "watchdog", translate("Disable Connecti
 mf1:value("0", translate("No"))
 mf1:value("1", translate("Yes"))
 mf1.default=0
+
+mf2 = di:taboption(this_taba, ListValue, "detect", translate("Stop after Detection :"));
+mf2:value("0", translate("No"))
+mf2:value("1", translate("Yes"))
+mf2.default=0
 		
 mf = di:taboption(this_taba, ListValue, "ppp", translate("Force Modem to PPP Protocol :"));
 mf:value("0", translate("No"))
