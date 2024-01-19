@@ -111,6 +111,8 @@ datalist[51] = "megafon"
 celllist[51] = 2
 datalist[52] = "ln9"
 celllist[52] = 2
+datalist[53] = "fm190"
+celllist[53] = 4
 
 printf = function(s,...)
 	if echo == 0 then

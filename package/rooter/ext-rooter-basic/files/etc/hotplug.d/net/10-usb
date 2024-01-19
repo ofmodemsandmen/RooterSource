@@ -21,7 +21,7 @@ if [ "$NP" -gt 1 ]; then
 
 		for i in ${INTERRUPT}; do
 			if [[ $i = ${USB3_NUMBER} ]]; then
-				echo 1 > /proc/irq/$i/smp_affinity 2>/dev/null
+				echo f > /proc/irq/$i/smp_affinity 2>/dev/null
 			else
 				echo e > /proc/irq/$i/smp_affinity 2>/dev/null
 			fi

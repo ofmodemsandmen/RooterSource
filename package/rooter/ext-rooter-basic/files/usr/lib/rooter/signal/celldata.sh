@@ -54,8 +54,10 @@ OX=$(echo "${OX//[ \"]/}")
 CID=""
 CID5=""
 RAT=""
+REGSTAT=""
 REGV=$(echo "$OX" | grep -o "+C5GREG:2,[0-9],[A-F0-9]\{2,6\},[A-F0-9]\{5,10\},[0-9]\{1,2\}")
 if [ -n "$REGV" ]; then
+	REGSTAT=$(echo "$REGV" | cut -d, -f2)
 	LAC5=$(echo "$REGV" | cut -d, -f3)
 	LAC5=$LAC5" ($(printf "%d" 0x$LAC5))"
 	CID5=$(echo "$REGV" | cut -d, -f4)
@@ -104,7 +106,9 @@ else
 		LAC=""
 	fi
 fi
-REGSTAT=$(echo "$REGV" | cut -d, -f2)
+if [ -z "$REGSTAT" ]; then
+	REGSTAT=$(echo "$REGV" | cut -d, -f2)
+fi
 if [ "$REGSTAT" == "5" -a "$COPS" != "-" ]; then
 	COPS_MNC=$COPS_MNC" (Roaming)"
 fi
