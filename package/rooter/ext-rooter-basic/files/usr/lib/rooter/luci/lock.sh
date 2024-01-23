@@ -342,7 +342,7 @@ case $uVid in
 		if [ -e /etc/fake ]; then
 			exit 0
 		fi
-		if "$flg" = "0" ]; then
+		if [ "$flg" = "0" ]; then
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M1")
 			log "$OX"
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M2")

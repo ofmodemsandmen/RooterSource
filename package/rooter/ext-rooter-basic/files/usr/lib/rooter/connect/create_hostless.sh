@@ -196,21 +196,17 @@ check_ip() {
 addv6() {
 	. /lib/functions.sh
 	. /lib/netifd/netifd-proto.sh
-	local interface=wan$INTER
-	local zone="$(fw3 -q network "$interface" 2>/dev/null)"
-
 	log "Adding IPv6 dynamic interface"
-	json_init
-	json_add_string name "${interface}_6"
-	json_add_string ${ifname1} "@$interface"
-	json_add_string proto "dhcpv6"
-	json_add_string extendprefix 1
-	[ -n "$zone" ] && json_add_string zone "$zone"
-	[ "$pdns" = 1 ] && json_add_boolean peerdns 0
-	[ "$nat46" = 1 ] || json_add_string iface_464xlat 0
-	proto_add_dynamic_defaults
-	json_close_object
-	ubus call network add_dynamic "$(json_dump)"
+
+	#	config interface 'wan1_6'
+	uci set network.wan$INTER"_6"._orig_ifname="@wan$INTER"
+	uci set network.wan$INTER"_6"._orig_bridge='false'
+	uci set network.wan$INTER"_6".proto='dhcpv6'
+	uci set network.wan$INTER"_6".ifname="$ifname"
+	uci set network.wan$INTER"_6".reqaddress='try'
+	uci set network.wan$INTER"_6".reqprefix='auto'
+	uci commit network
+	ifup wan$INTER"_6"
 }
 
 CURRMODEM=$1

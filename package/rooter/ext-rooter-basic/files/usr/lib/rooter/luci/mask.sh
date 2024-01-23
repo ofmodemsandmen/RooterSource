@@ -9,15 +9,12 @@ log() {
 #
 # remove for band locking
 #
-enb=$(uci -q get custom.bandlock.enabled)
-if [ $enb == "0" ]; then
-	exit 0
-fi
 
 reverse() {
 	LX=$1
 	length=${#LX}
-	jx="${LX:2:length-2}"
+	let lnx=$length-2
+	jx="${LX:2:$lnx}"
 	length=${#jx}
 	str=""
 	i=$((length-1))
@@ -66,7 +63,7 @@ model=$($ROOTER/gcom/gcom-locked "$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 L1=$(uci -q get modem.modem$CURRMODEM.L1)
 L5=$(uci -q get modem.modem$CURRMODEM.L5)
 L6=$(uci -q get modem.modem$CURRMODEM.L6)
-
+log "$L1"
 if [ ! $L1 ]; then
 	exit 0
 fi
@@ -239,7 +236,7 @@ case $uVid in
 				CA=""
 			;;
 			"9070"|"9071"|"9078"|"9079"|"907a"|"907b" ) # EM/MC7455
-				M2='11111011000110000001000011001100000000001'
+				M2='11111011000110000001000011000100000000001'
 				if [ -e /etc/fake ]; then
 					M2='1111101100011100011100000100110100000000110001010000000000000000010'
 				fi

@@ -32,7 +32,9 @@ if [ -z "$MANUF" ]; then
         MANUF=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	MANUF=$(echo $MANUF)
 	MANUF=$(echo "${MANUF//[\"]/}")
-	MANUF=${MANUF::-3}
+	length=${#MANUF}
+	let lnx=$length-3
+	MANUF=${MANUF::$lnx}
 	MPREFIX=${MANUF::8}
 	if [ "$MPREFIX" = "AT+CGMI " ]; then
 		MANUF=$(echo $MANUF | cut -c 9-)
@@ -53,7 +55,9 @@ if [ -z "$MODEL" ]; then
         MODEL=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	MODEL=$(echo $MODEL)
 	MODEL=$(echo "${MODEL//[\"]/}")
-	MODEL=${MODEL::-3}
+	length=${#MODEL}
+	let lnx=$length-3
+	MODEL=${MODEL::$lnx}
 	MPREFIX=${MODEL::8}
 	if [ "$MPREFIX" = "AT+CGMM " ]; then
 		MODEL=$(echo $MODEL | cut -c 9-)
