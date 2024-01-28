@@ -5,6 +5,9 @@ ROOTER=/usr/lib/rooter
 MODEMTYPE=$1
 NETMODE=$2
 
+
+# https://pastebin.com/HyqJszfc
+
 # log() {
 	modlog "ModeChange $CURRMODEM" "$@"
 # }
@@ -16,7 +19,8 @@ uci commit modem
 
 MODEMTYPE=$(uci get modem.modem$CURRMODEM.modemtype)
 COMMPORT="/dev/ttyUSB"$(uci get modem.modem$CURRMODEM.commport)
-
+#
+RESETmodem=true
 # ZTE
 if [ $MODEMTYPE -eq 1 ]; then
 	case $NETMODE in
@@ -234,6 +238,9 @@ if [ $MODEMTYPE -eq 9 ]; then
 				ATC="AT+XACT=4,2" ;;
 		esac
 	fi
+	if [ "$idV" == "2cb7" -a "$idP" == "0104" ]; then
+		RESETmodem=false
+	fi
 fi
 
 # SIMCom
@@ -273,4 +280,6 @@ $ROOTER/luci/celltype.sh $CURRMODEM
 uci set modem.modem$CURRMODEM.cmode="1"
 uci commit modem
 
-$ROOTER/luci/restart.sh $CURRMODEM 11
+if $RESETmodem; then
+	$ROOTER/luci/restart.sh $CURRMODEM 11
+fi

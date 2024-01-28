@@ -564,6 +564,13 @@ if [ "$ACTION" = remove ]; then
 			fi
 			uci set network.wan$INTER.${ifname1}=" "
 			uci set network.wan$INTER.metric=$INTER"0"
+			
+			uci -q delete network.wan$INTER"_6"
+			uci set network.wan$INTER'_6'=interface
+			uci set network.wan$INTER'_6'.proto=none
+			uci set network.wan$INTER'_6'.${ifname1}="@wan$COUNTER"
+			uci set network.wan$INTER'_6'.metric=$INTER"0"
+		
 			uci commit network
 			/etc/init.d/network reload
 			ifdown wan$INTER

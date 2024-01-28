@@ -44,7 +44,6 @@ check_apn() {
 	fi
 	ATCMDD="AT+CGDCONT=?"
 	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-
 	[ "$PDPT" = "0" ] && PDPT=""
 	for PDP in "$PDPT" IPV4V6; do
 		if [[ "$(echo $OX | grep -o "$PDP")" ]]; then
@@ -75,6 +74,7 @@ check_apn() {
 	if [ "$CGDCONT" == "$CID,\"$IPVAR\",\"$NAPN\",$IPCG,0,0,1" ]; then
 		if [ -z "$(echo $OX | grep -o "+CFUN: 1")" ]; then
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")
+			log "$OX"
 		fi
 	else
 		ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\",,0,0,1"
@@ -170,9 +170,21 @@ get_tty_fix() {
 get_ip() {
 	ATCMDD="AT+CGPIAF=1,1,1,0;+CGPADDR"
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	OX=$(echo "$OX" | grep "^+CGPADDR: $CID," | cut -d'"' -f2)
-	ip4=$(echo $OX | cut -d, -f1 | grep "\.")
-	ip6=$(echo $OX | cut -d, -f2 | grep ":")
+	OX=$(echo "$OX" | grep "^+CGPADDR: $CID,")
+	first=$(echo "$OX" | cut -d, -f2 | tr -d \")
+	is6=$(echo "$first" | grep ":")
+	if [ ! -z "$is6" ]; then
+		ip4=""
+		ip6=$first
+	else
+		ip6=""
+		ip4=$first
+		sec=$(echo "$OX" | cut -d, -f3 | tr -d \")
+		is6=$(echo "$sec" | grep ":")
+		if [ ! -z "$is6" ]; then
+			ip6=$sec
+		fi
+	fi
 	log "IP address(es) obtained: $ip4 $ip6"
 }
 
@@ -202,9 +214,10 @@ addv6() {
 	uci set network.wan$INTER"_6"._orig_ifname="@wan$INTER"
 	uci set network.wan$INTER"_6"._orig_bridge='false'
 	uci set network.wan$INTER"_6".proto='dhcpv6'
-	uci set network.wan$INTER"_6".ifname="$ifname"
+	uci set network.wan$INTER"_6".$ifname1="@wan$INTER"
 	uci set network.wan$INTER"_6".reqaddress='try'
 	uci set network.wan$INTER"_6".reqprefix='auto'
+
 	uci commit network
 	ifup wan$INTER"_6"
 }
@@ -349,6 +362,9 @@ if [ $SP -gt 0 ]; then
 		fi
 		$ROOTER/connect/bandmask $CURRMODEM 1
 		uci commit modem
+		if [ -e /usr/lib/rooter/connect/mhi2usb.sh ]; then
+			/usr/lib/rooter/connect/mhi2usb.sh $CURRMODEM
+		fi
 	fi
 
 

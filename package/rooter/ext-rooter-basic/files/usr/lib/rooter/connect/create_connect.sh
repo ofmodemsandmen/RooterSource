@@ -745,6 +745,9 @@ if $QUECTEL; then
 		log "Quectel Unsolicited Responses Disabled"
 	fi
 	$ROOTER/connect/bandmask $CURRMODEM 1
+	if [ -e /usr/lib/rooter/connect/mhi2usb.sh ]; then
+		/usr/lib/rooter/connect/mhi2usb.sh $CURRMODEM
+	fi
 	clck=$(uci -q get custom.bandlock.cenable$CURRMODEM)
 	if [ $clck = "1" ]; then
 		ear=$(uci -q get custom.bandlock.earfcn$CURRMODEM)
