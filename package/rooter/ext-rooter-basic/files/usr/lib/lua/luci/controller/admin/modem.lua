@@ -45,6 +45,7 @@ function index()
 	entry({"admin", "modem", "change_proto"}, call("action_change_proto"))
 	entry({"admin", "modem", "setpin"}, call("action_setpin"))
 	entry({"admin", "modem", "setrestart"}, call("action_setrestart"))
+	entry({"admin", "modem", "savesim"}, call("action_savesim"))
 end
 
 function trim(s)
@@ -355,6 +356,17 @@ function action_check_misc()
 	cmode = luci.model.uci.cursor():get("modem", "modem" .. miscnum, "cmode")
 	if cmode == "0" then
 		rv["netmode"] = "10"
+	end
+	
+	os.execute('/usr/lib/rooter/luci/simsel.sh &')
+	file = io.open("/tmp/simsel", "r")
+	if file == nil then
+		rv['simsel'] = "0"
+		rv['simnum'] = "0"
+	else
+		rv['simsel'] = file:read("*line")
+		rv['simnum'] = file:read("*line")
+		file:close()
 	end
 
 	luci.http.prepare_content("application/json")
@@ -685,4 +697,9 @@ end
 function action_setrestart()
 	local set = luci.http.formvalue("set")
 	os.execute("uci set custom.bandlock.restart=" .. set .. "; uci commit custom")
+end
+
+function action_savesim()
+	local set = luci.http.formvalue("set")
+	os.execute("/usr/lib/rooter/luci/setsim.sh " .. "\"" .. set .. "\"")
 end

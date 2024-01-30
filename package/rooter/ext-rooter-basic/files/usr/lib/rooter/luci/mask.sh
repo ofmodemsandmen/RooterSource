@@ -63,7 +63,7 @@ model=$($ROOTER/gcom/gcom-locked "$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 L1=$(uci -q get modem.modem$CURRMODEM.L1)
 L5=$(uci -q get modem.modem$CURRMODEM.L5)
 L6=$(uci -q get modem.modem$CURRMODEM.L6)
-log "$L1"
+
 if [ ! $L1 ]; then
 	exit 0
 fi

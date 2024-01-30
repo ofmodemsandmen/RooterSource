@@ -73,6 +73,7 @@ end
 	var cenable;
 	var modtype;
 	var locking = 0;
+	var simchecked = "0";
 	
 	function T77(uVid, uPid)
 	{
@@ -159,6 +160,40 @@ end
 				document.getElementById("modpin").value = pinn;
 				loadpin = "1";
 			} 
+			
+			simsel = rv.simsel;
+			simnum = rv.simnum;
+			
+			if ( simsel == "1" )
+			{
+				document.getElementById("simsection").style.visibility="visible";
+				document.getElementById("simsection").style.display="block";
+				if ( simnum == "0" )
+				{
+					document.getElementById("csim").innerHTML="----";
+				}
+				else
+				{
+					document.getElementById("csim").innerHTML="SIM #" + simnum;
+				}
+				if ( simchecked == "0" )
+				{
+					if ( simnum == "1" )
+					{
+						document.getElementById("sim1").checked = true;
+					}
+					else
+					{
+						document.getElementById("sim2").checked = true;
+					}
+					simchecked = "1";
+				}
+			}
+			else
+			{
+				document.getElementById("simsection").style.visibility="hidden";
+				document.getElementById("simsection").style.display="none";
+			}
 			
 			if ( stat == "0" )
 			{
@@ -1969,13 +2004,22 @@ end
 	
 	function sndpin(event)
 	{
-	
+		rbtn = document.getElementById("sim1").checked;
+		if ( rbtn == true )
+		{
+			rval = document.getElementById("sim1").value;
+		}
+		else
+		{
+			rval = document.getElementById("sim2").value;
+		}
+		document.getElementById("attxt").value=rval;
+		simchecked = "0";
 	}
 	
 	function sendpin(btn)
 	{
 		var s = document.getElementById("modpin").value;
-		document.getElementById("attxt").value=s;
 		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "setpin")%>',
 			{ set: s },
 			function(x, rv)
@@ -2001,6 +2045,33 @@ end
 		);
 	}
 	
+	function changesim() 
+	{
+		rbtn = document.getElementById("sim1").checked;
+		if ( rbtn == true )
+		{
+			rval = document.getElementById("sim1").value;
+		}
+		else
+		{
+			rval = document.getElementById("sim2").value;
+		}
+		conf = confirm("<%:Modem will be restarted after SIM change\nContinue?%>")
+		if ( conf )
+		{
+			XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "savesim")%>',
+			{ set: rval },
+				function()
+				{
+					document.getElementById("attxt").value=rval;
+					//simchecked = "0";
+				}
+			);
+		}
+		return;
+	}
+	
+	// <div id="simsection" style="visibility:hidden;display:none">
 //]]></script>
 
 <form method="post" action="<%=REQUEST_URI%>">
@@ -2067,9 +2138,43 @@ end
 </fieldset>
 
 <% if nosms == 0 then %>
+<div id="simsection" style="visibility:hidden;display:none">
+<fieldset class="cbi-section" id="cbi-sim">
+	<legend><%:SIM Selection%></legend>
+	
+	<table width="700" border="0">
+		<tr>
+			<td width="100px" style="font-size: 20px" align="left">Currently Using : </td>
+			<td width="600px" style="font-size: 20px" align="left" id="csim"></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+		</tr>
+	</table>
+		
+	<table width="700" border="0">
+		<tr>
+			<td width="100px" style="font-size: 20px" align="center">SIM 1</td>
+			<td width="50px">
+				<input type="radio" id="sim1" name="simsel" value="1" style="height:20px; width:20px; vertical-align: middle;">
+			</td>
+			<td width="550px"><input type="button" id="chgesim" class="cbi-button cbi-button-apply" value="<%:Change SIM%>" onclick="return changesim()" /></td>
+		</tr>
+		<tr>
+			<td style="font-size: 20px" align="center">SIM 2</td>
+			<td>
+				<input type="radio" id="sim2" name="simsel" value="2" style="height:20px; width:20px; vertical-align: middle;">
+			</td>
+			<td></td>
+		</tr>
+	</table>
+</div>
+</fieldset>
+
 <fieldset class="cbi-section" id="cbi-term">
 	<legend><%:AT-Command Terminal%></legend>
-	
+
 	<div id="popup">
 		<table width="500" border="0">
 			<tr>
