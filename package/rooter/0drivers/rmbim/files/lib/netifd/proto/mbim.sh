@@ -293,7 +293,14 @@ _proto_mbim_setup() {
 					;;
 				esac
 			fi
-			ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\""
+			IDV=$(uci get modem.modem$CURRMODEM.idV)
+			if [ "$IDV" = "12d1" ]; then
+				CFUNOFF="0"
+			else
+				CFUNOFF="4"
+			fi
+			IPUP=$(echo $IPVAR | tr 'a-z' 'A-Z')
+			ATCMDD="AT+CGDCONT=$CID,\"$IPUP\",\"$NAPN\""
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=$CFUNOFF")
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=1")

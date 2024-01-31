@@ -1381,8 +1381,7 @@ do
 		esac
 
 		if [ $BRK = 1 ]; then
-			ATCMDD="AT+COPS=0"
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			$ROOTER/common/lockchk.sh $CURRMODEM 
 			$ROOTER/log/logger "Retry Connection with Modem #$CURRMODEM"
 			log "Retry Connection"
 			sleep 10
