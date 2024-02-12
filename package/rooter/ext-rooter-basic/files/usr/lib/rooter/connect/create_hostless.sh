@@ -217,7 +217,10 @@ addv6() {
 	uci set network.wan$INTER"_6".$ifname1="@wan$INTER"
 	uci set network.wan$INTER"_6".reqaddress='try'
 	uci set network.wan$INTER"_6".reqprefix='auto'
-
+	TINTER=$INTER
+	INTER=$INTER"_6"
+	set_dns
+	INTER=$TINTER
 	uci commit network
 	ifup wan$INTER"_6"
 }

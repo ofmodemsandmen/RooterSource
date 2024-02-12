@@ -89,6 +89,9 @@ PCI="-"
 CTEMP="-"
 SINR=""
 COPS_MCC=""
+RSRPCA=" "
+PCICA=" "
+CHANCA=" "
 
 CSQ=$(echo $OX | grep -o "+CSQ: [0-9]\{1,2\}" | grep -o "[0-9]\{1,2\}")
 if [ "$CSQ" = "99" ]; then
@@ -272,6 +275,8 @@ fi
 if [ -n "$XLDATA" ]; then
 	XLDATA=$(echo "${XLDATA//[\" ]/}")
 	XLEC=$(echo $OX | grep -o "+XLEC: [01],[0-9]\+,[0-5],.*BAND_LTE_[0-9]\{1,2\},[^ ]\+")
+	ATRSRP=$(echo $OX | grep -o "+RSRP:[^O]\+")
+	ATRSRP=$(echo "$ATRSRP" | grep -o "[0-9]\{1,3\},[0-9]\{1,5\},-[0-9]\{3,4\}")
 	MODE="LTE"
 	PCI=$(echo $XLDATA | cut -d, -f6)
 	PCI=$(printf "%d" $PCI)
@@ -307,6 +312,16 @@ if [ -n "$XLDATA" ]; then
 						LBAND=$LBAND"<br />B$BAND (CA, Bandwidth $BW MHz)"
 					fi
 				fi
+			done
+			NBRrsrp=1
+			for JJ in $(echo "$ATRSRP"); do
+				if [ $NBRrsrp -ne 1 -a $NBRrsrp -le $NUMBR ]; then
+					PCICA=$PCICA" "$(echo $JJ | cut -d, -f1)
+					CHANCA=$CHANCA" "$(echo $JJ | cut -d, -f2)
+					RSRPCA=$RSRPCA" "$(echo $JJ | cut -d, -f3)
+
+				fi
+				NBRrsrp=$(($(echo $NBRrsrp) + 1))
 			done
 		fi
 	else
@@ -410,6 +425,18 @@ if [ -n "$CADATA3" ]; then
 		fi
 		LBAND=$LBAND"<br />B"$(($BAND + 0))" (CA, Bandwidth: "$BW" MHz)"
 	done
+fi
+RSRPCA=$(echo $RSRPCA | tr " " ",")
+if [ -n "$RSRPCA" ]; then
+	RSCP=$RSCP","$RSRPCA
+fi
+PCICA=$(echo $PCICA | tr " " ",")
+if [ -n "$PCICA" ]; then
+	PCI=$PCI","$PCICA
+fi
+CHANCA=$(echo $CHANCA | tr " " ",")
+if [ -n "$CHANCA" ]; then
+	CHANNEL=$CHANNEL","$CHANCA
 fi
 
 MTEMP=$(echo $OX | grep -o "+MTSM: [0-9.]\{1,5\}")
