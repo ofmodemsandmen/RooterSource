@@ -96,32 +96,24 @@ set_dns() {
 
 	echo "$aDNS" | grep -o "[[:graph:]]" &>/dev/null
 	if [ $? = 0 ]; then
-		log "Using DNS settings from the Connection Profile"
-		pdns=1
-		for DNSV in $(echo "$aDNS"); do
-			if [ "$DNSV" != "0.0.0.0" ] && [ -z "$(echo "$bDNS" | grep -o "$DNSV")" ]; then
-				[ -n "$(echo "$DNSV" | grep -o ":")" ] && continue
-				bDNS="$bDNS $DNSV"
-			fi
-		done
-
-		bDNS=$(echo $bDNS)
-		uci set network.wan$INTER.peerdns=0
-		uci set network.wan$INTER.dns="$bDNS"
-		echo "$bDNS" > /tmp/v4dns$INTER
-
-		bDNS=""
+		pdns=0
 		for DNSV in $(echo "$aDNS"); do
 			if [ "$DNSV" != "0:0:0:0:0:0:0:0" ] && [ -z "$(echo "$bDNS" | grep -o "$DNSV")" ]; then
 				[ -z "$(echo "$DNSV" | grep -o ":")" ] && continue
 				bDNS="$bDNS $DNSV"
+				pdns=1
 			fi
 		done
-		echo "$bDNS" > /tmp/v6dns$INTER
+		if [ "$pdns" = "1" ]; then
+			log "Using DNS settings from the Connection Profile"
+			bDNS=$(echo $bDNS)
+			uci set network.wan$INTER.peerdns=0
+			uci set network.wan$INTER.dns="$bDNS"
+		else
+			log "Using Hostless Modem as a DNS relay"
+		fi
 	else
 		log "Using Hostless Modem as a DNS relay"
-		pdns=0
-		rm -f /tmp/v[46]dns$INTER
 	fi
 }
 
