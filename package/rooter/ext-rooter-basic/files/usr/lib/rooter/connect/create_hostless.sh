@@ -583,7 +583,8 @@ if [ $SP = 5 ]; then
 	if [ -n "$ip6" ]; then
 		check_ip
 		if [ "$v6cap" -gt 0 ]; then
-			addv6
+			ip6=$ip6
+			#addv6
 		fi
 	fi
 fi
@@ -629,7 +630,8 @@ if [ $SP -eq 7 ]; then
 			if [ -n "$ip6" ]; then
 				check_ip
 				if [ "$v6cap" -gt 0 ]; then
-					addv6
+					BRK=0
+					#addv6
 				fi
 			fi
 		fi
