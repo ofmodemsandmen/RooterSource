@@ -43,21 +43,18 @@ end
 if oaddr:sub(-1) == ' ' then
 	oaddr = oaddr:sub(1, -2)
 end
-local oaddrl = #oaddr * 2
-if oaddrl > 14 then
-	oaddrl = oaddrl - 2
-elseif oaddrl > 6 then
-	oaddrl = oaddrl - 1
-end
-oaddrl = string.format("%02X", oaddrl)
-
 utf8togsm.chktxt(oaddr)
 oaddr = utf8togsm["txt"]
-
+local oaddrl = #oaddr
+if oaddrl > 6 and oaddrl < 16 then
+	oaddrl = oaddrl - 1
+elseif oaddrl > 14 then
+	oaddrl = oaddrl - 2
+end
+oaddrl = string.format("%02X", oaddrl)
 if utf8togsm["dcs"] == "08" then
 	isok = false
 end
-
 pack7bit.pack(string.format("%02X", math.floor(#oaddr / 2)), oaddr)
 oaddr = pack7bit["pdu"]
 

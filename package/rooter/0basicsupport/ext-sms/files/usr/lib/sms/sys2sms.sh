@@ -11,15 +11,14 @@ shift 1
 TXT="$@"
 MYPID=$(printf "%05d" $$)
 RESFILE="/tmp/pdu"$MYPID
-
 CURRMODEM=$(uci get modem.general.smsnum)
 COMMPORT="/dev/ttyUSB"$(uci get modem.modem$CURRMODEM.commport)
-
+OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CPMS?")
+MEM3=$(echo "$OX" | grep -o "[SME]\{2\}")
+MEM3=${MEM3: -2}
 RES=""
 XSTATUS=0
-
 lua /usr/lib/sms/sys2sms.lua "$ADDR" "$TXT" $MYPID
-
 if [ -e $RESFILE ]; then
 	read PDUL PDU < $RESFILE
 	rm $RESFILE
@@ -29,13 +28,9 @@ else
 	PDUL=""
 	PDU=""
 fi
-
 LOCKDIR="/tmp/smslock$CURRMODEM"
 PIDFILE="${LOCKDIR}/PID"
-
-SMSLOC=$(uci -q get modem.modem$CURRMODEM.smsloc)
-ATCMDD="$PDUL,$SMSLOC,0,$PDU"
-
+ATCMDD="$PDUL,$MEM3,0,$PDU"
 while [ $XSTATUS -eq 0 ]; do
 	if mkdir "${LOCKDIR}" &>/dev/null; then
 		echo "$$" > "${PIDFILE}"
@@ -59,7 +54,6 @@ while [ $XSTATUS -eq 0 ]; do
 		sleep 1
 	fi
 done
-
 log "$RES"
 echo "$RES"
 exit $XSTATUS
