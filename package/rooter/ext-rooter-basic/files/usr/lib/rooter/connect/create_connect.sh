@@ -1112,7 +1112,7 @@ do
 		fi
 
 		if [ -e $ROOTER/connect/chkconn.sh ]; then
-			jkillall chkconn.sh
+			#jkillall "chkconn1.sh  $CURRMODEM"
 			$ROOTER/connect/chkconn.sh $CURRMODEM &
 		fi
 
