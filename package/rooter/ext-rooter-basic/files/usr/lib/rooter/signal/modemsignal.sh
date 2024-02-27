@@ -215,6 +215,9 @@ while [ 1 = 1 ]; do
 					"81d7"|"81d8" )
 						$ROOTER/common/t77data.sh $CURRMODEM $COMMPORT
 					;;
+					"81d9" )
+						$ROOTER/common/fibocomdata.sh $CURRMODEM $COMMPORT
+						;;
 					* )
 						$ROOTER/common/sierradata.sh $CURRMODEM $COMMPORT
 					;;

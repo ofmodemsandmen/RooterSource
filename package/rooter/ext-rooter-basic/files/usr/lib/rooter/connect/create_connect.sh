@@ -609,44 +609,54 @@ uci commit modem.modem$CURRMODEM
 					get_tty 02
 					mbimcport
 				else
-					case $idV in
-						"2c7c"|"05c6" )
-							get_tty_fix 2
-							mbimcport
-						;;
-						"03f0" )
-							get_tty 02
-							mbimcport
-						;;
-						"1bc7" )
-							if [ "$idP" = "1041" ]; then
-								get_tty 07
-							else
+					if [ "$idV" = 413c -a "$idP" = 81d9 ]; then
+						get_tty_fix 2
+						lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
+						source /tmp/parmpass
+						ACMPORT=$CPORT
+						CPORT="8$ACMPORT"
+						ln -fs /dev/ttyACM$ACMPORT /dev/ttyUSB$CPORT
+						log "Modem $CURRMODEM Fibocom MBIM Comm Port : /dev/ttyUSB$CPORT"
+					else
+						case $idV in
+							"2c7c"|"05c6" )
+								get_tty_fix 2
+								mbimcport
+							;;
+							"03f0" )
 								get_tty 02
-							fi
-							mbimcport
-						;;
-						"1e0e" )
-							get_tty 02
-							mbimcport
-						;;
-						"2cb7" )
-							get_tty_fix 0
-							lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
-							source /tmp/parmpass
-							ACMPORT=$CPORT
-							CPORT="8$ACMPORT"
-							ln -fs /dev/ttyACM$ACMPORT /dev/ttyUSB$CPORT
+								mbimcport
+							;;
+							"1bc7" )
+								if [ "$idP" = "1041" ]; then
+									get_tty 07
+								else
+									get_tty 02
+								fi
+								mbimcport
+							;;
+							"1e0e" )
+								get_tty 02
+								mbimcport
+							;;
+							"2cb7" )
+								get_tty_fix 0
+								lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
+								source /tmp/parmpass
+								ACMPORT=$CPORT
+								CPORT="8$ACMPORT"
+								ln -fs /dev/ttyACM$ACMPORT /dev/ttyUSB$CPORT
 
-							uci set modem.modem$CURRMODEM.commport=$CPORT
-							uci set modem.modem$CURRMODEM.proto="30"
-							log "Modem $CURRMODEM MBIM Comm Port : /dev/ttyUSB$CPORT"
-						;;
-						* )
-							uci set modem.modem$CURRMODEM.commport=""
-							log "No MBIM Comm Port"
-						;;
-					esac
+								uci set modem.modem$CURRMODEM.commport=$CPORT
+								uci set modem.modem$CURRMODEM.proto="30"
+								log "Modem $CURRMODEM MBIM Comm Port : /dev/ttyUSB$CPORT"
+							;;
+							* )
+								uci set modem.modem$CURRMODEM.commport=""
+								log "No MBIM Comm Port"
+							;;
+						esac
+					fi
 				fi
 			fi
 		fi
@@ -797,6 +807,10 @@ if [ $idV = "2dee" ]; then
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATC")
 fi
 if [ $idV = "2cb7" -o $idV = "8087" ]; then
+	$ROOTER/connect/bandmask $CURRMODEM 2
+fi
+
+if [ $idV = "413c" -a $idV = "81d9" ]; then
 	$ROOTER/connect/bandmask $CURRMODEM 2
 fi
 
