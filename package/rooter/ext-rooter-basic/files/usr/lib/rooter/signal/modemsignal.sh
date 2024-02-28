@@ -215,9 +215,6 @@ while [ 1 = 1 ]; do
 					"81d7"|"81d8" )
 						$ROOTER/common/t77data.sh $CURRMODEM $COMMPORT
 					;;
-					"81d9" )
-						$ROOTER/common/fibocomdata.sh $CURRMODEM $COMMPORT
-						;;
 					* )
 						$ROOTER/common/sierradata.sh $CURRMODEM $COMMPORT
 					;;
@@ -229,9 +226,12 @@ while [ 1 = 1 ]; do
 			"1e0e" )
 				$ROOTER/common/simcomdata.sh $CURRMODEM $COMMPORT
 				;;
-			"8087" )
+			"8087"|"0e8d" )
 				if [ $PROD = "095a" ]; then
 					$ROOTER/common/fibocomdata.sh $CURRMODEM $COMMPORT
+				fi
+				if [ $PROD = "7126" -o $PROD = "7127" ]; then
+					$ROOTER/common/fibocomdata350.sh $CURRMODEM $COMMPORT
 				fi
 				;;
 			"0408" )
