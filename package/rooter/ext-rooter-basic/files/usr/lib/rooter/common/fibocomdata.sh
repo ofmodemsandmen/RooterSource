@@ -62,19 +62,14 @@ OX=$(echo $OX | tr 'a-z' 'A-Z')
 SERVING=$(echo $OX | grep -o "+GTCCINFO:.\+GTRAT")
 
 REGXa="[12],[249],[0-9]\{3\},[0-9]\{2,3\},[0-9A-F]\{0,6\},[0-9A-F]\{0,10\},[0-9A-F]\{1,8\},[0-9A-F]\{1,8\},[15][0-9]\{1,4\},[0-9]\{1,3\},[-0-9]\{1,5\},[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\}"
-
 REGXb="+GTCAINFO: 1,[0-9]\{1,2\},[0-9]\{3\},[0-9]\{2,3\},[0-9]\{1,5\},[0-9]\{3,9\},[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\},[-0-9]\{1,4\},[0-9]\{1,6\},[0-9]\{1,6\},[0-9]\{1,3\},[0-9]\{1,3\}"
-
 REGXc="+GTCAINFO: [2-9],[0-9]\{1,2\},[0-9]\{1,5\},[0-9]\{1,3\},[0-9]\{1,3\},[-0-9]\{1,4\},[0-9]\{1,5\},[0-9]\{1,5\},[0-9]\{1,3\},[0-9]\{1,3\}"
-
 REGXd="+XMCI: 2,[0-9]\{3\},[0-9]\{2,3\},[^,]\+,[^,]\+,[^,]\+,\"0X[0-9A-F]\{8\}\",[^,]\+,[^,]\+,[0-9]\{1,2\},[0-9]\{1,2\},[0-9]\{1,2\}"
-
 REGXe="+XMCI: 4,[0-9]\{3\},[0-9]\{2,3\},[^,]\+,[^,]\+,\"0X[0-9A-F]\{4\}\",\"0X[0-9A-F]\{8\}\",[^,]\+,[^,]\+,[0-9]\{1,2\},[0-9]\{1,2\},[-0-9]\{1,5\}"
-
 REGXf="SCC[0-9]: 1,0,[0-9]\{1,3\},1[0-9]\{2\},[0-9]\{1,6\},[0-9]\{1,3\}"
-
 REGXg="2,4,,,,,[0-9A-F]\{1,5\},[0-9A-F]\{1,3\},,[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\}"
 REGXh="2,9,,,,,[0-9A-F]\{5\},[0-9A-F]\{1,3\},,[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\}"
+REGXj="+GTCAINFO:.\+SCC1[^O]\+"
 REGXy="1,4,[0-9]\{3\},[0-9]\{2,3\},[0-9A-F]\{0,5\},[0-9A-F]\{0,10\},[0-9]\{1,8\}, ,[0-9]\{1,2\},[0-5], ,"
 
 CHANNEL="-"
@@ -89,9 +84,9 @@ PCI="-"
 CTEMP="-"
 SINR=""
 COPS_MCC=""
-RSRPCA=" "
-PCICA=" "
-CHANCA=" "
+RSRPCA=""
+PCICA=""
+CHANCA=""
 
 CSQ=$(echo $OX | grep -o "+CSQ: [0-9]\{1,2\}" | grep -o "[0-9]\{1,2\}")
 if [ "$CSQ" = "99" ]; then
@@ -156,6 +151,7 @@ else
 	XLDATA=$(echo $OX | grep -o "$REGXe")
 fi
 CADATA3=$(echo $OX | grep -o "$REGXf")
+CADATA4=$(echo $OX | grep -o "$REGXj" | tr -d " " | tr ":" ",")
 if [ -n "$GTCCDATA" ]; then
 	COPS_MCC=$(echo $GTCCDATA | cut -d, -f3)
 	COPS_MNC=$(echo $GTCCDATA | cut -d, -f4)
@@ -212,9 +208,9 @@ if [ -n "$GTCCDATA" ]; then
 			fi
 			BAND=${BAND:1}
 			if [ "$CELLTYPE" -eq 1 ]; then
-				BAND="B"$(($BAND + 0))" (Bandwidth: "$BW" MHz)"
+				BAND="B"$(echo $BAND | sed 's/^0*//')" (Bandwidth: "$BW" MHz)"
 			else
-				BAND="B"$(($BAND + 0))" (CA, Bandwidth: "$BW" MHz)"
+				BAND="B"$(echo $BAND | sed 's/^0*//')" (CA, Bandwidth: "$BW" MHz)"
 			fi
 		fi
 		if [ "$CRAT" -eq 9 ]; then
@@ -276,7 +272,7 @@ if [ -n "$XLDATA" ]; then
 	XLDATA=$(echo "${XLDATA//[\" ]/}")
 	XLEC=$(echo $OX | grep -o "+XLEC: [01],[0-9]\+,[0-5],.*BAND_LTE_[0-9]\{1,2\},[^ ]\+")
 	ATRSRP=$(echo $OX | grep -o "+RSRP:[^O]\+")
-	ATRSRP=$(echo "$ATRSRP" | grep -o "[0-9]\{1,3\},[0-9]\{1,5\},-[0-9]\{3,4\}")
+	ATRSRP=$(echo "$ATRSRP" | grep -o "[0-9]\{1,3\},[0-9]\{1,5\},-[0-9]\{2,3\}")
 	MODE="LTE"
 	PCI=$(echo $XLDATA | cut -d, -f6)
 	PCI=$(printf "%d" $PCI)
@@ -315,13 +311,13 @@ if [ -n "$XLDATA" ]; then
 			done
 			NBRrsrp=1
 			for JJ in $(echo "$ATRSRP"); do
-				if [ $NBRrsrp -ne 1 -a $NBRrsrp -le $NUMBR ]; then
+				if [ $NBRrsrp -gt 1 -a $NBRrsrp -le $NUMBR ]; then
 					PCICA=$PCICA" "$(echo $JJ | cut -d, -f1)
 					CHANCA=$CHANCA" "$(echo $JJ | cut -d, -f2)
 					RSRPCA=$RSRPCA" "$(echo $JJ | cut -d, -f3)
 
 				fi
-				NBRrsrp=$(($(echo $NBRrsrp) + 1))
+				NBRrsrp=$((NBRrsrp + 1))
 			done
 		fi
 	else
@@ -414,31 +410,83 @@ if [ -n "$CADATA3" ]; then
 		BAND=$(echo $CAVAL | cut -d, -f3)
 		BAND=${BAND:1}
 		PCIX=$(echo $CAVAL | cut -d, -f4)
-		PCI=$(echo "$PCI", "$PCIX")
+		PCI=$(echo "$PCI","$PCIX")
 		CHAN=$(echo $CAVAL | cut -d, -f5)
-		CHANNEL=$(echo "$CHANNEL", "$CHAN")
+		CHANNEL=$(echo "$CHANNEL","$CHAN")
 		BW=$(echo $CAVAL | cut -d, -f6)
 		if [ $BW -gt 14 ]; then
-			BW=$(($(echo $BW) / 5))
+			BW=$((BW / 5))
 		else
 			BW="1.4"
 		fi
-		LBAND=$LBAND"<br />B"$(($BAND + 0))" (CA, Bandwidth: "$BW" MHz)"
+		LBAND=$LBAND"<br />B"$(echo $BAND | sed 's/^0*//')" (CA, Bandwidth: "$BW" MHz)"
 	done
 fi
-RSRPCA=$(echo $RSRPCA | tr " " ",")
-if [ -n "$RSRPCA" ]; then
-	RSCP=$RSCP","$RSRPCA
+if [ -n "$CADATA4" ]; then
+	NRCA=$(echo $CADATA4 | grep -o "PCC,[15]")
+	CADATA4=$(echo $CADATA4 | grep -o "SCC[0-9][^S]\+")
+	if [ -n "NRCA" ]; then
+		CALIST4=$(echo $CADATA4 | grep -o "SCC[0-9]\{1,2\},2,[01],[0-9]\{4,5\},[0-9]\{1,3\},[0-9]\{6\},[0-9]\{1,3\},[0-9]\{1,3\},[^S]\+")
+		for CAVAL in $(echo "$CALIST4"); do
+			BAND=$(echo $CAVAL | cut -d, -f4)
+			RATP=${BAND:0:1}
+			if [ "$RATP" == "1" ]; then
+				RATP="B"
+			else
+				RATP="n"
+			fi
+			UPL=$(echo $CAVAL | cut -d, -f3)
+			BWD=$(echo $CAVAL | cut -d, -f7)
+			BWU=$(echo $CAVAL | cut -d, -f8)
+			SHOWBWU=true
+			if [ $RATP == "B" ]; then
+				if [ $BWD -gt 14 ]; then
+					BWD=$((BWD / 5))
+				else
+					BWD="1.4"
+				fi
+				if [ $BWU -gt 14 ]; then
+					BWU=$((BWD / 5))
+				else
+					BWU="1.4"
+					SHOWBWU=false
+				fi
+			else
+				if [ "$BWU" == "0" ]; then
+					BWU="5"
+				fi
+				if [ "$BWD" == "0" ]; then
+					BWD="5"
+					SHOWBWU=false
+				fi
+			fi
+			CHANNEL=$(echo "$CHANNEL","$(echo $CAVAL | cut -d, -f6)")
+			PCI=$(echo "$PCI","$(echo $CAVAL | cut -d, -f5)")
+			BAND=${BAND:1}
+			if [ $UPL == "1" ]; then
+				LBAND=$LBAND"<br />$RATP"$(echo $BAND | sed 's/^0*//')" (CA"$(printf "\xe2\x86\x91")", Bandwidth: "$BWD" MHz down | "$BWU" MHz up)"
+			elif $SHOWBWU; then
+				LBAND=$LBAND"<br />$RATP"$(echo $BAND | sed 's/^0*//')" (CA, Bandwidth: "$BWD" MHz down | "$BWU" MHz up)"
+			else
+				LBAND=$LBAND"<br />$RATP"$(echo $BAND | sed 's/^0*//')" (CA, Bandwidth: "$BWD" MHz)"
+			fi
+		done
+	fi
 fi
-PCICA=$(echo $PCICA | tr " " ",")
-if [ -n "$PCICA" ]; then
-	PCI=$PCI","$PCICA
+if [ -z "$CADATA2" ] && [ -z "$CADATA3" ] && [ -z "$CADATA4" ]; then
+	RSRPCA=$(echo $RSRPCA | tr " " ",")
+	if [ -n "$RSRPCA" ]; then
+		RSCP=$RSCP","$RSRPCA
+	fi
+	PCICA=$(echo $PCICA | tr " " ",")
+	if [ -n "$PCICA" ]; then
+		PCI=$PCI","$PCICA
+	fi
+	CHANCA=$(echo $CHANCA | tr " " ",")
+	if [ -n "$CHANCA" ]; then
+		CHANNEL=$CHANNEL","$CHANCA
+	fi
 fi
-CHANCA=$(echo $CHANCA | tr " " ",")
-if [ -n "$CHANCA" ]; then
-	CHANNEL=$CHANNEL","$CHANCA
-fi
-
 MTEMP=$(echo $OX | grep -o "+MTSM: [0-9.]\{1,5\}")
 if [ -n "$MTEMP" ]; then
 	CTEMP=$(echo $MTEMP | grep -o "[0-9.]\{1,5\}")$(printf "\xc2\xb0")"C"
