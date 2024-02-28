@@ -28,9 +28,9 @@ $(eval $(call TestHostCommand,proper-umask, \
 
 ifndef IB
 $(eval $(call SetupHostCommand,gcc, \
-	Please install the GNU C Compiler (gcc) 4.8 or later, \
-	$(CC) -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?|10\.?)', \
-	gcc -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?|10\.?)', \
+	Please install the GNU C Compiler (gcc) 6 or later, \
+	$(CC) -dumpversion | grep -E '^([6-9]\.?|1[0-9]\.?)', \
+	gcc -dumpversion | grep -E '^([6-9]\.?|1[0-9]\.?)', \
 	gcc --version | grep -E 'Apple.(LLVM|clang)' ))
 
 $(eval $(call TestHostCommand,working-gcc, \
@@ -40,13 +40,13 @@ $(eval $(call TestHostCommand,working-gcc, \
 		gcc -x c -o $(TMP_DIR)/a.out -))
 
 $(eval $(call SetupHostCommand,g++, \
-	Please install the GNU C++ Compiler (g++) 4.8 or later, \
-	$(CXX) -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?|10\.?)', \
-	g++ -dumpversion | grep -E '^(4\.[8-9]|[5-9]\.?|10\.?)', \
+	Please install the GNU C++ Compiler (g++) 6 or later, \
+	$(CXX) -dumpversion | grep -E '^([6-9]\.?|1[0-9]\.?)', \
+	g++ -dumpversion | grep -E '^([6-9]\.?|1[0-9]\.?)', \
 	g++ --version | grep -E 'Apple.(LLVM|clang)' ))
 
 $(eval $(call TestHostCommand,working-g++, \
-	\nPlease reinstall the GNU C++ Compiler (4.8 or later) - \
+	Please reinstall the GNU C++ Compiler (6 or later) - \
 	it appears to be broken, \
 	echo 'int main(int argc, char **argv) { return 0; }' | \
 		g++ -x c++ -o $(TMP_DIR)/a.out - -lstdc++ && \
