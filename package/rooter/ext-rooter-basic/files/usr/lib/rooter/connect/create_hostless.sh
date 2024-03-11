@@ -553,7 +553,7 @@ if [ $SP = 8 -o  $SP = 9 ]; then
 		log " "
 		log "Fibocom Connect : $OX"
 		log " "
-		ERROR="ERROR"
+		ERROR="ERRORX"
 		if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
 		then
 			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
@@ -568,12 +568,12 @@ log "$OX"
 			ip6=$(echo $OX | cut -d, -f2 | grep ":")
 			log "IP address(es) obtained: $ip4 $ip6"
 			check_ip
-			
+			gtw=$(echo "$ip4" | cut -d. -f1)"."$(echo "$ip4" | cut -d. -f2)"."$(echo "$ip4" | cut -d. -f3)".1"
 			uci set network.wan$INTER.proto='static'
 			uci set network.wan$INTER.ipaddr="$ip4"
 			uci set network.wan$INTER.option netmask='255.255.255.0'
-			uci set network.wan$INTER.gateway='25.248.94.1'
-			uci set network.wan$INTER.dns='8.8.8.8'
+			uci set network.wan$INTER.gateway="$gtw"
+			uci set network.wan$INTER.dns="$gtw"
 			uci commit network
 			ifup wan$INTER
 		fi
