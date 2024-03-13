@@ -99,13 +99,19 @@ set_dns() {
 		pdns=0
 		for DNSV in $(echo "$aDNS"); do
 			if [ "$DNSV" != "0:0:0:0:0:0:0:0" ] && [ -z "$(echo "$bDNS" | grep -o "$DNSV")" ]; then
-				[ -z "$(echo "$DNSV" | grep -o ":")" ] && continue
+				if [ ! -z "$(echo "$DNSV" | grep -o ":")" ]; then
+					bDNS="$bDNS $DNSV"
+					pdns=1
+				fi
+			fi
+			if [ "$DNSV" != "0.0.0.0" ] && [ -z "$(echo "$bDNS" | grep -o "$DNSV")" ]; then
+				[ -z "$(echo "$DNSV" | grep -o ".")" ] && continue
 				bDNS="$bDNS $DNSV"
 				pdns=1
 			fi
 		done
 		if [ "$pdns" = "1" ]; then
-			log "Using DNS settings from the Connection Profile"
+			log "Using DNS settings from the Connection Profile $bDNS"
 			bDNS=$(echo $bDNS)
 			uci set network.wan$INTER.peerdns=0
 			uci set network.wan$INTER.dns="$bDNS"
@@ -217,36 +223,6 @@ addv6() {
 	ifup wan$INTER"_6"
 }
 
-fcc_unlock() {
-	VENDOR_ID_HASH="3df8c719"
-	ATCMDD="at+gtfcclockgen"
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	CHALLENGE=$(echo "$OX" | grep -o '0x[0-9a-fA-F]\+' | awk '{print $1}')
-	 if [ -n "$CHALLENGE" ]; then
-        log "Got challenge from modem: $CHALLENGE"
-        HEX_CHALLENGE=$(printf "%08x" "$CHALLENGE")
-        COMBINED_CHALLENGE="${HEX_CHALLENGE}$(printf "%.8s" "${VENDOR_ID_HASH}")"
-        RESPONSE_HASH=$(echo "$COMBINED_CHALLENGE" | xxd -r -p | sha256sum | cut -d ' ' -f 1)
-        TRUNCATED_RESPONSE=$(printf "%.8s" "$RESPONSE_HASH")
-        RESPONSE=$(printf "%d" "0x$TRUNCATED_RESPONSE")
-
-        log "Sending response to modem: $RESPONSE"
-        #UNLOCK_RESPONSE=$(at_command "at+gtfcclockver=$RESPONSE")
-		ATCMDD="at+gtfcclockver=$RESPONSE"
-		UNLOCK_RESPONSE=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		succ=$(echo "$UNLOCK_RESPONSE" | grep "+GTFCCLOCKVER: 1")
-        if [ ! -z "$succ" ]; then
-			log "FCC unlock succeeded"
-            return
-         else
-            log "Unlock failed. Got response: $UNLOCK_RESPONSE"
-        fi
-    else
-        log "Failed to obtain FCC challenge. Got: ${RAW_CHALLENGE}"
-    fi
-
-}
-
 CURRMODEM=$1
 
 MAN=$(uci -q get modem.modem$CURRMODEM.manuf)
@@ -320,9 +296,9 @@ if [ $SP -gt 0 ]; then
 	elif [ $SP -eq 7 ]; then
 		PORTN=0
 	elif [ $SP -eq 8 ]; then
-		PORTN=4
+		PORTN=3
 	elif [ $SP -eq 9 ]; then
-		PORTN=2
+		PORTN=1
 	else
 		PORTN=1
 	fi
@@ -541,41 +517,26 @@ fi
 	
 if [ $SP = 8 -o  $SP = 9 ]; then
 	log "FM350 Connection Command"
-	fcc_unlock
 	$ROOTER/connect/bandmask $CURRMODEM 2
 	uci commit modem
 	get_connect
 	export SETAPN=$NAPN
 	BRK=1
 	
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-f350ecm.gcom" "$CURRMODEM")
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-fecm.gcom" "$CURRMODEM")
 		chcklog "$OX"
 		log " "
 		log "Fibocom Connect : $OX"
 		log " "
-		ERROR="ERRORX"
+		ERROR="ERROR"
 		if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
 		then
 			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
 			log "Failed to Connect"
 		else
 			BRK=0
-			ATCMDD="AT+CGPADDR=0"
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-log "$OX"
-			OX=$(echo "$OX" | grep "^+CGPADDR: 0," | cut -d'"' -f2)
-			ip4=$(echo $OX | cut -d, -f1 | grep "\.")
-			ip6=$(echo $OX | cut -d, -f2 | grep ":")
-			log "IP address(es) obtained: $ip4 $ip6"
+			get_ip
 			check_ip
-			gtw=$(echo "$ip4" | cut -d. -f1)"."$(echo "$ip4" | cut -d. -f2)"."$(echo "$ip4" | cut -d. -f3)".1"
-			uci set network.wan$INTER.proto='static'
-			uci set network.wan$INTER.ipaddr="$ip4"
-			uci set network.wan$INTER.option netmask='255.255.255.0'
-			uci set network.wan$INTER.gateway="$gtw"
-			uci set network.wan$INTER.dns="$gtw"
-			uci commit network
-			ifup wan$INTER
 		fi
 fi
 
