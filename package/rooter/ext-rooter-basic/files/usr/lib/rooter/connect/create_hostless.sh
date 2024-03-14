@@ -517,26 +517,72 @@ fi
 	
 if [ $SP = 8 -o  $SP = 9 ]; then
 	log "FM350 Connection Command"
+	fcc_unlock
 	$ROOTER/connect/bandmask $CURRMODEM 2
 	uci commit modem
 	get_connect
 	export SETAPN=$NAPN
 	BRK=1
 	
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-fecm.gcom" "$CURRMODEM")
+		ATCMDD="AT+CGPIAF=1,0,0,0;+CGDCONT=1"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		log "$OX"
+			
+		ATCMDD='AT+CGDCONT=1,"IP","'$NAPN'",,0,0,0,0,0,0,0'
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		chcklog "$OX"
 		log " "
 		log "Fibocom Connect : $OX"
 		log " "
-		ERROR="ERROR"
+		ERROR="ERRORX"
 		if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
 		then
 			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
 			log "Failed to Connect"
 		else
 			BRK=0
-			get_ip
+			ATCMDD="AT+CGPADDR=0"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			log "$OX"
+						
+			ATCMDD='AT+CGDCONT=1,"IP","'$NAPN'",,0,0,0,0,0,0,0'
+			#OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			#log "$OX"
+			cntr=0
+			while [ true ]; do
+				ATCMDD="AT+CGACT=1,1"
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				log "$OX"
+				cgev=$(echo "$OX" | grep "+CGEV")
+				if [ ! -z "$cgev" ]; then
+					break;
+				fi
+				let cntr=$cntr+1
+				if [ "$cntr" -gt 5 ]; then
+					break
+				fi
+				sleep 5
+			done
+			
+			ATCMDD="AT+CGPADDR=1"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			log "$OX"
+			OX=$(echo "$OX" | grep "^+CGPADDR: 1," | cut -d'"' -f2)
+			ip4=$(echo $OX | cut -d, -f1 | grep "\.")
+			ip6=$(echo $OX | cut -d, -f2 | grep ":")
+			log "IP address(es) obtained: $ip4 $ip6"
 			check_ip
+						
+			gtw=$(echo "$ip4" | cut -d. -f1)"."$(echo "$ip4" | cut -d. -f2)"."$(echo "$ip4" | cut -d. -f3)".1"
+			uci set network.wan$INTER.proto='static'
+			uci set network.wan$INTER.ipaddr="$ip4"
+			uci set network.wan$INTER.netmask='255.255.255.0'
+			uci set network.wan$INTER.gateway="$gtw"
+			uci set network.wan$INTER.dns="1.1.1.1"
+			uci set network.wan$INTER.peerdns=0
+			set_dns
+			uci commit network
+			ifup wan$INTER
 		fi
 fi
 
