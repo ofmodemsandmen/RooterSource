@@ -95,8 +95,7 @@ COPS_MCC=""
 RSRPCA=" "
 PCICA=" "
 CHANCA=" "
-log "$OX"
-log "$SERVING"
+
 CSQ=$(echo $OX | grep -o "+CSQ: [0-9]\{1,2\}" | grep -o "[0-9]\{1,2\}")
 if [ "$CSQ" = "99" ]; then
 	CSQ=""
@@ -133,7 +132,6 @@ if [ -n "$SERVING" ]; then
 		;;
 	esac
 	GTCCDATA=$(echo $SERVING | grep -o "$REGXa")
-	log "$GTCCDATA"
 	GTCCDATAy=$(echo $SERVING | grep -o "$REGXy")
 	LTENEIGH=$(echo $SERVING | grep -o "$REGXg")
 	NRNEIGH=$(echo $SERVING | grep -o "$REGXh")
