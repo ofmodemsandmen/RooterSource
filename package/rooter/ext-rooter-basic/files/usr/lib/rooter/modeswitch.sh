@@ -197,6 +197,8 @@ if [ "$ACTION" = add ]; then
 		exit 0
 	elif [ $uVid = 0bda -a $uPid = 8152 ]; then
 		exit 0
+	elif [ $uVid = 0e8d -a $uPid = 2000 ]; then
+		exit 0
 	fi
 
 	
