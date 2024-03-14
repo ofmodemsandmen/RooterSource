@@ -13,24 +13,24 @@ decode_signal() {
 	if [ "$CRAT" -eq 4 ]; then
 		RSCPs=$(($RSRP - 141))
 		if [ -n "$RSCP" ]; then
-			RSCP=$RSCP" dBm<br />"$RSCPs
+			RSCP=$RSCP","$RSCPs
 		else
 			RSCP=$RSCPs
 		fi
 		if [ -n "$ECIO" ]; then
-			ECIO=$ECIO" dB<br />"$((($RSRQ / 2) - 20))
+			ECIO=$ECIO","$((($RSRQ / 2) - 20))
 		else
 			ECIO=$((($RSRQ / 2) - 20))
 		fi
 	elif [ "$CRAT" -eq 9 ]; then
 		RSCPs=$(($RSRP - 157))
 		if [ -n "$RSCP" ]; then
-			RSCP=$RSCP" dBm<br />"$RSCPs
+			RSCP=$RSCP","$RSCPs
 		else
 			RSCP=$RSCPs
 		fi
 		if [ -n "$ECIO" ]; then
-			ECIO=$ECIO" dB<br />"$((($RSRQ / 2) - 43))
+			ECIO=$ECIO","$((($RSRQ / 2) - 43))
 		else
 			ECIO=$((($RSRQ / 2) - 43))
 		fi
@@ -426,8 +426,9 @@ if [ -n "$CADATA4" ]; then
 	NRCA=$(echo $CADATA4 | grep -o "PCC,[15]")
 	CADATA4=$(echo $CADATA4 | grep -o "SCC[0-9][^S]\+")
 	if [ -n "NRCA" ]; then
-		CALIST4=$(echo $CADATA4 | grep -o "SCC[0-9]\{1,2\},2,[01],[0-9]\{4,5\},[0-9]\{1,3\},[0-9]\{6\},[0-9]\{1,3\},[0-9]\{1,3\},[^S]\+")
+		CALIST4=$(echo $CADATA4 | grep -o "SCC[0-9]\{1,2\},2,[01],[15][0-9]\{2,4\},[0-9]\{1,3\},[0-9]\{1,6\},[0-9]\{1,3\},[0-9]\{1,3\},[^S]\+")
 		for CAVAL in $(echo "$CALIST4"); do
+			CAVAL=$CAVAL
 			BAND=$(echo $CAVAL | cut -d, -f4)
 			RATP=${BAND:0:1}
 			if [ "$RATP" == "1" ]; then
@@ -435,9 +436,10 @@ if [ -n "$CADATA4" ]; then
 			else
 				RATP="n"
 			fi
-			UPL=$(echo $CAVAL | cut -d, -f3)
+			UPLC=$(echo $CAVAL | cut -d, -f3)
 			BWD=$(echo $CAVAL | cut -d, -f7)
 			BWU=$(echo $CAVAL | cut -d, -f8)
+			RSRP=$(echo $CAVAL | cut -d, -f13)
 			SHOWBWU=true
 			if [ $RATP == "B" ]; then
 				if [ $BWD -gt 14 ]; then
@@ -445,25 +447,28 @@ if [ -n "$CADATA4" ]; then
 				else
 					BWD="1.4"
 				fi
-				if [ $BWU -gt 14 ]; then
-					BWU=$((BWD / 5))
-				else
-					BWU="1.4"
+				BWU=$((BWU / 5))
+				if [ $BWU -lt 3 ]; then
 					SHOWBWU=false
 				fi
+				CRAT="4"
 			else
 				if [ "$BWU" == "0" ]; then
-					BWU="5"
+					SHOWBWU=false
 				fi
 				if [ "$BWD" == "0" ]; then
 					BWD="5"
-					SHOWBWU=false
 				fi
+				CRAT="9"
+			fi
+			if [ -n "$RSRP" ]; then
+				ECIO=""
+				decode_signal
 			fi
 			CHANNEL=$(echo "$CHANNEL","$(echo $CAVAL | cut -d, -f6)")
 			PCI=$(echo "$PCI","$(echo $CAVAL | cut -d, -f5)")
 			BAND=${BAND:1}
-			if [ $UPL == "1" ]; then
+			if [ $UPLC == "1" ]; then
 				LBAND=$LBAND"<br />$RATP"$(echo $BAND | sed 's/^0*//')" (CA"$(printf "\xe2\x86\x91")", Bandwidth: "$BWD" MHz down | "$BWU" MHz up)"
 			elif $SHOWBWU; then
 				LBAND=$LBAND"<br />$RATP"$(echo $BAND | sed 's/^0*//')" (CA, Bandwidth: "$BWD" MHz down | "$BWU" MHz up)"

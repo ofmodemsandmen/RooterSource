@@ -358,7 +358,7 @@ case $uVid in
 		fi
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	;;
-	"8087"|"2cb7" )
+	"8087"|"2cb7"|"0e8d" )
 		MODT="2"
 		FM150=""
 		if [ $uVid = 2cb7 ]; then
@@ -371,29 +371,37 @@ case $uVid in
 		else
 			COMM="XACT"
 		fi
-		ATCMDD='AT+'$COMM'?'
-		log " "
-		log " Get Current Bands : $ATCMDD"
-		log " "
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		log " "
-		log " Get Current Bands Response : $OX"
-		log " "
+		if [ $uVid = 0e8d ]; then
+			COMM="GTACT"
+		fi
 
 		lte=""
 		if [ ! -z $mask ]; then
 			fibdecode $mask 1 0
 			lte=","$lst
-			fi
+		fi
 		L1="4,2,1"
 		lst=""
-		if [ ! -z $FM150 ]; then
-			L1="17,6,"
-			if [ ! -z $mask5g ]; then
+		if [ -n "$FM150" ]; then
+			if [ -n "$lte" ]; then
+				L1="17,6,"
+			else
+				L1="14,,"
+			fi
+			if [ -n "$mask5g" ]; then
 				fibdecode $mask5g 5 0
 				lst=","$lst
 			else
 				L1="4,3,"
+			fi
+		fi
+		if [ $uVid = 0e8d ]; then
+			L1="17,3,6"
+			if [ ! -z $mask5g ]; then
+				fibdecode $mask5g 5 0
+				lst=","$lst
+			else
+				L1="4,3,3"
 			fi
 		fi
 		ATCMDD="AT+""$COMM"="$L1$lte$lst"

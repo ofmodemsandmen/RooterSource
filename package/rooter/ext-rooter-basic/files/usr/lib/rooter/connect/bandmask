@@ -57,7 +57,7 @@ sierrabandmask() {
 			L6=${a:10}
 			break
 		done < /tmp/sierrabm
-		
+
 		log " "
 		log "EM9191 LTE Band Mask : $L1"
 		log "EM9191 5G NSA Band Mask : $L5"
@@ -284,6 +284,8 @@ quebandmask() {
 }
 
 fibomask() {
+	idV=$(uci get modem.modem$CURRMODEM.idV)
+	idP=$(uci get modem.modem$CURRMODEM.idP)
 	enb=$(uci -q get custom.bandlock.enabled)
 	CPORT=$(uci get modem.modem$CURRMODEM.commport)
 	msk=""
@@ -298,6 +300,12 @@ fibomask() {
 				NRsupport=true
 			fi
 		done
+		ATCMDD='AT+GTACT?'
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		OX=$(echo $OX" " | grep "+GTACT:" | tr -d '"' | tr " " ",")
+	elif [ "$idV" == "2cb7" -a "$idP" == "0104" ]; then
+# Fibocom FM190W has a bug, failing test syntax AT+GTACT=?
+		NRsupport=true
 		ATCMDD='AT+GTACT?'
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		OX=$(echo $OX" " | grep "+GTACT:" | tr -d '"' | tr " " ",")
