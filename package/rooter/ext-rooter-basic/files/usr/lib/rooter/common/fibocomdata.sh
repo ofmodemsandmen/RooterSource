@@ -3,7 +3,7 @@
 ROOTER=/usr/lib/rooter
 
 log() {
-	logger -t "Fibocom Data" "$@"
+	modlog "Fibocom Data" "$@"
 }
 
 CURRMODEM=$1
@@ -102,12 +102,29 @@ else
 fi
 
 if [ -n "$SERVING" ]; then
-	MODE=$(echo $SERVING | grep -o "+GTCCINFO: .\+ SERVICE CELL:")
-	LENM=${#MODE}
-	if [ $LENM -gt 25 ]; then
-		MODE=${MODE:11:$LENM-25}
+	PROD=$(uci get modem.modem$CURRMODEM.idP)
+	if [ "$PROD" = 7127 -o "$PROD" = 7126 ]; then
+		MODE=$SERVING
+		MODE=${MODE:13:1}
+		case $MODE in
+		"2" )
+			MODE="WCDMA"
+			;;
+		"4" )
+			MODE="LTE"
+			;;
+		"9" )
+			MODE="NR-RAN"
+			;;
+		esac
 	else
-		MODE="-"
+		MODE=$(echo $SERVING | grep -o "+GTCCINFO: .\+ SERVICE CELL:")
+		LENM=${#MODE}
+		if [ $LENM -gt 25 ]; then
+			MODE=${MODE:11:$LENM-25}
+		else
+			MODE="-"
+		fi
 	fi
 	GTCCDATA=$(echo $SERVING | grep -o "$REGXa")
 	GTCCDATAy=$(echo $SERVING | grep -o "$REGXy")
@@ -492,9 +509,21 @@ if [ -z "$CADATA2" ] && [ -z "$CADATA3" ] && [ -z "$CADATA4" ]; then
 		CHANNEL=$CHANNEL","$CHANCA
 	fi
 fi
-MTEMP=$(echo $OX | grep -o "+MTSM: [0-9.]\{1,5\}")
-if [ -n "$MTEMP" ]; then
-	CTEMP=$(echo $MTEMP | grep -o "[0-9.]\{1,5\}")$(printf "\xc2\xb0")"C"
+if [ "$PROD" = 7127 -o "$PROD" = 7126 ]; then
+	ATCMDD="AT+GTZONERDMAXTEMP=1"
+	OXtm=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	ist=$(echo "$OXtm" | grep "+GTZONERDMAXTEMP: 1")
+	if [ ! -z "$ist" ]; then
+		CTEMP=$(echo $ist | cut -d, -f2)
+		LENM=${#CTEMP}
+		let LENM=$LENM-3
+		CTEMP=${CTEMP:0:$LENM}$(printf "\xc2\xb0")"C"
+	fi
+else
+	MTEMP=$(echo $OX | grep -o "+MTSM: [0-9.]\{1,5\}")
+	if [ -n "$MTEMP" ]; then
+		CTEMP=$(echo $MTEMP | grep -o "[0-9.]\{1,5\}")$(printf "\xc2\xb0")"C"
+	fi
 fi
 
 MODTYPE="9"

@@ -571,6 +571,9 @@ if [ $SP = 8 -o  $SP = 9 ]; then
 			log "Failed to Connect"
 		else
 			BRK=0
+			ATCMDD="AT+CGACT=0"
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				log "$OX"
 			ATCMDD="AT+CGPADDR=0"
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			log "$OX"
@@ -666,7 +669,7 @@ if [ $SP = 5 ]; then
 		check_ip
 		if [ "$v6cap" -gt 0 ]; then
 			ip6=$ip6
-			#addv6
+			addv6
 		fi
 	fi
 fi

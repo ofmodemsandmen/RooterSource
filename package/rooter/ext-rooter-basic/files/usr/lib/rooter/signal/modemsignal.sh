@@ -231,7 +231,7 @@ while [ 1 = 1 ]; do
 					$ROOTER/common/fibocomdata.sh $CURRMODEM $COMMPORT
 				fi
 				if [ $PROD = "7126" -o $PROD = "7127" ]; then
-					$ROOTER/common/fibocomdata350.sh $CURRMODEM $COMMPORT
+					$ROOTER/common/fibocomdata.sh $CURRMODEM $COMMPORT
 				fi
 				;;
 			"0408" )
