@@ -1259,6 +1259,7 @@ do
 			COMMPORT="/dev/ttyUSB"$CPORT
 			ATCMDD="AT+CGACT=0,$CID"
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			PDPT="IP"
 			check_apn
 			if [ -n "$CGDCONT0" -a $CID != 0 ]; then
 				OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CGATT=0")
