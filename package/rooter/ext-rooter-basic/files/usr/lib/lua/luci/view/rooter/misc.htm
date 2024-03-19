@@ -211,6 +211,7 @@ end
 				document.getElementById("net2").style.display="none";
 				document.getElementById("net3").style.display="none";
 				document.getElementById("net4").style.display="none";
+				document.getElementById("net5").style.display="none";
 				document.getElementById("apply1").style.display="none";
 			
 				if ( gpio == "0" )
@@ -548,6 +549,9 @@ end
 				case "9":
 					mode = "<%:5G Only%>";
 				break;
+				case "11":
+					mode = "<%:Automatic%>";
+				break;
 				case "10":
 					mode = "<%:Changing Mode ...%>";
 					document.getElementById("apply1").value="<%:Applying Change%>";
@@ -564,6 +568,7 @@ end
 				document.getElementById("net2").style.display="none";
 				document.getElementById("net3").style.display="none";
 				document.getElementById("net4").style.display="none";
+				document.getElementById("net5").style.display="none";
 				document.getElementById("apply1").style.display="none";
 			}
 			if ( cell == "0" )
@@ -572,6 +577,7 @@ end
 				document.getElementById("net2").style.display="none";
 				document.getElementById("net3").style.display="none";
 				document.getElementById("net4").style.display="none";
+				document.getElementById("net5").style.display="none";
 				document.getElementById("apply1").style.display="none";
 			}
 			if ( cell == "1" )
@@ -581,6 +587,7 @@ end
 				document.getElementById("net2").style.display="none";
 				document.getElementById("net3").style.display="none";
 				document.getElementById("net4").style.display="none";
+				document.getElementById("net5").style.display="none";
 				document.getElementById("apply1").style.display="block";
 				document.getElementById("apply1").style.visibility="visible";
 			}
@@ -591,6 +598,7 @@ end
 				document.getElementById("net3").style.display="block";
 				document.getElementById("net3").style.visibility="visible";
 				document.getElementById("net4").style.display="none";
+				document.getElementById("net5").style.display="none";
 				document.getElementById("apply1").style.display="block";
 				document.getElementById("apply1").style.visibility="visible";
 			}
@@ -601,6 +609,7 @@ end
 				document.getElementById("net2").style.visibility="visible";
 				document.getElementById("net3").style.display="none";
 				document.getElementById("net4").style.display="none";
+				document.getElementById("net5").style.display="none";
 				document.getElementById("apply1").style.display="block";
 				document.getElementById("apply1").style.visibility="visible";
 			}
@@ -611,6 +620,18 @@ end
 				document.getElementById("net3").style.display="none";
 				document.getElementById("net4").style.display="block";
 				document.getElementById("net4").style.visibility="visible";
+				document.getElementById("net5").style.display="none";
+				document.getElementById("apply1").style.display="block";
+				document.getElementById("apply1").style.visibility="visible";
+			}
+			if ( cell == "5" )
+			{
+				document.getElementById("net1").style.display="none";
+				document.getElementById("net2").style.display="none";
+				document.getElementById("net3").style.display="none";
+				document.getElementById("net5").style.display="block";
+				document.getElementById("net5").style.visibility="visible";
+				document.getElementById("net4").style.display="none";
 				document.getElementById("apply1").style.display="block";
 				document.getElementById("apply1").style.visibility="visible";
 			}
@@ -1500,6 +1521,9 @@ end
 				break;
 			case "4":
 				nmode=document.getElementById("net4").value;
+				break;
+			case "5":
+				nmode=document.getElementById("net5").value;
 				break;
 		}
 		document.getElementById("netmode").innerHTML = "<%:Changing Mode ...%>";
@@ -2503,6 +2527,9 @@ end
 			<option value="7"><%:4G Only%></option>
 			<option value="8"><%:4G & 5G : NSA Mode%></option>
 			<option value="9"><%:5G Only : SA Mode%></option>
+		</select>
+		<select style="visibility:hidden;width:auto" name="net_mode" id="net5">
+			<option value="11" selected="selected"><%:Automatic%></option>
 		</select>
 		</td>
 		<td><input style="visibility:hidden;" type="button" id="apply1" class="cbi-button cbi-button-apply" value="<%:Apply Mode Change%>" onclick="return applyc(this)" /></td>

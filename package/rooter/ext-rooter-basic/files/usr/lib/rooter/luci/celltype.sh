@@ -361,6 +361,38 @@ fibocom_type() {
 	uci commit modem
 }
 
+fibocom350_type() {
+	NETMODE=""
+	ATCMDD='AT+GTACT?'
+	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	OXX=$(echo $OX" " | grep "+GTACT:" | tr -d '"' | tr " " ",")
+	n=${#OXX}
+	let nn=$n-22
+	NOX=${OXX:18:$nn}
+	L1=$(echo $NOX | cut -d, -f1)
+	L2=$(echo $NOX | cut -d, -f2)
+	L3=$(echo $NOX | cut -d, -f3)
+	st=6
+	if [ "$L1" -gt 9 ]; then
+		st=7
+	fi
+	BND=${NOX:$st}
+	case $L1 in
+	"17" )
+		NETMODE="11" ;;
+	"2" )
+		NETMODE="7" ;;
+	"14" )
+		NETMODE="9" ;;
+	* )
+		NETMODE="1" ;;
+	esac
+	NETMODE="11"
+	uci set modem.modem$CURRMODEM.modemtype="9"
+	uci set modem.modem$CURRMODEM.netmode=$NETMODE
+	uci commit modem
+}
+
 simcom_type() {
 	ATCMDD="AT+CNMP?"
 	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
@@ -484,6 +516,9 @@ case $idV in
 	if [ $idP = "095a" ]; then
 		fibocom_type
 	fi
+	;;
+"0e8d" )
+	fibocom350_type
 	;;
 "0408" )
 	quanta_type
