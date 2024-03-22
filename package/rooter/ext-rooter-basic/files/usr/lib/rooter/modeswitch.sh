@@ -597,7 +597,7 @@ if [ "$ACTION" = remove ]; then
 			if [ -e /usr/lib/gps/gpskill.sh ]; then
 				/usr/lib/gps/gpskill.sh $retresult
 			fi
-			PID=$(ps |grep "chkconn.sh" | grep -v grep |head -n 1 | awk '{print $1}')
+			PID=$(ps |grep "chkconn1.sh" | grep -v grep |head -n 1 | awk '{print $1}')
 			kill -9 $PID
 
 			$ROOTER/signal/status.sh $retresult "No Modem Present"
