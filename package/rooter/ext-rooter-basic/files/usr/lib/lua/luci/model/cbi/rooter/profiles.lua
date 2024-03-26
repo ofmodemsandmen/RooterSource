@@ -72,6 +72,7 @@ tt:value("66", "TTL 66")
 tt:value("67", "TTL 67")
 tt:value("88", "TTL 88")
 tt:value("117", "TTL 117")
+tt:value("128", "TTL 128")
 tt:value("TTL-INC 1", "TTL-INC 1")
 tt.default = "0"
 
