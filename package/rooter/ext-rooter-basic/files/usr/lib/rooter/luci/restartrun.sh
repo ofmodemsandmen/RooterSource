@@ -25,6 +25,25 @@ jkillall chkconn.sh
 echo "0" > /tmp/usbwait
 uVid=$(uci get modem.modem$CURRMODEM.uVid)
 uPid=$(uci get modem.modem$CURRMODEM.uPid)
+bn=$(cat /tmp/sysinfo/board_name)
+bn=$(echo "$bn" | grep "mk01k21")
+if [ ! -z "$bn" ]; then
+	i=496
+	echo $i > /sys/class/gpio/export
+	echo "out" > /sys/class/gpio/gpio$i/direction
+	echo "1" > /sys/class/gpio/gpio$i/value
+	sleep 5
+	echo "0" > /sys/class/gpio/gpio$i/value
+	log "Power Toggle"
+fi
+bn=$(cat /tmp/sysinfo/board_name)
+bn=$(echo "$bn" | grep "x3000")
+if [ ! -z "$bn" ]; then
+	echo "0" > /sys/class/gpio/cellular-control/value
+	sleep 2
+	echo "1" > /sys/class/gpio/cellular-control/value
+	log "Power Toggle"
+fi
 if [ $uVid != "2c7c" ]; then
 	if [ ! -z "$CPORT" ]; then
 		ATCMDD="AT+CFUN=1,1"
@@ -40,17 +59,7 @@ else
 	fi
 	log "Hard modem reset done $OX"
 fi
-bn=$(cat /tmp/sysinfo/board_name)
-bn=$(echo "$bn" | grep "mk01k21")
-if [ ! -z "$bn" ]; then
-	i=496
-	echo $i > /sys/class/gpio/export
-	echo "out" > /sys/class/gpio/gpio$i/direction
-	echo "1" > /sys/class/gpio/gpio$i/value
-	sleep 5
-	echo "0" > /sys/class/gpio/gpio$i/value
-	log "Power Toggle"
-fi
+
 ifdown wan$INTER
 uci delete network.wan$CURRMODEM
 uci set network.wan$CURRMODEM=interface
