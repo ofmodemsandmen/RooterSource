@@ -44,6 +44,21 @@ if [ ! -z "$bn" ]; then
 	echo "1" > /sys/class/gpio/cellular-control/value
 	log "Power Toggle"
 fi
+bn=$(cat /tmp/sysinfo/board_name)
+bn=$(echo "$bn" | grep "z8102ax-128m")
+if [ ! -z "$bn" ]; then
+	DEV=$(uci get modem.modem$CURRMODEM.device)
+	if [ $DEV = "2-1.2" ]; then
+		echo "0" > /sys/class/gpio/modem2/value
+		sleep 2
+		echo "1" > /sys/class/gpio/modem2/value
+	else
+		echo "0" > /sys/class/gpio/modem1/value
+		sleep 2
+		echo "1" > /sys/class/gpio/modem1/value
+	fi
+	log "Power Toggle"
+fi
 if [ $uVid != "2c7c" ]; then
 	if [ ! -z "$CPORT" ]; then
 		ATCMDD="AT+CFUN=1,1"

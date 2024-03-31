@@ -178,5 +178,7 @@ power_toggle() {
 	fi
 }
 
-/usr/lib/rooter/connect/reconnect.sh $1
+CURRMODEM=$1
+MOD=$(uci -q get modem.general.miscnum)
+/usr/lib/rooter/connect/reconnect.sh $MOD
 #power_toggle $1
