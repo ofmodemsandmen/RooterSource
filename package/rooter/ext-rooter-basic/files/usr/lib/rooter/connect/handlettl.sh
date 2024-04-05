@@ -5,44 +5,43 @@ log() {
 }
 
 delTTL() {
-	FLG="0"
-	exst=$(cat /etc/ttl.user | grep "#startTTL$CURRMODEM")
-	if [ ! -z "$exst" ]; then
-		cp /etc/ttl.user /etc/ttl.user.bk
-		sed -i -e "s|iptables -t mangle -I POSTROUTING -o |iptables -t mangle -D POSTROUTING -o |g" /etc/ttl.user.bk
-		sed -i -e "s|iptables -t mangle -I PREROUTING -i |iptables -t mangle -D PREROUTING -i |g" /etc/ttl.user.bk
-		sed -i -e "s|ip6tables -t mangle -I POSTROUTING -o |ip6tables -t mangle -D POSTROUTING -o |g" /etc/ttl.user.bk
-		sed -i -e "s|ip6tables -t mangle -I PREROUTING -i |ip6tables -t mangle -D PREROUTING -i $|g" /etc/ttl.user.bk
-		rm -f /tmp/ttl.user
-		run=0
-		while IFS= read -r line; do
-			if [ $run = "0" ]; then
-				sttl=$line
-				stx=$(echo "$sttl" | grep "#startTTL$CURRMODEM")
-				if [ ! -z $stx ]; then
-					run=1
-				fi
-			else
-				sttl=$line
-				stx=$(echo "$sttl" | grep "#endTTL$CURRMODEM")
-				if [ ! -z $stx ]; then
-					chmod 777 /tmp/ttl.user
-					/tmp/ttl.user
-					break
-				fi
-				echo "$sttl" >> /tmp/ttl.user
-			fi
-		done < /etc/ttl.user.bk
-		cp /etc/ttl.user /etc/ttl.user.bk
-		
-		sed /"#startTTL$CURRMODEM"/,/"#endTTL$CURRMODEM"/d /etc/ttl.user.bk > /etc/ttl.user
-		FLG="1"
-	fi
+	cp /etc/firewall.user /etc/ttl.user.bk
+	sed /"#startTTL$CURRMODEM"/,/"#endTTL$CURRMODEM"/d /etc/ttl.user.bk > /etc/firewall.user
+}
+
+delHL() {
+	cp /etc/firewall.user /etc/ttl.user.bk
+	sed /"#startHL$CURRMODEM"/,/"#endHL$CURRMODEM"/d /etc/ttl.user.bk > /etc/firewall.user
 }
 
 CURRMODEM=$1
-TTL="$2"
-TTLOPTION="$3"
+
+ttl=$(uci -q get modem.modeminfo$CURRMODEM.ttl)
+if [ -z "$ttl" ]; then
+	ttl="0"
+fi
+cttl=$(uci -q get modem.modeminfo$CURRMODEM.cttl)
+if [ -z "$cttl" ]; then
+	cttl="65"
+fi
+hl=$(uci -q get modem.modeminfo$CURRMODEM.hl)
+if [ -z "$hl" ]; then
+	hl="0"
+fi
+chl=$(uci -q get modem.modeminfo$CURRMODEM.chl)
+if [ -z "$chl" ]; then
+	chl="65"
+fi
+ttloption=$(uci -q get modem.modeminfo$CURRMODEM.ttloption)
+if [ -z "$ttloption" ]; then
+	ttloption="0"
+fi
+	
+TTL="$ttl"
+CTTL="$cttl"
+HL="$hl"
+CHL="$chl"
+TTLOPTION="$ttloption"
 
 if [ $CURRMODEM = "0" ]; then
 	IFACE="wan"
@@ -59,101 +58,71 @@ if [ "$TTL" = "0" ]; then
 		fi
 	else
 		delTTL
-		log "Deleting TTL on interface $IFACE"
+		delHL
+		log "Deleting TTL/HL on interface $IFACE"
+		/etc/init.d/firewall restart
 		exit 0
 	fi
 fi
 
+if [ "$TTL" = "2" ]; then
+	TTL=$CTTL
+fi
+if [ "$HL" = "0" ]; then
+	HL=$TTL
+fi
+if [ "$HL" = "2" ]; then
+	HL=$CHL
+fi
+
+log "Checking TTL"
 if [ "$TTL" = "1" ]; then
 	delTTL
 	log "Deleting TTL on interface $IFACE"
-	exit 0
-fi
-
-delTTL
-VALUE="$TTL"
-echo "#startTTL$CURRMODEM" >> /etc/ttl.user
-log "Setting TTL $VALUE on interface $IFACE"
-if [ "$TTL" = "TTL-INC 1" ]; then
-	TTL="0"
-fi
-
-if [ $VALUE = "0" ]; then
-	if [ "$TTLOPTION" = "0" ]; then
-		echo "iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-inc 1" >> /etc/ttl.user
-		log "iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-inc 1"
-		echo "iptables -t mangle -I PREROUTING -i $IFACE -j TTL --ttl-inc 1" >> /etc/ttl.user
-		log "iptables -t mangle -I PREROUTING -i $IFACE -j TTL --ttl-inc 1"
-		iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-inc 1
-		iptables -t mangle -I PREROUTING -i $IFACE -j TTL --ttl-inc 1
-		if [ -e /usr/sbin/ip6tables ]; then
-			echo "ip6tables -t mangle -I POSTROUTING -o $IFACE -j HL --hl-inc 1" >> /etc/ttl.user
-			log "ip6tables -t mangle -I POSTROUTING -o $IFACE -j HL --hl-inc 1"
-			echo "ip6tables -t mangle -I PREROUTING -i $IFACE -j HL --hl-inc 1" >> /etc/ttl.user
-			log "ip6tables -t mangle -I PREROUTING -i $IFACE -j HL --hl-inc 1"
-			ip6tables -t mangle -I POSTROUTING -o $IFACE -j HL --hl-inc 1
-			ip6tables -t mangle -I PREROUTING -i $IFACE -j HL --hl-inc 1
-		fi
-	else
-		if [ "$TTLOPTION" = "1" ]; then
-			echo "iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-inc 1" >> /etc/ttl.user
-			log "iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-inc 1"
-			iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-inc 1
-			if [ -e /usr/sbin/ip6tables ]; then
-				echo "ip6tables -t mangle -I POSTROUTING -o $IFACE -j HL --hl-inc 1" >> /etc/ttl.user
-				log "ip6tables -t mangle -I POSTROUTING -o $IFACE -j HL --hl-inc 1"
-				ip6tables -t mangle -I POSTROUTING -o $IFACE -j HL --hl-inc 1
-			fi
-		else
-			echo "iptables -t mangle -I POSTROUTING -o $IFACE ! -p icmp -j TTL --ttl-inc 1" >> /etc/ttl.user
-			log "iptables -t mangle -I POSTROUTING -o $IFACE ! -p icmp -j TTL --ttl-inc 1"
-			iptables -t mangle -I POSTROUTING -o $IFACE ! -p icmp -j TTL --ttl-inc 1
-			if [ -e /usr/sbin/ip6tables ]; then
-				echo "ip6tables -t mangle -I POSTROUTING -o $IFACE ! -p icmp -j HL --hl-inc 1" >> /etc/ttl.user
-				log "ip6tables -t mangle -I POSTROUTING -o $IFACE ! -p icmp -j HL --hl-inc 1"
-				ip6tables -t mangle -I POSTROUTING -o $IFACE ! -p icmp -j HL --hl-inc 1
-			fi
-		fi
-	fi
 else
+	delTTL
+	log "Setting TTL $TTL on interface $IFACE"
+	echo "#startTTL$CURRMODEM" >> /etc/firewall.user
+	if [ "$TTL" = "TTL-INC 1" ]; then
+		TTLOPTION="0"
+		TTL=64
+	fi
+
 	if [ "$TTLOPTION" = "0" ]; then
-		echo "iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-set $VALUE" >> /etc/ttl.user
-		log "iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-set $VALUE"
-		echo "iptables -t mangle -I PREROUTING -i $IFACE -j TTL --ttl-set $VALUE" >> /etc/ttl.user
-		log "iptables -t mangle -I PREROUTING -i $IFACE -j TTL --ttl-set $VALUE"
-		iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-set $VALUE
-		iptables -t mangle -I PREROUTING -i $IFACE -j TTL --ttl-set $VALUE
-		if [ -e /usr/sbin/ip6tables ]; then
-			echo "ip6tables -t mangle -I POSTROUTING -o $IFACE -j HL --hl-set $VALUE" >> /etc/ttl.user
-			log "ip6tables -t mangle -I POSTROUTING -o $IFACE -j HL --hl-set $VALUE"
-			echo "ip6tables -t mangle -I PREROUTING -i $IFACE -j HL --hl-set $VALUE" >> /etc/ttl.user
-			log "ip6tables -t mangle -I PREROUTING -i $IFACE -j HL --hl-set $VALUE"
-			ip6tables -t mangle -I POSTROUTING -o $IFACE -j HL --hl-set $VALUE
-			ip6tables -t mangle -I PREROUTING -i $IFACE -j HL --hl-set $VALUE
-		fi
+		echo "nft add rule inet fw4 mangle_postrouting oifname $IFACE ip ttl set $TTL" >> /etc/firewall.user
+		echo "nft add rule inet fw4 mangle_prerouting oifname $IFACE ip ttl set $TTL" >> /etc/firewall.user
 	else
 		if [ "$TTLOPTION" = "1" ]; then
-			echo "iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-set $VALUE" >> /etc/ttl.user
-			log "iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-set $VALUE"
-			iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-set $VALUE
-			if [ -e /usr/sbin/ip6tables ]; then
-				echo "ip6tables -t mangle -I POSTROUTING -o $IFACE -j HL --hl-set $VALUE" >> /etc/ttl.user
-				log "ip6tables -t mangle -I POSTROUTING -o $IFACE -j HL --hl-set $VALUE"
-				ip6tables -t mangle -I POSTROUTING -o $IFACE -j HL --hl-set $VALUE
-			fi
+			echo "nft add rule inet fw4 mangle_postrouting oifname $IFACE ip ttl set $TTL" >> /etc/firewall.user
 		else
-			echo "iptables -t mangle -I POSTROUTING -o $IFACE ! -p icmp -j TTL --ttl-set $VALUE" >> /etc/ttl.user
-			log "iptables -t mangle -I POSTROUTING -o $IFACE ! -p icmp -j TTL --ttl-set $VALUE"
-			iptables -t mangle -I POSTROUTING -o $IFACE ! -p icmp -j TTL --ttl-set $VALUE
-			if [ -e /usr/sbin/ip6tables ]; then
-				echo "ip6tables -t mangle -I POSTROUTING -o $IFACE ! -p icmp -j HL --hl-set $VALUE" >> /etc/ttl.user
-				log "ip6tables -t mangle -I POSTROUTING -o $IFACE ! -p icmp -j HL --hl-set $VALUE"
-				ip6tables -t mangle -I POSTROUTING -o $IFACE ! -p icmp -j HL --hl-set $VALUE
-			fi
+			echo "nft add rule inet fw4 mangle_postrouting protocol icmp oifname $IFACE ip ttl set $TTL" >> /etc/firewall.user
 		fi
 	fi
+	echo "#endTTL$CURRMODEM" >> /etc/firewall.user
 fi
-echo "#endTTL$CURRMODEM" >> /etc/ttl.user
+
+log "Checking HL"
+if [ "$HL" = "1" ]; then
+	delHL
+	log "Deleting HL on interface $IFACE"
+else
+	delHL
+	log "Setting HL $HL on interface $IFACE"
+	echo "#startHL$CURRMODEM" >> /etc/firewall.user
+
+	if [ "$TTLOPTION" = "0" ]; then
+		echo "nft add rule inet fw4 mangle_postrouting oifname $IFACE ip6 hoplimit set $HL" >> /etc/firewall.user
+		echo "nft add rule inet fw4 mangle_prerouting oifname $IFACE ip6 hoplimit set $HL" >> /etc/firewall.user
+	else
+		if [ "$TTLOPTION" = "1" ]; then
+			echo "nft add rule inet fw4 mangle_postrouting oifname $IFACE ip6 hoplimit set $HL" >> /etc/firewall.user
+		else
+			echo "nft add rule inet fw4 mangle_postrouting protocol icmp oifname $IFACE ip6 hoplimit set $HL" >> /etc/firewall.user
+		fi
+	fi
+	echo "#endHL$CURRMODEM" >> /etc/firewall.user
+fi
+/etc/init.d/firewall restart
 
 
 

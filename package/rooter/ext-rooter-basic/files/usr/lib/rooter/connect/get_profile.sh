@@ -3,7 +3,7 @@
 . /lib/functions.sh
 
 ROOTER=/usr/lib/rooter
-ROOTER_LINK="/tmp/links"
+ROOTER_LINK="/tmp/links" 
 
 log() {
 	modlog "Get Profile $CURRMODEM" "$@"
@@ -220,6 +220,23 @@ do_custom() {
 						ttl="0"
 					fi
 					uci set modem.modeminfo$CURRMODEM.ttl="$ttl"
+					config_get cttl $1 cttl
+					if [ -z "$cttl" ]; then
+						cttl="65"
+					fi
+					uci set modem.modeminfo$CURRMODEM.cttl="$cttl"
+					
+					config_get hl $1 hl
+					if [ -z "$ttl" ]; then
+						ttl="0"
+					fi
+					uci set modem.modeminfo$CURRMODEM.hl="$hl"
+					config_get chl $1 chl
+					if [ -z "$chl" ]; then
+						chl="65"
+					fi
+					uci set modem.modeminfo$CURRMODEM.chl="$chl"
+					
 					config_get ttloption $1 ttloption
 					if [ -z "$ttloption" ]; then
 						ttloption="0"
@@ -384,6 +401,23 @@ if [ $MATCH = 0 ]; then
 		ttl="0"
 	fi
 	uci set modem.modeminfo$CURRMODEM.ttl="$ttl"
+	cttl=$(uci -q get profile.default.cttl)
+	if [ -z "$cttl" ]; then
+		cttl="65"
+	fi
+	uci set modem.modeminfo$CURRMODEM.cttl="$cttl"
+	
+	hl=$(uci -q get profile.default.hl)
+	if [ -z "$hl" ]; then
+		hl="0"
+	fi
+	uci set modem.modeminfo$CURRMODEM.hl="$hl"
+	chl=$(uci -q get profile.default.chl)
+	if [ -z "$chl" ]; then
+		chl="65"
+	fi
+	uci set modem.modeminfo$CURRMODEM.chl="$chl"
+	
 	ttloption=$(uci -q get profile.default.ttloption)
 	if [ -z "$ttloption" ]; then
 		ttloption="0"
