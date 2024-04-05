@@ -153,8 +153,19 @@ chcklog() {
 
 get_connect() {
 	NAPN=$(uci -q get modem.modeminfo$CURRMODEM.apn)
+	NAPN2=$(uci -q get modem.modeminfo$CURRMODEM.apn2)
+	NAPN3=$(uci -q get modem.modeminfo$CURRMODEM.apn3)
+	NUSER=$(uci -q get modem.modeminfo$CURRMODEM.user)
+	NPASS=$(uci -q get modem.modeminfo$CURRMODEM.passw)
+	NAUTH=$(uci -q get modem.modeminfo$CURRMODEM.auth)
 	PDPT=$(uci -q get modem.modeminfo$CURRMODEM.pdptype)
 	uci set modem.modem$CURRMODEM.apn="$NAPN"
+	uci set modem.modem$CURRMODEM.apn2=$NAPN2
+	uci set modem.modem$CURRMODEM.apn3=$NAPN3
+	uci set modem.modem$CURRMODEM.user=$NUSER
+	uci set modem.modem$CURRMODEM.passw=$NPASS
+	uci set modem.modem$CURRMODEM.auth=$NAUTH
+	uci set modem.modem$CURRMODEM.pin=$PINC
 	uci commit modem
 }
 
@@ -413,6 +424,12 @@ if [ $SP -gt 0 ]; then
 		$ROOTER/connect/bandmask $CURRMODEM 2
 		uci commit modem
 	fi
+	if [ $SP = 8 -o  $SP = 9 ]; then
+		log "FM350 Unlock Command"
+		fcc_unlock
+		$ROOTER/connect/bandmask $CURRMODEM 2
+		uci commit modem
+	fi
 	$ROOTER/common/gettype.sh $CURRMODEM
 fi
 	
@@ -505,222 +522,335 @@ if [ "$ttl" != "0" -a "$ttl" != "1" -a "$ttl" != "TTL-INC 1" -a "$hostless" = "1
 fi
 $ROOTER/connect/handlettl.sh $CURRMODEM "$ttl" "$ttloption" &
 
-if [ $SP -eq 2 ]; then
-	get_connect
-	export SETAPN=$NAPN
-	BRK=1
 
-	while [ $BRK -eq 1 ]; do
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-zecm.gcom" "$CURRMODEM")
-		chcklog "$OX"
-		ERROR="ERROR"
-		if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
-		then
-			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
-		else
-			BRK=0
-		fi
-	done
+autoapn=$(uci -q get profile.disable.autoapn)
+imsi=$(uci -q get modem.modem$CURRMODEM.imsi)
+mcc6=${imsi:0:6}
+mcc5=${imsi:0:5}
+get_connect
+apndata=""
+if [ -e /usr/lib/rooter/connect/apndata.sh ]; then
+	/usr/lib/rooter/connect/apndata.sh $CURRMODEM
+	if [ -e /tmp/apndata ]; then
+		apndata=$(cat /tmp/apndata)" "
+	fi
 fi
 
-if [ $SP -eq 4 ]; then
-	get_connect
-	export SETAPN=$NAPN
-	BRK=1
-
-	while [ $BRK -eq 1 ]; do
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-fecm.gcom" "$CURRMODEM")
-		chcklog "$OX"
-		log " "
-		log "Fibocom Connect : $OX"
-		log " "
-		ERROR="ERROR"
-		if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
-		then
-			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
-		else
-			BRK=0
-			get_ip
-		fi
-	done
+apd=0
+if [ -e /usr/lib/autoapn/apn.data ]; then
+	apd=1
 fi
-	
-if [ $SP = 8 -o  $SP = 9 ]; then
-	log "FM350 Connection Command"
-	fcc_unlock
-	$ROOTER/connect/bandmask $CURRMODEM 2
+pdptype="ipv4v6"
+IPVAR=$(uci -q get modem.modeminfo$CURRMODEM.pdptype)
+case "$IPVAR" in
+	"IP" )
+		pdptype="ipv4"
+	;;
+	"IPV6" )
+		pdptype="ipv6"
+	;;
+	"IPV4V6" )
+		pdptype="ipv4v6"
+	;;
+esac
+if [ "$autoapn" = "1" -a $apd -eq 1 ]; then
+	isplist=$(grep -F "$mcc6" '/usr/lib/autoapn/apn.data')
+	if [ -z "$isplist" ]; then
+		isplist=$(grep -F "$mcc5" '/usr/lib/autoapn/apn.data')
+		if [ -z "$isplist" ]; then
+			isplist="000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
+			if [ ! -z "$NAPN2" ]; then
+				isplist=$isplist" 000000,$NAPN2,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
+			fi
+			if [ ! -z "$NAPN3" ]; then
+				isplist=$isplist" 000000,$NAPN3,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
+			fi
+		fi
+	fi
+else
+	if [ -z "$apndata" ]; then
+		isplist=$apndata"000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
+		if [ ! -z "$NAPN2" ]; then
+			isplist=$isplist" 000000,$NAPN2,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
+		fi
+		if [ ! -z "$NAPN3" ]; then
+			isplist=$isplist" 000000,$NAPN3,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
+		fi
+	else
+		isplist=$apndata
+	fi
+fi
+log "$isplist"
+uci set modem.modeminfo$CURRMODEM.isplist="$isplist"
+uci commit modem
+rm -f /tmp/usbwait
+for isp in $isplist
+do
+	NAPN=$(echo $isp | cut -d, -f2)
+	NPASS=$(echo $isp | cut -d, -f4)
+	CID=$(echo $isp | cut -d, -f5)
+	NUSER=$(echo $isp | cut -d, -f6)
+	NAUTH=$(echo $isp | cut -d, -f7)
+	if [ "$NPASS" = "nil" ]; then
+		NPASS="NIL"
+	fi
+	if [ "$NUSER" = "nil" ]; then
+		NUSER="NIL"
+	fi
+	if [ "$NAUTH" = "nil" ]; then
+		NAUTH="0"
+	fi
+	export SETAPN=$NAPN
+	export SETUSER=$NUSER
+	export SETPASS=$NPASS
+	export SETAUTH=$NAUTH
+	export PINCODE=$PINC
+
+	uci set modem.modem$CURRMODEM.apn=$NAPN
+	uci set modem.modem$CURRMODEM.user=$NUSER
+	uci set modem.modem$CURRMODEM.passw=$NPASS
+	uci set modem.modem$CURRMODEM.auth=$NAUTH
+	uci set modem.modem$CURRMODEM.pin=$PINC
 	uci commit modem
-	get_connect
-	export SETAPN=$NAPN
-	BRK=1
 	
-		ATCMDD="AT+CGPIAF=1,0,0,0;+CGDCONT=1"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		log "$OX"
-			
-		ATCMDD='AT+CGDCONT=1,"IP","'$NAPN'",,0,0,0,0,0,0,0'
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		chcklog "$OX"
-		log " "
-		log "Fibocom Connect : $OX"
-		log " "
-		ERROR="ERRORX"
-		if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
-		then
-			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
-			log "Failed to Connect"
-		else
-			BRK=0
-			ATCMDD="AT+CGACT=0"
-				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-				log "$OX"
-			ATCMDD="AT+CGPADDR=0"
+	
+	if [ $SP -eq 2 ]; then
+		get_connect
+		export SETAPN=$NAPN
+		BRK=1
+
+		while [ $BRK -eq 1 ]; do
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-zecm.gcom" "$CURRMODEM")
+			chcklog "$OX"
+			ERROR="ERROR"
+			if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
+			then
+				$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
+			else
+				BRK=0
+			fi
+		done
+	fi
+
+	if [ $SP -eq 4 ]; then
+		#get_connect
+		export SETAPN=$NAPN
+		BRK=1
+
+		while [ $BRK -eq 1 ]; do
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-fecm.gcom" "$CURRMODEM")
+			chcklog "$OX"
+			log " "
+			log "Fibocom Connect : $OX"
+			log " "
+			ERROR="ERROR"
+			if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
+			then
+				$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
+			else
+				BRK=0
+				get_ip
+			fi
+		done
+	fi
+		
+	if [ $SP = 8 -o  $SP = 9 ]; then
+		log "FM350 Connection Command"
+		#fcc_unlock
+		#$ROOTER/connect/bandmask $CURRMODEM 2
+		uci commit modem
+		#get_connect
+		export SETAPN=$NAPN
+		BRK=1
+		
+			ATCMDD="AT+CGPIAF=1,0,0,0;+CGDCONT=1"
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			log "$OX"
-						
+				
 			ATCMDD='AT+CGDCONT=1,"IP","'$NAPN'",,0,0,0,0,0,0,0'
-			#OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			#log "$OX"
-			cntr=0
-			while [ true ]; do
-				ATCMDD="AT+CGACT=1,1"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			chcklog "$OX"
+			log " "
+			log "Fibocom Connect : $OX"
+			log " "
+			ERROR="ERRORX"
+			if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
+			then
+				$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
+				log "Failed to Connect"
+			else
+				BRK=0
+				ATCMDD="AT+CGACT=0"
+					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+					log "$OX"
+				ATCMDD="AT+CGPADDR=0"
 				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 				log "$OX"
-				cgev=$(echo "$OX" | grep "+CGEV")
-				if [ ! -z "$cgev" ]; then
-					break;
+
+				cntr=0
+				while [ true ]; do
+					ATCMDD="AT+CGACT=1,1"
+					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+					log "$OX"
+					cgev=$(echo "$OX" | grep "+CGEV")
+					if [ ! -z "$cgev" ]; then
+						break;
+					fi
+					let cntr=$cntr+1
+					if [ "$cntr" -gt 1 ]; then
+						break
+					fi
+					sleep 5
+				done
+				
+				ATCMDD="AT+CGPADDR=1"
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				log "$OX"
+				OX=$(echo "$OX" | grep "^+CGPADDR: 1," | cut -d'"' -f2)
+				ip4=$(echo $OX | cut -d, -f1 | grep "\.")
+				ip6=$(echo $OX | cut -d, -f2 | grep ":")
+				log "IP address(es) obtained: $ip4 $ip6"
+				if [ -z "$ip4" ]; then
+					BRK=1
+					log "No IP Address"
+				else
+					check_ip
+								
+					gtw=$(echo "$ip4" | cut -d. -f1)"."$(echo "$ip4" | cut -d. -f2)"."$(echo "$ip4" | cut -d. -f3)".1"
+					uci set network.wan$INTER.proto='static'
+					uci set network.wan$INTER.ipaddr="$ip4"
+					uci set network.wan$INTER.netmask='255.255.255.0'
+					uci set network.wan$INTER.gateway="$gtw"
+					uci set network.wan$INTER.dns="1.1.1.1"
+					uci set network.wan$INTER.peerdns=0
+					set_dns
+					uci commit network
+					ifup wan$INTER
+					rm -f /tmp/usbwait
 				fi
-				let cntr=$cntr+1
-				if [ "$cntr" -gt 5 ]; then
-					break
-				fi
-				sleep 5
-			done
-			
-			ATCMDD="AT+CGPADDR=1"
+			fi
+	fi
+
+	if [ $SP = 5 ]; then
+		#get_connect
+		if [ -n "$NAPN" ]; then
+			$ROOTER/common/lockchk.sh $CURRMODEM
+			if [ $idP = 6026 ]; then
+				IPN=1
+				case "$PDPT" in
+				"IPV6" )
+					IPN=2
+					;;
+				"IPV4V6" )
+					IPN=3
+					;;
+				esac
+				ATCMDD="AT+QICSGP=$CID,$IPN,\"$NAPN\""
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				ATCMDD="AT+QNETDEVCTL=2,$CID,1"
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			else
+				check_apn
+				log "Using $NAPN"
+			fi
+		fi
+		ATCMDD="AT+CNMI?"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		if `echo $OX | grep -o "+CNMI: [0-3],2," >/dev/null 2>&1`; then
+			ATCMDD="AT+CNMI=0,0,0,0,0"
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			log "$OX"
-			OX=$(echo "$OX" | grep "^+CGPADDR: 1," | cut -d'"' -f2)
-			ip4=$(echo $OX | cut -d, -f1 | grep "\.")
-			ip6=$(echo $OX | cut -d, -f2 | grep ":")
-			log "IP address(es) obtained: $ip4 $ip6"
-			check_ip
-						
-			gtw=$(echo "$ip4" | cut -d. -f1)"."$(echo "$ip4" | cut -d. -f2)"."$(echo "$ip4" | cut -d. -f3)".1"
-			uci set network.wan$INTER.proto='static'
-			uci set network.wan$INTER.ipaddr="$ip4"
-			uci set network.wan$INTER.netmask='255.255.255.0'
-			uci set network.wan$INTER.gateway="$gtw"
-			uci set network.wan$INTER.dns="1.1.1.1"
-			uci set network.wan$INTER.peerdns=0
-			set_dns
-			uci commit network
-			ifup wan$INTER
 		fi
-fi
-
-if [ $SP = 5 ]; then
-	get_connect
-	if [ -n "$NAPN" ]; then
-		$ROOTER/common/lockchk.sh $CURRMODEM
-		if [ $idP = 6026 ]; then
-			IPN=1
-			case "$PDPT" in
-			"IPV6" )
-				IPN=2
-				;;
-			"IPV4V6" )
-				IPN=3
-				;;
-			esac
-			ATCMDD="AT+QICSGP=$CID,$IPN,\"$NAPN\""
+		ATCMDD="AT+QINDCFG=\"smsincoming\""
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		if `echo $OX | grep -o ",1" >/dev/null 2>&1`; then
+			ATCMDD="AT+QINDCFG=\"smsincoming\",0,1"
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			ATCMDD="AT+QNETDEVCTL=2,$CID,1"
+		fi
+		ATCMDD="AT+QINDCFG=\"all\""
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		if `echo $OX | grep -o ",1" >/dev/null 2>&1`; then
+			ATCMDD="AT+QINDCFG=\"all\",0,1"
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		else
-			check_apn
 		fi
-	fi
-	ATCMDD="AT+CNMI?"
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if `echo $OX | grep -o "+CNMI: [0-3],2," >/dev/null 2>&1`; then
-		ATCMDD="AT+CNMI=0,0,0,0,0"
+		log "Quectel Unsolicited Responses Disabled"
+		$ROOTER/luci/celltype.sh $CURRMODEM
+		ATCMDD="AT+QINDCFG=\"all\",1"
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	fi
-	ATCMDD="AT+QINDCFG=\"smsincoming\""
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if `echo $OX | grep -o ",1" >/dev/null 2>&1`; then
-		ATCMDD="AT+QINDCFG=\"smsincoming\",0,1"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	fi
-	ATCMDD="AT+QINDCFG=\"all\""
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	if `echo $OX | grep -o ",1" >/dev/null 2>&1`; then
-		ATCMDD="AT+QINDCFG=\"all\",0,1"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	fi
-	log "Quectel Unsolicited Responses Disabled"
-	$ROOTER/luci/celltype.sh $CURRMODEM
-	ATCMDD="AT+QINDCFG=\"all\",1"
-	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-
-	get_ip
-	if [ -n "$ip6" ]; then
-		check_ip
-		if [ "$v6cap" -gt 0 ]; then
-			ip6=$ip6
-			addv6
+		BRK=0
+		get_ip
+		if [ -z "$ip4" -o "$ip4" = "0.0.0.0" ]; then
+			if [ -z "$ip6" -o "$ip6" = "0000:0000:0000:0000:0000:0000:0000:0000" ]; then
+				BRK=1
+				log "No IP Address"
+			fi
 		fi
-	fi
-fi
-
-if [ $SP -eq 6 ]; then
-	get_connect
-	export SETAPN=$NAPN
-	BRK=1
-
-	while [ $BRK -eq 1 ]; do
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-ncm.gcom" "$CURRMODEM")
-		chcklog "$OX"
-		ERROR="ERROR"
-		if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
-		then
-			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
-		else
-			BRK=0
-		fi
-	done
-fi
-
-if [ $SP -eq 7 ]; then
-	get_connect
-	export SETAPN=$NAPN
-	BRK=1
-
-	if [ -n "$NAPN" ]; then
-		check_apn
-	fi
-
-	while [ $BRK -eq 1 ]; do
-		ATCMDD="AT\$ECMCALL=1"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		chcklog "$OX"
-		ERROR="ERROR"
-		if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
-		then
-			$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
-		else
-			BRK=0
-			get_ip
+		if [ "$BRK" = 0 ]; then
 			if [ -n "$ip6" ]; then
 				check_ip
 				if [ "$v6cap" -gt 0 ]; then
-					BRK=0
-					#addv6
+					ip6=$ip6
+					addv6
 				fi
 			fi
 		fi
-	done
+	fi
+
+	if [ $SP -eq 6 ]; then
+		#get_connect
+		export SETAPN=$NAPN
+		BRK=1
+
+		while [ $BRK -eq 1 ]; do
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "connect-ncm.gcom" "$CURRMODEM")
+			chcklog "$OX"
+			ERROR="ERROR"
+			if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
+			then
+				$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
+			else
+				BRK=0
+			fi
+		done
+	fi
+
+	if [ $SP -eq 7 ]; then
+		#get_connect
+		export SETAPN=$NAPN
+		BRK=1
+
+		if [ -n "$NAPN" ]; then
+			check_apn
+		fi
+
+		while [ $BRK -eq 1 ]; do
+			ATCMDD="AT\$ECMCALL=1"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			chcklog "$OX"
+			ERROR="ERROR"
+			if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
+			then
+				$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
+			else
+				BRK=0
+				get_ip
+				if [ -n "$ip6" ]; then
+					check_ip
+					if [ "$v6cap" -gt 0 ]; then
+						BRK=0
+						#addv6
+					fi
+				fi
+			fi
+		done
+	fi
+
+	if [ $BRK = 0 ]; then
+		break
+	fi
+done
+
+if [ $BRK = 1 ]; then
+	log "Did not connect"
 fi
 
 rm -f /tmp/usbwait
@@ -779,18 +909,16 @@ if [ $SP -gt 0 ]; then
 	if [ -e $ROOTER/connect/postconnect.sh ]; then
 		$ROOTER/connect/postconnect.sh $CURRMODEM
 	fi
-	if [ $(uci -q get modem.modeminfo$CURRMODEM.at) -eq "1" ]; then
-		ATCMDD=$(uci -q get modem.modeminfo$CURRMODEM.atc)
-		if [ -n "$ATCMDD" ]; then
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			OX=$($ROOTER/common/processat.sh "$OX")
-			ERROR="ERROR"
-			if `echo $OX | grep "$ERROR" 1>/dev/null 2>&1`
-			then
-				log "Error sending custom AT command: $ATCMDD with result: $OX"
-			else
-				log "Sent custom AT command: $ATCMDD with result: $OX"
-			fi
+	ATCMDD=$(uci -q get modem.modeminfo$CURRMODEM.atc)
+	if [ -n "$ATCMDD" ]; then
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		OX=$($ROOTER/common/processat.sh "$OX")
+		ERROR="ERROR"
+		if `echo $OX | grep "$ERROR" 1>/dev/null 2>&1`
+		then
+			log "Error sending custom AT command: $ATCMDD with result: $OX"
+		else
+			log "Sent custom AT command: $ATCMDD with result: $OX"
 		fi
 	fi
 

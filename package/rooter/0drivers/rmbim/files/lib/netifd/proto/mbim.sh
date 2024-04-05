@@ -570,18 +570,16 @@ _proto_mbim_setup() {
 		$ROOTER/sms/check_sms.sh $CURRMODEM &
 		ln -s $ROOTER/signal/modemsignal.sh $ROOTER_LINK/getsignal$CURRMODEM
 		# send custom AT startup command
-		if [ $(uci -q get modem.modeminfo$CURRMODEM.at) -eq "1" ]; then
-			ATCMDD=$(uci -q get modem.modeminfo$CURRMODEM.atc)
-			if [ ! -z "${ATCMDD}" ]; then
-				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-				OX=$($ROOTER/common/processat.sh "$OX")
-				ERROR="ERROR"
-				if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
-				then
-					log "Error sending custom AT command: $ATCMDD with result: $OX"
-				else
-					log "Sent custom AT command: $ATCMDD with result: $OX"
-				fi
+		ATCMDD=$(uci -q get modem.modeminfo$CURRMODEM.atc)
+		if [ ! -z "${ATCMDD}" ]; then
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			OX=$($ROOTER/common/processat.sh "$OX")
+			ERROR="ERROR"
+			if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
+			then
+				log "Error sending custom AT command: $ATCMDD with result: $OX"
+			else
+				log "Sent custom AT command: $ATCMDD with result: $OX"
 			fi
 		fi
 	fi

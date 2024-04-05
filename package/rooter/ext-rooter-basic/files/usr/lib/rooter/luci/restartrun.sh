@@ -59,10 +59,18 @@ if [ ! -z "$bn" ]; then
 	fi
 	log "Power Toggle"
 fi
+
 if [ $uVid != "2c7c" ]; then
-	if [ ! -z "$CPORT" ]; then
-		ATCMDD="AT+CFUN=1,1"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	if [ $uVid = "0e8d" ]; then
+		if [ ! -z "$CPORT" ]; then
+			ATCMDD="AT+CFUN=15"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
+	else
+		if [ ! -z "$CPORT" ]; then
+			ATCMDD="AT+CFUN=1,1"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
 	fi
 	log "Hard modem reset done $OX"
 else
