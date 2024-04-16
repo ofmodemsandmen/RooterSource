@@ -8,6 +8,7 @@ log() {
 
 CURRMODEM=$1
 COMMPORT=$2
+idP=$(uci get modem.modem$CURRMODEM.idP)
 
 decode_signal() {
 	if [ "$CRAT" -eq 4 ]; then
@@ -58,19 +59,28 @@ decode_bw() {
 OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "fibocominfo.gcom" "$CURRMODEM")
 
 OX=$(echo $OX | tr 'a-z' 'A-Z')
-
+echo "$OX" > /tmp/sccone
+sed -i 's/SCC 1/SCC1/g' /tmp/sccone
+OX=$(cat /tmp/sccone)
+rm -f /tmp/sccone
 SERVING=$(echo $OX | grep -o "+GTCCINFO:.\+GTRAT")
 
-REGXa="[12],[249],[0-9]\{3\},[0-9]\{2,3\},[0-9A-F]\{0,6\},[0-9A-F]\{0,10\},[0-9A-F]\{1,8\},[0-9A-F]\{1,8\},[15][0-9]\{1,4\},[0-9]\{1,3\},[-0-9]\{1,5\},[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\}"
+REGXa="[12],[249],[0-9]\{3\},[0-9]\{1,3\},[0-9A-F]\{0,6\},[0-9A-F]\{0,10\},[0-9A-F]\{1,8\},[0-9A-F]\{1,8\},[15][0-9]\{1,4\},[0-9]\{1,4\},[-0-9]\{1,5\},[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\}"
 REGXb="+GTCAINFO: 1,[0-9]\{1,2\},[0-9]\{3\},[0-9]\{2,3\},[0-9]\{1,5\},[0-9]\{3,9\},[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\},[-0-9]\{1,4\},[0-9]\{1,6\},[0-9]\{1,6\},[0-9]\{1,3\},[0-9]\{1,3\}"
 REGXc="+GTCAINFO: [2-9],[0-9]\{1,2\},[0-9]\{1,5\},[0-9]\{1,3\},[0-9]\{1,3\},[-0-9]\{1,4\},[0-9]\{1,5\},[0-9]\{1,5\},[0-9]\{1,3\},[0-9]\{1,3\}"
 REGXd="+XMCI: 2,[0-9]\{3\},[0-9]\{2,3\},[^,]\+,[^,]\+,[^,]\+,\"0X[0-9A-F]\{8\}\",[^,]\+,[^,]\+,[0-9]\{1,2\},[0-9]\{1,2\},[0-9]\{1,2\}"
 REGXe="+XMCI: 4,[0-9]\{3\},[0-9]\{2,3\},[^,]\+,[^,]\+,\"0X[0-9A-F]\{4\}\",\"0X[0-9A-F]\{8\}\",[^,]\+,[^,]\+,[0-9]\{1,2\},[0-9]\{1,2\},[-0-9]\{1,5\}"
-REGXf="SCC[0-9]: 1,0,[0-9]\{1,3\},1[0-9]\{2\},[0-9]\{1,6\},[0-9]\{1,3\}"
-REGXg="2,4,,,,,[0-9A-F]\{1,5\},[0-9A-F]\{1,3\},,[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\}"
 REGXh="2,9,,,,,[0-9A-F]\{5\},[0-9A-F]\{1,3\},,[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\}"
 REGXj="+GTCAINFO:.\+SCC1[^O]\+"
-REGXy="1,4,[0-9]\{3\},[0-9]\{2,3\},[0-9A-F]\{0,5\},[0-9A-F]\{0,10\},[0-9]\{1,8\}, ,[0-9]\{1,2\},[0-5], ,"
+REGXy="1,9,[0-9]\{0,3\},[0-9]\{0,3\},[0-9A-F]\{0,7\},[0-9A-F]\{0,10\},[0-9A-F]\{1,8\},[0-9A-F]\{1,8\},[15][0-9]\{1,4\},[0-9]\{1,4\},[-0-9]\{1,5\},[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\}"
+
+if [ "$idP" = 7127 -o "$idP" = 7126 ]; then
+	REGXg="2,4,[0-9]\{0,3\},[0-9]\{0,3\},[0-9A-F]\{0,7\},[0-9A-F]\{0,10\},[0-9A-F]\{1,8\},[0-9A-F]\{0,8\},[0-9]\{0,4\},[0-9]\{0,3\},[-0-9]\{0,5\},[0-9]\{0,3\}"
+	REGXf="SCC[0-9]:[1,2,3\],0,[0-9]\{1,3\},[0-9]\{2,3\},[0-9]\{1,6\},[0-9]\{1,3\}"
+else
+	REGXg="2,4,,,,,[0-9A-F]\{1,7\},[0-9A-F]\{1,3\},,[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\}"
+	REGXf="SCC[0-9]: 1,0,[0-9]\{1,3\},1[0-9]\{2\},[0-9]\{1,6\},[0-9]\{1,3\}"
+fi
 
 CHANNEL="-"
 ECIO="-"
@@ -102,19 +112,32 @@ else
 fi
 
 if [ -n "$SERVING" ]; then
-	PROD=$(uci get modem.modem$CURRMODEM.idP)
-	if [ "$PROD" = 7127 -o "$PROD" = 7126 ]; then
+	if [ "$idP" = 7127 -o "$idP" = 7126 ]; then
 		MODE=$SERVING
-		MODE=${MODE:13:1}
+		MODE=$(echo "$MODE" | tr " " ",")
+		NSA=$(echo "$MODE" | cut -d, -f16)
+		if [ "$NSA" != "1" ]; then
+			NSA="0"
+		fi
+		GTCCDATAy=""
+		MODEX=$MODE
+		MODE=$(echo "$MODE" | cut -d, -f3)
 		case $MODE in
 		"2" )
 			MODE="WCDMA"
 			;;
 		"4" )
 			MODE="LTE"
+			if [ "$NSA" = "1" ]; then
+				FG=$(echo "$MODEX" | cut -d, -f17)
+				if [ "$FG" = "9" ]; then
+					MODE="5G NSA"
+					GTCCDATAy=$(echo $SERVING | grep -o "$REGXy")
+				fi
+			fi
 			;;
 		"9" )
-			MODE="NR-RAN"
+			MODE="5G SA"
 			;;
 		esac
 	else
@@ -127,13 +150,16 @@ if [ -n "$SERVING" ]; then
 		fi
 	fi
 	GTCCDATA=$(echo $SERVING | grep -o "$REGXa")
-	GTCCDATAy=$(echo $SERVING | grep -o "$REGXy")
 	LTENEIGH=$(echo $SERVING | grep -o "$REGXg")
 	NRNEIGH=$(echo $SERVING | grep -o "$REGXh")
 	echo "" > /tmp/scan$CURRMODEM
 	for NVAL in $(echo "$LTENEIGH"); do
 		CHAN=$(echo $NVAL | cut -d, -f7)
-		CHAN=$(printf "%d" 0x$CHAN)
+		if [ "$idP" = 7127 -o "$idP" = 7126 ]; then
+			CHAN=$CHAN
+		else
+			CHAN=$(printf "%d" 0x$CHAN)
+		fi
 		BAND=$(/usr/lib/rooter/chan2band.sh $CHAN)
 		PCIx=$(echo $NVAL | cut -d, -f8)
 		PCIx=$(printf "%d" 0x$PCIx)
@@ -167,11 +193,19 @@ else
 	XUDATA=$(echo $OX | grep -o "$REGXd")
 	XLDATA=$(echo $OX | grep -o "$REGXe")
 fi
+
 CADATA3=$(echo $OX | grep -o "$REGXf")
 CADATA4=$(echo $OX | grep -o "$REGXj" | tr -d " " | tr ":" ",")
 if [ -n "$GTCCDATA" ]; then
 	COPS_MCC=$(echo $GTCCDATA | cut -d, -f3)
 	COPS_MNC=$(echo $GTCCDATA | cut -d, -f4)
+	msize=${#COPS_MNC}
+	if [ "$msize" -eq 1 ]; then
+		COPS_MNC="00"$COPS_MNC
+	fi
+	if [ "$msize" -eq 2 ]; then
+		COPS_MNC="0"$COPS_MNC
+	fi
 	COPX=""
 	if [ -e /tmp/copn.at ]; then
 		COPN=$(cat /tmp/copn.at)
@@ -185,7 +219,7 @@ if [ -n "$GTCCDATA" ]; then
 	fi
 	COPN=$(echo $COPN | tr " " "," | tr -d '"' )
 	if [ -n "$COPN" ]; then
-		COPP=$(echo $COPN" " | sed "s/.*\($COPS_MCC$COPS_MNC,.*\)\,/\1/")
+		COPP=$(echo $COPN" " | sed "s/.*\($COPS_MCC$COPS_MNC,,*\)\,/\1/")
 		if [ -n "$COPP" ]; then
 			COPX=$(echo $COPP | cut -d, -f2)
 		fi
@@ -197,14 +231,18 @@ if [ -n "$GTCCDATA" ]; then
 	ECIO=""
 	PCI=""
 	XUDATA=""
-	for CCVAL in $(echo "$GTCCDATA"); do
+	for CCVAL in $(echo "$GTCCDATA $GTCCDATAy"); do
 		CELLTYPE=$(echo $CCVAL | cut -d, -f1)
 		CRAT=$(echo $CCVAL | cut -d, -f2)
 		BAND=$(echo $CCVAL | cut -d, -f9)
 		CHAN=$(echo $CCVAL | cut -d, -f7)
-		CHAN=$(printf "%d" 0x$CHAN)
 		PCID=$(echo $CCVAL | cut -d, -f8)
-		PCID=$(printf "%d" 0x$PCID)
+		if [ "$idP" = 7127 -o "$idP" = 7126 ]; then
+			CHAN=$CHAN
+		else
+			CHAN=$(printf "%d" 0x$CHAN)
+			PCID=$(printf "%d" 0x$PCID)
+		fi
 		BW=$(echo $CCVAL | cut -d, -f10)
 		if [ "$CRAT" -eq 4 ]; then
 			SSINR=$(echo $CCVAL | cut -d, -f11 | grep -o "[-0-9]\{1,4\}")
@@ -242,6 +280,10 @@ if [ -n "$GTCCDATA" ]; then
 			else
 				SINR=$SSINR
 			fi
+			size=${#BW}
+			size=$size-1
+			BW=${BW:0:$size}
+			let BW=$BW*2
 			if [ "$CELLTYPE" -eq 1 ]; then
 				BAND="n"${BAND:2}" (Bandwidth: "$BW" MHz)"
 			else
@@ -263,26 +305,44 @@ if [ -n "$GTCCDATA" ]; then
 		else
 			PCI=$PCID
 		fi
+
+		OXX=$OX"+ERSRQ"
 		if [ "$CELLTYPE" -eq 1 ]; then
-			RSRP=$(echo $CCVAL | cut -d, -f13)
-			RSRQ=$(echo $CCVAL | cut -d, -f14)
-			if [ "$RSRP" -ne 255 ] && [ "$RSRQ" -ne 255 ]; then
-				decode_signal
-				RSSI=$(rsrp2rssi $RSCPs $BW)
-				CSQ_PER=$((100 - (($RSSI + 51) * 100/-62)))"%"
-				CSQ=$((($RSSI + 113) / 2))
-				CSQ_RSSI=$RSSI" dBm"
+			if [ "$idP" = 7127 -o "$idP" = 7126 ]; then
+				RSRPP=$(echo $OX | grep -o "+RSRP:.\+RSRQ")
+				RSRPP=$(echo $RSRPP | tr " " ",")
+				if [ "$CRAT" -eq 4 ]; then
+					RSRP=$(echo "$RSRPP" | cut -d, -f6)
+				else
+					RSRP=$(echo "$RSRPP" | cut -d, -f12)
+				fi
+				if [ -z "$RSCP" ]; then
+					RSCP=$(echo $RSRP | tr -d ' ') 
+				else
+					RSCP=$RSCP" (4G) dBm<br />"$(echo $RSRP | tr -d ' ')" (5G) " 
+				fi
+				RSRQQ=$(echo $OXX | grep -o "+RSRQ:.\+ERSRQ")
+				RSRQQ=$(echo $RSRQQ | tr " " ",")
+				RSRQ=$(echo "$RSRQQ" | cut -d, -f6)
+				RSRQ1=$(echo "$RSRQQ" | cut -d, -f12)
+				if [ -z "$ECIO" ]; then
+					ECIO=$(echo $RSRQ | tr -d ' ')
+				else
+					ECIO=$ECIO" (4G) dB<br />"$(echo $RSRQ1 | tr -d ' ')" (5G) "
+				fi
+			else
+				RSRP=$(echo $CCVAL | cut -d, -f13)
+				RSRQ=$(echo $CCVAL | cut -d, -f14)
+				if [ "$RSRP" -ne 255 ] && [ "$RSRQ" -ne 255 ]; then
+					decode_signal
+					RSSI=$(rsrp2rssi $RSCPs $BW)
+					CSQ_PER=$((100 - (($RSSI + 51) * 100/-62)))"%"
+					CSQ=$((($RSSI + 113) / 2))
+					CSQ_RSSI=$RSSI" dBm"
+				fi
 			fi
 		fi
 	done
-fi
-
-if [ -n "$GTCCDATAy" ]; then
-	CHANNEL=$(echo $GTCCDATAy | cut -d, -f7)
-	BW=$(echo $GTCCDATAy | cut -d, -f10)
-	decode_bw
-	LBAND="B"$(echo $GTCCDATAy | cut -d, -f9)" (Bandwidth: "$BW" MHz)"
-	XUDATA=""
 fi
 
 if [ -n "$XLDATA" ]; then
@@ -363,6 +423,7 @@ if [ -n "$XLDATA" ]; then
 		CSQ_RSSI=$RSSI" dBm"
 	fi
 fi
+
 if [ -n "$XUDATA" ]; then
 	MODE="UMTS"
 	CHANNEL=$(echo $XUDATA | cut -d, -f7)
@@ -373,6 +434,7 @@ if [ -n "$XUDATA" ]; then
 	ECIO=$(echo $XUDATA | cut -d, -f12)
 	ECIO=$((($ECIO / 2) - 24))
 fi
+
 if [ -n "$CADATA1" ]; then
 	RSCP=""
 	ECIO=""
@@ -400,6 +462,7 @@ if [ -n "$CADATA1" ]; then
 	fi
 	PCI=$(echo $CADATA1 | cut -d, -f7)
 fi
+
 if [ -n "$CADATA2" ]; then
 	CADATA2=$(echo "${CADATA2//[ ]/}")
 	for CAVAL in $(echo "$CADATA2"); do
@@ -421,6 +484,10 @@ if [ -n "$CADATA2" ]; then
 		PCI=$(echo "$PCI", "$PCIX")
 	done
 fi
+
+if [ "$idP" = 7127 -o "$idP" = 7126 ]; then
+	CADATA3=""
+fi
 if [ -n "$CADATA3" ]; then
 	CADATA3=$(echo "${CADATA3//[ ]/}")
 	for CAVAL in $(echo "$CADATA3"); do
@@ -439,6 +506,7 @@ if [ -n "$CADATA3" ]; then
 		LBAND=$LBAND"<br />B"$(echo $BAND | sed 's/^0*//')" (CA, Bandwidth: "$BW" MHz)"
 	done
 fi
+
 if [ -n "$CADATA4" ]; then
 	NRCA=$(echo $CADATA4 | grep -o "PCC,[15]")
 	CADATA4=$(echo $CADATA4 | grep -o "SCC[0-9][^S]\+")
@@ -456,13 +524,21 @@ if [ -n "$CADATA4" ]; then
 			UPLC=$(echo $CAVAL | cut -d, -f3)
 			BWD=$(echo $CAVAL | cut -d, -f7)
 			BWU=$(echo $CAVAL | cut -d, -f8)
-			RSRP=$(echo $CAVAL | cut -d, -f13)
+			if [ "$idP" = 7127 -o "$idP" = 7126 ]; then
+				RSRP=$(echo $CAVAL | cut -d, -f14)
+			else
+				RSRP=$(echo $CAVAL | cut -d, -f13)
+			fi
 			SHOWBWU=true
+		
 			if [ $RATP == "B" ]; then
 				if [ $BWD -gt 14 ]; then
 					BWD=$((BWD / 5))
 				else
 					BWD="1.4"
+				fi
+				if [ "$BWU" -gt 100 ]; then
+					BWU=100
 				fi
 				BWU=$((BWU / 5))
 				if [ $BWU -lt 3 ]; then
@@ -478,9 +554,13 @@ if [ -n "$CADATA4" ]; then
 				fi
 				CRAT="9"
 			fi
-			if [ -n "$RSRP" ]; then
-				ECIO=""
-				decode_signal
+			if [ "$idP" = 7127 -o "$idP" = 7126 ]; then
+				RSRPX=$RSRP
+			else
+				if [ -n "$RSRP" ]; then
+					ECIO=""
+					decode_signal
+				fi
 			fi
 			CHANNEL=$(echo "$CHANNEL","$(echo $CAVAL | cut -d, -f6)")
 			PCI=$(echo "$PCI","$(echo $CAVAL | cut -d, -f5)")
@@ -495,6 +575,7 @@ if [ -n "$CADATA4" ]; then
 		done
 	fi
 fi
+
 if [ -z "$CADATA2" ] && [ -z "$CADATA3" ] && [ -z "$CADATA4" ]; then
 	RSRPCA=$(echo $RSRPCA | tr " " ",")
 	if [ -n "$RSRPCA" ]; then
@@ -509,7 +590,7 @@ if [ -z "$CADATA2" ] && [ -z "$CADATA3" ] && [ -z "$CADATA4" ]; then
 		CHANNEL=$CHANNEL","$CHANCA
 	fi
 fi
-if [ "$PROD" = 7127 -o "$PROD" = 7126 ]; then
+if [ "$idP" = 7127 -o "$idP" = 7126 ]; then
 	ATCMDD="AT+GTZONERDMAXTEMP=1"
 	OXtm=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	ist=$(echo "$OXtm" | grep "+GTZONERDMAXTEMP: 1")
