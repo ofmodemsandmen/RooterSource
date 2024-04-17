@@ -64,8 +64,11 @@ sed -i 's/SCC 1/SCC1/g' /tmp/sccone
 OX=$(cat /tmp/sccone)
 rm -f /tmp/sccone
 SERVING=$(echo $OX | grep -o "+GTCCINFO:.\+GTRAT")
+echo "$SERVING" > /tmp/sccone
+sed -i 's/,,,/,1,1,/g' /tmp/sccone
+SERVING=$(cat /tmp/sccone)
 
-REGXa="[12],[249],[0-9]\{3\},[0-9]\{1,3\},[0-9A-F]\{0,6\},[0-9A-F]\{0,10\},[0-9A-F]\{1,8\},[0-9A-F]\{1,8\},[15][0-9]\{1,4\},[0-9]\{1,4\},[-0-9]\{1,5\},[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\}"
+REGXa="[12],[249],[0-9]\{3\},[0-9]\{1,3\},[0-9A-F]\{0,6\},[0-9A-F]\{0,10\},[0-9A-F]\{1,8\},[0-9A-F]\{1,8\},[15][0-9]\{0,4\},[0-9]\{0,4\},[-0-9]\{0,5\},[0-9]\{0,3\},[0-9]\{0,3\},[0-9]\{0,3\}"
 REGXb="+GTCAINFO: 1,[0-9]\{1,2\},[0-9]\{3\},[0-9]\{2,3\},[0-9]\{1,5\},[0-9]\{3,9\},[0-9]\{1,3\},[0-9]\{1,3\},[0-9]\{1,3\},[-0-9]\{1,4\},[0-9]\{1,6\},[0-9]\{1,6\},[0-9]\{1,3\},[0-9]\{1,3\}"
 REGXc="+GTCAINFO: [2-9],[0-9]\{1,2\},[0-9]\{1,5\},[0-9]\{1,3\},[0-9]\{1,3\},[-0-9]\{1,4\},[0-9]\{1,5\},[0-9]\{1,5\},[0-9]\{1,3\},[0-9]\{1,3\}"
 REGXd="+XMCI: 2,[0-9]\{3\},[0-9]\{2,3\},[^,]\+,[^,]\+,[^,]\+,\"0X[0-9A-F]\{8\}\",[^,]\+,[^,]\+,[0-9]\{1,2\},[0-9]\{1,2\},[0-9]\{1,2\}"
@@ -222,6 +225,9 @@ if [ -n "$GTCCDATA" ]; then
 		COPP=$(echo $COPN" " | sed "s/.*\($COPS_MCC$COPS_MNC,,*\)\,/\1/")
 		if [ -n "$COPP" ]; then
 			COPX=$(echo $COPP | cut -d, -f2)
+			if [ "$COPX" = "+COPN:" ]; then
+				COPX=""
+			fi
 		fi
 	fi
 
@@ -263,7 +269,11 @@ if [ -n "$GTCCDATA" ]; then
 			fi
 			BAND=${BAND:1}
 			if [ "$CELLTYPE" -eq 1 ]; then
-				BAND="B"$(echo $BAND | sed 's/^0*//')" (Bandwidth: "$BW" MHz)"
+				if [ -z "$BAND" ]; then
+					BAND=B$(/usr/lib/rooter/chan2band.sh $CHAN)" (Not Showing)"
+				else
+					BAND="B"$(echo $BAND | sed 's/^0*//')" (Bandwidth: "$BW" MHz)"
+				fi
 			else
 				BAND="B"$(echo $BAND | sed 's/^0*//')" (CA, Bandwidth: "$BW" MHz)"
 			fi
@@ -671,6 +681,10 @@ if [ -n "$COPS_MCC" ]; then
 	echo 'COPS_MCC="'"$COPS_MCC"'"' >> /tmp/signal$CURRMODEM.file
 	echo 'COPS_MNC="'"$COPS_MNC"'"' >> /tmp/signal$CURRMODEM.file
 fi
-if [ -n "$COPX" ]; then
-	echo 'COPS="'"$COPX"'"' >> /tmp/signal$CURRMODEM.file
+if [ "$idP" = 7127 -o "$idP" = 7126 ]; then
+	COPX=$COPX
+else
+	if [ -n "$COPX" ]; then
+		echo 'COPS="'"$COPX"'"' >> /tmp/signal$CURRMODEM.file
+	fi
 fi
