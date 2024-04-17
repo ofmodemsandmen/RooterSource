@@ -5,8 +5,8 @@ translate = I18N.translate
 
 function index()
 	local page
-	page = entry({"admin", "speed", "rspeedtest"}, template("speedtest/rspeedtest"), translate("SpeedTest by Ookla"), 72)
-	page.dependent = true
+	--page = entry({"admin", "speed", "rspeedtest"}, template("speedtest/rspeedtest"), translate("SpeedTest by Ookla"), 72)
+	--page.dependent = true
 	
 	entry({"admin", "speed", "closeserver"}, call("action_closeserver"))
 	entry({"admin", "speed", "stoptest"}, call("action_stoptest"))
