@@ -14,6 +14,7 @@ define Package/ext-login
   SECTION:=utils
   CATEGORY:=ROOter
   SUBMENU:=Themes
+  DEPENDS:=+luci-lib-ipkg
   TITLE:=Install scripts for Login Backgrounds
   PKGARCH:=all
 endef
