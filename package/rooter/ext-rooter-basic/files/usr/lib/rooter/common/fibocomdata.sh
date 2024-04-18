@@ -340,6 +340,10 @@ if [ -n "$GTCCDATA" ]; then
 				else
 					ECIO=$ECIO" (4G) dB<br />"$(echo $RSRQ1 | tr -d ' ')" (5G) "
 				fi
+				RSSI=$(rsrp2rssi $RSCP $BW)
+				CSQ_PER=$((100 - (($RSSI + 51) * 100/-62)))"%"
+				CSQ=$((($RSSI + 113) / 2))
+				CSQ_RSSI=$RSSI" dBm"
 			else
 				RSRP=$(echo $CCVAL | cut -d, -f13)
 				RSRQ=$(echo $CCVAL | cut -d, -f14)
