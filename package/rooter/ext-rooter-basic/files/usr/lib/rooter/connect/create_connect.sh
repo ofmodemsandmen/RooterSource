@@ -1038,6 +1038,7 @@ fi
 
 for isp in $isplist
 do
+	log "$isp"
 	NAPN=$(echo $isp | cut -d, -f2)
 	NPASS=$(echo $isp | cut -d, -f4)
 	CID=$(echo $isp | cut -d, -f5)
@@ -1066,7 +1067,7 @@ do
 	uci commit modem
 
 	concount=1
-	while [ "$concount" -lt 3 ]; do
+	while [ "$concount" -lt 2 ]; do
 		case $PROT in
 		"1" )
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "auto.gcom" "$CURRMODEM")
@@ -1272,13 +1273,13 @@ do
 			ATCMDD="AT+CGACT=1,$CID"
 			OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			ERROR="ERROR"
-			if [ -e /tmp/simerr$CURRMODEM ]; then
-				SIMFAIL=1
-				log "SIM card error"
-			else
+			#if [ -e /tmp/simerr$CURRMODEM ]; then
+			#	SIMFAIL=1
+			#	log "SIM card error"
+			#else
 				chkreg
 				[ "$REGOK" != 1 ] && log "Subscriber registration failed"
-			fi
+			#fi
 			if [ "$SIMFAIL" = 1 -o "$REGOK" != 1 ]; then
 				BRK=1
 				$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
