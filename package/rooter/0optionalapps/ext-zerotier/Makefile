@@ -14,13 +14,13 @@ define Package/ext-zerotier
   SECTION:=utils
   CATEGORY:=ROOter
   SUBMENU:=Optional Applications
-  DEPENDS:=+zerotier
-  TITLE:=Install scripts for Zerotier
+  DEPENDS:=+zerotier +extramenu
+  TITLE:=Install scripts for Basic Zerotier
   PKGARCH:=all
 endef
 
 define Package/ext-zerotier/description
-  Install scripts for Zerotier
+  Install scripts for Basic Zerotier
 endef
 
 

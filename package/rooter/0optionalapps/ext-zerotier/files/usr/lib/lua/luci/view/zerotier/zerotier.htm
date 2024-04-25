@@ -1,18 +1,5 @@
 <%+header%>
-<%
-local sys = require "luci.sys"
-local utl = require "luci.util" 
-local fs = require "nixio.fs"
 
-function showicon(lck)
-	if lck == 0 then
-		return resource .. "/icons/unlock1.png"
-	else
-		return resource .. "/icons/lock1.png"
-	end
-end
-
--%>
 <script type="text/javascript" src="<%=resource%>/xhr.js"></script>
 <script type="text/javascript">//<![CDATA[
 
@@ -22,88 +9,151 @@ end
 			null,
 			function(x, rv)
 			{
-				document.getElementById("password").value=rv.password;
-				document.getElementById("netids").innerHTML=rv.netid;
-				document.getElementById("netids").style.fontWeight = "bold" ;
-				document.getElementById("routids").innerHTML=rv.routerid;
+				enab = rv.enable;
+				if ( enab == "0" )
+				{
+					document.getElementById('enab').checked=false;
+				}
+				else
+				{
+					document.getElementById('enab').checked=true;
+				}
+				rvr = rv.netid;
+				if ( rvr == "xxxxxxxxxxxxxxxx" )
+				{
+					document.getElementById("netid").value="";
+				}
+				else
+				{
+					document.getElementById("netid").value=rv.netid;
+				}
+				document.getElementById("routids").value=rv.routerid;
 				document.getElementById("routids").style.fontWeight = "bold" ;
-				document.getElementById("netid").value=rv.netid;
 				document.getElementById("netid").style.fontWeight = "bold" ;
-				
 				document.getElementById("idh").style.visibility="visible";
-				document.getElementById("ids").style.visibility="visible";
-				//document.getElementById("netidt").style.visibility="hidden";
+				document.getElementById("status").value = "<%:Waiting...%>";
+				document.getElementById("status").style.fontWeight = "bold" ;
+				document.getElementById("mac").value = "---";
+				document.getElementById("mac").style.fontWeight = "bold" ;
+				document.getElementById("ip").value = "---";
+				document.getElementById("ip").style.fontWeight = "bold" ;
+				custn = rv.cust;
+				if ( custn == null )
+				{
+					custn = "";
+				}
+				document.getElementById("custn").value=custn;
 			}
-				
 	);
 	
-	function done() { 
-		document.getElementById("popup").style.display = "none";
-		passw = document.getElementById("password").value;
-		var r = document.getElementById("pass").value;
-		if ( r == null )
-
+	XHR.get('<%=luci.dispatcher.build_url("admin", "services", "get_zstatus")%>', null,
+		function(x, rv)
 		{
-			document.getElementById("pass").value="";
-			return false;
+			nstat = rv.status;
+			if ( nstat == "0" )
+			{
+				ns = "<%:Offline%>";
+			}
+			else
+			{
+				if ( nstat == "1" )
+				{
+					ns = "<%:Connecting%>";
+				}
+				else
+				{
+					ns = "<%:Online%>";
+				}
+			}
+			document.getElementById("status").value = ns;
+			document.getElementById("status").style.fontWeight = "bold" ;
+			document.getElementById("mac").value = rv.mac;
+			document.getElementById("mac").style.fontWeight = "bold" ;
+			document.getElementById("ip").value = rv.ip;
+			document.getElementById("ip").style.fontWeight = "bold" ;
 		}
-		if ( r == passw )
-		{
-			//document.getElementById("lockbtn").src="<%=showicon(0)%>";
-			document.getElementById("idh").style.visibility="visible";
-			document.getElementById("ids").style.visibility="visible";
-			//document.getElementById("netidt").style.visibility="hidden";
-			document.getElementById("pass").value="";
-			lockb = 1;
-		}
-		else
-		{
-			alert("<%:Incorrect Password!!!%>");
-			document.getElementById("pass").value="";
-		}
-		//document.getElementById("lockbtn").disabled=false;
-		return false;
-	};
-
-	function unlock(btn)
-	{
-		if ( lockb == 0 )
-		{
-			document.getElementById("popup").style.display = "block";
-			//document.getElementById("lockbtn").disabled=true;
-		}
-		else
-		{
-			//document.getElementById("lockbtn").src="<%=showicon(1)%>";
-			document.getElementById("netidt").style.visibility="visible";
-			document.getElementById("idh").style.visibility="hidden";
-			document.getElementById("ids").style.visibility="hidden";
-			lockb = 0;
-		}
-		return false;
-	}
+	);
 	
+	XHR.poll(10, '<%=luci.dispatcher.build_url("admin", "services", "get_zstatus")%>', null,
+		function(x, rv)
+		{
+			nstat = rv.status;
+			if ( nstat == "0" )
+			{
+				ns = "<%:Offline%>";
+			}
+			else
+			{
+				if ( nstat == "1" )
+				{
+					ns = "<%:Connecting%>";
+				}
+				else
+				{
+					ns = "<%:Online%>";
+				}
+			}
+			document.getElementById("status").value = ns;
+			document.getElementById("status").style.fontWeight = "bold" ;
+			document.getElementById("mac").value = rv.mac;
+			document.getElementById("mac").style.fontWeight = "bold" ;
+			document.getElementById("ip").value = rv.ip;
+			document.getElementById("ip").style.fontWeight = "bold" ;
+		}
+	);
+	
+	function isHex(h) 
+	{
+		h = "0x" + h;
+		var re = Boolean(h.match(/^0x[0-9a-f]+$/i));
+		return re;
+	}
+
 	function changeid(btn)
 	{
 		var s = document.getElementById("netid").value;
+		if ( s == "" )
+		{
+			alert("<%:You must enter a correct Network ID!!%>");
+			return false;
+		}
+		else
+		{
+			if ( isHex(s) == false )
+			{
+				alert("<%:You must enter a correct Network ID!!%>");
+				return false;
+			}
+		}
 		if ( s.length !== 16 )
 		{
 			alert("<%:You must enter a correct Network ID!!%>");
 			return false;
 		}
-		document.getElementById("chngid").innerHTML="<%:Changing...%>";
 		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "sendid")%>',
 			{ set: s },
 			function(x, rv)
 			{
-				document.getElementById("netids").innerHTML=s;
-				document.getElementById("netids").style.fontWeight = "bold" ;
-				//document.getElementById("routids").innerHTML=s;
-				document.getElementById("routids").style.fontWeight = "bold" ;
-				document.getElementById("chngid").innerHTML="<%:Change Network ID%>";
+				document.getElementById("routids").value=rv.routerid;
 				alert("<%:Changed Network ID!!%>");
 			}
 				
+		);
+	}
+
+	function enable(btn)
+	{
+		dx = 0;
+		if ( btn.checked == true )
+		{
+			dx = 1;
+		}
+		XHR.get('<%=luci.dispatcher.build_url("admin", "services", "sendenable")%>',
+			{ set: dx },
+			function()
+			{
+				document.getElementById("routids").value=rv.routerid;
+			}
 		);
 	}
 	
@@ -111,67 +161,65 @@ end
 
 <form method="post" action="<%=REQUEST_URI%>">
 <div class="cbi-map" id="cbi-modem">
-<h2><a id="content" name="content"><%:Router ID (Zerotier)%></a></h2>
-<div class="cbi-map-descr"> </div>
+<h2><a id="content" name="content"><%:Zerotier Remote Access%></a></h2>
+<div class="cbi-map-descr"><%:Configure Remote Access%></div>
 <head>
+	<link rel="stylesheet" href="<%=resource%>/buttons/buttons.css">
      <style>
-	  #popup {
-		width:560px;
-		height:190px;
-		padding:20px;
-		background-color:gainsboro;  
-		border-style : solid;	
-		position:fixed;
-		top : 40%;
-		margin-left: auto;
-		margin-right: auto;
-		left: 0;
-		right: 0;
-		text-align: center;
-		display:none;
-	}
+
     </style>
 </head>
 
 <fieldset class="cbi-section" id="cbi-mod">
-		
-	<table style="visibility:hidden" width="700" border="0" id="atpass">
-	<tr>
-		<td width="10%"><div id="password" align="right"></div></td>
-	</tr>
-	</table>
 	
-	<div id="popup">
-		<table width="500" border="0">
-			<tr>
-				<td width="50px"><div><%:Enter Password to Unlock Change%></div></td>
-			</tr>
-			<tr>
-				<td width="200px"><input id="pass" type="password"/></td>
-			</tr>
-			<tr>
-				<td><input type="image" src="<%=showicon(0)%>" style="width:48px;height:48px;" onclick="return done()" /></td>
-			</tr>
-		</table>
-	</div>
-	
-	
-	<table width="465" border="0" id="ids" style="visibility:hidden" >
+	<table width="465" border="0">
 		<tr>
-			<td width="20%"><div align="right" id="netidts"><strong><%:Current ZeroTier Network ID%></strong></div></td>
-			<td width="15%"><div align="left" id="netids"></div></td>
-			<td width="7%"><div align="right" id="routidts"><strong><%:Router ID%></strong></div></td>
-			<td width="15%"><div align="left" id="routids"></div></td>
-			<td width="43%"></td>
+			<td width="20%"><div align="right" style="font-size: 20px"><strong><%:Remote Access Enabled%></strong></div></td>
+			<td width="15%" align="center">
+			<div>
+				<label class="switch">
+					<input type="checkbox" id="enab" onclick="enable(this)">
+					<span class="slider round"></span>
+				</label>
+			</div>
+			<td width="65%"></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
 		</tr>
 	</table>
 	
-	<table width="465" border="0" id="idh" style="visibility:hidden" >
+	<table width="465" border="0" id="idh">
 		<tr>
-			<td width="20%"><div align="right" id="netidt"><strong><%:Edit ID%></strong></div></td>
-			<td width="15%" ><input type="text" name="netid" id="netid" class="cbi-input-text" ></input>
-			<td width="10%"><input type="button" id="chngid" class="cbi-button cbi-button-apply" value="<%:Change Network ID%>" onclick="return changeid(this)" /></td>
+			<td width="20%"><div align="right" style="font-size: 20px"><strong><%:Current Network ID%></strong></div></td>
+			<td width="15%" style="font-size: 22px" ><input type="text" style="font-size: 22px" name="netid" id="netid" class="cbi-input-text" ></input>
+			<td width="10%"><div style="color:black;width:230px" id="chngid" class="button-33" role="button" onclick="return changeid(this)"><%:Change Network ID%></div></td>
 			<td width="55%"></td>
+		</tr>
+		<tr>
+			<td><div align="right" style="font-size: 20px"><strong><%:Current Router ID%></strong></div></td>
+			<td style="font-size: 22px"><input type="text" style="font-size: 22px" name="routids" readonly id="routids" class="cbi-input-text" ></input>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><div align="right" style="font-size: 20px"><strong><%:Status%></strong></div></td>
+			<td style="font-size: 22px"><input type="text" style="font-size: 22px" name="status" readonly id="status" class="cbi-input-text" ></input>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><div align="right" style="font-size: 20px"><strong><%:Remote MAC Address%></strong></div></td>
+			<td style="font-size: 22px"><input type="text" style="font-size: 22px" name="mac" readonly id="mac" class="cbi-input-text" ></input>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><div align="right" style="font-size: 20px"><strong><%:Remote IP Address%></strong></div></td>
+			<td style="font-size: 22px"><input type="text" style="font-size: 22px" name="ip" readonly id="ip" class="cbi-input-text" ></input>
+			<td></td>
+			<td></td>
 		</tr>
 	</table>
 	
