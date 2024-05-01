@@ -27,6 +27,23 @@
 				{
 					document.getElementById("netid").value=rv.netid;
 				}
+				lock = rv.lock;
+				if ( lock == "0" )
+				{
+					document.getElementById("cbi-lock").style.display="block";
+					document.getElementById("cbi-lock").style.visibility="visible";
+					document.getElementById("cbi-mod").style.visibility="hidden";
+					document.getElementById("cbi-mod").style.display="none";
+				}
+				else 
+				{
+					document.getElementById("cbi-mod").style.display="block";
+					document.getElementById("cbi-mod").style.visibility="visible";
+					document.getElementById("cbi-lock").style.visibility="hidden";
+					document.getElementById("cbi-lock").style.display="none";
+				} 
+				
+			
 				document.getElementById("routids").value=rv.routerid;
 				document.getElementById("routids").style.fontWeight = "bold" ;
 				document.getElementById("netid").style.fontWeight = "bold" ;
@@ -171,7 +188,6 @@
 </head>
 
 <fieldset class="cbi-section" id="cbi-mod">
-	
 	<table width="465" border="0">
 		<tr>
 			<td width="20%"><div align="right" style="font-size: 20px"><strong><%:Remote Access Enabled%></strong></div></td>
@@ -222,8 +238,17 @@
 			<td></td>
 		</tr>
 	</table>
-	
-</fieldset>		
+</fieldset>	
+
+<fieldset class="cbi-section"  id="cbi-lock">
+	<table width="465" border="0">
+		<tr>
+			<td width="20%"><div align="left" style="font-size: 20px"><strong><%:Menu Locked%></strong></div></td>
+			<td width="15%" align="center"></td>
+			<td width="65%"></td>
+		</tr>
+	</table>
+</fieldset>	
 
 </div>
 </form>

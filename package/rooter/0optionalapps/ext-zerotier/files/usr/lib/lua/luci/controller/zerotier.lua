@@ -4,11 +4,8 @@ I18N = require "luci.i18n"
 translate = I18N.translate
 
 function index()
-	local lock = luci.model.uci.cursor():get("custom", "menu", "full")
-		if lock == "1" then
-			page = entry({"admin", "adminmenu", "zerotier"}, template("zerotier/zerotier"), translate("Zerotier Remote Access"), 7)
-			page.dependent = true
-		end
+	local page = entry({"admin", "adminmenu", "zerotier"}, template("zerotier/zerotier"), translate("Zerotier Remote Access"), 7)
+	page.dependent = true
 	
 	entry({"admin", "services", "getid"}, call("action_getid"))
 	entry({"admin", "services", "sendid"}, call("action_sendid"))
@@ -29,6 +26,7 @@ function action_getid()
 	rv["routerid"] = string.sub(secret,1,10)
 	rv["password"] = luci.model.uci.cursor():get("custom", "zerotier", "password")
 	rv["cust"] = luci.model.uci.cursor():get("zerotier", "zerotier", "cust")
+	rv["lock"] = luci.model.uci.cursor():get("custom", "menu", "full")
 	luci.http.prepare_content("application/json")
 	luci.http.write_json(rv)
 end
