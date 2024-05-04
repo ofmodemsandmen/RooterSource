@@ -9,10 +9,21 @@ if [ "$NP" -gt 1 ]; then
 	log "hotplug (iface): action='$ACTION' interface='$INTERFACE'"
 	if [ "$ACTION" = "add" ]; then
 		IFACE=$(ls /sys/class/net)
+		
 		for i in ${IFACE}; do
 			ethtool -K $i gro on 2>/dev/null
 			if [[ -e /sys/class/net/$i/queues/rx-0/rps_cpus ]]; then
-				echo f > /sys/class/net/$i/queues/rx-0/rps_cpus
+					
+				# RPS
+    				echo f > /sys/class/net/$i/queues/rx-0/rps_cpus
+
+    				# XPS
+    				echo f > /sys/class/net/$i/queues/tx-0/xps_cpus
+
+    				# RFS
+    				echo 131072 > /proc/sys/net/core/rps_sock_flow_entries
+   				echo 32768 > /sys/class/net/$i/queues/rx-0/rps_flow_cnt
+
 			fi
 		done
 		
@@ -26,8 +37,5 @@ if [ "$NP" -gt 1 ]; then
 				echo e > /proc/irq/$i/smp_affinity 2>/dev/null
 			fi
 		done
-
-		#inter=$(grep . /sys/class/net/$INTERFACE/queues/?x-0/?ps_cpus)
-		#log "$inter"
 	fi
 fi
