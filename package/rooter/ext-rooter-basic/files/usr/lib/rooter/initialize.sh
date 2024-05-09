@@ -115,7 +115,7 @@ echo 'DISTRIB_CODENAME="'"$DISTRIB_CODENAME"'"' >> /etc/openwrt_release
 echo 'DISTRIB_TARGET="'"$DISTRIB_TARGET"'"' >> /etc/openwrt_release
 echo 'DISTRIB_DESCRIPTION="'"$DISTRIB_DESCRIPTION"'"' >> /etc/openwrt_release
 
-/usr/lib/rooter/luci/external.sh &
+#/usr/lib/rooter/luci/external.sh &
 
 MODSTART=1
 WWAN=0

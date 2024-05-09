@@ -596,7 +596,7 @@ end
 
 function action_externalip()
 	local rv ={}
-
+	os.execute("/usr/lib/rooter/luci/external.sh")
 	file = io.open("/tmp/ipip", "r")
 	if file == nil then
 		rv["extip"] = translate("Not Available")
