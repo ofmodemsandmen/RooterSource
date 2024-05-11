@@ -142,11 +142,13 @@
  
  	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_6001) },
  	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_CMU_300) },
-@@ -2055,6 +2072,28 @@
+@@ -2055,6 +2072,30 @@
  	  .driver_info = RSVD(0) | RSVD(1) | RSVD(6) },
  	{ USB_DEVICE(0x0489, 0xe0b5),						/* Foxconn T77W968 ESIM */
  	  .driver_info = RSVD(0) | RSVD(1) | RSVD(6) },
 +	{ USB_DEVICE(0x413c, 0x81d8),						/* Foxconn T77W968 */
++	.driver_info = RSVD(0) | RSVD(1) | RSVD(6) },
++	{ USB_DEVICE(0x413c, 0x81d9),						/* Foxconn DW5820e */
 +	.driver_info = RSVD(0) | RSVD(1) | RSVD(6) },
 +	{ USB_DEVICE(0x1bc7, 0x1910),						/* Ln960 */
 +	.driver_info = RSVD(0) | RSVD(1) | RSVD(6) },
