@@ -114,7 +114,7 @@ if [[ "$RETURN_CODE_1" != "200" &&  "$RETURN_CODE_2" != "200" &&  "$RETURN_CODE_
 				uci commit ping
 				exit 0
 			else
-				reboot -f
+				touch /etc/banner && reboot -f
 			fi
 		fi
 	fi

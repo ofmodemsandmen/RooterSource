@@ -58,7 +58,7 @@ pingtest(){
 
 restart() {
 	if [ $ACTIVE = "2" ]; then 
-		reboot -f
+		touch /etc/banner && reboot -f
 	else
 		/usr/lib/rooter/luci/restart.sh $CURRMODEM 11
 		exit 0
