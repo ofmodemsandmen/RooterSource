@@ -184,6 +184,7 @@ handle_client() {
 	uci delete network.wg$ifce
 	uci set network.wg$ifce="interface"
 	uci set network.wg$ifce.proto="wireguard"
+	uci set network.wg$ifce.metric="1"
 	
 	auto=$(uci -q get wireguard."$WG".auto)
 	if [ -z $auto ]; then
