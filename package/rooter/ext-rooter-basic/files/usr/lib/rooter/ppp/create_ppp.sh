@@ -179,8 +179,8 @@ fi
 log "PPP Comm Port : /dev/ttyUSB$CPORT"
 log "PPP Data Port : /dev/ttyUSB$DPORT"
 
-if [ -e $ROOTER/mhi2usb.sh ]; then
-	$ROOTER/mhi2usb.sh $CURRMODEM 2
+if [ -e /usr/lib/rooter/connect/mhi2usb.sh ]; then
+	/usr/lib/rooter/connect/mhi2usb.sh $CURRMODEM
 fi
 
 if [ -e /tmp/mhiusb ]; then
