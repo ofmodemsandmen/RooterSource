@@ -10,8 +10,13 @@ CURRMODEM=$1
 COMMPORT=$2
 
 OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "t77info.gcom" "$CURRMODEM")
-
 OX=$(echo $OX | tr 'a-z' 'A-Z')
+OXC=$(echo $OX | tr -d " ")
+
+PCELL_LTE="RAT:[LTE+NR]\{3,6\}MCC:.\+PCELL:LTE_BAND:[0-9]\+[^C]\+WIDTH:[.0-9]\{1,6\}MHZCHANNEL:[0-9]\+PCI:[0-9]\{1,3\}LTE_RSRP:.\{2,8\}DBM,RSRQ:.\{2,8\}DB.\{12,20\},LTE_SNR:.\{3,7\}DB"
+SCELL_LTE="SCELL:LTE_BAND:[0-9]\+LTE_BAND_WIDTH:[.0-9]\{1,6\}MHZCHANNEL:[0-9]\+PCI:[0-9]\{1,3\}LTE_RSRP:.\{2,8\}DBM,RSRQ:.\{2,8\}DB.\{12,20\},LTE_SNR:[^S]\{2,7\}"
+PCELL_NSA="NR_BAND:N[0-9]\{1,3\}NR_BAND_WIDTH:[.0-9]\{3,5\}MHZNR_CHANNEL:[0-9]\{6\}NR_PCI:[0-9]\{1,3\}NR_RSRP:.\{2,8\}DBM.\{15,60\}NR_RSRQ:.\{2,8\}NR_SNR:.\{3,7\}DB"
+
 O=$($ROOTER/common/processat.sh "$OX")
 O=$(echo $O)
 
@@ -66,7 +71,53 @@ fi
 TECH=$(echo $O" " | grep -o "+COPS: .,.,[^,]\+,[027]")
 TECH="${TECH: -1}"
 
-if [ -n "$TECH" ]; then
+PLTE=$(echo $OXC | grep -o "$PCELL_LTE")
+SLTE=$(echo $OXC | grep -o "$SCELL_LTE")
+PNR=$(echo $OXC | grep -o "$PCELL_NSA")
+if [ -n "$PLTE" ]; then
+	MODE="LTE"
+	LBAND="B"$(echo $PLTE | cut -d: -f11 | grep -o "[0-9]\{1,3\}")
+	BW=$(echo $PLTE | cut -d: -f12 | grep -o "[.0-9]\{3,5\}")
+	if [ ${BW: -2} == ".0" ]; then
+		BW=$(printf "%.0f" $BW)
+	fi
+	LBAND=$LBAND" (Bandwidth $BW MHz)"
+	CHANNEL=$(echo $PLTE | cut -d: -f13 | grep -o "[0-9]\{1,7\}")
+	PCI=$(echo $PLTE | cut -d: -f14 | grep -o "[0-9]\{1,3\}")
+	RSCP=$(printf "%.0f" $(echo $PLTE | cut -d: -f15 | grep -o "[-.0-9]\{2,7\}"))
+	ECIO=$(printf "%.0f" $(echo $PLTE | cut -d: -f16 | grep -o "[-.0-9]\{2,6\}"))
+	SINR=$(printf "%.0f" $(echo $PLTE | cut -d: -f18 | grep -o "[-.0-9]\{3,6\}"))
+	if [ -n "$PNR" ]; then
+		MODE="LTE+NR (NR5G-NSA)"
+		BAND="n"$(echo $PNR | cut -d: -f2 | grep -o "[0-9]\{1,3\}")
+		BW=$(printf "%.0f" $(echo $PNR | cut -d: -f3 | grep -o "[.0-9]\{3,5\}"))
+		LBAND=$LBAND"<br />"$BAND" (Bandwidth $BW MHz)"
+		CHANNEL=$CHANNEL","$(echo $PNR | cut -d: -f4 | grep -o "[0-9]\{1,7\}")
+		PCI=$PCI","$(echo $PNR | cut -d: -f5 | grep -o "[0-9]\{1,3\}")
+		RSCP=$RSCP","$(printf "%.0f" $(echo $PNR | cut -d: -f6 | grep -o "[-.0-9]\{2,7\}"))
+		ECIO=$ECIO","$(printf "%.0f" $(echo $PNR | cut -d: -f8 | grep -o "[-.0-9]\{2,6\}"))
+		SINR=$SINR","$(printf "%.0f" $(echo $PNR | cut -d: -f9 | grep -o "[-.0-9]\{3,6\}"))
+	fi
+	for SLTEV in $(echo "$SLTE"); do
+		BAND="B"$(echo $SLTEV | cut -d: -f3 | grep -o "[0-9]\{1,3\}")
+		BW=$(echo $SLTEV | cut -d: -f4 | grep -o "[.0-9]\{3,5\}")
+		if [ ${BW: -2} == ".0" ]; then
+			BW=$(printf "%.0f" $BW)
+		fi
+		LBAND=$LBAND"<br />CA "$BAND" (Bandwidth $BW MHz)"
+		CHANNEL=$CHANNEL","$(echo $SLTEV | cut -d: -f5 | grep -o "[0-9]\{1,7\}")
+		PCI=$PCI","$(echo $SLTEV | cut -d: -f6 | grep -o "[0-9]\{1,3\}")
+		RSCP=$RSCP","$(printf "%.0f" $(echo $SLTEV | cut -d: -f7 | grep -o "[-.0-9]\{2,7\}"))
+		ECIO=$ECIO","$(printf "%.0f" $(echo $SLTEV | cut -d: -f8 | grep -o "[-.0-9]\{2,6\}"))
+		SNR=$(echo $SLTEV | cut -d: -f10 | grep -o "[-.0-9]\{3,6\}")
+		if [ -n "$SNR" ]; then
+			SINR=$SINR","$(printf "%.0f" $SNR)
+		else
+			SINR=$SINR",-"
+		fi
+	done
+fi
+if [ -z "$PLTE" ] && [ -n "$TECH" ]; then
 	RSSI=$(echo $O | grep -o " RSSI: [^D]\+D" | grep -o "[-0-9\.]\+")
 	if [ -n "$RSSI" ]; then
 		CSQ_RSSI=$(echo $RSSI)" dBm"
@@ -77,7 +128,7 @@ if [ -n "$TECH" ]; then
 			ECIO=$(echo $O | grep -o " RSRQ: [^D]\+D" | grep -o "[-0-9\.]\+")
 			SINR=$(echo $OX | grep -o "RS-S[I]*NR: [^D]\+D")
 			SINR=${SINR:8}
-			SINR=$(echo "$SINR" | grep -o "[-0-9.]\{1,3\}")" dB"
+			SINR=$(echo "$SINR" | grep -o "[-0-9.]\{1,3\}")
 			LBAND="B"$(echo $O | grep -o " BAND: [0-9]\+" | grep -o "[0-9]\+")
 			DEBUGv1=$(echo $O | grep -o "EARFCN(DL/UL):")
 			DEBUGv2=$(echo $O | grep -o "LTE ENGINEERING")
@@ -127,7 +178,7 @@ if [ -n "$TECH" ]; then
 						RSCP=$RSCP" dBm, "$(echo $SCCv | cut -d, -f6 | grep -o "[-0-9.]\+")
 						ECIO=$ECIO" dB, "$(echo $SCCv | cut -d, -f7 | grep -o "[-0-9.]\+")
 						CSQ_RSSI=$CSQ_RSSI", "$(echo $SCCv | cut -d, -f8 | grep -o "[-0-9.]\+")" dBm"
-						SINR=$SINR", "$(echo $SCCv | cut -d, -f9 | grep -o "[-0-9.]\+")" dB"
+					SINR=$SINR", "$(echo $SCCv | cut -d, -f9 | grep -o "[-0-9.]\+")
 					fi
 				done
 			else
@@ -176,7 +227,6 @@ if [ -n "$TECH" ]; then
 			;;
 	esac
 fi
-
 SCFG=$(echo $OX | grep -o "\^SYSCONFIG: [0-9]\{1,2\}" | grep -o "[0-9]\{1,2\}")
 if [ -n "$SCFG" ]; then
 	case $SCFG in
@@ -190,7 +240,6 @@ if [ -n "$SCFG" ]; then
 		NETMODE="1" ;;
 	esac
 fi
-
 MODTYPE="8"
 
 {
@@ -208,11 +257,10 @@ MODTYPE="8"
 	echo 'LBAND="'"$LBAND"'"'
 	echo 'PCI="'"$PCI"'"'
 	echo 'TEMP="'"$TEMP"'"'
-	echo 'SINR="'"$SINR"'"'
+	echo 'SINR="'"$SINR dB"'"'
 } > /tmp/signal$CURRMODEM.file
-
-CONNECT=$(uci get modem.modem$CURRMODEM.connected)
-if [ $CONNECT -eq 0 ]; then
+CONNECT=$(uci -q get modem.modem$CURRMODEM.connected)
+if [ "$CONNECT" == 0 ]; then
     exit 0
 fi
 
@@ -220,7 +268,7 @@ if [ "$CSQ" = "-" ]; then
 	log "$OX"
 fi
 
-WWANX=$(uci get modem.modem$CURRMODEM.interface)
+WWANX=$(uci -q get modem.modem$CURRMODEM.interface)
 OPER=$(cat /sys/class/net/$WWANX/operstate 2>/dev/null)
 rm -f "/tmp/connstat"$CURRMODEM
 
