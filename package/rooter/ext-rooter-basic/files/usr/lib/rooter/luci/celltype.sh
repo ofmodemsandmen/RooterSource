@@ -291,23 +291,45 @@ meig_type() {
 }
 
 telit_type() {
-	ATCMDD="AT^SYSCONFIG?"
-	OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	SCFG=$(echo $OX | grep -o "\^SYSCONFIG: [0-9]\{1,2\}" | grep -o "[0-9]\{1,2\}")
-	if [ -n "$SCFG" ]; then
-		PREF=$(echo $OX | grep -o "\^SYSCONFIG: 2,[0-9]" | grep -o ",[0-9]")
-		case $SCFG in
-		"13" )
-			NETMODE="3" ;;
-		"14" )
-			NETMODE="5" ;;
-		"17" )
-			NETMODE="7" ;;
-		* )
-			NETMODE="1" ;;
-		esac
-		uci set modem.modem$CURRMODEM.modemtype="8"
+	if [ "$idV" == "1e2d" ]; then
+		ATCMDD="AT^SLMODE?"
+		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		OX=$(echo $OX | tr -d ' ')
+		SCFG=$(echo $OX | grep -o "\^SLMODE:[01],[0-9]")
+		if [ -n "$SCFG" ]; then
+			RAT=${SCFG: -1}
+			case $RAT in
+			"1" )
+				NETMODE="5" ;;
+			"2" )
+				NETMODE="7" ;;
+			"4" )
+				NETMODE="9" ;;
+			"6" )
+				NETMODE="8" ;;
+			* )
+				NETMODE="1" ;;
+			esac
+		fi
+	else
+		ATCMDD="AT^SYSCONFIG?"
+		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		SCFG=$(echo $OX | grep -o "\^SYSCONFIG: [0-9]\{1,2\}" | grep -o "[0-9]\{1,2\}")
+		if [ -n "$SCFG" ]; then
+			PREF=$(echo $OX | grep -o "\^SYSCONFIG: 2,[0-9]" | grep -o ",[0-9]")
+			case $SCFG in
+			"13" )
+				NETMODE="3" ;;
+			"14" )
+				NETMODE="5" ;;
+			"17" )
+				NETMODE="7" ;;
+			* )
+				NETMODE="1" ;;
+			esac
+		fi
 	fi
+	uci set modem.modem$CURRMODEM.modemtype="8"
 	uci set modem.modem$CURRMODEM.netmode=$NETMODE
 	uci commit modem
 }

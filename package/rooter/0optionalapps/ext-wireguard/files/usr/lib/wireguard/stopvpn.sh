@@ -61,6 +61,7 @@ else
 	if [ -e /usr/lib/wireguard/wiremwan3.sh ]; then
 		/usr/lib/wireguard/wiremwan3.sh stop
 	fi
+	ifup wan
 fi
 UDP=$(uci get wireguard."$WG".udptunnel)
 if [ $UDP = 1 ]; then
