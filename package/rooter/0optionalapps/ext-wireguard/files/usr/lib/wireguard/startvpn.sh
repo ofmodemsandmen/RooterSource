@@ -317,6 +317,9 @@ else
 	ifup wg$INTER
 	sleep 2
 	uci set wireguard.settings.client="1"
+	if [ -e /usr/lib/wireguard/wiremwan3.sh ]; then
+		/usr/lib/wireguard/wiremwan3.sh start
+	fi
 fi
 
 uci set wireguard."$WG".active="1"

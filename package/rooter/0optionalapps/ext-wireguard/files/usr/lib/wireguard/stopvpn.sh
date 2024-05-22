@@ -58,6 +58,9 @@ else
 	uci set network.wg$INTER.listen_port=""
 	uci add_list network.wg$INTER.addresses=""
 	uci commit network
+	if [ -e /usr/lib/wireguard/wiremwan3.sh ]; then
+		/usr/lib/wireguard/wiremwan3.sh stop
+	fi
 fi
 UDP=$(uci get wireguard."$WG".udptunnel)
 if [ $UDP = 1 ]; then
