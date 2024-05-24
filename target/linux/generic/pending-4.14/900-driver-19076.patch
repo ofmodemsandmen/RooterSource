@@ -1,6 +1,6 @@
 --- a/drivers/net/usb/qmi_wwan.c
 +++ b/drivers/net/usb/qmi_wwan.c
-@@ -995,6 +995,12 @@
+@@ -995,6 +995,13 @@
  	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0125)},	/* Quectel EC25, EC20 R2.0  Mini PCIe */
  	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0306)},	/* Quectel EP06/EG06/EM06 */
  	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0512)},	/* Quectel EG12/EM12 */
@@ -10,6 +10,7 @@
 +	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0801)},	/* Quectel RM520 */
 +	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x6005)},	/* Quectel EC200A */
 +	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0307)},	/* Quectel EM12 */
++	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0122)},	/* Quectel RM550 */
  	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0620)},	/* Quectel EM160R-GL */
  	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0800)},	/* Quectel RM500Q-GL */
  
@@ -99,10 +100,15 @@
  	{ USB_DEVICE(QUALCOMM_VENDOR_ID, 0x6000)}, /* ZTE AC8700 */
  	{ USB_DEVICE_AND_INTERFACE_INFO(QUALCOMM_VENDOR_ID, 0x6001, 0xff, 0xff, 0xff), /* 4G LTE usb-modem U901 */
  	  .driver_info = RSVD(3) },
-@@ -1120,6 +1131,31 @@
+@@ -1120,6 +1131,36 @@
  	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EM12, 0xff, 0xff, 0xff),
  	  .driver_info = RSVD(1) | RSVD(2) | RSVD(3) | RSVD(4) | NUMEP2 },
  	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EM12, 0xff, 0, 0) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, 0x0122, 0xff, 0xff, 0x30)},
++ 	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, 0x0122, 0xff, 0x00, 0x40) },
++ 	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, 0x0122, 0xff, 0, 0)},
++	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, 0x0122, 0xff, 0xff, 0xff),
++ 	  .driver_info = RSVD(1) | RSVD(2) | RSVD(3) | RSVD(4) | NUMEP2 },
 +	{ USB_DEVICE_AND_INTERFACE_INFO(0x0e8d, 0x7127, 0xff, 0x00, 0x00),
 + 	  .driver_info = RSVD(0) | RSVD(1) },
 +	{ USB_DEVICE_AND_INTERFACE_INFO(0x0e8d, 0x7126, 0xff, 0x00, 0x00),
