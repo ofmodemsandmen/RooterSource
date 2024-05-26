@@ -233,7 +233,7 @@ case $uVid in
 		if [ $uPid = 0306 ]; then
 			RESTART="1"
 		fi
-		if [ $uPid = 0800 -o $uPid = 0900 -o $uPid = 0801 ]; then
+		if [ $uPid = 0800 -o $uPid = 0900 -o $uPid = 0801 -o $uPid = 0122 ]; then
 			if [ ! -z "$mask" ]; then
 				fibdecode $mask 1 1
 			else

@@ -128,7 +128,7 @@ if [ $MODEMTYPE -eq 6 ]; then
 	fi
 	NEWFMT=false
 	if [ "$idV" = "2c7c" ]; then
-		if [ "$idP" = "0800" -o "$idP" = "0620" -o "$idP" = "030b" -o "$idP" = "0801" -o "$idP" = "0900" ]; then
+		if [ "$idP" = "0800" -o "$idP" = "0620" -o "$idP" = "030b" -o "$idP" = "0801" -o "$idP" = "0900" -o "$idP" = "0122" ]; then
 			NEWFMT=true
 		fi
 	fi
