@@ -80,9 +80,6 @@ echo "0" > /tmp/usbwait
 uVid=$(uci get modem.modem$CURRMODEM.uVid)
 uPid=$(uci get modem.modem$CURRMODEM.uPid)
 pwrtoggle
-if [ "$toggle" ="1" ]; then
-	exit 0
-fi
 
 if [ $uVid != "2c7c" ]; then
 	if [ $uVid = "0e8d" -o $uVid = "8087" -o $uVid = "2cb7" -o $uVid = "1508" ]; then
