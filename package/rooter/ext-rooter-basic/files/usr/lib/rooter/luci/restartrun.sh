@@ -59,6 +59,22 @@ pwrtoggle() {
 		toggle="1"
 		return
 	fi
+	bnx=$(echo "$bn" | grep "wg1602")
+	if [ ! -z "$bnx" ]; then
+		DEV=$(uci get modem.modem$CURRMODEM.device)
+		if [ $DEV = "1-1" ]; then
+			echo "0" > /sys/class/gpio/4g1-pwr/value
+			sleep 2
+			echo "1" > /sys/class/gpio/4g1-pwr/value
+		else
+			echo "0" > /sys/class/gpio/4g2-pwr/value
+			sleep 2
+			echo "1" > /sys/class/gpio/4g2-pwr/value
+		fi
+		log "Power Toggle"
+		toggle="1"
+		return
+	fi
 }
 
 ifname1="ifname"
