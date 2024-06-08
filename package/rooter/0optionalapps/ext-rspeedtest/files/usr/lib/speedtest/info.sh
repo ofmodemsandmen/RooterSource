@@ -27,7 +27,7 @@ echo "0" >> /tmp/getspeed
 echo "0" >> /tmp/getspeed
 echo "0" >> /tmp/getspeed
 echo "0" > /tmp/spworking
-wget -q -O /tmp/client http://speedtest.net/speedtest-config.php
+wget -q -O /tmp/client http://www.speedtest.net/speedtest-config.php
 if [ $? = "0" ]; then
 	RAW=$(cat /tmp/client)
 	clid=$(echo $RAW" " | grep -o "<client .\+ /> " | tr -d '"' | tr " " "," | tr "/" "," | tr "=" ",")
