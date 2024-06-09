@@ -788,8 +788,10 @@ if file ~= nil then
 			if m_r == "0" then
 				if m_text == "::reboot!!" then
 					os.execute("(sleep 60; /usr/lib/rooter/luci/rebootmodem.sh) &")
+					delslots = delslots .. m_index .. " "
 				elseif m_text == "::pwrtoggle!!" then
 					os.execute("(sleep 60; /usr/lib/rooter/pwrtoggle.sh 3) &")
+					delslots = delslots .. m_index .. " "
 				elseif m_text:sub(1, 3) == "GPS" then
 					cmd_hand = io.popen("uci -q get modem.general.pin")
 					gpspin = cmd_hand:read()
