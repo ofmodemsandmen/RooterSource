@@ -328,6 +328,10 @@ f_main()
 							fi
 						fi
 						
+						wifi up $(uci -q get wireless.wwan$wif.device)
+						ubus call network.interface.wwan$wif up
+                        ubus call network reload
+						
 						if [ -f "${FILE}" ]; then
 							# read list of selected Hotspots
 							while IFS='|' read -r ssid encrypt key
