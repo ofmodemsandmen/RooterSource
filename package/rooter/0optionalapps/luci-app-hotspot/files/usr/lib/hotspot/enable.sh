@@ -38,6 +38,10 @@ else
 	uci set travelmate.global.bssid=""
 	uci set travelmate.global.trm_enabled="0"
 	uci commit travelmate
+	PID=$(ps |grep "travelmate.sh" | grep -v grep |head -n 1 | awk '{print $1}')
+		if [ ! -z "$PID" ]; then
+			kill -9 $PID
+		fi
 	uci -q set wireless.wwan$wif.disabled=1
 	uci set wireless.wwan$wif.ssid="Hotspot Manager Interface"
 	uci -q commit wireless
