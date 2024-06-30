@@ -33,14 +33,14 @@ if profsave == "1" then
 	else
 		m:section(SimpleSection).template = "rooter/profile"
 	end
-
+end
 	ds = m:section(TypedSection, "simpin", translate("Default SIM Pin"), translate("Used if no SIM Pin value in Profile"))
 	ds.anonymous = true
 	
 	ms = ds:option(Value, "pin", translate("PIN :")); 
 	ms.rmempty = true;
 	ms.default = ""
-end
+
 
 
 -- 

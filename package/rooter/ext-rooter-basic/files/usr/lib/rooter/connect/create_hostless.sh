@@ -430,6 +430,9 @@ if [ $SP -gt 0 ]; then
 		$ROOTER/connect/bandmask $CURRMODEM 2
 		uci commit modem
 	fi
+	if [ -e $ROOTER/simlock.sh ]; then
+		$ROOTER/simlock.sh $CURRMODEM
+	fi
 	$ROOTER/common/gettype.sh $CURRMODEM
 fi
 	

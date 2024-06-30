@@ -827,8 +827,14 @@ fi
 
 CHKPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 if [ -n "$CHKPORT" ]; then
+	
+	if [ -e $ROOTER/simlock.sh ]; then
+		$ROOTER/simlock.sh $CURRMODEM
+	fi
+
 	$ROOTER/common/gettype.sh $CURRMODEM
 	$ROOTER/connect/get_profile.sh $CURRMODEM
+	
 	if [ -e $ROOTER/simlock.sh ]; then
 		$ROOTER/simlock.sh $CURRMODEM
 	fi
@@ -844,7 +850,7 @@ if [ -n "$CHKPORT" ]; then
 		fi
 		exit 0
 	fi
-
+	
 	detect=$(uci -q get modem.modeminfo$CURRMODEM.detect)
 	if [ "$detect" = "1" ]; then
 		log "Stopped after detection"
