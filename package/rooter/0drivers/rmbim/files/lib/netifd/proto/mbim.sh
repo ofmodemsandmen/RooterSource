@@ -179,9 +179,15 @@ _proto_mbim_setup() {
 
 	[ "$STATUS" -ne 0 ] || {
 		sleep 1
-		log "Setting FCC Auth"
-		uqmi $DBG -s -m -d $device --fcc-auth
-		sleep 1
+		IDV=$(uci get modem.modem$CURRMODEM.idV)
+		IDP=$(uci get modem.modem$CURRMODEM.idP)
+		if [ "$IDV" = 2c7c -a "$IDP" = 0900 ]; then
+			log "Ignore FCC Auth"
+		else
+			log "Setting FCC Auth"
+			uqmi $DBG -s -m -d $device --fcc-auth
+			sleep 1
+		fi
 	}
 
 	log "Reading capabilities"
