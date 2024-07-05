@@ -1,18 +1,13 @@
-/******************************************************************************
-  @file    tty2tcp.c
-  @brief   switch data between tcp socket and ttyUSB port.
+/*
+    Copyright 2023 Quectel Wireless Solutions Co.,Ltd
 
-  DESCRIPTION
-  QLog Tool for USB and PCIE of Quectel wireless cellular modules.
-
-  INITIALIZATION AND SEQUENCING REQUIREMENTS
-  None.
-
-  ---------------------------------------------------------------------------
-  Copyright (c) 2016 - 2020 Quectel Wireless Solution, Co., Ltd.  All Rights Reserved.
-  Quectel Wireless Solution Proprietary and Confidential.
-  ---------------------------------------------------------------------------
-******************************************************************************/
+    Quectel hereby grants customers of Quectel a license to use, modify,
+    distribute and publish the Software in binary form provided that
+    customers shall have no right to reverse engineer, reverse assemble,
+    decompile or reduce to source code form any portion of the Software. 
+    Under no circumstances may customers modify, demonstrate, use, deliver 
+    or disclose any portion of the Software in source code form.
+*/
 
 #include <stdio.h>
 #include <ctype.h>
@@ -160,6 +155,7 @@ static int qusb_open(const void *usb_handle) {
 
     fd = qusb_control[0];
 
+    //pthread_attr_destroy(&usb_thread_attr);     //aaron 2023.07.27
     return fd;
 }
 
@@ -333,6 +329,11 @@ _hangup:
     }
 
 _out:
+    if (server_fd > 0) {
+        close(server_fd);
+        server_fd = -1;
+    }
+
     free(pbuf);
     return 0;
 }

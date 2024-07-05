@@ -1,3 +1,14 @@
+/*
+    Copyright 2023 Quectel Wireless Solutions Co.,Ltd
+
+    Quectel hereby grants customers of Quectel a license to use, modify,
+    distribute and publish the Software in binary form provided that
+    customers shall have no right to reverse engineer, reverse assemble,
+    decompile or reduce to source code form any portion of the Software.
+    Under no circumstances may customers modify, demonstrate, use, deliver
+    or disclose any portion of the Software in source code form.
+*/
+
 #ifndef __QFIREHOSE_USB_LINUX_H__
 #define __QFIREHOSE_USB_LINUX_H__
 #include <stdio.h>
@@ -16,6 +27,12 @@
 
 #define MAX_PATH 256
 #define MIN(a,b)	 ((a) < (b)? (a) : (b))
+#define ZIP_INFO  "/tmp/zip_info.txt"
+#define ZIP_PROCESS_INFO  "/tmp/zip_process_info.txt"
+
+#define safe_free(p) do {if (p != NULL) {free((void*)p); p = NULL;}} while(0)
+
+extern char zip_cmd_buf[512];
 
 typedef struct module_sys_info {
 /*
@@ -138,4 +155,20 @@ typedef struct {
     int idProduct;
     int interfaceNum;
 } TLV_USB;
+
+typedef struct {
+    char zip_file_name_backup[128];
+    char zip_file_dir_backup[256];
+}file_name_backup_count;
+
+typedef struct {
+    int file_name_count;
+    file_name_backup_count file_backup_c[50];
+}file_name_backup;
+
+extern file_name_backup file_name_b;
+
+extern int is_upgrade_fimeware_zip_7z;
+extern int is_firehose_zip_7z_name_exit;
+extern int is_upgrade_fimeware_only_zip;
 #endif

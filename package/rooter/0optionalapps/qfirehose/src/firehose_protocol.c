@@ -1,18 +1,14 @@
-/******************************************************************************
-  @file    firehose_protocol.c
-  @brief   firehose protocol.
+/*
+    Copyright 2023 Quectel Wireless Solutions Co.,Ltd
 
-  DESCRIPTION
-  QFirehoe Tool for USB and PCIE of Quectel wireless cellular modules.
+    Quectel hereby grants customers of Quectel a license to use, modify,
+    distribute and publish the Software in binary form provided that
+    customers shall have no right to reverse engineer, reverse assemble,
+    decompile or reduce to source code form any portion of the Software.
+    Under no circumstances may customers modify, demonstrate, use, deliver
+    or disclose any portion of the Software in source code form.
+*/
 
-  INITIALIZATION AND SEQUENCING REQUIREMENTS
-  None.
-
-  ---------------------------------------------------------------------------
-  Copyright (c) 2016 - 2020 Quectel Wireless Solution, Co., Ltd.  All Rights Reserved.
-  Quectel Wireless Solution Proprietary and Confidential.
-  ---------------------------------------------------------------------------
-******************************************************************************/
 #include "usb_linux.h"
 #include <poll.h>
 #include <pthread.h>
@@ -22,10 +18,14 @@
 int recv_sc600y_configure_num = 1;
 extern const char *q_device_type;
 static int fh_recv_cmd_sk[2];
+extern unsigned q_module_packet_sign;
 
 extern unsigned q_erase_all_before_download;
 extern int update_transfer_bytes(long long bytes_cur);
 extern int show_progress();
+
+char file_name_image[128] = {0};
+char file_name_image_dir[256] = {0};
 
 typedef struct sparse_header
 {
@@ -201,6 +201,10 @@ static const char * fh_xml_get_value(const char *xml_line, const char *key) {
         return NULL;
     }
 
+    int len = pend - pchar;
+    if (len >= 64)
+        return NULL;
+
     strncpy(value, pchar, pend - pchar);
     value[pend - pchar] = '\0';
 
@@ -214,6 +218,12 @@ static void fh_xml_set_value(char *xml_line, const char *key, unsigned value) {
      char *tmp_line = malloc(strlen(xml_line) + 1 + sizeof(value_str));
 
     if (!pchar || !tmp_line) {
+
+        if (tmp_line)
+        {
+            free(tmp_line);
+            tmp_line = NULL;
+        }
         return;
     }
 
@@ -233,7 +243,7 @@ static int fh_parse_xml_line(const char *xml_line, struct fh_cmd *fh_cmd) {
     size_t len = strlen(xml_line);
 
     memset(fh_cmd, 0, sizeof( struct fh_cmd));
-    strcpy(fh_cmd->xml_original_data, xml_line);
+    strncpy(fh_cmd->xml_original_data, xml_line, 512);
     if (fh_cmd->xml_original_data[len - 1] == '\n')
         fh_cmd->xml_original_data[len - 1] = '\0';
 
@@ -412,21 +422,100 @@ __fh_parse_xml_line:
 }
 
 static int fh_fixup_program_cmd(struct fh_data *fh_data, struct fh_cmd *fh_cmd, long* filesize_out) {
-    char full_path[512];
-    char *unix_filename = strdup(fh_cmd->program.filename);
+    char full_path[512] = {0};
+    char unix_filename_tmp[256] = {0};
     char *ptmp;
     FILE *fp;
     long filesize = 0;
     uint32_t num_partition_sectors = fh_cmd->program.num_partition_sectors;
+    int image_in_firehose_dir = 0;
+
+    char *unix_filename = strdup(fh_cmd->program.filename);
+    if (unix_filename == NULL)
+    {
+        error_return();
+    }
 
     while((ptmp = strchr(unix_filename, '\\'))) {
         *ptmp = '/';
     }
 
-    snprintf(full_path, sizeof(full_path), "%.255s/%.240s", fh_data->firehose_dir, unix_filename);
+    if (is_upgrade_fimeware_zip_7z)
+    {
+        int i;
+
+        char *p2 = strrchr(unix_filename, '/');
+        if (p2 == NULL)
+        {
+            memmove(unix_filename_tmp, unix_filename, strlen(unix_filename));
+            image_in_firehose_dir = 1;
+        }
+        else
+        {
+            memmove(unix_filename_tmp, p2 + 1, strlen(p2) - 1);
+        }
+
+        memset(file_name_image, 0, sizeof(file_name_image));
+        memset(file_name_image_dir, 0, sizeof(file_name_image_dir));
+
+        for(i=0;i<file_name_b.file_name_count;i++)
+        {
+            if (strstr(file_name_b.file_backup_c[i].zip_file_name_backup, unix_filename_tmp))
+            {
+                if (image_in_firehose_dir)
+                {
+                    if (strstr(file_name_b.file_backup_c[i].zip_file_dir_backup, "update/firehose"))
+                    {
+                        memmove(file_name_image, file_name_b.file_backup_c[i].zip_file_name_backup, strlen(file_name_b.file_backup_c[i].zip_file_name_backup));
+                        memmove(file_name_image_dir, file_name_b.file_backup_c[i].zip_file_dir_backup, strlen(file_name_b.file_backup_c[i].zip_file_dir_backup));
+                        break;
+                    }
+                }
+                else
+                {
+                    memmove(file_name_image, file_name_b.file_backup_c[i].zip_file_name_backup, strlen(file_name_b.file_backup_c[i].zip_file_name_backup));
+                    memmove(file_name_image_dir, file_name_b.file_backup_c[i].zip_file_dir_backup, strlen(file_name_b.file_backup_c[i].zip_file_dir_backup));
+                    break;
+                }
+            }
+        }
+
+        if (file_name_image[0] != '\0')
+        {
+            memset(zip_cmd_buf, 0, sizeof(zip_cmd_buf));
+            if (is_upgrade_fimeware_only_zip)
+            {
+                snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "unzip -o -q %.240s '*%.200s' -d /tmp/ > %s", fh_data->firehose_dir, file_name_image_dir, ZIP_PROCESS_INFO);
+            }
+            else
+            {
+                snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "7z x %.240s -o/tmp/ %.200s > %s", fh_data->firehose_dir, file_name_image_dir, ZIP_PROCESS_INFO);
+            }
+            dbg_time("%s zip_cmd_buf:%s\n", __func__, zip_cmd_buf);
+            if( -1 == system(zip_cmd_buf))
+            {
+                dbg_time("%s system return error\n", __func__);
+                return -1;
+            }
+            usleep(1000);
+
+            snprintf(full_path, sizeof(full_path), "/tmp/%.240s", file_name_image_dir);
+            dbg_time("%s full_path:%s\n", __func__, full_path);
+        }
+    }
+    else
+    {
+        snprintf(full_path, sizeof(full_path), "%.255s/%.240s", fh_data->firehose_dir, unix_filename);
+    }
+
     if (access(full_path, R_OK)) {
         fh_cmd->program.num_partition_sectors = 0;
         dbg_time("fail to access %s, errno: %d (%s)\n", full_path, errno, strerror(errno));
+        if (unix_filename)
+        {
+            free(unix_filename);
+            unix_filename = NULL;
+        }
         error_return();
     }
 
@@ -434,6 +523,11 @@ static int fh_fixup_program_cmd(struct fh_data *fh_data, struct fh_cmd *fh_cmd, 
     if (!fp) {
         fh_cmd->program.num_partition_sectors = 0;
         dbg_time("fail to fopen %s, errno: %d (%s)\n", full_path, errno, strerror(errno));
+        if (unix_filename)
+        {
+            free(unix_filename);
+            unix_filename = NULL;
+        }
         error_return();
     }
 
@@ -446,6 +540,11 @@ static int fh_fixup_program_cmd(struct fh_data *fh_data, struct fh_cmd *fh_cmd, 
         dbg_time("fail to ftell %s, errno: %d (%s)\n", full_path, errno, strerror(errno));
         fh_cmd->program.num_partition_sectors = 0;
         fh_cmd->program.filesz = 0;
+        if (unix_filename)
+        {
+            free(unix_filename);
+            unix_filename = NULL;
+        }
         error_return();
     }
     fh_cmd->program.filesz = filesize;
@@ -464,6 +563,10 @@ static int fh_fixup_program_cmd(struct fh_data *fh_data, struct fh_cmd *fh_cmd, 
             fh_cmd->program.num_partition_sectors);
     }
 
+    if (is_upgrade_fimeware_zip_7z)
+    {
+       unlink(full_path);
+    }
     free(unix_filename);
 
     return 0;
@@ -717,25 +820,117 @@ static int fh_send_reset_cmd(struct fh_data *fh_data) {
 }
 
 static int fh_send_rawmode_image(struct fh_data *fh_data, const struct fh_cmd *fh_cmd, unsigned timeout) {
-    char full_path[512];
+    char full_path[512] = {0};
+    char unix_filename_tmp[256] = {0};
     char read_chunk_header_buf[64] = {0};
-    char *unix_filename = strdup(fh_cmd->program.filename);
     char *ptmp;
     FILE *fp;
     size_t filesize, filesend;
-    void *pbuf = malloc(fh_data->MaxPayloadSizeToTargetInBytes);
+    int image_in_firehose_dir = 0;
 
-    if (pbuf == NULL)
+    char *unix_filename = strdup(fh_cmd->program.filename);
+    if (unix_filename == NULL)
+    {
         error_return();
+    }
+
+    void *pbuf = malloc(fh_data->MaxPayloadSizeToTargetInBytes);
+    if (pbuf == NULL)
+    {
+        if (unix_filename)
+        {
+            free(unix_filename);
+            unix_filename = NULL;
+        }
+        error_return();
+    }
 
     while((ptmp = strchr(unix_filename, '\\'))) {
         *ptmp = '/';
     }
 
-    snprintf(full_path, sizeof(full_path), "%.255s/%.240s", fh_data->firehose_dir, unix_filename);
+    if (is_upgrade_fimeware_zip_7z)
+    {
+        int i;
+
+        char *p2 = strrchr(unix_filename, '/');
+        if (p2 == NULL)
+        {
+            memmove(unix_filename_tmp, unix_filename, strlen(unix_filename));
+            image_in_firehose_dir = 1;
+        }
+        else
+        {
+            memmove(unix_filename_tmp, p2 + 1, strlen(p2) - 1);
+        }
+
+        memset(file_name_image, 0, sizeof(file_name_image));
+        memset(file_name_image_dir, 0, sizeof(file_name_image_dir));
+
+        for(i=0;i<file_name_b.file_name_count;i++)
+        {
+            if (strstr(file_name_b.file_backup_c[i].zip_file_name_backup, unix_filename_tmp))
+            {
+                if (image_in_firehose_dir)
+                {
+                    if (strstr(file_name_b.file_backup_c[i].zip_file_dir_backup, "update/firehose"))
+                    {
+                        memmove(file_name_image, file_name_b.file_backup_c[i].zip_file_name_backup, strlen(file_name_b.file_backup_c[i].zip_file_name_backup));
+                        memmove(file_name_image_dir, file_name_b.file_backup_c[i].zip_file_dir_backup, strlen(file_name_b.file_backup_c[i].zip_file_dir_backup));
+                        break;
+                    }
+                }
+                else
+                {
+                    memmove(file_name_image, file_name_b.file_backup_c[i].zip_file_name_backup, strlen(file_name_b.file_backup_c[i].zip_file_name_backup));
+                    memmove(file_name_image_dir, file_name_b.file_backup_c[i].zip_file_dir_backup, strlen(file_name_b.file_backup_c[i].zip_file_dir_backup));
+                    break;
+                }
+            }
+        }
+
+        if (file_name_image[0] != '\0')
+        {
+            memset(zip_cmd_buf, 0, sizeof(zip_cmd_buf));
+            if (is_upgrade_fimeware_only_zip)
+            {
+                snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "unzip -o -q %.240s '*%.200s' -d /tmp/ > %s", fh_data->firehose_dir, file_name_image_dir, ZIP_PROCESS_INFO);
+            }
+            else
+            {
+                snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "7z x %.240s -o/tmp/ %.200s > %s", fh_data->firehose_dir, file_name_image_dir, ZIP_PROCESS_INFO);
+            }
+            dbg_time("%s zip_cmd_buf:%s\n", __func__, zip_cmd_buf);
+            if( -1 == system(zip_cmd_buf))
+            {
+                dbg_time("%s system return error\n", __func__);
+                return -1;
+            }
+            usleep(1000);
+
+            snprintf(full_path, sizeof(full_path), "/tmp/%.240s", file_name_image_dir);
+            dbg_time("%s full_path:%s\n", __func__, full_path);
+        }
+    }
+    else
+    {
+        snprintf(full_path, sizeof(full_path), "%.255s/%.240s", fh_data->firehose_dir, unix_filename);
+    }
+
     fp = fopen(full_path, "rb");
     if (!fp) {
         dbg_time("fail to fopen %s, errno: %d (%s)\n", full_path, errno, strerror(errno));
+        if (unix_filename)
+        {
+            free(unix_filename);
+            unix_filename = NULL;
+        }
+
+        if (pbuf)
+        {
+            free(pbuf);
+            pbuf = NULL;
+        }
         error_return();
     }
 
@@ -890,6 +1085,11 @@ static int fh_send_rawmode_image(struct fh_data *fh_data, const struct fh_cmd *f
     free(unix_filename);
     free(pbuf);
 
+    if (is_upgrade_fimeware_zip_7z)
+    {
+       unlink(full_path);
+    }
+
     if (filesend >= filesize)
         return 0;
 
@@ -935,16 +1135,26 @@ static int fh_process_sparse_program(struct fh_data *fh_data, const struct fh_cm
     char full_path[512];
     char read_header_buf[64] = {0};
     char read_chunk_header_buf[64] = {0};
-    char *unix_filename = strdup(fh_cmd->program.filename);
     char *ptmp;
     FILE *fp;
     size_t filesize/*, filesend*/;
+
+    char *unix_filename = strdup(fh_cmd->program.filename);
+    if (unix_filename == NULL)
+        error_return();
+
     void *pbuf = malloc(fh_data->MaxPayloadSizeToTargetInBytes);
+    if (pbuf == NULL)
+    {
+        if (unix_filename)
+        {
+            free(unix_filename);
+            unix_filename = NULL;
+        }
+        error_return();
+    }
 
     memset(&SparseImgData, 0, sizeof(SparseImgParam));
-
-    if (pbuf == NULL)
-        error_return();
 
     while((ptmp = strchr(unix_filename, '\\'))) {
         *ptmp = '/';
@@ -954,6 +1164,17 @@ static int fh_process_sparse_program(struct fh_data *fh_data, const struct fh_cm
     fp = fopen(full_path, "rb");
     if (!fp) {
         dbg_time("fail to fopen %s, errno: %d (%s)\n", full_path, errno, strerror(errno));
+        if (unix_filename)
+        {
+            free(unix_filename);
+            unix_filename = NULL;
+        }
+
+        if (pbuf)
+        {
+            free(pbuf);
+            pbuf = NULL;
+        }
         error_return();
     }
 
@@ -1241,48 +1462,392 @@ int firehose_main(const char *firehose_dir, void *usb_handle, unsigned qusb_zlp_
     fh_data->xml_rx_size = sizeof(fh_data->xml_rx_buf);
     fh_data->ZlpAwareHost = qusb_zlp_mode;
 
-    if (!qfile_find_file(firehose_dir, "rawprogram_", ".xml", &xmlfile_list[xmlfile_cnt])
-        && !qfile_find_file(firehose_dir, "firehose-rawprogram", ".xml", &xmlfile_list[xmlfile_cnt])
-       ) {
-        dbg_time("retrieve rawprogram namd file failed.\n");
-        //error_return();
+    if (is_upgrade_fimeware_zip_7z)
+    {
+        int i;
+        for (i = 0; i < 32; i++ )
+        {
+            xmlfile_list[i] = (char*)malloc(256);
+            if (xmlfile_list[i] == NULL)
+            {
+                dbg_time("%s xmlfile_list malloc failed\n", __func__);
+                error_return();
+            }
+        }
+
+        char rawprogram_patch_filename[128] = {0};
+        char rawprogram_patch_firehose_dir[256] = {0};
+
+        if (q_module_packet_sign)
+        {
+            for (x = 0; x < 10; x++) {
+                snprintf(xmlfile_tmp, sizeof(xmlfile_tmp), "rawprogram%u_secboot", x);  //use rawprogram%u Adaptation rawprogram%u_xxx  for AG215S-GLR
+
+                for(i=0;i<file_name_b.file_name_count;i++)
+                {
+                    if ((strstr(file_name_b.file_backup_c[i].zip_file_name_backup, xmlfile_tmp) && strstr(file_name_b.file_backup_c[i].zip_file_name_backup, ".xml")))
+                    {
+                        dbg_time("file_name_b.file_backup_c[i].zip_file_name_backup:%s\n", file_name_b.file_backup_c[i].zip_file_name_backup);
+                        dbg_time("file_name_b.file_backup_c[i].zip_file_dir_backup:%s\n", file_name_b.file_backup_c[i].zip_file_dir_backup);
+
+                        if (strstr(file_name_b.file_backup_c[i].zip_file_dir_backup, "update/firehose"))
+                        {
+                            memmove(rawprogram_patch_filename, file_name_b.file_backup_c[i].zip_file_name_backup, strlen(file_name_b.file_backup_c[i].zip_file_name_backup));
+                            memmove(rawprogram_patch_firehose_dir, file_name_b.file_backup_c[i].zip_file_dir_backup, strlen(file_name_b.file_backup_c[i].zip_file_dir_backup));
+                            break;
+                        }
+                    }
+                }
+
+                if (rawprogram_patch_filename[0] != '\0')  //find rawprogram file
+                {
+                    memset(zip_cmd_buf, 0, sizeof(zip_cmd_buf));
+                    if (is_upgrade_fimeware_only_zip)
+                    {
+                        snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "unzip -o -q %.240s '*%.200s' -d /tmp/ > %s", firehose_dir, rawprogram_patch_firehose_dir, ZIP_PROCESS_INFO);
+                    }
+                    else
+                    {
+                        snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "7z x %.240s -o/tmp/ %.200s > %s", firehose_dir, rawprogram_patch_firehose_dir, ZIP_PROCESS_INFO);
+                    }
+                    dbg_time("%s zip_cmd_buf:%s\n", __func__, zip_cmd_buf);
+                    if( -1 == system(zip_cmd_buf))
+                    {
+                        dbg_time("%s system return error\n", __func__);
+                        for (i = 0; i < 32; i++ )
+                        {
+                            if (xmlfile_list[i])
+                            {
+                                free(xmlfile_list[i]);
+                                xmlfile_list[i] = NULL;
+                            }
+                        }
+
+                        error_return();
+                    }
+                    usleep(1000);
+
+                    memmove(xmlfile_list[xmlfile_cnt], rawprogram_patch_firehose_dir, 240);
+                    dbg_time("xmlfile_list[xmlfile_cnt] = %s", xmlfile_list[xmlfile_cnt]);
+
+                    xmlfile_cnt++;
+                }
+            }
+        }
+        else
+        {
+            memset(rawprogram_patch_filename, 0, sizeof(rawprogram_patch_filename));
+            memset(rawprogram_patch_firehose_dir, 0, sizeof(rawprogram_patch_firehose_dir));
+
+            for(i=0;i<file_name_b.file_name_count;i++)
+            {
+                if ((strstr(file_name_b.file_backup_c[i].zip_file_name_backup, "rawprogram_") && strstr(file_name_b.file_backup_c[i].zip_file_name_backup, ".xml"))
+                    || (strstr(file_name_b.file_backup_c[i].zip_file_name_backup, "firehose-rawprogram") && strstr(file_name_b.file_backup_c[i].zip_file_name_backup, ".xml")))
+                {
+                    dbg_time("file_name_b.file_backup_c[i].zip_file_name_backup:%s\n", file_name_b.file_backup_c[i].zip_file_name_backup);
+                    dbg_time("file_name_b.file_backup_c[i].zip_file_dir_backup:%s\n", file_name_b.file_backup_c[i].zip_file_dir_backup);
+
+                    if (strstr(file_name_b.file_backup_c[i].zip_file_dir_backup, "update/firehose"))
+                    {
+                        memmove(rawprogram_patch_filename, file_name_b.file_backup_c[i].zip_file_name_backup, strlen(file_name_b.file_backup_c[i].zip_file_name_backup));
+                        memmove(rawprogram_patch_firehose_dir, file_name_b.file_backup_c[i].zip_file_dir_backup, strlen(file_name_b.file_backup_c[i].zip_file_dir_backup));
+                        break;
+                    }
+                }
+            }
+
+            if (rawprogram_patch_filename[0] != '\0')  //find rawprogram file
+            {
+                memset(zip_cmd_buf, 0, sizeof(zip_cmd_buf));
+                if (is_upgrade_fimeware_only_zip)
+                {
+                    snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "unzip -o -q %.240s '*%.200s' -d /tmp/ > %s", firehose_dir, rawprogram_patch_firehose_dir, ZIP_PROCESS_INFO);
+                }
+                else
+                {
+                    snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "7z x %.240s -o/tmp/ %.200s > %s", firehose_dir, rawprogram_patch_firehose_dir, ZIP_PROCESS_INFO);
+                }
+                dbg_time("%s zip_cmd_buf:%s\n", __func__, zip_cmd_buf);
+                if( -1 == system(zip_cmd_buf))
+                {
+                    dbg_time("%s system return error\n", __func__);
+                    for (i = 0; i < 32; i++ )
+                    {
+                        if (xmlfile_list[i])
+                        {
+                            free(xmlfile_list[i]);
+                            xmlfile_list[i] = NULL;
+                        }
+                    }
+
+                    error_return();
+                }
+                usleep(1000);
+
+                memmove(xmlfile_list[xmlfile_cnt], rawprogram_patch_firehose_dir, 240);
+                dbg_time("xmlfile_list[xmlfile_cnt] = %s", xmlfile_list[xmlfile_cnt]);
+                xmlfile_cnt++;
+            }
+
+            for (x = 0; x < 10; x++) {
+                snprintf(xmlfile_tmp, sizeof(xmlfile_tmp), "rawprogram%u", x);  //use rawprogram%u Adaptation rawprogram%u_xxx
+
+                memset(rawprogram_patch_filename, 0, sizeof(rawprogram_patch_filename));
+                memset(rawprogram_patch_firehose_dir, 0, sizeof(rawprogram_patch_firehose_dir));
+                for(i=0;i<file_name_b.file_name_count;i++)
+                {
+                    if ((strstr(file_name_b.file_backup_c[i].zip_file_name_backup, xmlfile_tmp) && strstr(file_name_b.file_backup_c[i].zip_file_name_backup, ".xml")))
+                    {
+                        dbg_time("file_name_b.file_backup_c[i].zip_file_name_backup:%s\n", file_name_b.file_backup_c[i].zip_file_name_backup);
+                        dbg_time("file_name_b.file_backup_c[i].zip_file_dir_backup:%s\n", file_name_b.file_backup_c[i].zip_file_dir_backup);
+
+                        if (strstr(file_name_b.file_backup_c[i].zip_file_dir_backup, "update/firehose"))
+                        {
+                            memmove(rawprogram_patch_filename, file_name_b.file_backup_c[i].zip_file_name_backup, strlen(file_name_b.file_backup_c[i].zip_file_name_backup));
+                            memmove(rawprogram_patch_firehose_dir, file_name_b.file_backup_c[i].zip_file_dir_backup, strlen(file_name_b.file_backup_c[i].zip_file_dir_backup));
+                            break;
+                        }
+                    }
+                }
+
+                if (rawprogram_patch_filename[0] != '\0')  //find rawprogram file
+                {
+                    memset(zip_cmd_buf, 0, sizeof(zip_cmd_buf));
+                    if (is_upgrade_fimeware_only_zip)
+                    {
+                        snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "unzip -o -q %.240s '*%.200s' -d /tmp/ > %s", firehose_dir, rawprogram_patch_firehose_dir, ZIP_PROCESS_INFO);
+                    }
+                    else
+                    {
+                        snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "7z x %.240s -o/tmp/ %.200s > %s", firehose_dir, rawprogram_patch_firehose_dir, ZIP_PROCESS_INFO);
+                    }
+                    dbg_time("%s zip_cmd_buf:%s\n", __func__, zip_cmd_buf);
+                    if( -1 == system(zip_cmd_buf))
+                    {
+                        dbg_time("%s system return error\n", __func__);
+                        for (i = 0; i < 32; i++ )
+                        {
+                            if (xmlfile_list[i])
+                            {
+                                free(xmlfile_list[i]);
+                                xmlfile_list[i] = NULL;
+                            }
+                        }
+
+                        error_return();
+                    }
+                    usleep(1000);
+
+                    memmove(xmlfile_list[xmlfile_cnt], rawprogram_patch_firehose_dir, 240);
+                    dbg_time("xmlfile_list[xmlfile_cnt] = %s", xmlfile_list[xmlfile_cnt]);
+
+                    xmlfile_cnt++;
+                }
+            }
+        }
+
+        memset(rawprogram_patch_filename, 0, sizeof(rawprogram_patch_filename));
+        memset(rawprogram_patch_firehose_dir, 0, sizeof(rawprogram_patch_firehose_dir));
+
+        for(i=0;i<file_name_b.file_name_count;i++)
+        {
+            if ((strstr(file_name_b.file_backup_c[i].zip_file_name_backup, "patch_") && strstr(file_name_b.file_backup_c[i].zip_file_name_backup, ".xml"))
+                || (strstr(file_name_b.file_backup_c[i].zip_file_name_backup, "patch-") && strstr(file_name_b.file_backup_c[i].zip_file_name_backup, ".xml")))
+            {
+                dbg_time("file_name_b.file_backup_c[i].zip_file_name_backup:%s\n", file_name_b.file_backup_c[i].zip_file_name_backup);
+                dbg_time("file_name_b.file_backup_c[i].zip_file_dir_backup:%s\n", file_name_b.file_backup_c[i].zip_file_dir_backup);
+
+                if (strstr(file_name_b.file_backup_c[i].zip_file_dir_backup, "update/firehose"))
+                {
+                    memmove(rawprogram_patch_filename, file_name_b.file_backup_c[i].zip_file_name_backup, strlen(file_name_b.file_backup_c[i].zip_file_name_backup));
+                    memmove(rawprogram_patch_firehose_dir, file_name_b.file_backup_c[i].zip_file_dir_backup, strlen(file_name_b.file_backup_c[i].zip_file_dir_backup));
+                    break;
+                }
+            }
+        }
+
+        if (rawprogram_patch_filename[0] != '\0')  //find patch file
+        {
+            memset(zip_cmd_buf, 0, sizeof(zip_cmd_buf));
+            if (is_upgrade_fimeware_only_zip)
+            {
+                snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "unzip -o -q %.240s '*%.200s' -d /tmp/ > %s", firehose_dir, rawprogram_patch_firehose_dir, ZIP_PROCESS_INFO);
+            }
+            else
+            {
+                snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "7z x %.240s -o/tmp/ %.200s > %s", firehose_dir, rawprogram_patch_firehose_dir, ZIP_PROCESS_INFO);
+            }
+            dbg_time("%s zip_cmd_buf:%s\n", __func__, zip_cmd_buf);
+            if( -1 == system(zip_cmd_buf))
+            {
+                dbg_time("%s system return error\n", __func__);
+                for (i = 0; i < 32; i++ )
+                {
+                    if (xmlfile_list[i])
+                    {
+                        free(xmlfile_list[i]);
+                        xmlfile_list[i] = NULL;
+                    }
+                }
+
+                error_return();
+            }
+            usleep(1000);
+
+            memmove(xmlfile_list[xmlfile_cnt], rawprogram_patch_firehose_dir, 240);
+            dbg_time("xmlfile_list[xmlfile_cnt] = %s", xmlfile_list[xmlfile_cnt]);
+            xmlfile_cnt++;
+        }
+
+        for (x = 0; x < 10; x++) {
+            snprintf(xmlfile_tmp, sizeof(xmlfile_tmp), "patch%u.xml", x);
+
+            memset(rawprogram_patch_filename, 0, sizeof(rawprogram_patch_filename));
+            memset(rawprogram_patch_firehose_dir, 0, sizeof(rawprogram_patch_firehose_dir));
+            for(i=0;i<file_name_b.file_name_count;i++)
+            {
+                if ((strstr(file_name_b.file_backup_c[i].zip_file_name_backup, xmlfile_tmp) && strstr(file_name_b.file_backup_c[i].zip_file_name_backup, ".xml")))
+                {
+                    dbg_time("file_name_b.file_backup_c[i].zip_file_name_backup:%s\n", file_name_b.file_backup_c[i].zip_file_name_backup);
+                    dbg_time("file_name_b.file_backup_c[i].zip_file_dir_backup:%s\n", file_name_b.file_backup_c[i].zip_file_dir_backup);
+
+                    if (strstr(file_name_b.file_backup_c[i].zip_file_dir_backup, "update/firehose"))
+                    {
+                        memmove(rawprogram_patch_filename, file_name_b.file_backup_c[i].zip_file_name_backup, strlen(file_name_b.file_backup_c[i].zip_file_name_backup));
+                        memmove(rawprogram_patch_firehose_dir, file_name_b.file_backup_c[i].zip_file_dir_backup, strlen(file_name_b.file_backup_c[i].zip_file_dir_backup));
+                        break;
+                    }
+                }
+            }
+
+            if (rawprogram_patch_filename[0] != '\0')  //find patch file
+            {
+                memset(zip_cmd_buf, 0, sizeof(zip_cmd_buf));
+                if (is_upgrade_fimeware_only_zip)
+                {
+                    snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "unzip -o -q %.240s '*%.200s' -d /tmp/ > %s", firehose_dir, rawprogram_patch_firehose_dir, ZIP_PROCESS_INFO);
+                }
+                else
+                {
+                    snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "7z x %.240s -o/tmp/ %.200s > %s", firehose_dir, rawprogram_patch_firehose_dir, ZIP_PROCESS_INFO);
+                }
+                dbg_time("%s zip_cmd_buf:%s\n", __func__, zip_cmd_buf);
+                if( -1 == system(zip_cmd_buf))
+                {
+                    dbg_time("%s system return error\n", __func__);
+                    for (i = 0; i < 32; i++ )
+                    {
+                        if (xmlfile_list[i])
+                        {
+                            free(xmlfile_list[i]);
+                            xmlfile_list[i] = NULL;
+                        }
+                    }
+
+                    error_return();
+                }
+                usleep(1000);
+
+                memmove(xmlfile_list[xmlfile_cnt], rawprogram_patch_firehose_dir, 240);
+                dbg_time("xmlfile_list[xmlfile_cnt] = %s", xmlfile_list[xmlfile_cnt]);
+
+                xmlfile_cnt++;
+            }
+        }
+
+        for (x = 0; x < xmlfile_cnt; x++) {
+            snprintf(rawprogram_full_path, sizeof(rawprogram_full_path), "/tmp/%.255s", xmlfile_list[x]);
+            free(xmlfile_list[xmlfile_cnt]);
+            xmlfile_list[xmlfile_cnt] = NULL;
+            fh_parse_xml_file(fh_data, rawprogram_full_path);
+
+            unlink(rawprogram_full_path);
+        }
+
+        for (i = 0; i < 32; i++ )
+        {
+            if (xmlfile_list[i])
+            {
+                free(xmlfile_list[i]);
+                xmlfile_list[i] = NULL;
+            }
+        }
+
+        if (fh_data->fh_cmd_count == 0)
+        {
+            if (fh_data)
+            {
+                free(fh_data);
+                fh_data = NULL;
+            }
+            error_return();
+        }
     }
     else
-        xmlfile_cnt++;
-
-    for (x = 0; x < 10; x++) {
-        snprintf(xmlfile_tmp, sizeof(xmlfile_tmp), "rawprogram%u", x);  //use rawprogram%u Adaptation rawprogram%u_xxx
-        if (!qfile_find_file(firehose_dir, xmlfile_tmp, ".xml", &xmlfile_list[xmlfile_cnt])) {
-            continue;
+    {
+        if (q_module_packet_sign)
+        {
+            for (x = 0; x < 10; x++) {
+                snprintf(xmlfile_tmp, sizeof(xmlfile_tmp), "rawprogram%u_secboot", x);  //use rawprogram%u Adaptation rawprogram%u_xxx  for AG215S-GLR
+                if (!qfile_find_file(firehose_dir, xmlfile_tmp, ".xml", &xmlfile_list[xmlfile_cnt])) {
+                    continue;
+                }
+                xmlfile_cnt++;
+            }
         }
-        xmlfile_cnt++;
-    }
+        else
+        {
+            if (!qfile_find_file(firehose_dir, "rawprogram_", ".xml", &xmlfile_list[xmlfile_cnt])
+                && !qfile_find_file(firehose_dir, "firehose-rawprogram", ".xml", &xmlfile_list[xmlfile_cnt])
+               ) {
+                dbg_time("retrieve rawprogram namd file failed.\n");
+                //error_return();
+            }
+            else
+                xmlfile_cnt++;
 
-    if (!qfile_find_file(firehose_dir, "patch_", ".xml", &xmlfile_list[xmlfile_cnt])
-        && !qfile_find_file(firehose_dir, "patch-", ".xml", &xmlfile_list[xmlfile_cnt])
-       ) {
-        dbg_time("retrieve patch namd file failed.\n");
-        //error_return();
-    }
-    else
-        xmlfile_cnt++;
-
-    for (x = 0; x < 10; x++) {
-        snprintf(xmlfile_tmp, sizeof(xmlfile_tmp), "patch%u.xml", x);
-        if (!qfile_find_file(firehose_dir, xmlfile_tmp, ".xml", &xmlfile_list[xmlfile_cnt])) {
-            continue;
+            for (x = 0; x < 10; x++) {
+                snprintf(xmlfile_tmp, sizeof(xmlfile_tmp), "rawprogram%u", x);  //use rawprogram%u Adaptation rawprogram%u_xxx
+                if (!qfile_find_file(firehose_dir, xmlfile_tmp, ".xml", &xmlfile_list[xmlfile_cnt])) {
+                    continue;
+                }
+                xmlfile_cnt++;
+            }
         }
-        xmlfile_cnt++;
-    }
 
-    for (x = 0; x < xmlfile_cnt; x++) {
-        snprintf(rawprogram_full_path, sizeof(rawprogram_full_path), "%.255s/%.255s", firehose_dir, xmlfile_list[x]);
-        free(xmlfile_list[xmlfile_cnt]);
-        fh_parse_xml_file(fh_data, rawprogram_full_path);
-    }
+        if (!qfile_find_file(firehose_dir, "patch_", ".xml", &xmlfile_list[xmlfile_cnt])
+            && !qfile_find_file(firehose_dir, "patch-", ".xml", &xmlfile_list[xmlfile_cnt])
+           ) {
+            dbg_time("retrieve patch namd file failed.\n");
+            //error_return();
+        }
+        else
+            xmlfile_cnt++;
 
-    if (fh_data->fh_cmd_count == 0)
-        error_return();
+        for (x = 0; x < 10; x++) {
+            snprintf(xmlfile_tmp, sizeof(xmlfile_tmp), "patch%u.xml", x);
+            if (!qfile_find_file(firehose_dir, xmlfile_tmp, ".xml", &xmlfile_list[xmlfile_cnt])) {
+                continue;
+            }
+            xmlfile_cnt++;
+        }
+
+        for (x = 0; x < xmlfile_cnt; x++) {
+            snprintf(rawprogram_full_path, sizeof(rawprogram_full_path), "%.255s/%.255s", firehose_dir, xmlfile_list[x]);
+            free(xmlfile_list[xmlfile_cnt]);
+            fh_parse_xml_file(fh_data, rawprogram_full_path);
+        }
+
+        if (fh_data->fh_cmd_count == 0)
+        {
+            if (fh_data)
+            {
+                free(fh_data);
+                fh_data = NULL;
+            }
+            error_return();
+        }
+    }
 
     for (x = 0; x < fh_data->fh_cmd_count; x++) {
         struct fh_cmd *fh_cmd = &fh_data->fh_cmd_table[x];
@@ -1290,7 +1855,14 @@ int firehose_main(const char *firehose_dir, void *usb_handle, unsigned qusb_zlp_
         if (strstr(fh_cmd->cmd.type, "program")) {
             fh_fixup_program_cmd(fh_data, fh_cmd, &filesize);
             if (fh_cmd->program.num_partition_sectors == 0)
+            {
+                if (fh_data)
+                {
+                    free(fh_data);
+                    fh_data = NULL;
+                }
                 error_return();
+            }
 
             //calc files size
             filesizes += filesize;
@@ -1302,7 +1874,14 @@ int firehose_main(const char *firehose_dir, void *usb_handle, unsigned qusb_zlp_
     }
 
     if (socketpair( AF_LOCAL, SOCK_STREAM, 0, fh_recv_cmd_sk))
+    {
+        if (fh_data)
+        {
+            free(fh_data);
+            fh_data = NULL;
+        }
         error_return();
+    }
     fcntl(fh_recv_cmd_sk[0], F_SETFL, O_NONBLOCK);
     if (pthread_create(&recv_cmd_tid, NULL, fh_recv_cmd_thread, (void *)fh_data))
         error_return();
@@ -1324,7 +1903,7 @@ int firehose_main(const char *firehose_dir, void *usb_handle, unsigned qusb_zlp_
             if (!strstr(fh_cmd->cmd.type, "erase"))
                 continue;
 
-             if (fh_cmd->erase.start_sector != 0)
+             if (fh_cmd->erase.start_sector != 0)     //Pre erase start_sector == 0 partition
                 continue;
 
             if (q_erase_all_before_download) {
@@ -1361,7 +1940,13 @@ int firehose_main(const char *firehose_dir, void *usb_handle, unsigned qusb_zlp_
             if (fh_cmd->erase.SECTOR_SIZE_IN_BYTES == 0)  //防止BG95 误烧录 jira id: STMDM9205-5237 不能fh_cmd->erase.num_partition_sectors == 0， 因为<erase SECTOR_SIZE_IN_BYTES="512" label="erase whole disk" physical_partition_number="0" start_sector="0" /> 需要写到模块
                 continue;
 
-             if (fh_process_erase(fh_data, fh_cmd))
+            if (first_earse_and_last_programm_SBL)
+            {
+                if (fh_cmd->erase.start_sector == 0)    //Skip erase start_sector == 0 partition
+                    continue;
+            }
+
+            if (fh_process_erase(fh_data, fh_cmd))
                 error_return();
         }
     }

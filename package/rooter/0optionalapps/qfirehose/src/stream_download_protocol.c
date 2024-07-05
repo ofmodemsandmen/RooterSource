@@ -1,18 +1,13 @@
-/******************************************************************************
-  @file    stream_download_protocol.c
-  @brief   stream protocol.
+/*
+    Copyright 2023 Quectel Wireless Solutions Co.,Ltd
 
-  DESCRIPTION
-  QFirehoe Tool for USB and PCIE of Quectel wireless cellular modules.
-
-  INITIALIZATION AND SEQUENCING REQUIREMENTS
-  None.
-
-  ---------------------------------------------------------------------------
-  Copyright (c) 2016 - 2020 Quectel Wireless Solution, Co., Ltd.  All Rights Reserved.
-  Quectel Wireless Solution Proprietary and Confidential.
-  ---------------------------------------------------------------------------
-******************************************************************************/
+    Quectel hereby grants customers of Quectel a license to use, modify,
+    distribute and publish the Software in binary form provided that
+    customers shall have no right to reverse engineer, reverse assemble,
+    decompile or reduce to source code form any portion of the Software. 
+    Under no circumstances may customers modify, demonstrate, use, deliver 
+    or disclose any portion of the Software in source code form.
+*/
 
 #include "usb_linux.h"
 #include "hostdl_packet.h"
@@ -22,11 +17,11 @@
 
 #define MAX_SEND_BUFFER_SIZE 1280
 #define MAX_RECEIVE_BUFFER_SIZE 1280
-unsigned char g_Transmit_Buffer[MAX_SEND_BUFFER_SIZE];    
-int g_Transmit_Length;                            
+unsigned char g_Transmit_Buffer[MAX_SEND_BUFFER_SIZE];
+int g_Transmit_Length;
 
-unsigned char g_Receive_Buffer[MAX_RECEIVE_BUFFER_SIZE];     
-int g_Receive_Bytes;                            
+unsigned char g_Receive_Buffer[MAX_RECEIVE_BUFFER_SIZE];
+int g_Receive_Bytes;
 
 static void *stream_usb_handle;
 
@@ -40,7 +35,7 @@ static void dump_buffer(unsigned char * buff, int len)
 		dbg_time("%02x ", buff[i]);
 	}
 	dbg_time("\nend\n");
-	
+
 }
 
 #define CRC_16_L_SEED           0xFFFF
@@ -148,7 +143,7 @@ static int send_packet(int flag) {
     CHECK_FOR_DATA ();
 
     /* Since we don't know how long it's been. */
-    if (!!flag) { 
+    if (!!flag) {
         TRANSMIT_BYTE (0x7E);
     }
 
@@ -196,7 +191,7 @@ static int send_packet(int flag) {
 
 static int remove_escape_hdlc_flag(unsigned char* buffer, int len)
 {
-	int i = 0; 
+	int i = 0;
 	int index = 0;
 	int escape = 0;
 	//dump_buffer(buffer, len);
@@ -207,7 +202,7 @@ static int remove_escape_hdlc_flag(unsigned char* buffer, int len)
 		i++;
 	}
 	//all bytes is HDLC FLAG
-	if(i == len) 
+	if(i == len)
 		return 0;
 	for(; i < len; i++)
 	{
@@ -232,6 +227,11 @@ static int receive_packet(void)
 {
 	int bytesread = 0;
 	unsigned char *buff = g_Receive_Buffer;
+    if (buff == NULL)
+    {
+        return -1;
+    }
+
 	int idx = 0;
 	do
 	{
@@ -243,7 +243,7 @@ static int receive_packet(void)
 			break;
 		}
 		//dump_buffer(&buff[idx], bytesread);
-		idx += bytesread;			
+		idx += bytesread;
 		if(buff[idx - 1] == 0x7e)
 		{
 			//check the packet whether valid.
@@ -256,7 +256,7 @@ static int receive_packet(void)
 			}
 		}
 	}while(1);
-	
+
 	return 0;
 }
 
@@ -270,16 +270,16 @@ static int handle_hello(void)
     dbg_time("%s\n", __func__);
 
     memset(&g_Transmit_Buffer[0],0,sizeof(g_Transmit_Buffer));
-    g_Transmit_Buffer[HELLO_CMD_OFFSET] = HELLO_REQ;        
+    g_Transmit_Buffer[HELLO_CMD_OFFSET] = HELLO_REQ;
     memcpy(&g_Transmit_Buffer[HELLO_MAGIC_NUM_OFFSET],host_header,32);
     g_Transmit_Buffer[HELLO_MAX_VER_OFFSET] = STREAM_DLOAD_MAX_VER;
     g_Transmit_Buffer[HELLO_MIN_VER_OFFSET] = STREAM_DLOAD_MIN_VER;
-    g_Transmit_Buffer[HELLO_MAX_DATA_SZ_1_OFFSET] = 0;    
+    g_Transmit_Buffer[HELLO_MAX_DATA_SZ_1_OFFSET] = 0;
     g_Transmit_Length = 36;
-    
-    compute_reply_crc();    
+
+    compute_reply_crc();
     send_packet(1);
-    
+
     int timeout = 5;
     do{
         err = receive_packet();
@@ -301,7 +301,7 @@ static int handle_hello(void)
         }
         timeout--;
     }while(timeout);
-    
+
     return 0;
 }
 
@@ -333,7 +333,7 @@ static int handle_security_mode(unsigned char trusted) {
     return 0;
 }
 /*
-set download flag in module, quectel custom command, 
+set download flag in module, quectel custom command,
 if flag : reboot, module will enter DM
 if not flag: reboot normal
 */
@@ -394,6 +394,16 @@ static int stread_fread(const char *filename, void **pp_filebuf) {
     filesize = ftell(fp);
 
     *pp_filebuf = malloc(filesize);
+    if (pp_filebuf == NULL) {
+        dbg_time("fail to malloc %d, errno: %d (%s)\n", filesize, errno, strerror(errno));
+        if (fp)
+        {
+            fclose(fp);
+            fp = NULL;
+        }
+        return 0;
+    }
+
     fseek(fp, 0, SEEK_SET);
     filesize = fread(*pp_filebuf, 1, filesize, fp);
     fclose(fp);
@@ -411,13 +421,20 @@ static int handle_parti_tbl(unsigned char override) {
 
     filesize = stread_fread(partition_path, &filebuf);
     if (filesize <= 0)
+    {
+        if (filebuf)
+        {
+            free(filebuf);
+            filebuf = NULL;
+        }
         return 0;
-   
+    }
+
     compose_packet(0x19, &override, 1, filebuf, filesize);
     compute_reply_crc();
     send_packet(1);
     free(filebuf);
-   
+
     do{
         if(receive_packet() == 1){
             dbg_time("handle_parti_tbl command = %02x, status = %02x\n", g_Receive_Buffer[0], g_Receive_Buffer[1]);
@@ -425,10 +442,10 @@ static int handle_parti_tbl(unsigned char override) {
             {
             case 0x1a:
                 switch( g_Receive_Buffer[1] ){
-                    case 0x00: 
-                        return 1;  
+                    case 0x00:
+                        return 1;
                     case 0x01: //0x1 this means that the original partition is different from the current partition,try to send partition
-                        return 0; 
+                        return 0;
                     case 0x02: //0x2 Partition table format not recognized, does not accept override
                         return 0;
                     case 0x03: //0x3  Erase operation failed
@@ -470,7 +487,7 @@ static int handle_reset(void) {
             case 0x0d:
                 continue;
             default:
-            	dump_buffer(g_Receive_Buffer, 64); 
+            	dump_buffer(g_Receive_Buffer, 64);
                 return 0;
             }
         }
@@ -485,7 +502,7 @@ static int handle_reset(void) {
             }
         }
     }while(1);
-#endif    
+#endif
 }
 
 /******pkt_open_multi_image*******/
@@ -496,7 +513,7 @@ static void pkt_open_multi_image (unsigned char mode, unsigned char *data, uint3
 }
 
 static int handle_openmulti(uint32_t size,unsigned char* data)
-{    
+{
 	int timeout = 5;
     unsigned char mode=0x0e;
 
@@ -534,7 +551,7 @@ static void pkt_write_multi_image(uint32_t addr, unsigned char*data, uint16_t si
 }
 
 static int handle_write(unsigned char *data, uint32_t size)
-{    
+{
     //uint32_t total_size;
     uint32_t addr = 0;
     uint32_t writesize;
@@ -575,7 +592,7 @@ start_send_packet:
 retry_send_packet:
             retry_cnt--;
             if(retry_cnt > 0)
-            {                                
+            {
                 goto start_send_packet;
             }
             else
@@ -584,18 +601,18 @@ retry_send_packet:
                 return 0;
             }
         }
-    
+
     }
 
-    return 1;    
+    return 1;
 }
 /******PARTITION*******/
 static int handle_close(void) {
 	int timeout = 5;
     compose_packet(0x15, NULL, 0, NULL, 0);
-    compute_reply_crc();    
+    compute_reply_crc();
     send_packet(1);
-    
+
     do{
         if(receive_packet() == 1){
             switch(g_Receive_Buffer[0])
@@ -623,17 +640,29 @@ static int do_flash_mbn(const char *partion, const char *filepath) {
     int result = false;
     void *filebuf = NULL;
     int filesize = 0;
-    
+
     dbg_time("%s %s\n", __func__, partion);
 
     if (filepath) {
         filesize = stread_fread(filepath, &filebuf);
         if (filesize <= 0)
+        {
+            if (filebuf)
+            {
+                free(filebuf);
+                filebuf = NULL;
+            }
             return 0;
+        }
     }
     else {
         filesize = 4*1024;
         filebuf = (unsigned char *)malloc(filesize);
+        if (filebuf == NULL)
+        {
+            return 0;
+        }
+
         memset(filebuf, 0x00, filesize);
     }
 
@@ -658,7 +687,7 @@ static int do_flash_mbn(const char *partion, const char *filepath) {
     }
 
     dbg_time("OKAY\n");
-    
+
 __fail:
     free(filebuf);
 
@@ -674,8 +703,8 @@ int stream_download(const char *firehose_dir, void *usb_handle, unsigned qusb_zl
     if (handle_hello() == false) {
         dbg_time("Send hello command fail\n");
         return false;
-    } 
-    
+    }
+
     /*
     hello packet will set dload flag in module, when upgrade interrup, restart module,module will enter dm(quectel sbl)
     */
@@ -683,7 +712,7 @@ int stream_download(const char *firehose_dir, void *usb_handle, unsigned qusb_zl
         dbg_time("Send trust command fail\n");
         return false;
     }
-        
+
     if (handle_parti_tbl(0) == false) {
         dbg_time("----------------------------------\n");
         dbg_time("Detect partition mismatch.\n");
@@ -691,10 +720,10 @@ int stream_download(const char *firehose_dir, void *usb_handle, unsigned qusb_zl
         dbg_time("----------------------------------\n");
 
         if(handle_parti_tbl(1) == false) {
-            dbg_time("override failed. \n");	
+            dbg_time("override failed. \n");
             return false;
         }
-        
+
         /*
         partition is not match, the download flag will be clear, so set it again, reset will clear it
         */
@@ -706,7 +735,7 @@ int stream_download(const char *firehose_dir, void *usb_handle, unsigned qusb_zl
         }
     }
 
-#if 1    
+#if 1
     if (do_flash_mbn("0:SBL", "sbl1.mbn") == false) {
         return false;
     }
@@ -722,7 +751,6 @@ int stream_download(const char *firehose_dir, void *usb_handle, unsigned qusb_zl
     return true;
 }
 
-//hunter.lv add 
 //retrieve module soft revision
 
 typedef struct
@@ -737,7 +765,7 @@ typedef struct
 
 int retrieve_soft_revision(void *usb_handle, uint8_t *mobile_software_revision, unsigned length)
 {
-/* 
+/*
 80-v1294-1_yyd_serial_interface_control_document_(icd)_for_cdma_dual-mode_subscriber_station_data  3.4.122 Extended Build ID
 */
     uint8_t req1[] = {0x7E,0x7C, 0x93,0x49, 0x7E};

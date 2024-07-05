@@ -1,18 +1,14 @@
-/******************************************************************************
-  @file    qfirehose.c
-  @brief   entry point.
+/*
+    Copyright 2023 Quectel Wireless Solutions Co.,Ltd
 
-  DESCRIPTION
-  QFirehoe Tool for USB and PCIE of Quectel wireless cellular modules.
+    Quectel hereby grants customers of Quectel a license to use, modify,
+    distribute and publish the Software in binary form provided that
+    customers shall have no right to reverse engineer, reverse assemble,
+    decompile or reduce to source code form any portion of the Software.
+    Under no circumstances may customers modify, demonstrate, use, deliver
+    or disclose any portion of the Software in source code form.
+*/
 
-  INITIALIZATION AND SEQUENCING REQUIREMENTS
-  None.
-
-  ---------------------------------------------------------------------------
-  Copyright (c) 2016 - 2020 Quectel Wireless Solution, Co., Ltd.  All Rights Reserved.
-  Quectel Wireless Solution Proprietary and Confidential.
-  ---------------------------------------------------------------------------
-******************************************************************************/
 #include <getopt.h>
 #include <grp.h>
 #include <sys/types.h>
@@ -41,6 +37,7 @@ Date:   Thu Aug 6 19:23:58 2015 +0300
 */
 unsigned qusb_zlp_mode = 1; //MT7621 donot support USB ZERO PACKET
 unsigned q_erase_all_before_download = 0;
+unsigned q_module_packet_sign = 0;
 const char *q_device_type = "nand"; //nand/emmc/ufs
 int sahara_main(const char *firehose_dir, const char *firehose_mbn, void *usb_handle, int edl_mode_05c69008);
 int firehose_main (const char *firehose_dir, void *usb_handle, unsigned qusb_zlp_mode);
@@ -54,11 +51,24 @@ void ql_stop_usbmon_log();
 static long long all_bytes_to_transfer = 0;    //need transfered
 static long long transfer_bytes = 0;        //transfered bytes;
 
+char zip_cmd_buf[512] = {0};    //zip cmd buf
+char firehose_zip_name[80] = {0};
+char firehose_unzip_full_dir[256] = {0};
+file_name_backup file_name_b;
+int is_upgrade_fimeware_zip_7z = 0;
+int is_firehose_zip_7z_name_exit = 0;
+int is_upgrade_fimeware_only_zip = 0;
+
 int switch_to_edl_mode(void *usb_handle) {
     //DIAG commands used to switch the Qualcomm devices to EDL (Emergency download mode)
     unsigned char edl_cmd[] = {0x4b, 0x65, 0x01, 0x00, 0x54, 0x0f, 0x7e};
     //unsigned char edl_cmd[] = {0x3a, 0xa1, 0x6e, 0x7e}; //DL (download mode)
     unsigned char *pbuf = malloc(512);
+    if (pbuf == NULL)
+    {
+        return 0;
+    }
+
     int rx_len;
     int rx_count = 0;
 
@@ -74,21 +84,21 @@ int switch_to_edl_mode(void *usb_handle) {
         return 0;
 
     rx_count = 0;
-    
+
     do {
         rx_len = qusb_noblock_read(usb_handle, pbuf , 512, 0, 3000);
         if (rx_len == sizeof(edl_cmd) && memcmp(pbuf, edl_cmd, sizeof(edl_cmd)) == 0) {
             dbg_time("successful, wait module reboot\n");
-            free(pbuf);
+            safe_free(pbuf);
             return 1;
         }
-        
+
         if (rx_count++ > 50)
             break;
-        
+
     } while (rx_len > 0);
 
-    free(pbuf);
+    safe_free(pbuf);
     return 0;
 }
 
@@ -105,11 +115,11 @@ static void usage(int status, const char *program_name)
         dbg_time("    -f [package_dir]               Upgrade package directory path\n");
         dbg_time("    -p [/dev/ttyUSBx]              Diagnose port, will auto-detect if not specified\n");
         dbg_time("    -s [/sys/bus/usb/devices/xx]   When multiple modules exist on the board, use -s specify which module you want to upgrade\n");
-        dbg_time("    -e                             Erase All Before Download (will Erase calibration data, careful to USE)\n");
         dbg_time("    -l [dir_name]                  Sync log into a file(will create qfirehose_timestamp.log)\n");
         dbg_time("    -u [usbmon_log]                Catch usbmon log and save to file (need debugfs and usbmon driver)\n");
         dbg_time("    -n                             Skip MD5 check\n");
         dbg_time("    -d                             Device Type, default nand, support emmc/ufs\n");
+        dbg_time("    -v                             For AG215S-GLR signed firmware packages\n");
     }
     exit(status);
 }
@@ -123,29 +133,90 @@ static char * find_firehose_mbn(char** firehose_dir, size_t size)
 {
     char *firehose_mbn = NULL;
 
-    if (strstr(*firehose_dir, "/update/firehose") == NULL) {
-        size_t len = strlen(*firehose_dir);
+    if (is_upgrade_fimeware_zip_7z)
+    {
+        int i;
+        char file_name_prog[128] = {0};
+        char file_name_prog_dir[256] = {0};
 
-        strncat(*firehose_dir, "/update/firehose", size);
-        if (access(*firehose_dir, R_OK)) {
-            (*firehose_dir)[len] = '\0'; // for smart module
+        firehose_mbn = (char*)malloc(256);
+        if (firehose_mbn == NULL)
+        {
+            return NULL;
+        }
+
+        for(i=0;i<file_name_b.file_name_count;i++)
+        {
+            if ((strstr(file_name_b.file_backup_c[i].zip_file_name_backup, "prog_nand_firehose_") && strstr(file_name_b.file_backup_c[i].zip_file_name_backup, ".mbn"))
+                || (strstr(file_name_b.file_backup_c[i].zip_file_name_backup, "prog_emmc_firehose_") && strstr(file_name_b.file_backup_c[i].zip_file_name_backup, ".mbn"))
+                || (strstr(file_name_b.file_backup_c[i].zip_file_name_backup, "prog_firehose_") && strstr(file_name_b.file_backup_c[i].zip_file_name_backup, ".mbn"))
+                || (strstr(file_name_b.file_backup_c[i].zip_file_name_backup, "prog_firehose_") && strstr(file_name_b.file_backup_c[i].zip_file_name_backup, ".elf"))
+                || (strstr(file_name_b.file_backup_c[i].zip_file_name_backup, "firehose-prog") && strstr(file_name_b.file_backup_c[i].zip_file_name_backup, ".mbn"))
+                || (strstr(file_name_b.file_backup_c[i].zip_file_name_backup, "prog_") && strstr(file_name_b.file_backup_c[i].zip_file_name_backup, ".mbn"))
+                || (strstr(file_name_b.file_backup_c[i].zip_file_name_backup, "xbl_s_devprg_ns_SA52X") && strstr(file_name_b.file_backup_c[i].zip_file_name_backup, ".melf")))
+            {
+                printf("file_name_b.file_backup_c[i].zip_file_name_backup:%s\n", file_name_b.file_backup_c[i].zip_file_name_backup);
+                printf("file_name_b.file_backup_c[i].zip_file_dir_backup:%s\n", file_name_b.file_backup_c[i].zip_file_dir_backup);
+
+                if (strstr(file_name_b.file_backup_c[i].zip_file_dir_backup, "update/firehose"))
+                {
+                    memmove(file_name_prog, file_name_b.file_backup_c[i].zip_file_name_backup, strlen(file_name_b.file_backup_c[i].zip_file_name_backup));
+                    memmove(file_name_prog_dir, file_name_b.file_backup_c[i].zip_file_dir_backup, strlen(file_name_b.file_backup_c[i].zip_file_dir_backup));
+                    break;
+                }
+            }
+        }
+
+        if (file_name_prog[0] != '\0')
+        {
+            memset(zip_cmd_buf, 0, sizeof(zip_cmd_buf));
+            if (is_upgrade_fimeware_only_zip)
+            {
+                snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "unzip -o -q %.240s '*%.200s' -d /tmp/ > %s", *firehose_dir, file_name_prog_dir, ZIP_PROCESS_INFO);
+            }
+            else
+            {
+                snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "7z x %.240s -o/tmp/ %.200s > %s", *firehose_dir, file_name_prog_dir, ZIP_PROCESS_INFO);
+            }
+            printf("%s zip_cmd_buf:%s\n", __func__, zip_cmd_buf);
+            if( -1 == system(zip_cmd_buf))
+            {
+                printf("%s system return error\n", __func__);
+                return NULL;
+            }
+            usleep(1000);
+
+            memmove(firehose_mbn, file_name_prog_dir, 240);
         }
     }
+    else
+    {
+        if (strstr(*firehose_dir, "/update/firehose") == NULL) {
+            size_t len = strlen(*firehose_dir);
 
-    if (access(*firehose_dir, R_OK)) {
-        dbg_time("%s access(%s fail), errno: %d (%s)\n", __func__, *firehose_dir, errno, strerror(errno));
-        return NULL;
-    }
+            strncat(*firehose_dir, "/update/firehose", size);
+            if (access(*firehose_dir, R_OK)) {
+                (*firehose_dir)[len] = '\0'; // for smart module
+            }
+        }
 
-    if (!qfile_find_file(*firehose_dir, "prog_nand_firehose_", ".mbn", &firehose_mbn)
-        && !qfile_find_file(*firehose_dir, "prog_emmc_firehose_", ".mbn", &firehose_mbn)
-        && !qfile_find_file(*firehose_dir, "prog_firehose_", ".mbn", &firehose_mbn)
-        && !qfile_find_file(*firehose_dir, "prog_firehose_", ".elf", &firehose_mbn)
-        && !qfile_find_file(*firehose_dir, "firehose-prog", ".mbn", &firehose_mbn)
-        && !qfile_find_file(*firehose_dir, "prog_", ".mbn", &firehose_mbn)
-      ) {
-        dbg_time("%s fail to find firehose mbn file in %s\n", __func__, *firehose_dir);
-        return NULL;
+        if (access(*firehose_dir, R_OK)) {
+            dbg_time("%s access(%s fail), errno: %d (%s)\n", __func__, *firehose_dir, errno, strerror(errno));
+            return NULL;
+        }
+
+        if (!qfile_find_file(*firehose_dir, "prog_nand_firehose_", ".mbn", &firehose_mbn)
+            && !qfile_find_file(*firehose_dir, "prog_emmc_firehose_", ".mbn", &firehose_mbn)
+            && !qfile_find_file(*firehose_dir, "prog_firehose_", ".mbn", &firehose_mbn)
+            && !qfile_find_file(*firehose_dir, "prog_firehose_", ".elf", &firehose_mbn)
+            && !qfile_find_file(*firehose_dir, "firehose-prog", ".mbn", &firehose_mbn)
+            && !qfile_find_file(*firehose_dir, "prog_", ".mbn", &firehose_mbn)
+            && !qfile_find_file(*firehose_dir, "xbl_s_devprg_ns_SA52X", ".melf", &firehose_mbn)  //AG590ECNABR01A01M8G_OCPU_01.001.01
+          ) {
+            dbg_time("%s fail to find firehose mbn file in %s\n", __func__, *firehose_dir);
+            safe_free(firehose_mbn);
+            return NULL;
+        }
     }
 
     dbg_time("%s %s\n", __func__, firehose_mbn);
@@ -172,10 +243,10 @@ static int detect_and_judge_module_version(void *usb_handle) {
             }
         }
     }
-        
+
     if (version[0])
         return 0;
-    
+
     error_return();
 }
 
@@ -193,33 +264,56 @@ int main(int argc, char* argv[])
     int idVendor = 0, idProduct = 0, interfaceNum = 0;
     int edl_retry = 30; //SDX55 require long time by now 20190412
     double start;
-    char *firehose_dir = malloc(MAX_PATH);
+
     char *firehose_mbn = NULL;
-    char *module_port_name = malloc(MAX_PATH);
-    char *module_sys_path = malloc(MAX_PATH);
     int usb3_speed;
     struct timespec usb3_atime;
     int usb2tcp_port = 0;
     char filename[128] = {'\0'};
-    const char *usbmon_logfile = NULL;
+    char *usbmon_logfile = NULL;
 
-    firehose_dir[0] = module_port_name[0] = module_sys_path[0] = '\0';
+    char *firehose_dir = malloc(MAX_PATH);
+    if (firehose_dir == NULL)
+    {
+        return -1;
+    }
+
+    char *module_port_name = malloc(MAX_PATH);
+    if (module_port_name == NULL)
+    {
+        safe_free(firehose_dir);
+        return -1;
+    }
+
+    char *module_sys_path = malloc(MAX_PATH);
+    if (module_sys_path == NULL)
+    {
+        safe_free(module_port_name);
+        safe_free(firehose_dir);
+        return -1;
+    }
+
+    memset(firehose_dir, 0, MAX_PATH);
+    memset(module_port_name, 0, MAX_PATH);
+    memset(module_sys_path, 0, MAX_PATH);
+
+    //firehose_dir[0] = module_port_name[0] = module_sys_path[0] = '\0';
 
     /* set file priviledge mask 0 */
     umask(0);
     /*build V1.0.8*/
-    dbg_time("Version: QFirehose_Linux_Android_V1.4.13\n"); //when release, rename to V1.X
+    dbg_time("Version: QFirehose_Linux_Android_V1.4.17\n"); //when release, rename to V1.X
 #ifndef __clang__
     dbg_time("Builded: %s %s\n", __DATE__,__TIME__);
 #endif
 
 #ifdef ANDROID
-    struct passwd* passwd;
-    passwd = getpwuid(getuid());
+    struct passwd* pd;
+    pd = getpwuid(getuid());
     dbg_time("------------------\n");
-    dbg_time("User:\t %s\n",passwd->pw_name);
+    dbg_time("User:\t %s\n",pd->pw_name);
     struct group* group;
-    group = getgrgid(passwd->pw_gid);
+    group = getgrgid(pd->pw_gid);
     dbg_time("Group:\t %s\n", group->gr_name);
     dbg_time("------------------\n");
 #if 0 //not all customers need this function
@@ -229,47 +323,71 @@ int main(int argc, char* argv[])
 #endif
 
     optind = 1;
-    while ( -1 != (opt = getopt(argc, argv, "f:p:z:s:l:u:d:neh"))) {
+    while ( -1 != (opt = getopt(argc, argv, "f:p:z:s:l:u:d:nevh"))) {
         switch (opt) {
             case 'n':
                 check_hash = 0;
-                break;
+            break;
             case 'l':
                 if (loghandler) fclose(loghandler);
                 snprintf(filename, sizeof(filename), "%.80s/qfirehose_%lu.log", optarg, time(NULL));
                 loghandler = fopen(filename, "w+");
                 if (loghandler) dbg_time("upgrade log will be sync to %s\n", filename);
-                break;
+            break;
             case 'f':
-                strncpy(firehose_dir, optarg, MAX_PATH);
+                strncpy(firehose_dir, optarg, MAX_PATH - 1);
             break;
             case 'p':
-                strncpy(module_port_name, optarg, MAX_PATH);
+                strncpy(module_port_name, optarg, MAX_PATH - 1);
                 if (!strcmp(module_port_name, "9008")) {
                     usb2tcp_port = atoi(module_port_name);
                     module_port_name[0] = '\0';
                 }
             break;
             case 's':
-                strncpy(module_sys_path, optarg, MAX_PATH);
+                strncpy(module_sys_path, optarg, MAX_PATH - 1);
+                int len = strlen(optarg);
+                if (len > 256)
+                {
+                    safe_free(module_port_name);
+                    safe_free(module_sys_path);
+                    safe_free(usbmon_logfile);
+                    safe_free(firehose_dir);
+                    printf("optarg length is longer than 256\n");
+                    return -1;
+                }
+
                 if (module_sys_path[strlen(optarg)-1] == '/')
                     module_sys_path[strlen(optarg)-1] = '\0';
-                break;
+            break;
             case 'z':
                 qusb_zlp_mode = !!atoi(optarg);
-                break;
-            case 'e':    
+            break;
+            case 'e':
                 q_erase_all_before_download = 1;
-                break;
+            break;
             case 'u':
                 usbmon_logfile = strdup(optarg);
+                if (usbmon_logfile == NULL)
+                {
+                    printf("usbmon_logfile is NULL\n");
+                    return -1;
+                }
             break;
             case 'd':
                 q_device_type = strdup(optarg);
+                if (q_device_type == NULL)
+                {
+                    printf("q_device_type is NULL\n");
+                    return -1;
+                }
+            break;
+            case 'v':
+                q_module_packet_sign = 1;
             break;
             case 'h':
                 usage(EXIT_SUCCESS, argv[0]);
-                break;
+            break;
             default:
             break;
         }
@@ -287,10 +405,14 @@ int main(int argc, char* argv[])
         update_transfer_bytes(-1);
         error_return();
     }
-        
+
     if (access(firehose_dir, R_OK)) {
         dbg_time("fail to access %s, errno: %d (%s)\n", firehose_dir, errno, strerror(errno));
         update_transfer_bytes(-1);
+        safe_free(firehose_dir);
+        safe_free(module_port_name);
+        safe_free(module_sys_path);
+        safe_free(usbmon_logfile);
         error_return();
     }
 
@@ -298,27 +420,227 @@ int main(int argc, char* argv[])
     if (firehose_dir[opt-1] == '/') {
         firehose_dir[opt-1] = '\0';
     }
-        
-    // check the md5 value of the upgrade file
+
+    char buff[256] = {0};
+    int file_name_count = 0;
+
+    if (strstr(firehose_dir, ".zip") || strstr(firehose_dir, ".7z"))
+    {
+        if (strstr(firehose_dir, ".zip"))
+        {
+            is_upgrade_fimeware_only_zip = 1;
+        }
+
+        unlink(ZIP_INFO);
+        memset(zip_cmd_buf, 0, sizeof(zip_cmd_buf));
+        if (is_upgrade_fimeware_only_zip)
+        {
+            snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "unzip -l -q %.240s > %s", firehose_dir, ZIP_INFO);
+        }
+        else
+        {
+            snprintf(zip_cmd_buf, sizeof(zip_cmd_buf), "7z l %.240s > %s", firehose_dir, ZIP_INFO);
+        }
+        if( -1 == system(zip_cmd_buf))
+        {
+            dbg_time("%s system return error\n", __func__);
+            return -1;
+        }
+        usleep(1000);
+
+        char *p = strrchr(firehose_dir, '/');              //firehose_dir is the absolute path of the zip/7z file
+        if (p)
+        {
+            if (strstr(firehose_dir, ".zip"))
+            {
+                strncpy(firehose_zip_name, p + 1, strlen(p) - 4 - 1);  //4(.zip); 1(/)
+            }
+            else
+            {
+                strncpy(firehose_zip_name, p + 1, strlen(p) - 3 - 1);  //3(.7z); 1(/)
+            }
+        }
+        else
+        {
+            if (strstr(firehose_dir, ".zip"))
+            {
+                strncpy(firehose_zip_name, firehose_dir, strlen(firehose_dir) - 4); //QFirehose -f RG520NEUDCR01A01M4G_01.001.01.001.zip
+            }
+            else
+            {
+                strncpy(firehose_zip_name, firehose_dir, strlen(firehose_dir) - 3); //QFirehose -f RG520NEUDCR01A01M4G_01.001.01.001.7z
+            }
+        }
+
+        dbg_time("firehose_zip_name:%s\n", firehose_zip_name);   //RG520NEUDCR01A01M4G_01.001.01.001
+        is_upgrade_fimeware_zip_7z = 1;   //Judging as a zip/7z package upgrade
+
+        if (!access(ZIP_INFO, F_OK))
+        {
+            char *p0 = NULL;
+            char *p01 = NULL;
+            char *p1 = NULL;
+            char *p2 = NULL;
+            char *p3 = NULL;
+            char *p4 = NULL;
+            FILE* fp = fopen(ZIP_INFO, "rb");
+            if (fp == NULL) {
+                dbg_time("fail to fopen(%s), error: %d (%s)\n", ZIP_INFO, errno, strerror(errno));
+                return -1;
+            }
+
+            while (fgets(buff, sizeof(buff), fp))
+            {
+                p0 = strstr(buff, firehose_zip_name);
+                if (p0)
+                {
+                    int length_debug1 = strlen(p0);
+                    if (p0[length_debug1 - 1] == 0x0a)
+                        length_debug1 -= 1;
+
+                    memmove(file_name_b.file_backup_c[file_name_count].zip_file_dir_backup, p0, length_debug1);
+
+                    p01 = strrchr(p0, '/');
+                    if (p01 == NULL)
+                        continue;
+
+                    if (p01[0] == '/' && p01[1] == '\0')
+                    {
+                        continue;
+                    }
+
+                    is_firehose_zip_7z_name_exit = 1;   //Determine which type of package it is and whether it should be placed in one folder or several files or folders after decompression
+
+                    int length_debug = strlen(p01);
+                    if (p01[length_debug - 1] == 0x0a)
+                        length_debug -= 1;
+
+                    memmove(file_name_b.file_backup_c[file_name_count].zip_file_name_backup, p01 + 1, length_debug - 1);
+
+                    file_name_count++;
+                    file_name_b.file_name_count = file_name_count;
+
+                }
+                else
+                {
+                    p1 = strstr(buff, "contents.xml");
+                    p2 = strstr(buff, "md5.txt");
+                    p3 = strstr(buff, "update");
+
+                    if (p1)
+                    {
+                        int length_debug1 = strlen(p1);
+                        if (p1[length_debug1 - 1] == 0x0a)
+                            length_debug1 -= 1;
+
+                        memmove(file_name_b.file_backup_c[file_name_count].zip_file_dir_backup, p1, length_debug1);
+
+                        int length_debug = strlen(p1);
+                        if (p1[length_debug - 1] == 0x0a)
+                            length_debug -= 1;
+
+                        memmove(file_name_b.file_backup_c[file_name_count].zip_file_name_backup, p1 + 1, length_debug - 1);
+
+                        file_name_count++;
+                        file_name_b.file_name_count = file_name_count;
+                    }
+                    else if (p2)
+                    {
+                        int length_debug1 = strlen(p2);
+                        if (p2[length_debug1 - 1] == 0x0a)
+                            length_debug1 -= 1;
+
+                        memmove(file_name_b.file_backup_c[file_name_count].zip_file_dir_backup, p2, length_debug1);
+
+                        int length_debug = strlen(p2);
+                        if (p2[length_debug - 1] == 0x0a)
+                            length_debug -= 1;
+
+                        memmove(file_name_b.file_backup_c[file_name_count].zip_file_name_backup, p2 + 1, length_debug - 1);
+
+                        file_name_count++;
+                        file_name_b.file_name_count = file_name_count;
+                    }
+                    else if (p3)
+                    {
+                        int length_debug1 = strlen(p3);
+                        if (p3[length_debug1 - 1] == 0x0a)
+                            length_debug1 -= 1;
+
+                        memmove(file_name_b.file_backup_c[file_name_count].zip_file_dir_backup, p3, length_debug1);
+
+                        p4 = strrchr(p3, '/');
+                        if (p4 == NULL)
+                            continue;
+
+                        if (p4[0] == '/' && p4[1] == '\0')
+                        {
+                            dbg_time("continue..\n");
+                            continue;
+                        }
+
+                        int length_debug = strlen(p4);
+                        if (p4[length_debug - 1] == 0x0a)
+                            length_debug -= 1;
+
+                        memmove(file_name_b.file_backup_c[file_name_count].zip_file_name_backup, p4 + 1, length_debug - 1);
+
+                        file_name_count++;
+                        file_name_b.file_name_count = file_name_count;
+                    }
+                }
+            }
+
+            fclose(fp);
+            unlink(ZIP_INFO);
+
+            if (!is_firehose_zip_7z_name_exit)
+            {
+                memset(firehose_zip_name, 0, sizeof(firehose_zip_name));
+            }
+
+            if (firehose_zip_name[0] == '\0')
+            {
+                strcpy(firehose_unzip_full_dir, "/tmp");
+            }
+            else
+            {
+                snprintf(firehose_unzip_full_dir, sizeof(firehose_unzip_full_dir), "/tmp/%.76s", firehose_zip_name);
+            }
+
+            dbg_time("%s firehose_unzip_full_dir:%s\n", __func__, firehose_unzip_full_dir);
+        }
+    }
+
     if (check_hash && md5_check(firehose_dir)) {
         update_transfer_bytes(-1);
+        safe_free(firehose_dir);
+        safe_free(module_port_name);
+        safe_free(module_sys_path);
+        safe_free(usbmon_logfile);
         error_return();
     }
 
-    //hunter.lv add check dir 2018-07-28
     firehose_mbn = find_firehose_mbn(&firehose_dir, MAX_PATH);
     if (!firehose_mbn) {
         update_transfer_bytes(-1);
+        safe_free(module_port_name);
+        safe_free(module_sys_path);
+        safe_free(usbmon_logfile);
+        safe_free(firehose_dir);
         error_return();
     }
-    //hunter.lv add check dir 2018-07-28
 
     if (module_port_name[0] && !strncmp(module_port_name, "/dev/mhi", strlen("/dev/mhi"))) {
         if (qpcie_open(firehose_dir, firehose_mbn, module_port_name)) {
             update_transfer_bytes(-1);
+            safe_free(module_port_name);
+            safe_free(module_sys_path);
+            safe_free(usbmon_logfile);
+            safe_free(firehose_dir);
             error_return();
-        }      
-		
+        }
+
         usb_handle = &edl_pcie_mhifd;
         start = get_now();
         goto __firehose_main;
@@ -332,12 +654,22 @@ _usb2tcp_start:
     if (module_sys_path[0] && access(module_sys_path, R_OK)) {
         dbg_time("fail to access %s, errno: %d (%s)\n", module_sys_path, errno, strerror(errno));
         update_transfer_bytes(-1);
+        safe_free(module_port_name);
+        safe_free(module_sys_path);
+        safe_free(usbmon_logfile);
+        safe_free(firehose_dir);
+        safe_free(firehose_mbn);
         error_return();
     }
 
     if (module_port_name[0] && access(module_port_name, R_OK | W_OK)) {
         dbg_time("fail to access %s, errno: %d (%s)\n", module_port_name, errno, strerror(errno));
         update_transfer_bytes(-1);
+        safe_free(module_port_name);
+        safe_free(module_sys_path);
+        safe_free(usbmon_logfile);
+        safe_free(firehose_dir);
+        safe_free(firehose_mbn);
         error_return();
     }
 
@@ -351,6 +683,11 @@ _usb2tcp_start:
         if (module_count <= 0) {
             dbg_time("Quectel module not found\n");
             update_transfer_bytes(-1);
+            safe_free(module_port_name);
+            safe_free(module_sys_path);
+            safe_free(usbmon_logfile);
+            safe_free(firehose_dir);
+            safe_free(firehose_mbn);
             error_return();
         }
         else if (module_count == 1) {
@@ -359,6 +696,11 @@ _usb2tcp_start:
             dbg_time("There are multiple quectel modules in system, Please use <-s /sys/bus/usb/devices/xx> specify which module you want to upgrade!\n");
             dbg_time("The module's </sys/bus/usb/devices/xx> path was printed in the previous log!\n");
             update_transfer_bytes(-1);
+            safe_free(module_port_name);
+            safe_free(module_sys_path);
+            safe_free(usbmon_logfile);
+            safe_free(firehose_dir);
+            safe_free(firehose_mbn);
             error_return();
         }
     }
@@ -377,6 +719,11 @@ __edl_retry:
                 if (auto_find_quectel_modules(module_sys_path, MAX_PATH, "5c6/9008/", &usb3_atime) > 1) {
                     dbg_time("There are multiple quectel EDL modules in system!\n");
                     update_transfer_bytes(-1);
+                    safe_free(module_port_name);
+                    safe_free(module_sys_path);
+                    safe_free(usbmon_logfile);
+                    safe_free(firehose_dir);
+                    safe_free(firehose_mbn);
                     error_return();
                 }
             }
@@ -394,9 +741,9 @@ __edl_retry:
         if (interfaceNum == 1) {
             if ((idVendor == 0x2C7C) && (idProduct == 0x0800)) {
                 // although 5G module stay in dump mode, after send edl command, it also can enter edl mode
-                dbg_time("5G module stay in dump mode!\n");				
+                dbg_time("5G module stay in dump mode!\n");
             } else {
-                break;					
+                break;
             }
             dbg_time("something went wrong???, why only one interface left\n");
         }
@@ -409,12 +756,22 @@ __edl_retry:
 
     if (usb_handle == NULL) {
         update_transfer_bytes(-1);
+        safe_free(module_port_name);
+        safe_free(module_sys_path);
+        safe_free(usbmon_logfile);
+        safe_free(firehose_dir);
+        safe_free(firehose_mbn);
         error_return();
     }
 
     if (usb2tcp_port) {
         retval = usb2tcp_main(usb_handle, usb2tcp_port, qusb_zlp_mode);
         qusb_noblock_close(usb_handle);
+        safe_free(module_port_name);
+        safe_free(module_sys_path);
+        safe_free(usbmon_logfile);
+        safe_free(firehose_dir);
+        safe_free(firehose_mbn);
         return retval;
     }
 
@@ -440,15 +797,17 @@ __firehose_main:
 
     qusb_noblock_close(usb_handle);
 
-    if (firehose_dir) free(firehose_dir);
-    if (module_port_name) free(module_port_name);
-    if (module_sys_path) free(module_sys_path);
+    safe_free(firehose_dir);
+    safe_free(module_port_name);
+    safe_free(module_sys_path);
+    safe_free(firehose_mbn);
 
     dbg_time("Upgrade module %s.\n", retval == 0 ? "successfully" : "failed");
     if (loghandler) fclose(loghandler);
     if (retval) update_transfer_bytes(-1);
 	if (usbmon_logfile) ql_stop_usbmon_log();
-	
+    unlink(ZIP_PROCESS_INFO);
+
     return retval;
 }
 

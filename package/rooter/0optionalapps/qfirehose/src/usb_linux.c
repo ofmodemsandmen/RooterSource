@@ -1,18 +1,14 @@
-/******************************************************************************
-  @file    usb_linux.c
-  @brief   read and write usb devices.
+/*
+    Copyright 2023 Quectel Wireless Solutions Co.,Ltd
 
-  DESCRIPTION
-  QFirehoe Tool for USB and PCIE of Quectel wireless cellular modules.
+    Quectel hereby grants customers of Quectel a license to use, modify,
+    distribute and publish the Software in binary form provided that
+    customers shall have no right to reverse engineer, reverse assemble,
+    decompile or reduce to source code form any portion of the Software.
+    Under no circumstances may customers modify, demonstrate, use, deliver
+    or disclose any portion of the Software in source code form.
+*/
 
-  INITIALIZATION AND SEQUENCING REQUIREMENTS
-  None.
-
-  ---------------------------------------------------------------------------
-  Copyright (c) 2016 - 2020 Quectel Wireless Solution, Co., Ltd.  All Rights Reserved.
-  Quectel Wireless Solution Proprietary and Confidential.
-  ---------------------------------------------------------------------------
-******************************************************************************/
 #include <stdio.h>
 #include <ctype.h>
 #include <fcntl.h>
@@ -127,6 +123,10 @@ static int strEndsWith(const char *line, const char *suffix)
 static const char *ctimespec(const struct timespec *ts, char *time_name, size_t len) {
     time_t ltime = ts->tv_sec;
     struct tm *currtime = localtime(&ltime);
+    if (currtime == NULL)
+    {
+        return NULL;
+    }
 
     snprintf(time_name, len, "%04d%02d%02d_%02d:%02d:%02d",
     	(currtime->tm_year+1900), (currtime->tm_mon+1), currtime->tm_mday,
@@ -137,6 +137,12 @@ static const char *ctimespec(const struct timespec *ts, char *time_name, size_t 
 static int quectel_get_sysinfo_by_uevent(const char *uevent, MODULE_SYS_INFO *pSysInfo) {
     FILE *fp;
     char line[MAX_PATH];
+
+    if (!pSysInfo)
+    {
+        dbg_time("pSysInfo is NULL, errno: %d (%s)\n", errno, strerror(errno));
+        return 0;
+    }
 
     memset(pSysInfo, 0x00, sizeof(MODULE_SYS_INFO));
 
@@ -154,14 +160,13 @@ static int quectel_get_sysinfo_by_uevent(const char *uevent, MODULE_SYS_INFO *pS
 
         //dbg_time("%s\n", line);
         if (strStartsWith(line, "MAJOR=")) {
-            	pSysInfo->MAJOR = atoi(&line[strlen("MAJOR=")]);
+            pSysInfo->MAJOR = atoi(&line[strlen("MAJOR=")]);
         }
         else if (strStartsWith(line, "MINOR=")) {
-            	pSysInfo->MINOR = atoi(&line[strlen("MINOR=")]);
+            pSysInfo->MINOR = atoi(&line[strlen("MINOR=")]);
         }
         else if (strStartsWith(line, "DEVNAME=")) {
-            if(pSysInfo)
-            	strncpy(pSysInfo->DEVNAME, &line[strlen("DEVNAME=")], sizeof(pSysInfo->DEVNAME));
+            strncpy(pSysInfo->DEVNAME, &line[strlen("DEVNAME=")], sizeof(pSysInfo->DEVNAME));
         }
         else if (strStartsWith(line, "DEVTYPE=")) {
             strncpy(pSysInfo->DEVTYPE, &line[strlen("DEVTYPE=")], sizeof(pSysInfo->DEVTYPE));
@@ -222,7 +227,15 @@ int auto_find_quectel_modules(char *module_sys_path, unsigned size, const char *
 
         if ((strStartsWith(sysinfo.PRODUCT, "2c7c/6") || strStartsWith(sysinfo.PRODUCT, "2c7c/8"))
             && (sysinfo.PRODUCT[strlen("2c7c/6000")] == '/')) //skip ASR&HISI modules
-            continue;
+        {
+            if ((strStartsWith(sysinfo.PRODUCT, "2c7c/6008")) ||
+                 strStartsWith(sysinfo.PRODUCT, "2c7c/6009"))
+            {
+                 // EM061KGL, not ASR module, do not skip
+            }
+            else
+                continue;
+        }
 
         if (product && !strStartsWith(sysinfo.PRODUCT, product)) {
             dbg_time("skip %.24s/%s for PRODUCT %s is not %s\n", base, de->d_name,
@@ -233,13 +246,13 @@ int auto_find_quectel_modules(char *module_sys_path, unsigned size, const char *
         if (atime) {
             struct timespec this_atime;
             int speed;
- 
+
             snprintf(uevent, sizeof(uevent), "%.24s/%.16s", base, de->d_name);
             if (qusb_read_speed_atime(uevent, &this_atime, &speed)) {
                 if ((this_atime.tv_sec < atime->tv_sec)
                     || (this_atime.tv_sec == atime->tv_sec && this_atime.tv_nsec < atime->tv_nsec)) {
                     char t1[64], t2[64];
-                    
+
                     dbg_time("skip %.24s/%s for atime {%s} old than {%s}\n", base, de->d_name,
                         ctimespec(&this_atime, t1, sizeof(t1)), ctimespec(atime, t2, sizeof(t2)));
                     continue;
@@ -356,17 +369,17 @@ void quectel_get_syspath_name_by_ttyport(const char *module_port_name, char *mod
 static void quectel_get_usb_device_info(const char *module_sys_path, struct quectel_usb_device *udev) {
     static unsigned char devdesc[1024];
     size_t desclength, len;
-    char devname[MAX_PATH];
+    char devname[64];
     int desc_fd;
     __u8 bInterfaceNumber = 0;
     int dev_mknod_and_delete_after_use = 0;
 
     MODULE_SYS_INFO sysinfo;
-    snprintf(devname, sizeof(devname), "%.248s/%s", module_sys_path, "uevent");
+    snprintf(devname, sizeof(devname), "%.56s/%s", module_sys_path, "uevent");
     if (!quectel_get_sysinfo_by_uevent(devname, &sysinfo))
         return;
 
-    snprintf(devname, sizeof(devname), "/dev/%s", sysinfo.DEVNAME);
+    snprintf(devname, sizeof(devname), "/dev/%.56s", sysinfo.DEVNAME);
     if (access(devname, R_OK) && errno_nodev()) {
         //maybe Linux have create /sys/ device, but not ready to create /dev/ device.
         usleep(100*1000);
@@ -461,29 +474,26 @@ static void quectel_get_usb_device_info(const char *module_sys_path, struct quec
     }
 
     usb_dm_interface = 0;
-    if ((udev->bulk_ep_in[usb_dm_interface] == 0 && udev->bulk_ep_in[usb_dm_interface] == 0)
-        || (udev->idVendor == 0x2c7c && udev->idProduct == 0x0127)    //EM05CEFC-LNV  Laptop
-        || (udev->idVendor == 0x2c7c && udev->idProduct == 0x0514)    //EG060K-EA
-        || (udev->idVendor == 0x2c7c && udev->idProduct == 0x0310)    //EM05-CN       Laptop
-        || (udev->idVendor == 0x2c7c && udev->idProduct == 0x030a)    //EM05-G        Laptop
-        || (udev->idVendor == 0x2c7c && udev->idProduct == 0x0309)    //EM05E-EDU     Laptop
-        || (udev->idVendor == 0x2c7c && udev->idProduct == 0x030d)   //EM05G-FCCL    Laptop
-        || (udev->idVendor == 0x3c93 && udev->idProduct == 0xffff))   //EC20 GW  ttyUSB0  interface 08
-    {
 
-        if ((udev->idVendor == 0x2c7c && udev->idProduct == 0x0127)       //EM05CEFC-LNV  Laptop
+    if ((udev->idVendor == 0x2c7c && udev->idProduct == 0x0127)           //EM05CEFC-LNV  Laptop
             || (udev->idVendor == 0x2c7c && udev->idProduct == 0x0310)    //EM05-CN       Laptop
             || (udev->idVendor == 0x2c7c && udev->idProduct == 0x030a)    //EM05-G        Laptop
+            || (udev->idVendor == 0x2c7c && udev->idProduct == 0x0311)    //EM05-G-SE10   Laptop
+            || (udev->idVendor == 0x2c7c && udev->idProduct == 0x0315)    //EM05-G STD    Laptop
             || (udev->idVendor == 0x2c7c && udev->idProduct == 0x0309)    //EM05E-EDU     Laptop
+            || (udev->idVendor == 0x2c7c && udev->idProduct == 0x6008)    //EM061KGL      laptop
+            || (udev->idVendor == 0x2c7c && udev->idProduct == 0x0128)    //Google EM060KGL laptop
+            || (udev->idVendor == 0x2c7c && udev->idProduct == 0x6009)    //EM061KGL      laptop
+			|| (udev->idVendor == 0x2c7c && udev->idProduct == 0x0803)    //RM520NGL      thinkpad 5G module dedicated pid
             || (udev->idVendor == 0x2c7c && udev->idProduct == 0x030d))   //EM05G-FCCL    Laptop
-            usb_dm_interface = 3;
-
-        if (udev->idVendor == 0x2c7c && udev->idProduct == 0x0514)   //EG060K-EA
-            usb_dm_interface = 2;
-
-        if (udev->idVendor == 0x3c93 && udev->idProduct == 0xffff)   //EG060K-EA
-            usb_dm_interface = 8;
+    {
+        usb_dm_interface = 3;
     }
+    else if (udev->idVendor == 0x2c7c && udev->idProduct == 0x0514)   //EG060K-EA
+        usb_dm_interface = 2;
+
+    else if (udev->idVendor == 0x3c93 && udev->idProduct == 0xffff)   //EG060K-EA
+        usb_dm_interface = 8;
 }
 
 static int usbfs_bulk_write(struct quectel_usb_device *udev, const void *data, int len, int timeout_msec, int need_zlp) {
@@ -591,6 +601,9 @@ static int usbfs_bulk_read(struct quectel_usb_device *udev, void *pbuf, int len,
 static int qtcp_connect(const char *port_name, int *idVendor, int *idProduct, int *interfaceNum) {
     int fd = -1;
     char *tcp_host = strdup(port_name);
+    if (tcp_host == NULL)
+        return -1;
+
     char *tcp_port = strchr(tcp_host, ':');
     struct sockaddr_in sockaddr;
     TLV_USB tlv_usb;
@@ -598,15 +611,34 @@ static int qtcp_connect(const char *port_name, int *idVendor, int *idProduct, in
     dbg_time("%s port_name = %s\n", __func__, port_name);
 
     if (tcp_port == NULL)
+    {
+        if (tcp_host)
+        {
+            free(tcp_host);
+            tcp_host = NULL;
+        }
         return -1;
+    }
 
     *tcp_port++ = '\0';
     if (atoi(tcp_port) < 1 || atoi(tcp_port) > 0xFFFF)
+    {
+        if (tcp_host)
+        {
+            free(tcp_host);
+            tcp_host = NULL;
+        }
         return -1;
+    }
 
      fd = socket(AF_INET, SOCK_STREAM, 0);
 
     if (fd <= 0) {
+        if (tcp_host)
+        {
+            free(tcp_host);
+            tcp_host = NULL;
+        }
         dbg_time("Device could not be socket: Linux System Errno: %s\n", strerror (errno));
         return -1;
     }
@@ -616,9 +648,14 @@ static int qtcp_connect(const char *port_name, int *idVendor, int *idProduct, in
     sockaddr.sin_addr.s_addr = inet_addr(tcp_host);
     sockaddr.sin_port = htons(atoi(tcp_port));
 
-    free(tcp_host);
+    if (tcp_host)
+    {
+        free(tcp_host);
+        tcp_host = NULL;
+    }
     if (connect(fd, (struct sockaddr *) &sockaddr, sizeof(sockaddr)) < 0) {
         close(fd);
+        fd = -1;
         dbg_time("Device could not be connect: Linux System Errno: %s\n", strerror (errno));
         return -1;
     }
@@ -840,10 +877,15 @@ void *qusb_noblock_open(const char *module_sys_path, int *idVendor, int *idProdu
                     const char *driver = NULL;
 
                     pl = (typeof(pl)) malloc(sizeof(*pl));
+                    if (pl == NULL)
+                    {
+                        dbg_time("pl is NULL\n");
+                        return NULL;
+                    }
 
                     snprintf(pl->infname, sizeof(pl->infname), "%.255s:1.%d/driver", module_sys_path, usb_dm_interface);
                     n = readlink(pl->infname, pl->driver, sizeof(pl->driver));
-                    if (n > 0) {
+                    if (n > 0 && n < 510) {
                         pl->driver[n] = '\0';
                         while (pl->driver[n] != '/')
                             n--;
@@ -877,6 +919,11 @@ void *qusb_noblock_open(const char *module_sys_path, int *idVendor, int *idProdu
             retval = tcgetattr (fd, &ios);
             if (-1 == retval) {
                 dbg_time("ermio settings could not be fetched Linux System Error:%s", strerror (errno));
+                if (fd > 0)
+                {
+                    close(fd);
+                    fd = -1;
+                }
                 return NULL;
             }
 
@@ -897,7 +944,7 @@ void *qusb_noblock_open(const char *module_sys_path, int *idVendor, int *idProdu
             dbg_time("fail to access %s errno: %d (%s)\n", port_name, errno, strerror(errno));
         }
     }
-    else {
+    else if (module_sys_path && module_sys_path[0] != '/') {
         fd = qtcp_connect(module_sys_path, idVendor, idProduct, interfaceNum);
         if (fd > 0) {
             tcp_socket_fd = fd;
@@ -917,12 +964,15 @@ int qusb_noblock_close(void *handle) {
          tcp_socket_fd = -1;
     } if (handle == udev && udev->ttyfd > 0) {
         close(udev->ttyfd);
+        udev->ttyfd = -1;
         close(udev->desc);
+        udev->desc = -1;
     }
     else if (handle == udev && udev->desc > 0) {
         int bInterfaceNumber = usb_dm_interface;
         ioctl(udev->desc, USBDEVFS_RELEASEINTERFACE, &bInterfaceNumber);
         close(udev->desc);
+        udev->desc = -1;
     }
     else if (handle == &edl_pcie_mhifd && edl_pcie_mhifd > 0) {
         close(edl_pcie_mhifd); edl_pcie_mhifd = -1;
@@ -943,7 +993,7 @@ int qusb_read_speed_atime(const char *module_sys_path, struct timespec *out_time
     int fd;
     struct stat stat;
 
-    snprintf(speed, sizeof(speed), "%s/speed", module_sys_path);
+    snprintf(speed, sizeof(speed), "%.240s/speed", module_sys_path);
     fd = open(speed, O_RDONLY);
     if (fd == -1)
         return 0;
@@ -951,6 +1001,7 @@ int qusb_read_speed_atime(const char *module_sys_path, struct timespec *out_time
     if (read(fd, speed, sizeof(speed))) {}
     fstat(fd, &stat);
     close(fd);
+    fd = -1;
 
     *out_speed = atoi(speed);
 
@@ -1087,6 +1138,10 @@ int qfile_find_file(const char *dir, const char *prefix, const char *suffix, cha
     DIR *pdir;
     struct dirent* ent = NULL;
     pdir = opendir(dir);
+    if (pdir == NULL)
+    {
+        return 0;
+    }
 
     *filename = NULL;
     if(pdir)
@@ -1140,16 +1195,35 @@ int qpcie_open(const char *firehose_dir, const char *firehose_mbn, const char *m
     int bhifd, edlfd, diagfd;
     long ret;
     FILE *fp;
-    BHI_INFO_TYPE *bhi_info = malloc(sizeof(BHI_INFO_TYPE));
     char prog_firehose_sdx24[256+32];
     size_t filesize;
     void *filebuf;
     int cur_number = 0;
 
-    snprintf(prog_firehose_sdx24, sizeof(prog_firehose_sdx24), "%.255s/%s", firehose_dir, firehose_mbn);
+    BHI_INFO_TYPE *bhi_info = malloc(sizeof(BHI_INFO_TYPE));
+    if (bhi_info == NULL) {
+        dbg_time("bhi_info is NULL, errno: %d (%s)\n", errno, strerror(errno));
+        error_return();
+    }
+
+    if (is_upgrade_fimeware_zip_7z)
+    {
+        snprintf(prog_firehose_sdx24, sizeof(prog_firehose_sdx24), "/tmp/%.240s", firehose_mbn);
+        dbg_time("%s prog_firehose_sdx24:%s\n", __func__, prog_firehose_sdx24);
+    }
+    else
+    {
+        snprintf(prog_firehose_sdx24, sizeof(prog_firehose_sdx24), "%.240s/%.32s", firehose_dir, firehose_mbn);
+    }
+
     fp = fopen(prog_firehose_sdx24, "rb");
-    if (fp ==NULL) {
+    if (fp == NULL) {
         dbg_time("fail to fopen %s, errno: %d (%s)\n", prog_firehose_sdx24, errno, strerror(errno));
+        if (bhi_info)
+        {
+            free(bhi_info);
+            bhi_info = NULL;
+        }
         error_return();
     }
 
@@ -1158,9 +1232,29 @@ int qpcie_open(const char *firehose_dir, const char *firehose_mbn, const char *m
     fseek(fp, 0, SEEK_SET);
 
     filebuf = malloc(sizeof(filesize)+filesize);
+    if (filebuf == NULL) {
+        dbg_time("filebuf is NULL, errno: %d (%s)\n", errno, strerror(errno));
+        if (bhi_info)
+        {
+            free(bhi_info);
+            bhi_info = NULL;
+        }
+
+        if (fp)
+        {
+            fclose(fp);
+            fp = NULL;
+        }
+        error_return();
+    }
     memcpy(filebuf, &filesize, sizeof(filesize));
     if (fread((uint8_t *)filebuf+sizeof(filesize), 1, filesize, fp) == (size_t)0) { };
     fclose(fp);
+
+    if (is_upgrade_fimeware_zip_7z)
+    {
+        unlink(prog_firehose_sdx24);
+    }
 
 	int i;
     for (i=0; i<pcie_port_defult.pcie_port_number; i++)
@@ -1175,6 +1269,17 @@ int qpcie_open(const char *firehose_dir, const char *firehose_mbn, const char *m
     if (i == pcie_port_defult.pcie_port_number)
     {
         dbg_time("PCIE port assignment error\n");
+        if (bhi_info)
+        {
+            free(bhi_info);
+            bhi_info = NULL;
+        }
+
+        if (filebuf)
+        {
+            free(filebuf);
+            filebuf = NULL;
+        }
         error_return();
     }
 
@@ -1192,6 +1297,7 @@ int qpcie_open(const char *firehose_dir, const char *firehose_mbn, const char *m
         }
 
         close(diagfd);
+        diagfd = -1;
         edl_pcie_mhifd = -1;
     }
 
@@ -1199,12 +1305,52 @@ int qpcie_open(const char *firehose_dir, const char *firehose_mbn, const char *m
     bhifd = open(pcie_port_defult.pcie_port_one[cur_number].bhi, O_RDWR | O_NOCTTY);
     if (bhifd <= 0) {
         dbg_time("fail to open %s, errno: %d (%s)\n", "/dev/mhi_BHI", errno, strerror(errno));
+        if (bhi_info)
+        {
+            free(bhi_info);
+            bhi_info = NULL;
+        }
+
+        if (filebuf)
+        {
+            free(filebuf);
+            filebuf = NULL;
+        }
+
+        if (diagfd > 0)
+        {
+            close(diagfd);
+            diagfd = -1;
+        }
         error_return();
     }
 
     ret = ioctl(bhifd, IOCTL_BHI_GETDEVINFO, bhi_info);
     if (ret) {
         dbg_time("fail to ioctl IOCTL_BHI_GETDEVINFO, errno: %d (%s)\n", errno, strerror(errno));
+        if (bhi_info)
+        {
+            free(bhi_info);
+            bhi_info = NULL;
+        }
+
+        if (filebuf)
+        {
+            free(filebuf);
+            filebuf = NULL;
+        }
+
+        if (diagfd > 0)
+        {
+            close(diagfd);
+            diagfd = -1;
+        }
+
+        if (bhifd > 0)
+        {
+            close(bhifd);
+            bhifd = -1;
+        }
         error_return();
     }
 
@@ -1212,28 +1358,82 @@ int qpcie_open(const char *firehose_dir, const char *firehose_mbn, const char *m
     if (bhi_info->bhi_ee != MHI_EE_EDL) {
         dbg_time("bhi_ee is not MHI_EE_EDL\n");
         close(bhifd);
+        bhifd = -1;
         free(filebuf);
+        filebuf = NULL;
+        if (bhi_info)
+        {
+            free(bhi_info);
+            bhi_info = NULL;
+        }
+
+        if (diagfd > 0)
+        {
+            close(diagfd);
+            diagfd = -1;
+        }
         error_return();
     }
-    free(bhi_info);
+
+    if (bhi_info)
+    {
+        free(bhi_info);
+        bhi_info = NULL;
+    }
 
     ret = ioctl(bhifd, IOCTL_BHI_WRITEIMAGE, filebuf);
     if (ret) {
         dbg_time("fail to ioctl IOCTL_BHI_GETDEVINFO, errno: %d (%s)\n", errno, strerror(errno));
+        if (filebuf)
+        {
+            free(filebuf);
+            filebuf = NULL;
+        }
+
+        if (diagfd > 0)
+        {
+            close(diagfd);
+            diagfd = -1;
+        }
+
+        if (bhifd > 0)
+        {
+            close(bhifd);
+            bhifd = -1;
+        }
         error_return();
     }
 
-    close(bhifd);
-    free(filebuf);
+    if (bhifd > 0)
+    {
+        close(bhifd);
+        bhifd = -1;
+    }
+    if (filebuf)
+    {
+        free(filebuf);
+        filebuf = NULL;
+    }
 
     sleep(1);
     edlfd = open(pcie_port_defult.pcie_port_one[cur_number].edl, O_RDWR | O_NOCTTY);
     if (edlfd <= 0) {
         dbg_time("fail to access %s, errno: %d (%s)\n", pcie_port_defult.pcie_port_one[cur_number].edl, errno, strerror(errno));
+        if (diagfd > 0)
+        {
+            close(diagfd);
+            diagfd = -1;
+        }
         error_return();
     }
 
     edl_pcie_mhifd = edlfd;
+
+    if (diagfd > 0)
+    {
+        close(diagfd);
+        diagfd = -1;
+    }
 
     return 0;
 }
@@ -1250,7 +1450,7 @@ void *catch_log(void *arg)
     (void)arg;
     tbuff[off - 1] = ' ';
     while(1) {
-        nreads = read(usbmon_fd, tbuff + off, sizeof(tbuff) - off);
+        nreads = read(usbmon_fd, tbuff + off, sizeof(tbuff) - off - 1);
         if (nreads == -1 && errno == EINTR)
             continue;
         if (nreads <= 0)
@@ -1290,6 +1490,7 @@ int ql_capture_usbmon_log(const char* usbmon_logfile)
     if (usbmon_logfile_fd < 0) {
         dbg_time("open %s error(%d) (%s)\n", usbmon_logfile, errno, strerror(errno));
         close(usbmon_fd);
+        usbmon_fd = -1;
         return -1;
     }
 
@@ -1297,13 +1498,20 @@ int ql_capture_usbmon_log(const char* usbmon_logfile)
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
     pthread_create(&pt, &attr, catch_log, NULL);
 
+    //pthread_attr_destroy(&attr);     //aaron 2023.07.27
     return 0;
 }
 
 void ql_stop_usbmon_log()
 {
     if (usbmon_logfile_fd > 0)
+    {
         close(usbmon_logfile_fd);
+        usbmon_logfile_fd = -1;
+    }
     if (usbmon_fd > 0)
+    {
         close(usbmon_fd);
+        usbmon_fd = -1;
+    }
 }
