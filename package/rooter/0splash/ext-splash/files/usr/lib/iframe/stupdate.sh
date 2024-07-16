@@ -292,7 +292,11 @@ if [ $splash = "1" ]; then
 	sed -i -e "s!#BAND#!$namev!g" $STEMP
 	
 	if [ ! -e /tmp/simpin1 ]; then
-		sim="-"
+		if [ ! -e /tmp/simpinok1 ]; then
+			sim="-"
+		else
+			sim="Okay"
+		fi
 	else
 		simerr=$(cat /tmp/simpin1)
 		if [ "$simerr" = "0" -o "$simerr" = "1" -o "$simerr" = "2" ]; then

@@ -8,7 +8,7 @@ log() {
 
 CURRMODEM=$1
 CPORT=$(uci get modem.modem$CURRMODEM.commport)
-
+rm -f /tmp/simpinok$CURRMODEM
 ATCMDD="at+cpin?"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 ERR=$(echo "$OX" | grep "ERROR")
@@ -57,4 +57,5 @@ else
 	fi
 fi
 rm -f /tmp/simpin$CURRMODEM # not locked
+echo "1" > /tmp/simpinok$CURRMODEM
 
