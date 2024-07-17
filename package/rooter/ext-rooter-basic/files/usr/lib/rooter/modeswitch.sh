@@ -611,6 +611,7 @@ if [ "$ACTION" = remove ]; then
 			rm -f /tmp/modgone
 			rm -f /tmp/bmask
 			rm -f /tmp/simpin$retresult
+			rm -f /tmp/simpinok$retresult
 		fi
 	else
 		IDV=$(uci get mjpg-streamer.camera.idv)
