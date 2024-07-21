@@ -288,7 +288,7 @@ fi
 TTYDEVS=$(echo "$TTYDEVS" | tr '\n' ' ')
 TTYDEVS=$(echo $TTYDEVS)
 if [ -n "$TTYDEVS" ]; then
-	log Modem $CURRMODEM is a parent of $TTYDEVS
+	log "Modem $CURRMODEM is a parent of $TTYDEVS"
 else
 	log "No ECM Comm Port"
 fi
