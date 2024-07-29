@@ -16,6 +16,13 @@ delHL() {
 
 CURRMODEM=$1
 
+source /etc/openwrt_release
+DR=$DISTRIB_RELEASE
+vs=$(echo "$DR" | grep "21")
+if [ -z "$vs" ]; then
+	vs=$(echo "$DR" | grep "19")
+fi
+
 ttl=$(uci -q get modem.modeminfo$CURRMODEM.ttl)
 if [ -z "$ttl" ]; then
 	ttl="0"
@@ -87,15 +94,31 @@ else
 		TTLOPTION="0"
 		TTL=64
 	fi
+	
+	if [ ! -z "$vs" ]; then
+		r1="iptables -t mangle -I POSTROUTING -o $IFACE -j TTL --ttl-set $TTL"
+		r2="iptables -t mangle -I PREROUTING -i $IFACE -j TTL --ttl-set $TTL"
+		r3="iptables -t mangle -I POSTROUTING -p icmp -o $IFACE -j TTL --ttl-set $TTL"
+		r4="ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o $IFACE -j HL --hl-set $TTL"
+		r5="ip6tables -t mangle -I PREROUTING ! -p icmpv6 -i $IFACE -j HL --hl-set $TTL"
+		r6="ip6tables -t mangle -I POSTROUTING ! -p icmpv6 -o $IFACE -j HL --hl-set $TTL"
+	else
+		r1="nft add rule inet fw4 mangle_postrouting oifname $IFACE ip ttl set $TTL"
+		r2="nft add rule inet fw4 mangle_prerouting oifname $IFACE ip ttl set $TTL"
+		r3="nft add rule inet fw4 mangle_postrouting protocol icmp oifname $IFACE ip ttl set $TTL"
+		r4="nft add rule inet fw4 mangle_postrouting oifname $IFACE ip6 hoplimit set $HL"
+		r5="nft add rule inet fw4 mangle_prerouting oifname $IFACE ip6 hoplimit set $HL"
+		r6="nft add rule inet fw4 mangle_postrouting protocol icmp oifname $IFACE ip6 hoplimit set $HL"
+	fi
 
 	if [ "$TTLOPTION" = "0" ]; then
-		echo "nft add rule inet fw4 mangle_postrouting oifname $IFACE ip ttl set $TTL" >> /etc/firewall.user
-		echo "nft add rule inet fw4 mangle_prerouting oifname $IFACE ip ttl set $TTL" >> /etc/firewall.user
+		echo "$r1" >> /etc/firewall.user
+		echo "$r2" >> /etc/firewall.user
 	else
 		if [ "$TTLOPTION" = "1" ]; then
-			echo "nft add rule inet fw4 mangle_postrouting oifname $IFACE ip ttl set $TTL" >> /etc/firewall.user
+			echo "$r1" >> /etc/firewall.user
 		else
-			echo "nft add rule inet fw4 mangle_postrouting protocol icmp oifname $IFACE ip ttl set $TTL" >> /etc/firewall.user
+			echo "$r3" >> /etc/firewall.user
 		fi
 	fi
 	echo "#endTTL$CURRMODEM" >> /etc/firewall.user
@@ -111,13 +134,13 @@ else
 	echo "#startHL$CURRMODEM" >> /etc/firewall.user
 
 	if [ "$TTLOPTION" = "0" ]; then
-		echo "nft add rule inet fw4 mangle_postrouting oifname $IFACE ip6 hoplimit set $HL" >> /etc/firewall.user
-		echo "nft add rule inet fw4 mangle_prerouting oifname $IFACE ip6 hoplimit set $HL" >> /etc/firewall.user
+		echo "$r4" >> /etc/firewall.user
+		echo "$r5" >> /etc/firewall.user
 	else
 		if [ "$TTLOPTION" = "1" ]; then
-			echo "nft add rule inet fw4 mangle_postrouting oifname $IFACE ip6 hoplimit set $HL" >> /etc/firewall.user
+			echo "$r4" >> /etc/firewall.user
 		else
-			echo "nft add rule inet fw4 mangle_postrouting protocol icmp oifname $IFACE ip6 hoplimit set $HL" >> /etc/firewall.user
+			echo "$r6" >> /etc/firewall.user
 		fi
 	fi
 	echo "#endHL$CURRMODEM" >> /etc/firewall.user
