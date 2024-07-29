@@ -546,6 +546,8 @@ uci commit modem.modem$CURRMODEM
 				[ $MAN = "Telit" ] || TPORT=2
 			elif [ $idV = 1e0e -a $idP = 9001 ]; then
 				TPORT=2
+			elif [ $idV = 1e2d -a $idP = 00b7 ]; then
+                TPORT=0 
 			else
 				TPORT=1
 			fi
