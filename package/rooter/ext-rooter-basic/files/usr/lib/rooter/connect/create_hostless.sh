@@ -451,7 +451,7 @@ if [ $SP -gt 0 ]; then
 		if [ -e $ROOTER/simerr.sh ]; then
 			$ROOTER/simerr.sh $CURRMODEM
 		fi
-		#exit 0
+		exit 0
 	fi
 	detect=$(uci -q get modem.modeminfo$CURRMODEM.detect)
 	if [ "$detect" = "1" ]; then
