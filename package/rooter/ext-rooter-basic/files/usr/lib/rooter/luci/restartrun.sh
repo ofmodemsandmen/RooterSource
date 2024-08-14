@@ -75,6 +75,16 @@ pwrtoggle() {
 		toggle="1"
 		return
 	fi
+	bnx=$(echo "$bn" | grep "e2600ac-c1")
+	if [ ! -z "$bnx" ]; then
+		i=523
+		echo "0" > /sys/class/gpio/gpio$i/value
+		sleep 3
+		echo "1" > /sys/class/gpio/gpio$i/value
+		log "Power Toggle"
+		toggle="1"
+		return
+	fi
 }
 
 ifname1="ifname"
