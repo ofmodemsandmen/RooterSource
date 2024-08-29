@@ -24,3 +24,4 @@ config_load filter
 config_foreach do_ipset filter
 uci commit dhcp
 /etc/init.d/dnsmasq restart
+ipset setup
