@@ -14,7 +14,7 @@ define Package/ext-domain
   SECTION:=utils
   CATEGORY:=ROOter
   SUBMENU:=Optional Applications
-  DEPENDS:=+dnsmasq-full +ipset
+  DEPENDS:=+dnsmasq-full +ipset +adblock
   TITLE:=Domain Filter
   PKGARCH:=all
 endef

@@ -7,7 +7,7 @@ log() {
 
 handle_ipset() {
 	local ips=$1
-	uci add_list dhcp.@dnsmasq[0].ipset='/'$ips'/filter,filter6'
+	echo "$ips" >> /etc/adblock/adblock.blacklist
 }
 
 do_ipset() {
@@ -18,10 +18,7 @@ do_ipset() {
 }
 
 sleep 3
-
-uci -q delete dhcp.@dnsmasq[0].ipset
+echo "#" > /etc/adblock/adblock.blacklist
 config_load filter
 config_foreach do_ipset filter
-uci commit dhcp
-/etc/init.d/dnsmasq restart
-ipset setup
+/etc/init.d/adblock restart

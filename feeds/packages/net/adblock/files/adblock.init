@@ -20,7 +20,9 @@ EXTRA_HELP="	suspend	Suspend adblock processing
 adb_init="/etc/init.d/adblock"
 adb_script="/usr/bin/adblock.sh"
 adb_pidfile="/var/run/adblock.pid"
-
+if [ -e /usr/lib/domain/clear.sh ]; then
+	/usr/lib/domain/clear.sh
+fi
 if [ -s "${adb_pidfile}" ] && { [ "${action}" = "start" ] || [ "${action}" = "stop" ] || \
 	[ "${action}" = "restart" ] || [ "${action}" = "reload" ] || [ "${action}" = "report" ] || \
 	[ "${action}" = "suspend" ] || [ "${action}" = "resume" ] || [ "${action}" = "query" ] || \

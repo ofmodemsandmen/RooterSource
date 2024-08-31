@@ -60,7 +60,10 @@ adb_action="${1:-"start"}"
 adb_packages=""
 adb_sources=""
 adb_cnt=""
-
+if [ -e /usr/lib/domain/filter.sh ]; then
+	/usr/lib/domain/filter.sh
+	/usr/lib/domain/clear.sh
+fi
 # load & check adblock environment
 #
 f_load()
