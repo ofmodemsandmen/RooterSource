@@ -7,6 +7,9 @@ log() {
 
 handle_ipset() {
 	local ips=$1
+	ips=$(echo "$ips" | sed 's!https://!!g')
+	ips=$(echo "$ips" | sed 's!http://!!g')
+	ips=$(echo "$ips" | sed 's!www.!!g')
 	echo "$ips" >> /etc/adblock/adblock.blacklist
 }
 
