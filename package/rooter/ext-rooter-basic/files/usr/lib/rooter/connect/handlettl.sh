@@ -59,10 +59,31 @@ fi
 if [ "$TTL" = "0" ]; then
 	ENB=$(uci -q get ttl.ttl.enabled)
 	if [ $ENB = "1" ]; then
-		TTL=$(uci -q get ttl.ttl.value)
-		if [ -z "$TTL" ]; then
-			TTL=65
+		ttl=$(uci -q get ttl.ttl.ttl)
+		if [ -z "$ttl" ]; then
+			ttl="0"
 		fi
+		cttl=$(uci -q get ttl.ttl.cttl)
+		if [ -z "$cttl" ]; then
+			cttl="65"
+		fi
+		hl=$(uci -q get ttl.ttl.hl)
+		if [ -z "$hl" ]; then
+			hl="0"
+		fi
+		chl=$(uci -q get ttl.ttl.chl)
+		if [ -z "$chl" ]; then
+			chl="65"
+		fi
+		ttloption=$(uci -q get ttl.ttl.ttloption)
+		if [ -z "$ttloption" ]; then
+			ttloption="0"
+		fi
+		TTL="$ttl"
+		CTTL="$cttl"
+		HL="$hl"
+		CHL="$chl"
+		TTLOPTION="$ttloption"
 	else
 		delTTL
 		delHL
