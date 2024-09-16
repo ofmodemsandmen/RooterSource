@@ -313,6 +313,7 @@ _proto_mbim_setup() {
 			sleep 3
 			ATCMDD="AT+CGDCONT?"
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			log "AT+CGDCONT? (Try $wcnt of 3)"
 			log "$OX"
 			if [ "$NPASS" = "nil" -o "$NPASS" = "" ]; then
 				NPASS="NIL"
