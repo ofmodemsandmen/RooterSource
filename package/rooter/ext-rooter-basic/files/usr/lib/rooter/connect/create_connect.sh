@@ -926,15 +926,7 @@ if [ -n "$CHKPORT" ]; then
 		set_dns
 	fi
 
-	ttl=$(uci -q get modem.modeminfo$CURRMODEM.ttl)
-	if [ -z "$ttl" ]; then
-		ttl="0"
-	fi
-	ttloption=$(uci -q get modem.modeminfo$CURRMODEM.ttloption)
-	if [ -z "$ttloption" ]; then
-		ttloption="0"
-	fi
-	$ROOTER/connect/handlettl.sh $CURRMODEM "$ttl" "$ttloption" &
+	$ROOTER/connect/handlettl.sh $CURRMODEM 0 &
 
 	if [ -e $ROOTER/changedevice.sh ]; then
 		$ROOTER/changedevice.sh $ifname
