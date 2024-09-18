@@ -318,6 +318,9 @@ elif [ $idV = 0e8d -a $idP = 7127  ]; then
 elif [ $idV = 0e8d -a $idP = 7126  ]; then
 	log "RM350 ECM"
 	SP=9
+elif [ $idV = 0e8d -a $idP = 2028  ]; then
+	log "FG370 ECM"
+	SP=9
 else
 	SP=0
 fi
