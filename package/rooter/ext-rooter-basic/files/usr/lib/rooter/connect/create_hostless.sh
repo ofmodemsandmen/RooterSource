@@ -440,10 +440,6 @@ if [ -e $ROOTER/modem-led.sh ]; then
 	$ROOTER/modem-led.sh $CURRMODEM 2
 fi
 
-if [ -e $ROOTER/connect/chkconn.sh ]; then
-	$ROOTER/connect/chkconn.sh $CURRMODEM &
-fi
-		
 $ROOTER/connect/get_profile.sh $CURRMODEM
 if [ $SP -gt 0 ]; then
 	if [ -e $ROOTER/simlock.sh ]; then
@@ -465,6 +461,10 @@ if [ $SP -gt 0 ]; then
 	if [ -e /usr/lib/gps/gps.sh ]; then
 		/usr/lib/gps/gps.sh $CURRMODEM &
 	fi
+fi
+
+if [ -e $ROOTER/connect/chkconn.sh ]; then
+	$ROOTER/connect/chkconn.sh $CURRMODEM &
 fi
 
 INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
