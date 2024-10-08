@@ -375,9 +375,20 @@ t77mask() {
 		log "T77 Response : $lte"
 		log " "
 	fi
-	qm=$(echo $lte | cut -d, -f5)
+
+	bds=$(echo "$lte" | grep "Bands")
+	if [ -z "$bds" ]; then
+		qm=$(echo $lte | cut -d, -f5)
+	else
+		qm=$(echo $lte | cut -d, -f7)
+	fi
 	log "$qm"
-	bd=3
+	if [ -z "$bds" ]; then
+		bd=3
+	else
+		qm="0"$qm
+		bd=2
+	fi
 	msk=""
 	L1=$(echo $qm | cut -d: -f"$bd")
 	while [ $L1 != "OK" ]
