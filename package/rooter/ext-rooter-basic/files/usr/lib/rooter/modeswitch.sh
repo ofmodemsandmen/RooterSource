@@ -502,9 +502,30 @@ log "Device $DEVICENAME"
 		$ROOTER_LINK/create_proto$CURRMODEM $CURRMODEM &
 		;;
 	"10"|"11"|"12"|"13"|"14"|"15"|"16" )
-		log "Connecting a PPP Modem"
-		ln -s $ROOTER/ppp/create_ppp.sh $ROOTER_LINK/create_proto$CURRMODEM
-		$ROOTER_LINK/create_proto$CURRMODEM $CURRMODEM
+		if [ "$retval" = "11" ]; then
+			if [ -e /dev/wwan0mbim0 ]; then
+				log "Connecting a MHI Modem"
+				uci set modem.modem$CURRMODEM.proto=91
+				ln -s $ROOTER/mhi/create_mhi.sh $ROOTER_LINK/create_proto$CURRMODEM
+			else
+				echo "1" > /sys/bus/pci/rescan
+				log "Rescan"
+				sleep 2
+				if [ -e /dev/wwan0mbim0 ]; then
+					log "Connecting a MHI Modem"
+					uci set modem.modem$CURRMODEM.proto=91
+					ln -s $ROOTER/mhi/create_mhi.sh $ROOTER_LINK/create_proto$CURRMODEM
+				else
+					log "Connecting a PPP Modem"
+					ln -s $ROOTER/ppp/create_ppp.sh $ROOTER_LINK/create_proto$CURRMODEM
+				fi
+			fi
+			$ROOTER_LINK/create_proto$CURRMODEM $CURRMODEM
+		else
+			log "Connecting a PPP Modem"
+			ln -s $ROOTER/ppp/create_ppp.sh $ROOTER_LINK/create_proto$CURRMODEM
+			$ROOTER_LINK/create_proto$CURRMODEM $CURRMODEM
+		fi
 		;;
 	"9" )
 		log "Connecting an iPhone"

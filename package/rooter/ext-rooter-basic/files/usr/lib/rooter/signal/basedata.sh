@@ -74,6 +74,9 @@ case $pval in
 "9" )
 	PROTO="ipheth"
 	;;
+"91" )
+	PROTO="PCie"
+	;;
 esac
 
 INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
