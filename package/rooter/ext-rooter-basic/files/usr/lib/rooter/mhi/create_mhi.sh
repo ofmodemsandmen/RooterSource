@@ -302,9 +302,6 @@ log "Network Connected"
 START_NETWORK_ARGS="apn='$APN',ip-type=4"
 START_NETWORK_OUT=`qmicli -p -d $DEVICE--wds-start-network=$START_NETWORK_ARGS --client-no-release-cid 2>/dev/null`
 SET=`qmicli -p -d $DEVICE --wds-get-current-settings`
-log "$SET"
-#sigs=`qmicli -p -d $DEVICE --nas-get-signal-strength`
-#log "$sigs"
 
 qmicli -p -d $DEVICE --wds-get-current-settings > /tmp/mhisettings
 while IFS= read -r line; do
@@ -354,6 +351,7 @@ if [ "$vs" = "6" ]; then
 	uci set network.xlatd$INTER.metric=$INTER"0"
 	uci set network.xlatd$INTER.ip4table='default'
 	uci set network.xlatd$INTER.ip6table='default'
+	ifup xlatd$INTER
 fi
  
 uci delete network.wan$INTER
@@ -375,7 +373,7 @@ fi
 uci commit network
 ip link set dev $IFNAME arp off
 ifup wan$INTER
-ifup xlatd$INTER
+
 
 ln -fs $ROOTER/signal/modemsignal.sh $ROOTER_LINK/getsignal$CURRMODEM
 $ROOTER_LINK/getsignal$CURRMODEM $CURRMODEM $PROT &
