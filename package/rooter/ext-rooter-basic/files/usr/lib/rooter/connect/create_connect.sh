@@ -905,9 +905,9 @@ if [ -n "$CHKPORT" ]; then
 		[ $MAN = "Telit" ] || DHCP=0
 	fi
 	NODHCP=$(uci -q get modem.modeminfo$CURRMODEM.nodhcp)
-	if [ $idV = "2c7c" -a $idP = "0801" ]; then
-		NODHCP="1"
-	fi
+#	if [ $idV = "2c7c" -a $idP = "0801" ]; then
+#		NODHCP="1"
+#	fi
 	if [ "$NODHCP" = "1" ]; then
 		DHCP=0
 		log "Using QMI without DHCP"
@@ -1178,6 +1178,7 @@ do
 			uci set network.wan$INTER.device=/dev/cdc-wdm$WDMNX
 			uci set network.wan$INTER.metric=$INTER"0"
 			uci set network.wan$INTER.currmodem=$CURRMODEM
+			set_dns
 			uci -q commit network
 			rm -f /tmp/usbwait
 			ifup wan$INTER
