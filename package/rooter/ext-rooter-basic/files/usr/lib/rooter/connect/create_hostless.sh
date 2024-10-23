@@ -454,6 +454,9 @@ if [ $SP -gt 0 ]; then
 		if [ -e $ROOTER/simerr.sh ]; then
 			$ROOTER/simerr.sh $CURRMODEM
 		fi
+		if [ -e $ROOTER/connect/simreboot.sh ]; then
+			$ROOTER/connect/simreboot.sh
+		fi
 		exit 0
 	fi
 	detect=$(uci -q get modem.modeminfo$CURRMODEM.detect)

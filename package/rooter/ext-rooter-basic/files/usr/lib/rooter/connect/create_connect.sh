@@ -850,6 +850,9 @@ if [ -n "$CHKPORT" ]; then
 			uci set wizard.basic.detect="2"
 			uci commit wizard
 		fi
+		if [ -e $ROOTER/connect/simreboot.sh ]; then
+			$ROOTER/connect/simreboot.sh
+		fi
 		exit 0
 	fi
 	
