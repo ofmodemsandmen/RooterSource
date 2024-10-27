@@ -3,10 +3,10 @@
 
 genline() {
 	MONLIST=$MONLIST"<tr>"
-		t1="<td><div align=\"center\"><strong> $START</strong></div></td>"
-		t2="<td><div align=\"center\"><strong> $updata</strong></div></td>"
-		t3="<td><div align=\"center\"><strong> $downdata</strong></div></td>"
-		t4="<td><div align=\"center\"><strong> $totaldata</strong></div></td>"
+		t1="<td style=\"color:white;\"><div align=\"center\"><strong> $START</strong></div></td>"
+		t2="<td style=\"color:white;\"><div align=\"center\"><strong> $updata</strong></div></td>"
+		t3="<td style=\"color:white;\"><div align=\"center\"><strong> $downdata</strong></div></td>"
+		t4="<td style=\"color:white;\"><div align=\"center\"><strong> $totaldata</strong></div></td>"
 	MONLIST=$MONLIST$t1$t2$t3$t4"</tr>"
 }
 
@@ -79,7 +79,7 @@ currdata() {
 	rm -f $STEMP
 	cp $STATUS $STEMP
 	if [ -e /usr/lib/bwmon/data/monthly.data ]; then
-		#MONLIST="<table width=\"700\" border=\"1\" >"
+		#MONLIST="<table width=\"700\" border=\"1\" style=\"color:white;\" >"
 		bwdata
 		MONLIST=$MONLIST"</table>"
 	else
