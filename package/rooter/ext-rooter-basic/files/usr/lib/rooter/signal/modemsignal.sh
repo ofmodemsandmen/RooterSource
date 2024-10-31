@@ -212,7 +212,7 @@ while [ 1 = 1 ]; do
 				;;
 			"413c" )
 				case $PROD in
-					"81d7"|"81d8" )
+					"81d7"|"81d8"|"81d9" )
 						$ROOTER/common/t77data.sh $CURRMODEM $COMMPORT
 					;;
 					* )
