@@ -151,6 +151,9 @@ change_bconf() {
 #log "$ACTION"
 if [ "$ACTION" = add ]; then
 	bootdelay
+	if [ -e /tmp/gotpcie ]; then
+		exit 0
+	fi
 	CNTR=0
 	while [ -e /tmp/modgone ]; do
 		sleep 1

@@ -120,13 +120,19 @@ if [ "$proto" = 91 ]; then
 			mhi=$(echo "$line" | grep "mhi-pci-generic")
 			if [ ! -z "$mhi" ]; then
 				dev=$(echo "$dev" | tr " " "," | cut -d, -f1)
-				pcinum="0000:$dev"
+				size=${#dev}
+				if [ "$size" -eq 7 ]; then
+					pcinum="0000:$dev"
+				else
+					pcinum="$dev"
+				fi
 				break			
 			fi
 		fi
 	done < /tmp/mhipci
 	echo "1" > /sys/bus/pci/devices/$pcinum/remove
 	sleep 2
+	rm /tmp/usbwait
 fi
 
 pwrtoggle
@@ -170,3 +176,10 @@ while [ -e /tmp/usbwait ]
 	do
 		sleep 5
 	done
+if [ "$proto" = 91 ]; then
+	sleep 20
+	echo "1" > /sys/bus/pci/rescan
+	log "Rescan"
+	sleep 2
+	echo 'on' > /sys/devices/platform/soc/11280000.pcie/pci0000:00/0000:00:00.0/$pcinum/power/control
+fi
