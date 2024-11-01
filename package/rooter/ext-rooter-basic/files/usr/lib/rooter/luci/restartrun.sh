@@ -7,6 +7,22 @@ log() {
 	modlog "Modem Restart/Disconnect $CURRMODEM" "$@"
 }
 
+display_top() {
+	log "*****************************************************************"
+	log "*"
+}
+
+display_bottom() {
+	log "*****************************************************************"
+}
+
+
+display() {
+	local line1=$1
+	log "* $line1"
+	log "*"
+}
+
 pwrtoggle() {
 	toggle="0"
 	bn=$(cat /tmp/sysinfo/board_name)
@@ -177,9 +193,48 @@ while [ -e /tmp/usbwait ]
 		sleep 5
 	done
 if [ "$proto" = 91 ]; then
+	SMS=$(uci get modem.modem$CURRMODEM.sms)
+	if [ $SMS = 1 ]; then
+		if [ -e /usr/lib/sms/stopsms ]; then
+			/usr/lib/sms/stopsms $CURRMODEM
+		fi
+	fi
+	PID=$(ps |grep "getsignal$CURRMODEM" | grep -v grep |head -n 1 | awk '{print $1}')
+	kill -9 $PID
+	rm -f $ROOTER_LINK/getsignal$CURRMODEM
+	PID=$(ps |grep "reconnect$CURRMODEM" | grep -v grep |head -n 1 | awk '{print $1}')
+	kill -9 $PID
+	rm -f $ROOTER_LINK/reconnect$CURRMODEM
+	PID=$(ps |grep "create_proto$CURRMODEM" | grep -v grep |head -n 1 | awk '{print $1}')
+	kill -9 $PID
+	rm -f $ROOTER_LINK/create_proto$CURRMODEM
+	PID=$(ps |grep "processsms$CURRMODEM" | grep -v grep |head -n 1 | awk '{print $1}')
+	kill -9 $PID
+	rm -f $ROOTER_LINK/processsms$CURRMODEM
+	PID=$(ps |grep "con_monitor$CURRMODEM" | grep -v grep |head -n 1 | awk '{print $1}')
+	kill -9 $PID
+	rm -f $ROOTER_LINK/con_monitor$CURRMODEM
+	if [ -e /usr/lib/gps/gpskill.sh ]; then
+		/usr/lib/gps/gpskill.sh $CURRMODEM
+	fi
+	PID=$(ps |grep "chkconn1.sh" | grep -v grep |head -n 1 | awk '{print $1}')
+	kill -9 $PID
+	$ROOTER/signal/status.sh $CURRMODEM "No Modem Present"
+	$ROOTER/log/logger "Disconnect (Removed) Modem #$CURRMODEM"
+	display_top; display "Remove : $DEVICENAME : Modem $CURRMODEM"; display_bottom
+	check_all_empty
+	rm -f /tmp/usbwait
+	rm -f /tmp/mdown$CURRMODEM
+	rm -f /tmp/msimdata$CURRMODEM
+	rm -f /tmp/msimnum$CURRMODEM
+	rm -f /tmp/modgone
+	rm -f /tmp/bmask
+	rm -f /tmp/simpin$CURRMODEM
+	rm -f /tmp/simpinok$CURRMODEM
 	sleep 20
 	echo "1" > /sys/bus/pci/rescan
 	log "Rescan"
 	sleep 2
 	echo 'on' > /sys/devices/platform/soc/11280000.pcie/pci0000:00/0000:00:00.0/$pcinum/power/control
+	
 fi
