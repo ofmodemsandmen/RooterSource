@@ -122,6 +122,29 @@ echo "0" > /tmp/usbwait
 uVid=$(uci get modem.modem$CURRMODEM.uVid)
 uPid=$(uci get modem.modem$CURRMODEM.uPid)
 
+if [ $uVid != "2c7c" ]; then
+	if [ $uVid = "0e8d" -o $uVid = "8087" -o $uVid = "2cb7" -o $uVid = "1508" ]; then
+		if [ ! -z "$CPORT" ]; then
+			ATCMDD="AT+CFUN=15"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
+	else
+		if [ ! -z "$CPORT" ]; then
+			ATCMDD="AT+CFUN=1,1"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		fi
+	fi
+	log "Hard modem reset done $OX"
+else
+	if [ ! -z "$CPORT" ]; then
+		ATCMDD="AT+QPOWD=0"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		ATCMDD="AT+CFUN=1,1"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	fi
+	log "Hard modem reset done $OX"
+fi
+
 proto=$(uci -q get modem.modem$CURRMODEM.proto)
 if [ "$proto" = 91 ]; then
 	lspci -k > /tmp/mhipci
@@ -146,35 +169,14 @@ if [ "$proto" = 91 ]; then
 			fi
 		fi
 	done < /tmp/mhipci
+	echo 1 > /tmp/gotpcie1
 	echo "1" > /sys/bus/pci/devices/$pcinum/remove
+	log "PCi Remove"
 	sleep 2
 	rm /tmp/usbwait
 fi
 
 pwrtoggle
-
-if [ $uVid != "2c7c" ]; then
-	if [ $uVid = "0e8d" -o $uVid = "8087" -o $uVid = "2cb7" -o $uVid = "1508" ]; then
-		if [ ! -z "$CPORT" ]; then
-			ATCMDD="AT+CFUN=15"
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		fi
-	else
-		if [ ! -z "$CPORT" ]; then
-			ATCMDD="AT+CFUN=1,1"
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		fi
-	fi
-	log "Hard modem reset done $OX"
-else
-	if [ ! -z "$CPORT" ]; then
-		ATCMDD="AT+QPOWD=0"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		ATCMDD="AT+CFUN=1,1"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	fi
-	log "Hard modem reset done $OX"
-fi
 
 ifdown wan$INTER
 uci delete network.wan$CURRMODEM
@@ -234,6 +236,7 @@ if [ "$proto" = 91 ]; then
 	sleep 20
 	echo "1" > /sys/bus/pci/rescan
 	log "Rescan"
+	rm -f /tmp/gotpcie1
 	sleep 2
 	echo 'on' > /sys/devices/platform/soc/11280000.pcie/pci0000:00/0000:00:00.0/$pcinum/power/control
 	
