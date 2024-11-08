@@ -152,7 +152,16 @@ change_bconf() {
 if [ "$ACTION" = add ]; then
 	bootdelay
 	if [ -e /tmp/gotpcie ]; then
-		exit 0
+		find_usb_attrs
+		if [ "$uPr" = "USB_Storage" ]; then
+			exit 0
+		fi
+		$ROOTER/proto.sh $uVid $uPid $DEVICENAME 0
+		source /tmp/proto
+		rm -f /tmp/proto
+		if [ $retval = 11 ]; then
+			exit 0
+		fi
 	fi
 	CNTR=0
 	while [ -e /tmp/modgone ]; do
@@ -209,7 +218,7 @@ if [ "$ACTION" = add ]; then
 	
 	DELAY=1
 	if [ -f /tmp/usbwait ]; then
-		log "Delay for previous modem"
+		log "Delay for previous modem $DEVICENAME"
 		while [ -f /tmp/usbwait ]; do
 			sleep 1
 			let DELAY=$DELAY+1
@@ -219,6 +228,7 @@ if [ "$ACTION" = add ]; then
 		done
 	fi
 	echo "1" > /tmp/usbwait
+	log "Go $DEVICENAME"
 
 
 	bNumConfs=$(cat /sys/bus/usb/devices/$DEVICENAME/bNumConfigurations)
@@ -304,7 +314,7 @@ log "Device $DEVICENAME"
 			fi
 		fi
 	fi
-
+ 
 	log "Add : $DEVICENAME: Manufacturer=${uMa:-?} Product=${uPr:-?} Serial=${uSe:-?} $uVid $uPid"
 
 	if [ $MODSTART -gt $MODCNT ]; then
@@ -314,6 +324,18 @@ log "Device $DEVICENAME"
 
 	if [ $reinsert = 0 ]; then
 		CURRMODEM=$MODSTART
+		MODSTART=`expr $MODSTART + 1`
+		save_variables
+	fi
+	
+	if [ -e /tmp/gotpcie1 ]; then
+		gpc=$(cat /tmp/gotpcie1)
+		if [ "$gpc" = $CURRMODEM ]; then
+			uci set modem.modem$CURRMODEM.empty=1
+			uci commit modem
+			log "Exit from PCie"
+			exit 0
+		fi
 	fi
 
 	FILEN=$uVid:$uPid
@@ -383,6 +405,7 @@ log "Device $DEVICENAME"
 			fi
 		fi
 	fi
+	echo "1" > /tmp/usbwait
 	sleep 10
 	usb_dir="/sys$DEVPATH"
 	idV="$(sanitize "$usb_dir/idVendor")"
@@ -420,6 +443,12 @@ log "Device $DEVICENAME"
 	if [ $retval -ne 0 ]; then
 		log "Found Modem $CURRMODEM"
 		if [ $reinsert = 0 ]; then
+			if -e "/tmp/gotpcie1" ]; then
+				gpc=$(cat /tmp/gotpcie1)
+				if [ "$gpc" = $CURRMODEM ]; then
+					exit 0
+				fi
+			fi
 			uci set modem.modem$CURRMODEM.empty=0
 			uci set modem.modem$CURRMODEM.uVid=$uVid
 			uci set modem.modem$CURRMODEM.uPid=$uPid
@@ -444,10 +473,10 @@ log "Device $DEVICENAME"
 		fi
 	fi
 
-	if [ $reinsert = 0 -a $retval != 0 ]; then
-		MODSTART=`expr $MODSTART + 1`
-		save_variables
-	fi
+#	if [ $reinsert = 0 -a $retval != 0 ]; then
+#		MODSTART=`expr $MODSTART + 1`
+#		save_variables
+#	fi
 	PID=$(ps |grep "chkconn.sh" | grep -v grep |head -n 1 | awk '{print $1}')
 	kill -9 $PID
 
@@ -508,6 +537,10 @@ log "Device $DEVICENAME"
 		;;
 	"10"|"11"|"12"|"13"|"14"|"15"|"16" )
 		if [ "$retval" = "11" ]; then
+			log "Ignore GLAA"
+			uci set modem.modem$CURRMODEM.empty=1
+			uci commit modem
+			exit 0
 			if [ -e /dev/wwan0mbim0 ]; then
 				log "Connecting a MHI Modem"
 				uci set modem.modem$CURRMODEM.proto=91

@@ -39,7 +39,7 @@ pwrtoggle() {
 		return
 	fi
 	bnx=$(echo "$bn" | grep "x3000")
-	if [ ! -z "$bnx" ]; then
+	if [ ! -z "$bnx" -a "$CURRMODEM" = 1 ]; then
 		echo "0" > /sys/class/gpio/cellular-control/value
 		sleep 2
 		echo "1" > /sys/class/gpio/cellular-control/value
