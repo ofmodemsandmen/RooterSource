@@ -61,7 +61,7 @@ if [ "$TTL" = "0" ]; then
 	if [ $ENB = "1" ]; then
 		ttl=$(uci -q get ttl.ttl.ttl)
 		if [ -z "$ttl" ]; then
-			ttl="0"
+			ttl="1"
 		fi
 		cttl=$(uci -q get ttl.ttl.cttl)
 		if [ -z "$cttl" ]; then
