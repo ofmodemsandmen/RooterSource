@@ -441,6 +441,28 @@ case $uVid in
 					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 				fi
 			;;
+			"81df")
+				if [ ! -z $mask ]; then
+					fibdecode $mask 1 2
+					ATCMDD="AT^SLBAND=LTE,2,""$lst"
+					log "$ATCMDD"
+					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+					log " "
+					log "Lock Response : $OX"
+					log " "
+				else
+					exit 0
+				fi
+				if [ ! -z "$mask5g" ]; then
+					fibdecode $mask5g 1 2
+					ATCMDD5="AT^SLBAND=NR5G,2,""$lst"
+					log "$ATCMDD5"
+					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD5")
+					log " "
+					log "Lock Response : $OX"
+					log " "
+				fi
+			;;
 		esac
 	;;
 	* )
