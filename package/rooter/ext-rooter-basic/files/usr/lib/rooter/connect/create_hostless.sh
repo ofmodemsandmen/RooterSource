@@ -665,6 +665,15 @@ do
 		export SETAPN=$NAPN
 		BRK=1
 		
+		# $NAUTH 1 - PAP  2 - CHAP  0 - none
+		# $NPASS
+		# $NUSER
+			
+			if [ "$NAUTH" != "0" ]; then
+				ATCMDD="AT+CGAUTH=1,$NAUTH,\"$NUSER\",\"$NPASS\""
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				log "$OX"
+			fi
 			ATCMDD="AT+CGPIAF=1,0,0,0;+CGDCONT=1"
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			log "$OX"
