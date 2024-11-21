@@ -636,35 +636,46 @@ end
 				document.getElementById("apply1").style.visibility="visible";
 			}
 	
-			uVid = rv.uVid ;
-			uPid = rv.uPid ;
-			if ( uVid == "2c7c" )
+	// cbi-mode-pro
+			if ( rv.proto == "91" )
 			{
-				document.getElementById("prochnge").style.display = "block";
-				document.getElementById("modpro").style.display = "block";
-				document.getElementById("modpro").innerHTML = num2pro(rv.proto, "1");
-				document.getElementById("qpro").style.display="block";
-				document.getElementById("qpro").style.visibility="visible";
-				document.getElementById("spro").style.display="none";
-				modtype = "1";
+				document.getElementById("cbi-mode-pro").style.display = "none";
+				document.getElementById("cbi-mode-pro").style.visibility="hidden";
 			}
 			else
 			{
-				if ( uVid == "1199" || T77(uVid, uPid) == 1 )
+				document.getElementById("cbi-mode-pro").style.display = "block";
+				document.getElementById("cbi-mode-pro").style.visibility="visible";
+				uVid = rv.uVid ;
+				uPid = rv.uPid ;
+				if ( uVid == "2c7c" )
 				{
-					document.getElementById("modpro").style.display = "block";
-					document.getElementById("modpro").innerHTML = num2pro(rv.proto, "2");
-					document.getElementById("spro").style.display="block";
-					document.getElementById("spro").style.visibility="visible";
 					document.getElementById("prochnge").style.display = "block";
-					document.getElementById("qpro").style.display="none";
-					modtype = "2";
+					document.getElementById("modpro").style.display = "block";
+					document.getElementById("modpro").innerHTML = num2pro(rv.proto, "1");
+					document.getElementById("qpro").style.display="block";
+					document.getElementById("qpro").style.visibility="visible";
+					document.getElementById("spro").style.display="none";
+					modtype = "1";
 				}
 				else
 				{
-					document.getElementById("modpro").style.display = "none";
-					document.getElementById("prochnge").style.display = "none";
-					modtype = "0";
+					if ( uVid == "1199" || T77(uVid, uPid) == 1 )
+					{
+						document.getElementById("modpro").style.display = "block";
+						document.getElementById("modpro").innerHTML = num2pro(rv.proto, "2");
+						document.getElementById("spro").style.display="block";
+						document.getElementById("spro").style.visibility="visible";
+						document.getElementById("prochnge").style.display = "block";
+						document.getElementById("qpro").style.display="none";
+						modtype = "2";
+					}
+					else
+					{
+						document.getElementById("modpro").style.display = "none";
+						document.getElementById("prochnge").style.display = "none";
+						modtype = "0";
+					}
 				}
 			}
 			

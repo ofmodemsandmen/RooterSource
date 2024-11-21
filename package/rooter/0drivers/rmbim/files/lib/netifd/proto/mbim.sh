@@ -163,7 +163,9 @@ _proto_mbim_setup() {
 	devname="$(basename "$device")"
 	devpath="$(readlink -f /sys/class/usbmisc/$devname/device/)"
 	ifname="$( ls "$devpath"/net )"
-
+	if [ -z "$ifname" ]; then
+		ifname=$(uci -q get modem.modem$CURRMODEM.netinterface)
+	fi
 	[ -n "$ifname" ] || {
 		log "Failed to find matching interface"
 		proto_notify_error "$interface" NO_IFNAME
@@ -260,8 +262,8 @@ _proto_mbim_setup() {
 
 	log "Attach to network"
 	ATTACH=$(umbim $DBG -n -t $tid -d $device attach)
-	retq=$?
-	if [ $retq != 0 ]; then
+	retq=$(echo "$ATTACH" | grep "attached")
+	if [ -z "$retq" ]; then
 		log "Failed to attach to network"
 		proto_notify_error "$interface" ATTACH_FAILED
 		return 1

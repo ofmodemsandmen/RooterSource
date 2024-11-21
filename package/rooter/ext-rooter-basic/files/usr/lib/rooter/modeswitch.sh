@@ -156,6 +156,7 @@ if [ "$ACTION" = add ]; then
 		if [ "$uPr" = "USB_Storage" ]; then
 			exit 0
 		fi
+		exit 0
 		$ROOTER/proto.sh $uVid $uPid $DEVICENAME 0
 		source /tmp/proto
 		rm -f /tmp/proto

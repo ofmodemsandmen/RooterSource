@@ -357,11 +357,17 @@ if [ $MATCH = 0 ]; then
 	if [ -n "$ICCID" ]; then
 		if [ "$cselect" != "1" ]; then
 			iccid="891223"
+			iccid1="891490"
 			case $ICCID in
 			"$iccid"*)
 				uci set modem.modeminfo$CURRMODEM.apn2=""
 				uci set modem.modeminfo$CURRMODEM.apn3=""
 				uci set modem.modeminfo$CURRMODEM.apn="sp.koodo.com"
+				;;
+			"$iccid1"*)
+				uci set modem.modeminfo$CURRMODEM.apn2=""
+				uci set modem.modeminfo$CURRMODEM.apn3=""
+				uci set modem.modeminfo$CURRMODEM.apn="internet.freedommobile.ca"
 				;;
 			esac
 		fi
