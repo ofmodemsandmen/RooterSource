@@ -154,6 +154,9 @@ timeout:value("7", translatef("%d seconds", 7))
 timeout:value("8", translatef("%d seconds", 8))
 timeout:value("9", translatef("%d seconds", 9))
 timeout:value("10", translatef("%d seconds", 10))
+timeout:value("15", translatef("%d seconds", 15))
+timeout:value("20", translatef("%d seconds", 20))
+timeout:value("25", translatef("%d seconds", 25))
 
 interval = mwan_interface:option(ListValue, "interval", translate("Ping interval"))
 interval.default = "5"
