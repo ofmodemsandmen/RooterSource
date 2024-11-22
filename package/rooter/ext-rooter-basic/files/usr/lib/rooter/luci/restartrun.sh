@@ -127,6 +127,9 @@ if [ "$proto" = 91 ]; then
 	lspci -k > /tmp/mhipci
 	while IFS= read -r line; do
 		dev=$(echo "$line" | grep "Device")
+		if [ -z "$dev" ]; then
+			dev=$(echo "$line" | grep "SDX55")
+		fi
 		if [ ! -z "$dev" ]; then
 			read -r line
 			kd=$(echo "$line" | grep "Kernel driver")
@@ -147,9 +150,9 @@ if [ "$proto" = 91 ]; then
 		fi
 	done < /tmp/mhipci
 	echo 1 > /tmp/gotpcie1
-	echo "1" > /sys/bus/pci/devices/$pcinum/remove
+	#echo "1" > /sys/bus/pci/devices/$pcinum/remove
 	log "PCi Remove"
-	sleep 2
+	#sleep 20
 	rm /tmp/usbwait
 else
 	if [ $uVid != "2c7c" ]; then
@@ -173,10 +176,9 @@ else
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		fi
 		log "Hard modem reset done $OX"
+		pwrtoggle
 	fi
 fi
-
-pwrtoggle
 
 ifdown wan$INTER
 uci delete network.wan$CURRMODEM
@@ -195,6 +197,8 @@ while [ -e /tmp/usbwait ]
 		sleep 5
 	done
 if [ "$proto" = 91 ]; then
+	log "Clean Up"
+	rm -f /tmp/gotpcie1
 	SMS=$(uci get modem.modem$CURRMODEM.sms)
 	if [ $SMS = 1 ]; then
 		if [ -e /usr/lib/sms/stopsms ]; then
@@ -221,6 +225,8 @@ if [ "$proto" = 91 ]; then
 	fi
 	PID=$(ps |grep "chkconn1.sh" | grep -v grep |head -n 1 | awk '{print $1}')
 	kill -9 $PID
+	PID=$(ps |grep "create-mhi.sh" | grep -v grep |head -n 1 | awk '{print $1}')
+	kill -9 $PID
 	$ROOTER/signal/status.sh $CURRMODEM "No Modem Present"
 	$ROOTER/log/logger "Disconnect (Removed) Modem #$CURRMODEM"
 	display_top; display "Remove : $DEVICENAME : Modem $CURRMODEM"; display_bottom
@@ -233,11 +239,10 @@ if [ "$proto" = 91 ]; then
 	rm -f /tmp/bmask
 	rm -f /tmp/simpin$CURRMODEM
 	rm -f /tmp/simpinok$CURRMODEM
-	sleep 20
-	echo "1" > /sys/bus/pci/rescan
-	log "Rescan"
-	rm -f /tmp/gotpcie1
 	sleep 2
-	echo 'on' > /sys/devices/platform/soc/11280000.pcie/pci0000:00/0000:00:00.0/$pcinum/power/control
-	
+	#echo "1" > /sys/bus/pci/rescan
+	log "Rescan"
+	/usr/lib/rooter/mhi/create-pci.sh &
+	sleep 2
+
 fi

@@ -11,6 +11,9 @@ if [ "$proto" = 91 ]; then
 	lspci -k > /tmp/mhipci
 	while IFS= read -r line; do
 		dev=$(echo "$line" | grep "Device")
+		if [ -z "$dev" ]; then
+			dev=$(echo "$line" | grep "SDX55")
+		fi
 		if [ ! -z "$dev" ]; then
 			read -r line
 			kd=$(echo "$line" | grep "Kernel driver")
