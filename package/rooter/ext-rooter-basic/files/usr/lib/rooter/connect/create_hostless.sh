@@ -665,15 +665,6 @@ do
 		export SETAPN=$NAPN
 		BRK=1
 		
-		# $NAUTH 1 - PAP  2 - CHAP  0 - none
-		# $NPASS
-		# $NUSER
-			
-			if [ "$NAUTH" != "0" ]; then
-				ATCMDD="AT+CGAUTH=1,$NAUTH,\"$NUSER\",\"$NPASS\""
-				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-				log "$OX"
-			fi
 			ATCMDD="AT+CGPIAF=1,0,0,0;+CGDCONT=1"
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			log "$OX"
@@ -791,8 +782,27 @@ do
 		get_ip
 		if [ -z "$ip4" -o "$ip4" = "0.0.0.0" ]; then
 			if [ -z "$ip6" -o "$ip6" = "0000:0000:0000:0000:0000:0000:0000:0000" ]; then
-				BRK=1
-				log "No IP Address"
+				ATCMDD="AT+QMAP=\"WWAN\""
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				echo "$OX" > /tmp/wwanox
+				while IFS= read -r line; do
+					qm=$(echo "$line" | grep "IPV4")
+					if [ ! -z "$qm" ]; then
+						ip4=$(echo $line | cut -d, -f5 | tr -d '"' )
+					fi
+					qm=$(echo "$line" | grep "IPV6")
+					if [ ! -z "$qm" ]; then
+						ip6=$(echo $line | cut -d, -f5 | tr -d '"' )
+					fi
+				done < /tmp/wwanox
+				rm -f /tmp/wwanox
+				log "WWAN IP : $ip4 $ip6"
+				if [ -z "$ip4" -o "$ip4" = "0.0.0.0" ]; then
+					if [ -z "$ip6" -o "$ip6" = "0000:0000:0000:0000:0000:0000:0000:0000" -o "$ip6" = "0:0:0:0:0:0:0:0" ]; then
+						BRK=1
+						log "No IP Address"
+					fi
+				fi
 			fi
 		fi
 		if [ "$BRK" = 0 ]; then

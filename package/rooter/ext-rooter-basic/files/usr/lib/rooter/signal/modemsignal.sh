@@ -3,7 +3,7 @@
 ROOTER=/usr/lib/rooter
 
 log() {
-	logger -t "modem signal" "$@"
+	modlog "modem signal" "$@"
 }
 
 CURRMODEM=$1
@@ -212,7 +212,7 @@ while [ 1 = 1 ]; do
 				;;
 			"413c" )
 				case $PROD in
-					"81d7"|"81d8"|"81d9"|"81df" )
+					"81d7"|"81d8"|"81d9" )
 						$ROOTER/common/t77data.sh $CURRMODEM $COMMPORT
 					;;
 					* )
@@ -254,11 +254,7 @@ while [ 1 = 1 ]; do
 			if [ -e /tmp/phonenumber$CURRMODEM ]; then
 				source /tmp/phonenumber$CURRMODEM
 			fi
-			if [ ! -e /etc/config/gps ]; then
-				if [ -e /tmp/gpsdata ]; then
-					source /tmp/gpsdata
-				fi
-			fi
+
 			make_signal
 			uci set modem.modem$CURRMODEM.cmode="1"
 			uci commit modem
