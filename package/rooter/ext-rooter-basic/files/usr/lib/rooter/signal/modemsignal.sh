@@ -3,7 +3,7 @@
 ROOTER=/usr/lib/rooter
 
 log() {
-	modlog "modem signal" "$@"
+	logger -t "modem signal" "$@"
 }
 
 CURRMODEM=$1
@@ -254,7 +254,6 @@ while [ 1 = 1 ]; do
 			if [ -e /tmp/phonenumber$CURRMODEM ]; then
 				source /tmp/phonenumber$CURRMODEM
 			fi
-
 			make_signal
 			uci set modem.modem$CURRMODEM.cmode="1"
 			uci commit modem
