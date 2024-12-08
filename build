@@ -477,15 +477,15 @@ buldimage() {
 						make defconfig
 						configfix
 						make V=s
-						cp ./bin/targets$model_imagepath$model_image ./images/$model_mod"-full"$END$model_ext
+						cp ./bin/targets$model_imagepath$model_image ./images/$model_mod"-MWAN3"$END$model_ext
 						EX=$?
 						if [ $EX -ne 0 ]; then
 							echo "$EX $model_imagepath$model_image"
 							exit $EX
 						fi
 						cd ./images
-						zip $zippassword $model_mod$END.zip $model_mod"-full"$END$model_ext
-						rm -f $model_mod"-full"$END$model_ext
+						zip $zippassword $model_mod$END.zip $model_mod"-MWAN3"$END$model_ext
+						rm -f $model_mod"-MWAN3"$END$model_ext
 						cd ..
 					fi
 				fi
@@ -499,15 +499,15 @@ buldimage() {
 						make defconfig
 						configfix
 						make V=s
-						cp ./bin/targets$model_imagepath$model_image ./images/$model_mod"-full"$END$model_ext
+						cp ./bin/targets$model_imagepath$model_image ./images/$model_mod"-MWAN3"$END$model_ext
 						EX=$?
 						if [ $EX -ne 0 ]; then
 							echo "$EX $model_imagepath$model_image"
 							exit $EX
 						fi
 						cd ./images
-						zip $zippassword $model_mod$END.zip $model_mod"-full"$END$model_ext
-						rm -f $model_mod"-full"$END$model_ext
+						zip $zippassword $model_mod$END.zip $model_mod"-MWAN3"$END$model_ext
+						rm -f $model_mod"-MWAN3"$END$model_ext
 						cd ..
 					fi
 				fi
@@ -556,22 +556,22 @@ buldimage() {
 						make defconfig
 						configfix
 						make V=s
-						cp ./bin/targets$model_imagepath$model_image1 ./images/$model_mod"-full"$END$model_ext1
+						cp ./bin/targets$model_imagepath$model_image1 ./images/$model_mod"-MWAN3"$END$model_ext1
 						EX=$?
 						if [ $EX -ne 0 ]; then
 							echo "$EX $model_imagepath$model_image"
 							exit $EX
 						fi
-						cp ./bin/targets$model_imagepath$model_image2 ./images/$model_mod"-full"$END$model_ext2
+						cp ./bin/targets$model_imagepath$model_image2 ./images/$model_mod"-MWAN3"$END$model_ext2
 						EX=$?
 						if [ $EX -ne 0 ]; then
 							echo "$EX $model_imagepath$model_image"
 							exit $EX
 						fi
 						cd ./images
-						zip $zippassword$model_mod$END.zip $model_mod"-full"$END$model_ext1 $model_mod"-full"$END$model_ext2 
-						rm -f $model_mod"-full"$END$model_ext1
-						rm -f $model_mod"-full"$END$model_ext2
+						zip $zippassword$model_mod$END.zip $model_mod"-MWAN3"$END$model_ext1 $model_mod"-MWAN3"$END$model_ext2 
+						rm -f $model_mod"-MWAN3"$END$model_ext1
+						rm -f $model_mod"-MWAN3"$END$model_ext2
 						cd ..
 					fi
 				fi
@@ -585,22 +585,22 @@ buldimage() {
 						make defconfig
 						configfix
 						make V=s
-						cp ./bin/targets$model_imagepath$model_image1 ./images/$model_mod"-full"$END$model_ext1
+						cp ./bin/targets$model_imagepath$model_image1 ./images/$model_mod"-MWAN3"$END$model_ext1
 						EX=$?
 						if [ $EX -ne 0 ]; then
 							echo "$EX $model_imagepath$model_image"
 							exit $EX
 						fi
-						cp ./bin/targets$model_imagepath$model_image2 ./images/$model_mod"-full"$END$model_ext2
+						cp ./bin/targets$model_imagepath$model_image2 ./images/$model_mod"-MWAN3"$END$model_ext2
 						EX=$?
 						if [ $EX -ne 0 ]; then
 							echo "$EX $model_imagepath$model_image"
 							exit $EX
 						fi
 						cd ./images
-						zip $zippassword$model_mod$END.zip $model_mod"-full"$END$model_ext1 $model_mod"-full"$END$model_ext2 
-						rm -f $model_mod"-full"$END$model_ext1
-						rm -f $model_mod"-full"$END$model_ext2
+						zip $zippassword$model_mod$END.zip $model_mod"-MWAN3"$END$model_ext1 $model_mod"-MWAN3"$END$model_ext2 
+						rm -f $model_mod"-MWAN3"$END$model_ext1
+						rm -f $model_mod"-MWAN3"$END$model_ext2
 						cd ..
 					fi
 				fi	
@@ -667,12 +667,12 @@ buldimage() {
 						fi
 						cd ./images
 						gunzip $model_image1
-						mv $model_image2 $model_mod"-full"$END$model_ext1
+						mv $model_image2 $model_mod"-MWAN3"$END$model_ext1
 						gunzip $model_image3
-						mv $model_image4 $model_mod"-full"$END$model_ext2
-						zip -r $zippassword $model_mod$END.zip $model_mod"-full"$END$model_ext1 $model_mod"-full"$END$model_ext2 
-						rm -f $model_mod"-full"$END$model_ext1
-						rm -f $model_mod"-full"$END$model_ext2
+						mv $model_image4 $model_mod"-MWAN3"$END$model_ext2
+						zip -r $zippassword $model_mod$END.zip $model_mod"-MWAN3"$END$model_ext1 $model_mod"-MWAN3"$END$model_ext2 
+						rm -f $model_mod"-MWAN3"$END$model_ext1
+						rm -f $model_mod"-MWAN3"$END$model_ext2
 						cd ..
 					fi
 				fi
@@ -700,12 +700,12 @@ buldimage() {
 						fi
 						cd ./images
 						gunzip $model_image1
-						mv $model_image2 $model_mod"-full"$END$model_ext1
+						mv $model_image2 $model_mod"-MWAN3"$END$model_ext1
 						gunzip $model_image3
-						mv $model_image4 $model_mod"-full"$END$model_ext2
-						zip -r $zippassword $model_mod$END.zip $model_mod"-full"$END$model_ext1 $model_mod"-full"$END$model_ext2 
-						rm -f $model_mod"-full"$END$model_ext1
-						rm -f $model_mod"-full"$END$model_ext2
+						mv $model_image4 $model_mod"-MWAN3"$END$model_ext2
+						zip -r $zippassword $model_mod$END.zip $model_mod"-MWAN3"$END$model_ext1 $model_mod"-MWAN3"$END$model_ext2 
+						rm -f $model_mod"-MWAN3"$END$model_ext1
+						rm -f $model_mod"-MWAN3"$END$model_ext2
 						cd ..
 					fi
 				fi
@@ -758,9 +758,9 @@ buldimage() {
 						fi
 						cd ./images
 						gunzip $model_image1
-						mv $model_image2 $model_mod"-full"$END"-ext4.img"
-						zip -r $zippassword $model_mod$END.zip $model_mod"-full"$END"-ext4.img" 
-						rm -f $model_mod"-full"$END"-ext4.img"
+						mv $model_image2 $model_mod"-MWAN3"$END"-ext4.img"
+						zip -r $zippassword $model_mod$END.zip $model_mod"-MWAN3"$END"-ext4.img" 
+						rm -f $model_mod"-MWAN3"$END"-ext4.img"
 						rm -f $model_imagepath$model_image1
 						cd ..
 					fi
@@ -783,9 +783,9 @@ buldimage() {
 						fi
 						cd ./images
 						gunzip $model_image1
-						mv $model_image2 $model_mod"-full"$END"-ext4.img"
-						zip -r $zippassword $model_mod$END.zip $model_mod"-full"$END"-ext4.img" 
-						rm -f $model_mod"-full"$END"-ext4.img"
+						mv $model_image2 $model_mod"-MWAN3"$END"-ext4.img"
+						zip -r $zippassword $model_mod$END.zip $model_mod"-MWAN3"$END"-ext4.img" 
+						rm -f $model_mod"-MWAN3"$END"-ext4.img"
 						rm -f $model_imagepath$model_image1
 						cd ..
 					fi
