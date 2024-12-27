@@ -492,12 +492,14 @@ case $PROT in
 esac
 
 OX=$(for a in /sys/class/tty/*; do readlink $a; done | grep "$MATCH" | tr '\n' ' ' | xargs -r -n1 basename)
-TTYDEVS=$(echo "$OX" | grep -o ttyUSB[0-9])
+TTYDEVS=$(echo "$OX" | grep -o ttyUSB)
 if [ $? -ne 0 ]; then
-	TTYDEVS=$(echo "$OX" | grep -o ttyACM[0-9])
+	TTYDEVS=$(echo "$OX" | grep -o ttyACM)
 	[ $? -eq 0 ] && ACM=1
 fi
-TTYDEVS=$(echo "$TTYDEVS" | tr '\n' ' ')
+echo "$OX" > /tmp/ttyp
+$ROOTER/connect/getports.lua
+TTYDEVS=$(cat /tmp/ttyp | tr '\n' ' ')
 TTYDEVS=$(echo $TTYDEVS)
 if [ -n "$TTYDEVS" ]; then
 	log "Modem $CURRMODEM is a parent of $TTYDEVS"
