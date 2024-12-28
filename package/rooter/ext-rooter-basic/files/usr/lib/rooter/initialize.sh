@@ -12,7 +12,7 @@ fi
 #
 # Set the maximum number of modems supported
 #
-MAX_MODEMS=2
+MAX_MODEMS=$(uci -q get maxmodem.maxmodem.maxmodem)
 MODCNT=$MAX_MODEMS
 
 log() {

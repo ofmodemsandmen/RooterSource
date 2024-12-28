@@ -685,9 +685,11 @@ end
 
 		cmw = s:taboption(this_ctaba, ListValue, "inter", translate("Modem Interface Selection :"));
 		cmw:value("0", "Auto")
-		cmw:value("1", "WAN1")
-		cmw:value("2", "WAN2")
-		cmw:value("3", "OFF")
+		for i=1,maxmodem do
+			si = tostring(i)
+			cmw:value(si, "WAN" .. si)
+		end
+		cmw:value("5", "OFF")
 		cmw.default=0
 
 		cmd = s:taboption(this_ctaba, Value, "delay", translate("Connection Delay in Seconds :")); 

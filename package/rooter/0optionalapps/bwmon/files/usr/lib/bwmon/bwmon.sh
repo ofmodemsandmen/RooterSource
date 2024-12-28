@@ -88,7 +88,14 @@ device_get_stats() {
 }
 
 update() {
-	interfaces="wan1 wan2 wan wwan2 wwan5"
+	MAX=$(uci -q get maxmodem.maxmodem.maxmodem)
+	i=1
+	inter=""
+	while [ "$i" -le "$MAX" ]; do
+		inter=$inter"wan"$i" "
+		let i=$i+1
+	done
+	interfaces=$inter"wan wwan2 wwan5"
 	
 	rxval="0"
 	txval="0"

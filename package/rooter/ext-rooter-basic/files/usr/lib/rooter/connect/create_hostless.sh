@@ -478,6 +478,7 @@ if [ -e $ROOTER/connect/chkconn.sh ]; then
 fi
 
 INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
+[ $INTER = 5 ] && log "Modem $CURRMODEM disabled in Connection Profile" && exit 1
 if [ -z "$INTER" ]; then
 	INTER=$CURRMODEM
 else

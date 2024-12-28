@@ -866,7 +866,7 @@ if [ -n "$CHKPORT" ]; then
 		/usr/lib/gps/gps.sh $CURRMODEM &
 	fi
 	INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
-	[ $INTER = 3 ] && log "Modem $CURRMODEM disabled in Connection Profile" && exit 1
+	[ $INTER = 5 ] && log "Modem $CURRMODEM disabled in Connection Profile" && exit 1
 	$ROOTER/sms/check_sms.sh $CURRMODEM &
 	get_connect
 	if [ -z "$INTER" ]; then

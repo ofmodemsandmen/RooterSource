@@ -217,20 +217,16 @@ end
 				if ( gpio == "0" )
 				{
 					document.getElementById("pwrtoggle").style.display="none";
-					document.getElementById("pwrtoggle1").style.display="none";
 				}
 				if ( gpio == "1" )
 				{
 					document.getElementById("pwrtoggle").style.display="block";
 					document.getElementById("pwrtoggle").disabled=true;
-					document.getElementById("pwrtoggle1").style.display="none";
 				}
 				if ( gpio == "2" )
 				{
 					document.getElementById("pwrtoggle").style.display="block";
-					document.getElementById("pwrtoggle1").style.display="block";
 					document.getElementById("pwrtoggle").disabled=true;
-					document.getElementById("pwrtoggle1").disabled=true;
 				}
 			<% if nosms == 0 then %>	
 				plock = rv.plock;
@@ -354,46 +350,35 @@ end
 					if ( usb == "0" )
 					{
 						document.getElementById("pwrtoggle").style.display="none";
-						document.getElementById("pwrtoggle1").style.display="none";
 					}
 					if ( usb == "1" )
 					{
 						document.getElementById("pwrtoggle").style.display="block";
-						document.getElementById("pwrtoggle").value="<%:Reset USB 1%>";
+						document.getElementById("pwrtoggle").value="<%:Restart Modem%>";
 						document.getElementById("pwrtoggle").disabled=false;
 						document.getElementById("pwrtoggle").style.visibility="visible";
-						document.getElementById("pwrtoggle1").style.display="none";
 					}
 					if ( usb == "2" )
 					{
 						document.getElementById("pwrtoggle").style.display="block";
-						document.getElementById("pwrtoggle").value="<%:Reset USB 1%>";
+						document.getElementById("pwrtoggle").value="<%:Restart Modem%>";
 						document.getElementById("pwrtoggle").disabled=false;
 						document.getElementById("pwrtoggle").style.visibility="visible";
-						document.getElementById("pwrtoggle1").style.display="block";
-						document.getElementById("pwrtoggle1").value="<%:Reset USB 2%>";
-						document.getElementById("pwrtoggle1").disabled=false;
-						document.getElementById("pwrtoggle1").style.visibility="visible";
 					}
 				}
 				if ( gpio == "1" )
 				{
 					document.getElementById("pwrtoggle").style.display="block";
-					document.getElementById("pwrtoggle").value="<%:Power Toggle USB 1%>";
+					document.getElementById("pwrtoggle").value="<%:Restart Modem%>";
 					document.getElementById("pwrtoggle").disabled=false;
 					document.getElementById("pwrtoggle").style.visibility="visible";
-					document.getElementById("pwrtoggle1").style.display="none";
 				}
 				if ( gpio == "2" )
 				{
 					document.getElementById("pwrtoggle").style.display="block";
-					document.getElementById("pwrtoggle").value="<%:Power Toggle USB 1%>";
+					document.getElementById("pwrtoggle").value="<%:Restart Modem%>";
 					document.getElementById("pwrtoggle").disabled=false;
 					document.getElementById("pwrtoggle").style.visibility="visible";
-					document.getElementById("pwrtoggle1").style.display="block";
-					document.getElementById("pwrtoggle1").value="<%:Power Toggle USB 2%>";
-					document.getElementById("pwrtoggle1").disabled=false;
-					document.getElementById("pwrtoggle1").style.visibility="visible";
 				}
 			}
 			if ( stat == "2" )
@@ -463,46 +448,35 @@ end
 					if ( usb == "0" )
 					{
 						document.getElementById("pwrtoggle").style.display="none";
-						document.getElementById("pwrtoggle1").style.display="none";
 					}
 					if ( usb == "1" )
 					{
 						document.getElementById("pwrtoggle").style.display="block";
-						document.getElementById("pwrtoggle").value="<%:Reset USB 1%>";
+						document.getElementById("pwrtoggle").value="<%:Restart Modem%>";
 						document.getElementById("pwrtoggle").disabled=false;
 						document.getElementById("pwrtoggle").style.visibility="visible";
-						document.getElementById("pwrtoggle1").style.display="none";
 					}
 					if ( usb == "2" )
 					{
 						document.getElementById("pwrtoggle").style.display="block";
-						document.getElementById("pwrtoggle").value="<%:Reset USB 1%>";
+						document.getElementById("pwrtoggle").value="<%:Restart Modem%>";
 						document.getElementById("pwrtoggle").disabled=false;
 						document.getElementById("pwrtoggle").style.visibility="visible";
-						document.getElementById("pwrtoggle1").style.display="block";
-						document.getElementById("pwrtoggle1").value="<%:Reset USB 2%>";
-						document.getElementById("pwrtoggle1").disabled=false;
-						document.getElementById("pwrtoggle1").style.visibility="visible";
 					}
 				}
 				if ( gpio == "1" )
 				{
 					document.getElementById("pwrtoggle").style.display="block";
-					document.getElementById("pwrtoggle").value="<%:Power Toggle USB 1%>";
+					document.getElementById("pwrtoggle").value="<%:Restart Modem%>";
 					document.getElementById("pwrtoggle").disabled=false;
 					document.getElementById("pwrtoggle").style.visibility="visible";
-					document.getElementById("pwrtoggle1").style.display="none";
 				}
 				if ( gpio == "2" )
 				{
 					document.getElementById("pwrtoggle").style.display="block";
-					document.getElementById("pwrtoggle").value="<%:Power Toggle USB 1%>";
+					document.getElementById("pwrtoggle").value="<%:Restart Modem%>";
 					document.getElementById("pwrtoggle").disabled=false;
 					document.getElementById("pwrtoggle").style.visibility="visible";
-					document.getElementById("pwrtoggle1").style.display="block";
-					document.getElementById("pwrtoggle1").value="<%:Power Toggle USB 2%>";
-					document.getElementById("pwrtoggle1").disabled=false;
-					document.getElementById("pwrtoggle1").style.visibility="visible";
 				}
 			}
 			proto = rv.proto
@@ -1399,28 +1373,13 @@ end
 	function powertoggle(btn)
 	{
 		btn.disabled = true;
-		btn.value    = '<%:Toggling...%>';
+		btn.value    = '<%:Restarting...%>';
 		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "pwrtoggle")%>',
 			{ set: 1 },
 			function()
 			{
 				btn.disabled = false;
-				btn.value = '<%:Power Toggle USB 1%>';
-			}
-		);
-		return false;
-	}
-
-	function powertoggle1(btn)
-	{
-		btn.disabled = true;
-		btn.value    = '<%:Toggling...%>';
-		XHR.get('<%=luci.dispatcher.build_url("admin", "modem", "pwrtoggle")%>',
-			{ set: 2 },
-			function()
-			{
-				btn.disabled = false;
-				btn.value = '<%:Power Toggle USB 2%>';
+				btn.value = '<%:Restart Modem%>';
 			}
 		);
 		return false;
@@ -2168,10 +2127,9 @@ end
 			<input type="button" id="disconn" class="cbi-button cbi-button-apply" value="<%:Disconnect Current Modem%>" onclick="return modemdisconnect(this)" />
 		</td>
 		<td width="25%">
-			<input style="visibility:hidden;" type="button" id="pwrtoggle" class="cbi-button cbi-button-apply" value="<%:Power Toggle USB 1%>" onclick="return powertoggle(this)" />
+			<input style="visibility:hidden;" type="button" id="pwrtoggle" class="cbi-button cbi-button-apply" value="<%:Restart Modem%>" onclick="return powertoggle(this)" />
 		</td>
 		<td width="25%">
-			<input style="visibility:hidden;" type="button" id="pwrtoggle1" class="cbi-button cbi-button-apply" value="<%:Power Toggle USB 2%>" onclick="return powertoggle1(this)" />
 		</td>
   	</tr>
 	</table>
