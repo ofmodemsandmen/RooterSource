@@ -513,10 +513,6 @@ if [ "$ACTION" = add ]; then
 		;;
 	"10"|"11"|"12"|"13"|"14"|"15"|"16" )
 		if [ "$retval" = "11" ]; then
-			log "Ignore GLAA"
-			uci set modem.modem$CURRMODEM.empty=1
-			uci commit modem
-			exit 0
 			if [ -e /dev/wwan0mbim0 ]; then
 				log "Connecting a MHI Modem"
 				uci set modem.modem$CURRMODEM.proto=91
