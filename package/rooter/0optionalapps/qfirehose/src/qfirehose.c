@@ -20,6 +20,7 @@
 
 #include "usb_linux.h"
 #include "md5.h"
+#include <inttypes.h>
 
 /*
 [PATCH 3.10 27/54] usb: xhci: Add support for URB_ZERO_PACKET to bulk/sg transfers
@@ -330,7 +331,7 @@ int main(int argc, char* argv[])
             break;
             case 'l':
                 if (loghandler) fclose(loghandler);
-                snprintf(filename, sizeof(filename), "%.80s/qfirehose_%lu.log", optarg, time(NULL));
+                snprintf(filename, sizeof(filename), "%.80s/qfirehose_%"PRIu64".log", optarg, (uint64_t)time(NULL));
                 loghandler = fopen(filename, "w+");
                 if (loghandler) dbg_time("upgrade log will be sync to %s\n", filename);
             break;
