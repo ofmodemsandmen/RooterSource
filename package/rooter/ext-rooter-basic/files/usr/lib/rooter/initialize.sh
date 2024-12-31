@@ -9,12 +9,6 @@ if [ -f "/etc/codename" ]; then
 	source /etc/codename
 fi
 
-#
-# Set the maximum number of modems supported
-#
-MAX_MODEMS=$(uci -q get maxmodem.maxmodem.maxmodem)
-MODCNT=$MAX_MODEMS
-
 log() {
 	modlog "ROOter Initialize" "$@"
 }
@@ -31,7 +25,7 @@ do_zone() {
 		WAN1=$(echo $network | grep "wan1")
 		if [ -z $WAN1 ]; then
 			COUNTER=1
-			while [ $COUNTER -le $MODCNT ]; do
+			while [ $COUNTER -le 5 ]; do
 				newnet="$newnet wan$COUNTER"
 				let COUNTER=COUNTER+1
 			done
@@ -72,6 +66,12 @@ firstboot() {
 		DR="21.02.2"
 	fi
 	tone=$(echo "$DR" | grep "2")
+	if [ -e /etc/config/mwan3 ]; then
+		uci set maxmodem.maxmodem.maxmodem=2
+	else
+		uci set maxmodem.maxmodem.maxmodem=1
+	fi
+	uci commit maxmodem
 }
 
 if [ -e /tmp/installing ]; then
@@ -86,6 +86,12 @@ sed -i -e 's|/etc/savevar|#removed line|g' /etc/rc.local
 [ -f "/etc/firstboot" ] || {
 	firstboot
 }
+
+#
+# Set the maximum number of modems supported
+#
+MAX_MODEMS=$(uci -q get maxmodem.maxmodem.maxmodem)
+MODCNT=$MAX_MODEMS
 
 mkdir -p $ROOTER_LINK
 
@@ -157,6 +163,17 @@ if [ -n "$tone" -o -e /etc/newstyle ]; then
 fi
 
 COUNTER=1
+while [ $COUNTER -le 5 ]; do
+	uci -q delete network.wan$COUNTER
+	uci -q delete network.wan$COUNTER"_6"
+	uci delete modem.modem$COUNTER
+	uci delete modem.modeminfo$COUNTER
+	let COUNTER=COUNTER+1
+done
+uci commit network
+uci commit modem
+
+COUNTER=1
 while [ $COUNTER -le $MODCNT ]; do
 	uci delete modem.modem$COUNTER
 	uci set modem.modem$COUNTER=modem
@@ -194,6 +211,7 @@ while [ $COUNTER -le $MODCNT ]; do
 		ENB=$(uci -q get mwan3.wan$COUNTER.enabled)
 		if [ ! -z $ENB ]; then
 			uci set mwan3.wan$COUNTER.enabled=1
+			uci set mwan3.wan$COUNTER'_6'.enabled=1
 		fi
 	fi
 

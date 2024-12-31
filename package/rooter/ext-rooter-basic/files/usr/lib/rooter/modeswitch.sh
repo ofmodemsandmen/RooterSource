@@ -296,6 +296,10 @@ if [ "$ACTION" = add ]; then
 	reinsert=0
 	find_device $DEVICENAME
 	find_empty
+	if [ "$remresult" = "0" ]; then
+		log "Exceeded Maximum Number of Modems"
+		exit 0
+	fi
 	log "CURRMODEM $remresult"
  
 	log "Add : $DEVICENAME: Manufacturer=${uMa:-?} Product=${uPr:-?} Serial=${uSe:-?} $uVid $uPid"
