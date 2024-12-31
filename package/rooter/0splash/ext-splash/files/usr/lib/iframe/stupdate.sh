@@ -327,7 +327,7 @@ if [ $splash = "1" ]; then
 	sed -i -e "s!#MODEM#!$namev!g" $STEMP
 	level2txt "$cops" "single"
 	namev=$(echo "$namev" | tr -d '&')
-	sed -i -e "s~#PROVIDER#~$namev~g" $STEMP
+	sed -i -e "s!#PROVIDER#!$namev!g" $STEMP
 	level2txt "$proto" "single"
 	sed -i -e "s!#PROTO#!$namev!g" $STEMP
 	level2txt "$port" "single"
@@ -360,70 +360,100 @@ if [ $splash = "1" ]; then
 	level2txt "$CODENAME" "single"
 	sed -i -e "s!#FIRMWARE#!$namev!g" $STEMP
 	
+	MAX_MODEMS=$(uci -q get maxmodem.maxmodem.maxmodem)
 	dual=$(uci -q get iframe.iframe.dual)
-	if [ $dual = "1" ]; then
-		STEMP2="/tmp/www/stemp2.html"
-		STATUS2="/usr/lib/iframe/modem2.html"
-		rm -f $STEMP2
-		cp $STATUS2 $STEMP2
-		
-		readstatus 2
-		level2txt "$csq" "single" 0
-		sed -i -e "s!#CSQ#!$namev!g" $STEMP2
-		level2txt "$per" "per"
-		sed -i -e "s!#PER#!$namev!g" $STEMP2
-		level2txt "$rssi" "rssi"
-		sed -i -e "s!#RSSI#!$namev!g" $STEMP2
-		level2txt "$rscp" "rscp"
-		sed -i -e "s!#RSCP#!$namev!g" $STEMP2
-		level2txt "$ecio" "single" 1
-		sed -i -e "s!#RSRQ#!$namev!g" $STEMP2
-		level2txt "$sinr" "single" 1
-		sed -i -e "s!#SINR#!$namev!g" $STEMP2
+	cont=2
+	while [ "$cont" -le 5 ]; do
+		EMPTY=$(uci get modem.modem$cont.empty)
+		if [ $dual = "1" -a "$cont" -le "$MAX_MODEMS" -a "$EMPTY" = "0" ]; then
+			STEMP2="/tmp/www/stemp2.html"
+			STATUS2="/usr/lib/iframe/modem2.html"
+			rm -f $STEMP2
+			cp $STATUS2 $STEMP2
+			
+			sed -i -e "s!#MODEMN#!$cont!g" $STEMP2
+			readstatus $cont
+			level2txt "$csq" "single" 0
+			sed -i -e "s!#CSQ#!$namev!g" $STEMP2
+			level2txt "$per" "per"
+			sed -i -e "s!#PER#!$namev!g" $STEMP2
+			level2txt "$rssi" "rssi"
+			sed -i -e "s!#RSSI#!$namev!g" $STEMP2
+			level2txt "$rscp" "rscp"
+			sed -i -e "s!#RSCP#!$namev!g" $STEMP2
+			level2txt "$ecio" "single" 1
+			sed -i -e "s!#RSRQ#!$namev!g" $STEMP2
+			level2txt "$sinr" "single" 1
+			sed -i -e "s!#SINR#!$namev!g" $STEMP2
 
-		level2txt "$mode" "single"
-		sed -i -e "s!#MODE#!$namev!g" $STEMP2
-		level2txt "$mcc" "single"
-		sed -i -e "s!#MCC#!$namev!g" $STEMP2
-		level2txt "$mnc" "single"
-		sed -i -e "s!#MNC#!$namev!g" $STEMP2
-		level2txt "$rnc" "single"
-		sed -i -e "s!#RNC#!$namev!g" $STEMP2
-		level2txt "$rncn" "single"
-		sed -i -e "s!#RNCN#!$namev!g" $STEMP2
-		level2txt "$lac" "single"
-		sed -i -e "s!#LAC#!$namev!g" $STEMP2
-		level2txt "$lacn" "single"
-		sed -i -e "s!#LACN#!$namev!g" $STEMP2
-		level2txt "$pci" "single"
-		sed -i -e "s!#CELLID#!$namev!g" $STEMP2
-		level2txt "$channel" "single"
-		sed -i -e "s!#CHAN#!$namev!g" $STEMP2
-		level2txt "$lband" "single"
-		sed -i -e "s!#BAND#!$namev!g" $STEMP2
+			level2txt "$mode" "single"
+			sed -i -e "s!#MODE#!$namev!g" $STEMP2
+			level2txt "$mcc" "single"
+			sed -i -e "s!#MCC#!$namev!g" $STEMP2
+			level2txt "$mnc" "single"
+			sed -i -e "s!#MNC#!$namev!g" $STEMP2
+			level2txt "$rnc" "single"
+			sed -i -e "s!#RNC#!$namev!g" $STEMP2
+			level2txt "$rncn" "single"
+			sed -i -e "s!#RNCN#!$namev!g" $STEMP2
+			level2txt "$lac" "single"
+			sed -i -e "s!#LAC#!$namev!g" $STEMP2
+			level2txt "$lacn" "single"
+			sed -i -e "s!#LACN#!$namev!g" $STEMP2
+			level2txt "$pci" "single"
+			sed -i -e "s!#CELLID#!$namev!g" $STEMP2
+			level2txt "$channel" "single"
+			sed -i -e "s!#CHAN#!$namev!g" $STEMP2
+			level2txt "$lband" "single"
+			sed -i -e "s!#BAND#!$namev!g" $STEMP2
+			
+			sp="/tmp/simpin"$cont
+			spok="/tmp/simpinok"$cont
+			if [ ! -e $sp ]; then
+				if [ ! -e $spok ]; then
+					sim="-"
+				else
+					sim="Okay"
+				fi
+			else
+				simerr=$(cat $sp)
+				if [ "$simerr" = "0" -o "$simerr" = "1" -o "$simerr" = "2" ]; then
+					sim="Error"
+				else
+					if [ "$simerr" = "3" ]; then
+						sim="Okay"
+					else
+						sim="-"
+					fi
+				fi
+			fi
+			level2txt "$sim" "single"
+			sed -i -e "s!#SIM#!$namev!g" $STEMP2
 
-		level2txt "$modem" "single"
-		sed -i -e "s!#MODEM#!$namev!g" $STEMP2
-		level2txt "$cops" "single"
-		namev=$(echo "$namev" | tr -d '&')
-		sed -i -e "s!#MODEMN#!$namev!g" $STEMP2
-		level2txt "$proto" "single"
-		sed -i -e "s!#PROTO#!$namev!g" $STEMP2
-		level2txt "$port" "single"
-		sed -i -e "s!#PORT#!$namev!g" $STEMP2
-		level2txt "$tempur" "single"
-		sed -i -e "s!#TEMP#!$namev!g" $STEMP2
-		level2txt "$inter" "single"
-		if [ "$namev" != "<b class='level_2'>--</b>" ]; then
-			namev="<i class='msText'>WAN$namev</i>"
+			level2txt "$modem" "single"
+			sed -i -e "s!#MODEM#!$namev!g" $STEMP2
+			level2txt "$cops" "single"
+			namev=$(echo "$namev" | tr -d '&')
+			sed -i -e "s!#PROVIDER#!$namev!g" $STEMP2
+			level2txt "$proto" "single"
+			sed -i -e "s!#PROTO#!$namev!g" $STEMP2
+			level2txt "$port" "single"
+			sed -i -e "s!#PORT#!$namev!g" $STEMP2
+			level2txt "$tempur" "single"
+			sed -i -e "s!#TEMP#!$namev!g" $STEMP2
+			level2txt "$inter" "single"
+			if [ "$namev" != "<b class='level_2'>--</b>" ]; then
+				namev="<i class='msText'>WAN$namev</i>"
+			fi
+			sed -i -e "s!#INTER2#!$namev!g" $STEMP2
+			
+			MODEM2=$(cat $STEMP2)
+			sed -i -e "s!#MODEM$cont#!$MODEM2!g" $STEMP
+		else
+			sed -i -e "s!#MODEM$cont#!!g" $STEMP
 		fi
-		sed -i -e "s!#INTER2#!$namev!g" $STEMP2
-		
-		MODEM2=$(cat $STEMP2)
-		sed -i -e "s!#MODEM2#!$MODEM2!g" $STEMP
-	else
-		sed -i -e "s!#MODEM2#!!g" $STEMP
-	fi
+		let cont=$cont+1
+	done
 	
 	open=$(uci -q get iframe.iframe.speed)
 	if [ $open = "1" ]; then

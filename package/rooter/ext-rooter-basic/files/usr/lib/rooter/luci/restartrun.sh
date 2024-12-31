@@ -54,13 +54,18 @@ pwrtoggle() {
 			echo "0" > /sys/class/gpio/modem2/value
 			sleep 2
 			echo "1" > /sys/class/gpio/modem2/value
+			log "Power Toggle"
+			toggle="1"
 		else
-			echo "0" > /sys/class/gpio/modem1/value
-			sleep 2
-			echo "1" > /sys/class/gpio/modem1/value
+			if [ $DEV = "2-1.1" ]; then
+				echo "0" > /sys/class/gpio/modem1/value
+				sleep 2
+				echo "1" > /sys/class/gpio/modem1/value
+				log "Power Toggle"
+				toggle="1"
+			fi
 		fi
-		log "Power Toggle"
-		toggle="1"
+		
 		return
 	fi
 	bnx=$(echo "$bn" | grep "ws1698")

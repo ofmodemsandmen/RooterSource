@@ -22,7 +22,7 @@ a1.optional=false;
 a1.default = translate("ROOter Status")
 a1:depends("splashpage", "1")
 
-dc1 = s:option(ListValue, "dual", translate("Enable Modem 2 Status :"));
+dc1 = s:option(ListValue, "dual", translate("Enable Multiple Modem Status :"));
 dc1:value("0", translate("Disabled"))
 dc1:value("1", translate("Enabled"))
 dc1.default=0
