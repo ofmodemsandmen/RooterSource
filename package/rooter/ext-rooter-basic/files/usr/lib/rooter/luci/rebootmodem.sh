@@ -39,6 +39,10 @@ if [ "$proto" = 91 ]; then
 else
 	/usr/lib/rooter/luci/remodem.sh 1 &
 fi
-/usr/lib/rooter/luci/remodem.sh 2 &
+COUNTER=2
+while [ $COUNTER -le 5 ]; do
+	/usr/lib/rooter/luci/remodem.sh $COUNTER &
+	let COUNTER=COUNTER+1
+done
 sleep 5
 reboot -f

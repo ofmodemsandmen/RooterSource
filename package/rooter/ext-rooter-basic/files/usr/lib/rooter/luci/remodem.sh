@@ -7,14 +7,13 @@ log() {
 }
 
 CURRMODEM=$1
-CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
-uVid=$(uci get modem.modem$CURRMODEM.uVid)
 empty=$(uci -q get modem.modem$CURRMODEM.empty)
-if [ "$empty" = "1" ]; then
+if [ "$empty" != "0" ]; then
 	log "No Modem"
 	exit 0
 fi
-
+CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
+uVid=$(uci get modem.modem$CURRMODEM.uVid)
 if [ ! -e /dev/ttyUSB$CPORT ]; then
 	log "No Modem"
 	exit 0
