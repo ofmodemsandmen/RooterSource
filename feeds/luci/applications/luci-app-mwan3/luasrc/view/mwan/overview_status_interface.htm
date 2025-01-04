@@ -46,10 +46,6 @@ XHR.poll(-1, '<%=luci.dispatcher.build_url("admin", "status", "mwan", "interface
 							);
 							css = 'danger';
 							break;
-						default:
-							state = '<%:Disabled%>';
-							css = 'warning';
-							break;
 					}
 					statusview += String.format(
 						'<div class="alert-message %s">',
@@ -63,11 +59,14 @@ XHR.poll(-1, '<%=luci.dispatcher.build_url("admin", "status", "mwan", "interface
 						'<div><strong>Status: </strong>%s</div>',
 						state
 					);
-					if (time)
+					if (css)
 					{
-						statusview += time;
+						if (time)
+						{
+							statusview += time;
+						}
+						statusview += '</div>'
 					}
-					statusview += '</div>'
 				}
 				statusDiv.innerHTML = statusview;
 			}

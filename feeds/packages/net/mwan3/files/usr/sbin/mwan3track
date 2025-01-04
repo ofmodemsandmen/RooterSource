@@ -107,8 +107,14 @@ validate_wrap() {
 disconnected() {
 	local status="$(cat ${MWAN3TRACK_STATUS_DIR}/${INTERFACE}/STATUS)"
 
-	STATUS='offline'
-	echo "offline" > $MWAN3TRACK_STATUS_DIR/$INTERFACE/STATUS
+	eng=$(uci -q get mwan3.$INTERFACE.enabled)
+	if [ "$eng" = "0" ]; then
+		STATUS='disabled'
+		echo "disabled" > $MWAN3TRACK_STATUS_DIR/$INTERFACE/STATUS
+	else
+		STATUS='offline'
+		echo "offline" > $MWAN3TRACK_STATUS_DIR/$INTERFACE/STATUS
+	fi
 	get_uptime > $MWAN3TRACK_STATUS_DIR/$INTERFACE/OFFLINE
 	echo "0" > $MWAN3TRACK_STATUS_DIR/$INTERFACE/ONLINE
 	score=0
