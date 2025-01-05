@@ -14,7 +14,7 @@ define Package/ext-rooter16
   SECTION:=utils
   CATEGORY:=ROOter
   DEPENDS:=+ext-rooter-lite \
-		+luci-app-mwan3 +luci-app-dnsmasq-ipset 
+		+luci-app-mwan3 +luci-app-dnsmasq-ipset +ext-multimodem 
   TITLE:=ROOter support for 16meg and larger routers with MWan3
   PKGARCH:=all
 endef
