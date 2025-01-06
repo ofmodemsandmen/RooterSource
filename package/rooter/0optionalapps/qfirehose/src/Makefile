@@ -5,3 +5,4 @@ qfirehose:
 
 clean:
 	rm -rf firehose obj libs
+ 
