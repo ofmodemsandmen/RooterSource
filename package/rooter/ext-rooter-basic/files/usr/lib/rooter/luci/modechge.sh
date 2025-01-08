@@ -206,13 +206,13 @@ if [ $MODEMTYPE -eq 8 ]; then
 		"5" )
 			ATC="AT\$QCNSP=2,0,0" ;;
 		"7" )
-			ATC="AT\$QCNSP=6,0,0" ;;
+			ATC="AT\$QCNSP=6,0,0;^SLMODE=1,2" ;;
 		"8" )
 			ATC="AT^SLMODE=1,6" ;;
 		"9" )
 			ATC="AT^SLMODE=1,4" ;;
 		* )
-			ATC="AT\$QCNSP=0,0,0" ;;
+			ATC="AT\$QCNSP=0,0,0;^SLMODE=1,0" ;;
 	esac
 fi
 

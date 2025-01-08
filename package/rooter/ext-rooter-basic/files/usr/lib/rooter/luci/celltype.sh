@@ -291,13 +291,14 @@ meig_type() {
 }
 
 telit_type() {
-	if [ "$idV" == "1e2d" ]; then
+	if [ "$idV" == "1e2d" -o $idP == "81df" ]; then
 		ATCMDD="AT^SLMODE?"
 		OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		OX=$(echo $OX | tr -d ' ')
 		SCFG=$(echo $OX | grep -o "\^SLMODE:[01],[0-9]")
 		if [ -n "$SCFG" ]; then
 			RAT=${SCFG: -1}
+			log "RAT $RAT"
 			case $RAT in
 			"1" )
 				NETMODE="5" ;;
@@ -306,6 +307,8 @@ telit_type() {
 			"4" )
 				NETMODE="9" ;;
 			"6" )
+				NETMODE="8" ;;
+			"7" )
 				NETMODE="8" ;;
 			* )
 				NETMODE="1" ;;
@@ -520,7 +523,7 @@ case $idV in
 	;;
 "413c" )
 	case $idP in
-		"81d7"|"81d8" )
+		"81d7"|"81d8"|"81df" )
 			telit_type
 		;;
 		* )

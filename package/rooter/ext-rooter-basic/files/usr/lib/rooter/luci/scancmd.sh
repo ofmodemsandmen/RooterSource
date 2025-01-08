@@ -255,6 +255,17 @@ case $uVid in
 		echo "Done" >> /tmp/scan
 		exit 0
 	;;
+	"413c" )
+		if [ $uPid = 81df ]; then
+			M2='AT+VZWRSRP?'
+		else
+			rm -f /tmp/scanx
+			echo "Scan for Neighbouring cells not supported" >> /tmp/scan
+			uci set modem.pinginfo$CURRMODEM.alive=$ALIVE
+			uci commit modem
+			exit 0
+		fi
+	;;
 	* )
 		rm -f /tmp/scanx
 		echo "Scan for Neighbouring cells not supported" >> /tmp/scan
@@ -264,7 +275,7 @@ case $uVid in
 	;;
 esac
 
-export TIMEOUT="10"
+#export TIMEOUT="20"
 OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M2")
 OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M2")
 log "$OX"
@@ -346,6 +357,38 @@ do
 				break
 			fi
 		fi
+	;;
+	"413c")
+		while [ 1 = 1 ]
+		do
+			read -r line
+			qm=$(echo $line" " | grep "OK" | tr -d '"' | tr " " ",")
+			if [ "$qm" ]; then
+				break
+			fi
+			vz=$(echo "$line" | grep "+VZWRSRP")
+			if [ ! -z "$vz" ]; then
+				line=${line:10}
+			fi
+			BND=$(echo $line | cut -d, -f2)
+			PCI=$(echo $line | cut -d, -f1)
+			BAND=$(/usr/bin/chan2band.sh $BND)
+			RSSI=$(echo $line | cut -d, -f3 | tr -d '"')
+			if [ ! -z "$RSSI" ]; then
+				size=${#BAND}
+				if [ "$size" -lt 3 ]; then
+					BAND=$BAND" "
+				fi
+				BND=$BND"     "
+				BND=${BND:0:5}
+				let RSSI=$RSSI/10
+				RSSI=$RSSI"     "
+				RSSI=${RSSI:0:4}
+				echo "Band : $BAND    Signal : $RSSI (dBm) EARFCN : $BND  PCI : $PCI" >> /tmp/scan
+				flg=1
+			fi
+		done
+		break
 	;;
 	* )
 	

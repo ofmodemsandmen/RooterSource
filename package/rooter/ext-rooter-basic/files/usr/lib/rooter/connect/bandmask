@@ -369,6 +369,12 @@ t77mask() {
 		log "T77 Response : $OX"
 		log " "
 	fi
+	mw=$(echo "$OX" | grep "257")
+	if [ -z "$mw" ]; then
+		uci set modem.modem$CURRMODEM.mw="0"
+	else
+		uci set modem.modem$CURRMODEM.mw="1"
+	fi
 	lte=$(echo $OX" " | tr "," ":" | tr " " ",")
 	if [ $enb == "1" ]; then
 		log " "
