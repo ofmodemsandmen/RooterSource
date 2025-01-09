@@ -463,7 +463,7 @@ if [ $SP -gt 0 ]; then
 			$ROOTER/simerr.sh $CURRMODEM
 		fi
 		if [ -e $ROOTER/connect/simreboot.sh ]; then
-			$ROOTER/connect/simreboot.sh
+			$ROOTER/connect/simreboot.sh $CURRMODEM
 		fi
 		exit 0
 	fi
