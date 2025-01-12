@@ -1,9 +1,9 @@
 <%+header%>
 
 <%
-local cnt = 0
+local cnt = 1
 local tt = {}
-
+tt[0] = "********************************************************************************************************"
 os.execute("cat /sys/kernel/debug/usb/devices > /tmp/modstat 2>&1")
 local file = io.open("/tmp/modstat", "r")
 repeat
@@ -20,6 +20,31 @@ until 1 == 0
 cnt = cnt - 1
 file:close()
 os.execute("/usr/lib/rooter/luci/luaops.sh delete /tmp/modstat")
+pci = 0
+file = io.open("/usr/lib/rooter/mhi/create-pci.sh", "r")
+if file ~= nil then
+	os.execute("lspci -vD > /tmp/modstat 2>&1")
+	pcnt = 1
+	ptt = {}
+	ptt[0] = "********************************************************************************************************"
+	file = io.open("/tmp/modstat", "r")
+	repeat
+		local line = file:read("*line")
+		if line == nil then
+			break
+		end
+		if string.len(line) < 3 then
+			line = "********************************************************************************************************"
+		end
+		if not string.find(line, "lspci: Unable") then
+			ptt[pcnt] = line
+			pcnt = pcnt + 1
+		end
+	until 1 == 0
+	pcnt = pcnt - 1
+	file:close()
+	pci = 1
+end
 %>
 
 <script type="text/javascript" src="<%=resource%>/xhr.js"></script>
@@ -54,7 +79,7 @@ os.execute("/usr/lib/rooter/luci/luaops.sh delete /tmp/modstat")
 	<table width="550"  border="0" style="color :black;" >
   	<tr>
     		<td width="5%"> </td>
-    		<td width="90%"> </td>
+    		<td width="90%" style="font-size: 20px"><strong>USB Devices</strong></td>
     		<td width="5%"> </td>
   	</tr>
 	<% 
@@ -79,6 +104,35 @@ os.execute("/usr/lib/rooter/luci/luaops.sh delete /tmp/modstat")
 	<% 		end
 	end %>
 	</table>
+	<% if pci == 1 then %>
+	<table width="550"  border="0" style="color :black;" >
+		<tr>
+				<td width="5%"></td>
+				<td width="90%" style="font-size: 20px"><strong>PCI Devices</strong></td>
+				<td width="5%"></td>
+		</tr>
+		<% 
+		for i=0,pcnt do 
+			s, e = string.find(ptt[i], "Device")
+			if s ~= nil then
+		%>
+		<tr>
+				<td> </td>
+				<td><em><strong><%=ptt[i]%></strong></em></td>
+				<td> </td>
+		</tr>
+		<%		else
+		%>
+		<tr>
+				<td> </td>
+				<td><%=ptt[i]%></td>
+				<td> </td>
+		</tr>
+		<%end %>
+		<%end %>
+	</table>
+	<%end %>
+	
 </fieldset>
 <br></br>
 </div>
