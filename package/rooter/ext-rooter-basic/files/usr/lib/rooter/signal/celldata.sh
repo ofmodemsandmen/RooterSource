@@ -25,7 +25,6 @@ OXx=$OX
 OX=$(echo $OX | tr 'a-z' 'A-Z')
 OY=$(echo $OY | tr 'a-z' 'A-Z')
 OX=$OX" "$OY
-
 COPS="-"
 COPS_MCC="-"
 COPS_MNC="-"
@@ -38,11 +37,58 @@ if [ "x$COPSX" != "x" ]; then
 	COPS=$COPSX
 fi
 
+if [ "$COPS" = " " ]; then
+	COPSY=$(echo $OXx | grep -o "AT+COPS=0,0;+COPS? $cps""[01],0,.\+," | cut -d, -f4 | grep -o "[^\"]\+")
+	COPS="-"
+	if [ "x$COPSY" != "x" ]; then
+		COPS=$COPSY
+	fi
+fi
+
 COPSX=$(echo $OX | grep -o "$cps""[01],2,.\+," | cut -d, -f3 | grep -o "[^\"]\+")
 
 if [ "x$COPSX" != "x" ]; then
 	COPS_MCC=${COPSX:0:3}
 	COPS_MNC=${COPSX:3:3}
+	fmc=${COPS_MNC:0:1}
+	COPS_MNC1=$COPS_MNC
+	if [ "$fmc" = "0" ]; then
+		COPS_MNC1=${COPSX:4:2}
+	fi
+	if [ "$COPS" = " " ]; then
+		mccdata="/usr/lib/country/mccdata"
+		if [ -e "$mccdata" ]; then
+			nn=""
+			while IFS= read -r line; do
+				if [ -z "$nn" ]; then
+					nn=$line
+					read -r line
+				fi
+				country=$(echo "$line" | cut -d\| -f1)
+				mcc=$(echo "$country" | cut -d, -f2)
+				if [ "$mcc" = "$COPS_MCC" ]; then
+					st=2
+					nm=""
+					while [ 1 = 1 ]; do
+						isp=$(echo "$line" | cut -d\| -f$st)
+						if [ -z "$isp" ]; then
+							break
+						fi
+						mnc=$(echo "$isp" | cut -d, -f1)
+						if [ "$mnc" = "$COPS_MNC1" ]; then
+							if [ -z "$nm" ]; then
+								nm=$(echo "$isp" | cut -d, -f3)
+							else
+								nm=$nm" | "$(echo "$isp" | cut -d, -f3)
+							fi
+						fi
+						let st=$st+1
+					done
+					COPS="$nm"
+				fi
+			done < $mccdata
+		fi
+	fi
 	if [ "$COPS" = "-" ]; then
 		COPS=$(awk -F[\;] '/'$COPS'/ {print $2}' $ROOTER/signal/mccmnc.data)
 		[ "x$COPS" = "x" ] && COPS="-"

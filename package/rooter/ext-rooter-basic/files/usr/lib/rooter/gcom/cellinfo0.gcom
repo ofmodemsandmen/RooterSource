@@ -13,6 +13,11 @@ let t=time()+f
 gosub getresult
 if $s="^mTIMEOUT ERROR" print $s
 
+send "AT+COPS=0,0;+COPS?^m"
+let t=time()+f
+gosub getresult
+if $s="^mTIMEOUT ERROR" print $s
+
 send "AT+COPS=3,2;+COPS?^m"
 let t=time()+f
 gosub getresult

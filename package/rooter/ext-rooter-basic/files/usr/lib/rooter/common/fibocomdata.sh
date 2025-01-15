@@ -59,9 +59,9 @@ decode_bw() {
 OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "fibocominfo.gcom" "$CURRMODEM")
 
 OX=$(echo $OX | tr 'a-z' 'A-Z')
-echo "$OX" > /tmp/sccone
-sed -i 's/SCC 1/SCC1/g' /tmp/sccone
-OX=$(cat /tmp/sccone)
+echo "$OX" > /tmp/sccone1
+sed -i 's/SCC 1/SCC1/g' /tmp/sccone1
+OX=$(cat /tmp/sccone1)
 rm -f /tmp/sccone
 SERVING=$(echo $OX | grep -o "+GTCCINFO:.\+GTRAT")
 echo "$SERVING" > /tmp/sccone
@@ -156,6 +156,7 @@ if [ -n "$SERVING" ]; then
 	LTENEIGH=$(echo $SERVING | grep -o "$REGXg")
 	NRNEIGH=$(echo $SERVING | grep -o "$REGXh")
 	echo "" > /tmp/scan$CURRMODEM
+
 	for NVAL in $(echo "$LTENEIGH"); do
 		CHAN=$(echo $NVAL | cut -d, -f7)
 		if [ "$idP" = 7127 -o "$idP" = 7126 ]; then
@@ -170,7 +171,7 @@ if [ -n "$SERVING" ]; then
 		RSSI=$(($RSSI - 141))
 		echo -e "Band : $BAND\tPCI : $PCIx\tSignal : $RSSI (dBm)" >> /tmp/scan$CURRMODEM
 	done
-		for NVAL in $(echo "$NRNEIGH"); do
+	for NVAL in $(echo "$NRNEIGH"); do
 		CHAN=$(echo $NVAL | cut -d, -f7)
 		CHAN=$(printf "%d" 0x$CHAN)
 		BAND=$(/usr/lib/rooter/chan2band.sh $CHAN)
@@ -326,24 +327,52 @@ if [ -n "$GTCCDATA" ]; then
 				else
 					RSRP=$(echo "$RSRPP" | cut -d, -f12)
 				fi
+				if [ -z "$RSRP" ]; then
+					RS=$(echo $CCVAL | cut -d, -f14)
+					if [ "$CRAT" -eq 4 ]; then
+						let RS=$RS-140
+					else
+						let RS=$RS-156
+					fi
+					RSRP=$RS
+				fi
 				if [ -z "$RSCP" ]; then
 					RSCP=$(echo $RSRP | tr -d ' ') 
 				else
 					RSCP=$RSCP" (4G) dBm<br />"$(echo $RSRP | tr -d ' ')" (5G) " 
 				fi
+
 				RSRQQ=$(echo $OXX | grep -o "+RSRQ:.\+ERSRQ")
 				RSRQQ=$(echo $RSRQQ | tr " " ",")
 				RSRQ=$(echo "$RSRQQ" | cut -d, -f6)
+				if [ -z "$RSRQ" ]; then
+					RSRQ=$(echo $CCVAL | cut -d, -f13)
+					if [ "$CRAT" -eq 4 ]; then
+						let RSRQ=$RSRQ-20
+					else
+						let RSRQ=$RSRQ-43
+					fi
+				fi
 				RSRQ1=$(echo "$RSRQQ" | cut -d, -f12)
+				if [ -z "$RSRQ1" ]; then
+					RSRQ1=$(echo $CCVAL | cut -d, -f13)
+					if [ "$CRAT" -eq 4 ]; then
+						let RSRQ1=$RSRQ1-20
+					else
+						let RSRQ1=$RSRQ1-43
+					fi
+				fi
 				if [ -z "$ECIO" ]; then
 					ECIO=$(echo $RSRQ | tr -d ' ')
 				else
 					ECIO=$ECIO" (4G) dB<br />"$(echo $RSRQ1 | tr -d ' ')" (5G) "
 				fi
-				RSSI=$(rsrp2rssi $RSCP $BW)
-				CSQ_PER=$((100 - (($RSSI + 51) * 100/-62)))"%"
-				CSQ=$((($RSSI + 113) / 2))
-				CSQ_RSSI=$RSSI" dBm"
+				if [ "$CRAT" -eq 4 ]; then
+					RSSI=$(rsrp2rssi $RSCP $BW)
+					CSQ_PER=$((100 - (($RSSI + 51) * 100/-62)))"%"
+					CSQ=$((($RSSI + 113) / 2))
+					CSQ_RSSI=$RSSI" dBm"
+				fi
 			else
 				RSRP=$(echo $CCVAL | cut -d, -f13)
 				RSRQ=$(echo $CCVAL | cut -d, -f14)
