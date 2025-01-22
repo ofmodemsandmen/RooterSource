@@ -8,6 +8,8 @@ log() {
 
 CURRMODEM=$1
 COMMPORT=$2
+idV=$(uci get modem.modem$CURRMODEM.idV)
+idP=$(uci get modem.modem$CURRMODEM.idP)
 
 OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "t77info.gcom" "$CURRMODEM")
 OX=$(echo $OX | tr 'a-z' 'A-Z')
@@ -89,6 +91,11 @@ if [ -z "$PXLTE" ]; then
 		if [ -z "$PXLTE" ]; then
 			PXLTE=$(echo $OXC | grep -o "$PXELL_LTE1")
 		fi
+	fi
+fi
+if [ "$idV" = 7127 ]; then
+	if [ "$idP" = 00b7 -o "$idP" = 00b3 ]; then
+		PXLTE=""
 	fi
 fi
 #SLTEX=$(echo $OXC | grep -o "SCELL")
