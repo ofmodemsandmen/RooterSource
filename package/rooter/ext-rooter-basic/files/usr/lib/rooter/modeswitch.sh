@@ -177,39 +177,10 @@ if [ "$ACTION" = add ]; then
 			exit 0
 		fi
 	fi
-	CNTR=0
-	while [ -e /tmp/modgone ]; do
-		sleep 1
-		CNTR=`expr $CNTR + 1`
-		if [ $CNTR -gt 10 ]; then
-			rm -f /tmp/modgone
-			break
-		fi
-	done
 	
 	find_usb_attrs
-
-	if echo $DEVICENAME | grep -q ":" ; then
-		exit 0
-	fi
-
-	if [ -z $uMa ]; then
-		log "Ignoring Unnamed Hub"
-		exit 0
-	fi
-
-	UPR=${uPr}
-	CT=`echo $UPR | tr '[A-Z]' '[a-z]'`
-	if echo $CT | grep -q "hub" ; then
-		log "Ignoring Named Hub"
-		exit 0
-	fi
-
-		if [ $uVid = 1d6b ]; then
-		log "Ignoring Linux Hub"
-		exit 0
-	fi
 	
+		
 	if [ $uVid = 10c4 -a $uPid = ea60 ]; then
 		log "Ignoring CP2104 USB to UART Bridge Controller"
 		exit 0
@@ -235,6 +206,38 @@ if [ "$ACTION" = add ]; then
 	elif [ $uVid = 2109 -a $uPid = 8822 ]; then
 		exit 0
 	fi
+	
+	CNTR=0
+	while [ -e /tmp/modgone ]; do
+		sleep 1
+		CNTR=`expr $CNTR + 1`
+		if [ $CNTR -gt 10 ]; then
+			rm -f /tmp/modgone
+			break
+		fi
+	done
+
+	if echo $DEVICENAME | grep -q ":" ; then
+		exit 0
+	fi
+
+	if [ -z $uMa ]; then
+		log "Ignoring Unnamed Hub"
+		exit 0
+	fi
+
+	UPR=${uPr}
+	CT=`echo $UPR | tr '[A-Z]' '[a-z]'`
+	if echo $CT | grep -q "hub" ; then
+		log "Ignoring Named Hub"
+		exit 0
+	fi
+
+		if [ $uVid = 1d6b ]; then
+		log "Ignoring Linux Hub"
+		exit 0
+	fi
+
 
 	DELAY=1
 	if [ -f /tmp/usbwait ]; then
@@ -242,7 +245,7 @@ if [ "$ACTION" = add ]; then
 		while [ -f /tmp/usbwait ]; do
 			sleep 1
 			let DELAY=$DELAY+1
-			if [ $DELAY -gt 25 ]; then
+			if [ $DELAY -gt 35 ]; then
 				break
 			fi
 		done
