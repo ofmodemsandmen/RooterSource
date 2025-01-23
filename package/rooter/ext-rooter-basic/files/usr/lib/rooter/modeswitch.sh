@@ -205,8 +205,13 @@ if [ "$ACTION" = add ]; then
 		exit 0
 	fi
 
-	if [ $uVid = 1d6b ]; then
+		if [ $uVid = 1d6b ]; then
 		log "Ignoring Linux Hub"
+		exit 0
+	fi
+	
+	if [ $uVid = 10c4 -a $uPid = ea60 ]; then
+		log "Ignoring CP2104 USB to UART Bridge Controller"
 		exit 0
 	fi
 
