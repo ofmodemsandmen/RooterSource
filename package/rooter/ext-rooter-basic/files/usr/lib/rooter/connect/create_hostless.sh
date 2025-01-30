@@ -662,10 +662,22 @@ do
 		
 	if [ $SP = 8 -o  $SP = 9 ]; then
 		log "FM350 Connection Command"
-		#fcc_unlock
-		#$ROOTER/connect/bandmask $CURRMODEM 2
 		uci commit modem
-		#get_connect
+		if [ "$NAUTH" = "0" ]; then
+			ATCMDD="AT+CGAUTH=1,$NAUTH"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			log "$OX"
+			ATCMDD="AT+CGAUTH=0,$NAUTH"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			log "$OX"
+		else
+			ATCMDD="AT+CGAUTH=1,$NAUTH,\"$NUSER\",\"$NPASS\""
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			log "$OX"
+			ATCMDD="AT+CGAUTH=0,$NAUTH,\"$NUSER\",\"$NPASS\""
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			log "$OX"
+		fi
 		export SETAPN=$NAPN
 		BRK=1
 		

@@ -12,5 +12,9 @@ ACTION=$2
 
 result=`ps | grep -i "restartrun.sh" | grep -v "grep" | wc -l`
 if [ $result -lt 1 ]; then
+	$ROOTER/luci/restartrun.sh $CURRMODEM $ACTION 
+else
+	log "Waiting for Modem $CURRMODEM"
+	sleep 25
 	$ROOTER/luci/restartrun.sh $CURRMODEM $ACTION
 fi
