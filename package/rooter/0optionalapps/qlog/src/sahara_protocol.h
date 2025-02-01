@@ -53,7 +53,8 @@
 #define SAHARA_VERSION_SUPPORTED 4
 
 /*Maximum 1 megabyte tx buffer size*/
-#define SAHARA_RAW_BUFFER_SIZE (64*1024)
+ //for TTYB_DEFAULT_MEM_LIMIT is 64K (share with data and sizeof(struct tty_buffer)), so if usb read too fast, then tty_insert_flip_string will overflow
+#define SAHARA_RAW_BUFFER_SIZE (32*1024)
 
 // Sahara command IDs
 typedef enum
@@ -312,7 +313,7 @@ typedef struct
 #ifdef WINDOWSPC
 #define PACK( __Declaration__ ) __pragma( pack(push, 1) ) __Declaration__ __pragma( pack(pop) )
 PACK(
-typedef struct	// note for gcc use __attribute__((__packed__)) 
+typedef struct	// note for gcc use __attribute__((__packed__))
 {
   sahara_packet_header header;
   uint32_t image_id;                // ID of image to be transferred
@@ -322,7 +323,7 @@ typedef struct	// note for gcc use __attribute__((__packed__))
 } sahara_packet_read_data_64bit;
 );
 #else
-typedef __attribute__((__packed__)) struct 
+typedef __attribute__((__packed__)) struct
 {
   sahara_packet_header header;
   uint32_t image_id;                // ID of image to be transferred

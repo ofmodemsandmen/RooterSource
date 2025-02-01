@@ -1,5 +1,111 @@
+/******************************************************************************
+  @file    mdm.c
+  @brief   mdm log tool.
+
+  DESCRIPTION
+  QLog Tool for USB and PCIE of Quectel wireless cellular modules.
+
+  INITIALIZATION AND SEQUENCING REQUIREMENTS
+  None.
+
+  ---------------------------------------------------------------------------
+  Copyright (c) 2016 - 2020 Quectel Wireless Solution, Co., Ltd.  All Rights Reserved.
+  Quectel Wireless Solution Proprietary and Confidential.
+  ---------------------------------------------------------------------------
+******************************************************************************/
+
 #include "qlog.h"
 
+static int g_mdm_req = -1;
+static pthread_mutex_t diag_cmd_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t diag_cmd_cond = PTHREAD_COND_INITIALIZER;
+
+static void setTimespecRelative(struct timespec *p_ts, long long msec)
+{
+    struct timeval tv;
+
+    gettimeofday(&tv, (struct timezone *) NULL);
+
+    p_ts->tv_sec = tv.tv_sec + (msec / 1000);
+    p_ts->tv_nsec = (tv.tv_usec + (msec % 1000) * 1000L ) * 1000L;
+    if ((unsigned long)p_ts->tv_nsec >= 1000000000UL) {
+        p_ts->tv_sec += 1;
+        p_ts->tv_nsec -= 1000000000UL;
+    }
+}
+
+static int diag_cond_timeout(pthread_cond_t *cond, pthread_mutex_t * mutex, unsigned msecs) {
+    int ret = 0;
+    unsigned now;
+    unsigned int start;
+    struct timespec ts;
+
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    start = (unsigned)ts.tv_sec*1000 + (unsigned)(ts.tv_nsec / 1000000);
+
+    while (msecs) {
+        setTimespecRelative(&ts, msecs);
+        ret = pthread_cond_timedwait(cond, mutex, &ts);
+        if (ret != ETIMEDOUT)
+            break;
+
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+        now = (unsigned)ts.tv_sec*1000 + (unsigned)(ts.tv_nsec / 1000000);
+        if (now >= start)
+            break;
+        msecs = now - start;
+        start = now;
+    }
+
+    return ret;
+}
+
+#include "qshrink4.c"
+#include "qdss1.c"
+
+/*
+80-na157-61_yb_diagnostic_system_user_guide.pdf
+For non-HDLC encoded config
+When .cfg2 is used, which is non-HDLC encoded, the format of the file is as follows:
+Field                              Length (in bits) Description
+------- ---------------- -----------
+Start                              8  This is the start of packet, 0x7E
+Version                          8  Version
+Payload Length              16  Payload length
+Payload Variable This is the actual data
+Packet End                    8 Ending character "0x7E"
+
+1d 1c 3b 7e // 0x1D == Time Stamp Request
+00 78 f0 7e // 0x00 == Version Request
+7c 93 49 7e // 0x7C == Extended Build ID Request
+1c 95 2a 7e // 0x1C == DIAG Version Request
+0c 14 3a 7e // 0x0c == Status Request
+63 e5 a1 7e // 0x6C == Phone State Request
+
+4.7.5 Reading the CFG file
+Open the CFG file in a hex editor.
+For HDLC-encoded config
+Field                             Length (in bits) Description
+------- ---------------- -----------
+Information Variable ICD Packet or Message
+Frame Check                16 CRC-CCITT standard 16-bit CRC
+Ending Flag                   8 Ending character "0x7E"
+
+4b 0f 1a 00 00 bb 60 7e // 0x4B 0x0F 0x001A == Call Manager Subsystem Sys Select (80-V1294-7)
+4B 09 00 00 62 B6 7E // 0x4B 0x09 0x0000 == UMTS Subsystem Version Request (80-V2708-1
+4b 08 00 00 be ec 7e // 0x4B 0x08 0x0000 == GSM Subsystem Version Request (80-V5295-1)
+4b 08 01 00 66 f5 7e // 0x4B 0x0F 0x0001 == GSM Subsystem Status Request (80-V5295-1)
+4b 04 00 00 1d 49 7e // 0x4B 0x04 0x0000 == WCDMA Subsystem Version Request (80-V2708-1)
+4b 04 0f 00 d5 ca 7e // 0x4B 0x04 0x000F == WCDMA Subsystem Additional Status Request (80-V2708-1)
+
+80-v1294-100_c_mask-related_commands_for_diagnostic_monitoring.pdf
+2.6 Extended Message Configuration (125 / 0x7D)
+2.4 Logging Configuration (115 / 0x73)
+2.2 Event Report Control (96 / 0x60)
+2.8 Event Set Mask (130 / 0x82)
+
+C:\ProgramData\QUALCOMM\QXDM\Config\Qualcomm DMC Library\Primary\Default.cfg
+*/
 static unsigned char qlog_mdm_default_cfg[] = {
 0x1d,0x1c,0x3b,0x7e,0x00,0x78,0xf0,0x7e,0x4b,0x32,0x06,0x00,0xba,0x4d,0x7e,0x7c,0x93,0x49,0x7e,0x1c,0x95,0x2a,0x7e,0x0c,0x14,0x3a,0x7e,0x63,0xe5,0xa1,0x7e,0x4b,
 0x0f,0x00,0x00,0xbb,0x60,0x7e,0x4b,0x09,0x00,0x00,0x62,0xb6,0x7e,0x4b,0x08,0x00,0x00,0xbe,0xec,0x7e,0x4b,0x08,0x01,0x00,0x66,0xf5,0x7e,0x4b,0x04,0x00,0x00,0x1d,
@@ -112,11 +218,14 @@ static unsigned char qlog_mdm_default_cfg[] = {
 0x0d,0x00,0x00,0x01,0x98,0x04,0x00,0x30,0x00,0x00,0x00,0x00,0x06,0x00,0xf2,0x07,0x00,0x44,0x00,0xf8,0x1f,0x20,0x73,0x7e
 };
 
-extern int tty2tcp_sockfd;
-ssize_t mdm_send_cmd(int ttyfd, const unsigned char *buf, size_t size) {
+ssize_t mdm_send_cmd(int fd, const unsigned char *buf, size_t size, int sync) {
     size_t wc = 0;
 
     while (wc < size) {
+
+        if (qlog_exit_requested == 1)
+            break;
+
         size_t flag = wc;
         const unsigned char *cur = buf + wc;
         unsigned short len = cur[2] + (((unsigned short)cur[3]) << 8) + 5;
@@ -124,16 +233,41 @@ ssize_t mdm_send_cmd(int ttyfd, const unsigned char *buf, size_t size) {
         if (cur[0] == 0x7e && cur[1] == 0x01 && (wc + len) <= size && cur[len - 1] == 0x7e) {
             flag += (len - 1);
         }
-        else { 
+        else {
             if (flag == 0 && buf[flag] == 0x7E)
                 flag++;
 
             while (buf[flag] != 0x7E && flag < size)
                 flag++;
         }
-        
-        if (buf[flag] == 0x7E || flag == size)
-            qlog_poll_write(ttyfd, buf + wc, flag - wc + 1, 1000);
+
+        if (buf[flag] == 0x7E || flag == size) {
+#if 0
+            size_t nbytes = 0;
+            for (nbytes = 0; nbytes < (flag - wc + 1); nbytes++) {
+                printf("0x%02X,", buf[wc + nbytes]);
+            }
+            printf("\n");
+#endif
+
+            if (sync) {
+                g_mdm_req = buf[wc];
+            }
+
+            qlog_poll_write(fd, buf + wc, flag - wc + 1, 1000);
+            if (sync) {
+                pthread_mutex_lock(&diag_cmd_mutex);
+                if (diag_cond_timeout(&diag_cmd_cond, &diag_cmd_mutex, 2000)) {
+                    qlog_dbg("timeout g_mdm_req=%02x%02x%02x%02x\n",
+                        buf[wc+0], buf[wc+1], buf[wc+2], buf[wc+3]);
+                }
+                g_mdm_req = -1;
+                pthread_mutex_unlock(&diag_cmd_mutex);
+            }
+        }
+        else {
+            printf("%s unknow mdm cmd\n", __func__);
+        }
 
         if (tty2tcp_sockfd > 0 && (flag + 1) < size) {
             size_t i = 0;
@@ -142,20 +276,20 @@ ssize_t mdm_send_cmd(int ttyfd, const unsigned char *buf, size_t size) {
                 printf("%02x", buf[i+wc]);
             printf("\n");
         }
-        
+
         wc = flag + 1;
     }
 
     return size;
 }
 
-static int mdm_init_filter(int ttyfd, const char *cfg) {
+static int mdm_init_filter(int fd, const char *cfg) {
     unsigned char *rbuf;
     const size_t rbuf_size = (16*1024);
     size_t cfg_size = 0;
 
-#if 0
-    if (cfg == NULL) {
+#if 1
+    if (cfg && !strcmp(cfg, "dump")) {
         const unsigned char mdm_enter_dump1[] = {
             0x4b, 0x12, 0x18, 0x02, 0x01, 0x00, 0xd2, 0x7e
         };
@@ -163,17 +297,39 @@ static int mdm_init_filter(int ttyfd, const char *cfg) {
             0x7e, 0x01, 0x04, 0x00, 0x4b, 0x25, 0x03, 0x00, 0x7e
         };
         qlog_dbg("send mdm dump command\n");
-        mdm_send_cmd(ttyfd, mdm_enter_dump1, sizeof(mdm_enter_dump1));
+        mdm_send_cmd(fd, mdm_enter_dump1, sizeof(mdm_enter_dump1), 0);
         usleep(100*1000);
-        mdm_send_cmd(ttyfd, mdm_enter_dump2, sizeof(mdm_enter_dump2));
+        mdm_send_cmd(fd, mdm_enter_dump2, sizeof(mdm_enter_dump2), 0);
         return 0;
     }
 #endif
 
+    if (!mdm_diag_pkt) {
+        mdm_diag_pkt = diag_pkt_malloc(4/*7b2c3d7e*/, 9031 + 0, 0, mdm_handle_diag_pkt_func);
+        if (!mdm_diag_pkt)
+            return -1;
+    }
+
+    mdm_diag_pkt->last_7d = 0;
+    mdm_diag_pkt->pkt_len = 0;
+    mdm_create_qshrink4_file(fd);
+    if (diag_id_count && use_diag_qdss) {
+        qdss_state = 1;
+        diag_send_cmds_to_peripheral_init(0, 0);
+        qdss_state = 0;
+    }
+
+    if (use_diag_dpl)
+    {
+        dpl_state = 1;
+        diag_send_enable_dpl_req(0, 0, 1);
+        dpl_state = 0;
+    }
+
     rbuf = (unsigned char *)malloc(rbuf_size);
     if (rbuf == NULL) {
-          qlog_dbg("Fail to malloc rbuf_size=%zd, errno: %d (%s)\n", rbuf_size, errno, strerror(errno));
-          return -1;
+        qlog_dbg("Fail to malloc rbuf_size=%zd, errno: %d (%s)\n", rbuf_size, errno, strerror(errno));
+        return -1;
     }
 
     if (cfg) {
@@ -181,9 +337,10 @@ static int mdm_init_filter(int ttyfd, const char *cfg) {
         if (cfgfd < 0) {
             qlog_dbg("Fail to open %s, errno : %d (%s)\n", cfg, errno, strerror(errno));
         }
-
-        cfg_size = read(cfgfd, rbuf, rbuf_size);
-        close(cfgfd);
+        else {
+            cfg_size = read(cfgfd, rbuf, rbuf_size);
+            close(cfgfd);
+        }
     }
 
     if (cfg_size <= 0) {
@@ -191,13 +348,68 @@ static int mdm_init_filter(int ttyfd, const char *cfg) {
         memcpy(rbuf, qlog_mdm_default_cfg, cfg_size);
     }
 
-    mdm_send_cmd(ttyfd, rbuf, cfg_size);
-    
+    mdm_send_cmd(fd, rbuf, cfg_size, 1);
+
     free(rbuf);
-    
+
     return 0;
+}
+
+static int mdm_clean_filter(int fd) {
+    (void)(fd);
+    mdm_send_empty_mask();
+    if (diag_id_count && use_diag_qdss) {
+        qdss_state = 1;
+        diag_send_cmds_to_peripheral_kill(0, 0);
+        qdss_state = 0;
+    }
+
+    if (use_diag_dpl)
+    {
+        dpl_state = 1;
+        diag_send_enable_dpl_req(0, 0, 0);
+        dpl_state = 0;
+    }
+
+    return 0;
+}
+
+static int mdm_miss_qmdlv2_logfd = -1;
+static int mdm_logfile_init(int logfd, unsigned logfile_seq) {
+    (void)logfile_seq;
+    if (!use_qmdl2_v2)
+        return 0;
+
+    if (qlog_le32(qshrink4_data.header_length) == 0) {
+        mdm_miss_qmdlv2_logfd = logfd;
+        return 0;
+    }
+
+    mdm_miss_qmdlv2_logfd = -1;
+    unused_result_write(logfd, &qshrink4_data, qlog_le32(qshrink4_data.header_length));
+
+    return 0;
+}
+
+static size_t mdm_logfile_save(int logfd, const void *buf, size_t size) {
+    if (g_mdm_req != -1)
+        mdm_parse_data_for_command_rsp(buf, size);
+
+    if (use_qmdl2_v2) {
+        if (qlog_le32(qshrink4_data.header_length) == 0)
+            return size;
+        else if (mdm_miss_qmdlv2_logfd == logfd) {
+            mdm_miss_qmdlv2_logfd = -1;
+            qlog_logfile_save(logfd, &qshrink4_data, qlog_le32(qshrink4_data.header_length));
+        }
+    }
+
+    return qlog_logfile_save(logfd, buf, size);
 }
 
 qlog_ops_t mdm_qlog_ops = {
     .init_filter = mdm_init_filter,
+    .clean_filter = mdm_clean_filter,
+    .logfile_init = mdm_logfile_init,
+    .logfile_save = mdm_logfile_save,
 };

@@ -1,3 +1,18 @@
+/******************************************************************************
+  @file    sahara.c
+  @brief   sahara protocol to catch mdm ram dump.
+
+  DESCRIPTION
+  QLog Tool for USB and PCIE of Quectel wireless cellular modules.
+
+  INITIALIZATION AND SEQUENCING REQUIREMENTS
+  None.
+
+  ---------------------------------------------------------------------------
+  Copyright (c) 2016 - 2020 Quectel Wireless Solution, Co., Ltd.  All Rights Reserved.
+  Quectel Wireless Solution Proprietary and Confidential.
+  ---------------------------------------------------------------------------
+******************************************************************************/
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
@@ -20,9 +35,6 @@
 #include <pthread.h>
 #include <inttypes.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <linux/un.h>
-unsigned int inet_addr(const char *cp);
 
 /* modify macro MIN
 * usually we difine it as: (a) < (b) ? (a) : (b)
@@ -59,7 +71,7 @@ sahara_data_t sahara_data = {
 };
 
 typedef struct  {
-    char *port_name;
+    const char *port_name;
     int port_fd;
     int rx_timeout;
     size_t MAX_TO_READ;
@@ -96,38 +108,23 @@ LOG_ERROR
 };
 
 extern unsigned qlog_msecs(void);
-#define dbg( log_level, fmt, arg... ) do {if (kickstart_options.verbose || LOG_ERROR == log_level) { unsigned msec = qlog_msecs();  printf("[%03d.%03d]" fmt "\n",  msec/1000, msec%1000, ## arg);}} while (0)
+#define dbg( log_level, fmt, arg... ) do {if (kickstart_options.verbose || LOG_ERROR == log_level) { unsigned msec = qlog_msecs();  printf("[%03d.%03d] " fmt "\n",  msec/1000, msec%1000, ## arg);}} while (0)
 
 static bool port_tx_data (void *buffer, size_t bytes_to_send) {
-    int temp_bytes_sent;
-    size_t bytes_sent = 0;
+    size_t bytes_sent = qlog_poll_write(com_port.port_fd, buffer, bytes_to_send, 1000);;
 
-    while (bytes_sent < bytes_to_send) {
-		do {
-			temp_bytes_sent = write (com_port.port_fd, buffer + bytes_sent, MIN(bytes_to_send - bytes_sent, com_port.MAX_TO_WRITE));
-			if (-1 == temp_bytes_sent && (errno == EINTR || errno == EAGAIN)) {
-				sleep(1);
-			} else {
-				break;
-			}
-		} while(1);
-        
-        if (temp_bytes_sent <= 0) {
-            dbg(LOG_ERROR, "Write returned failure %d, errno %d, System error code: %s", temp_bytes_sent, errno, strerror (errno));
-            return false;
-        }
-        else {
-            bytes_sent += temp_bytes_sent;
-        }
-    }
-
-    return true;
+    return (bytes_sent == bytes_to_send);
 }
 
 static bool port_rx_data(void *buffer, size_t bytes_to_read, size_t *bytes_read) {
     fd_set rfds;
     struct timeval tv;
     int retval;
+
+    if (bytes_to_read == 0) {
+        *bytes_read = 0;
+        return true;
+    }
 
     // Init read file descriptor
     FD_ZERO (&rfds);
@@ -137,7 +134,7 @@ static bool port_rx_data(void *buffer, size_t bytes_to_read, size_t *bytes_read)
     tv.tv_sec  = com_port.rx_timeout >= 0 ? com_port.rx_timeout : 0;
     tv.tv_usec = 0;
 
-    retval = select (com_port.port_fd + 1, &rfds, NULL, NULL, ((com_port.rx_timeout >= 0) ? (&tv) : (NULL)));    
+    retval = select (com_port.port_fd + 1, &rfds, NULL, NULL, ((com_port.rx_timeout >= 0) ? (&tv) : (NULL)));
     if (retval <= 0) {
         dbg(LOG_ERROR, "select returned error: %s", strerror (errno));
         return false;
@@ -151,7 +148,7 @@ static bool port_rx_data(void *buffer, size_t bytes_to_read, size_t *bytes_read)
 
     if (NULL != bytes_read)
         *bytes_read = retval;
-    
+
     return true;
 }
 
@@ -188,8 +185,8 @@ static bool sahara_rx_data(size_t bytes_to_read) {
     if (0 == bytes_to_read) {
         command_packet_header = (sahara_packet_header *) sahara_data.rx_buffer;
         memset(command_packet_header, 0x00, sizeof(sahara_packet_header));
-        
-        if (false == port_rx_data(sahara_data.rx_buffer, sizeof(sahara_packet_header), &temp_bytes_read)) 
+
+        if (false == port_rx_data(sahara_data.rx_buffer, sizeof(sahara_packet_header), &temp_bytes_read))
             return false;
 
         dbg(LOG_INFO, "Read %zd bytes, command %d and packet length %d bytes", temp_bytes_read, qlog_le32(command_packet_header->command), qlog_le32(command_packet_header->length));
@@ -198,7 +195,7 @@ static bool sahara_rx_data(size_t bytes_to_read) {
 
         if (qlog_le32(command_packet_header->command) < SAHARA_LAST_CMD_ID) {
             dbg(LOG_EVENT, "RECEIVED <-- %s", boot_sahara_cmd_id_str[qlog_le32(command_packet_header->command)]);
-            if (false == port_rx_data(sahara_data.rx_buffer + sizeof(sahara_packet_header), qlog_le32(command_packet_header->length) - sizeof(sahara_packet_header), &temp_bytes_read)) 
+            if (false == port_rx_data(sahara_data.rx_buffer + sizeof(sahara_packet_header), qlog_le32(command_packet_header->length) - sizeof(sahara_packet_header), &temp_bytes_read))
                 return false;
             if (temp_bytes_read != (qlog_le32(command_packet_header->length) - sizeof(sahara_packet_header))) {
                 dbg(LOG_INFO, "Read %zd bytes", temp_bytes_read + sizeof(sahara_packet_header));
@@ -208,7 +205,7 @@ static bool sahara_rx_data(size_t bytes_to_read) {
             dbg(LOG_EVENT, "RECEIVED <-- SAHARA_CMD_UNKONOW_%d", qlog_le32(command_packet_header->command));
             return false;
         }
-    } 
+    }
     else {
         while (bytes_read < bytes_to_read) {
             if (false == port_rx_data(sahara_data.rx_buffer + bytes_read, bytes_to_read - bytes_read, &temp_bytes_read)) {
@@ -218,7 +215,7 @@ static bool sahara_rx_data(size_t bytes_to_read) {
                 bytes_read += temp_bytes_read;
         }
     }
-    
+
     return true;
 }
 
@@ -311,7 +308,7 @@ static bool send_memory_read_packet (uint64_t memory_table_address, uint64_t mem
             return false;
         }
     }
-    
+
     return true;
 }
 
@@ -346,7 +343,7 @@ static bool sahara_start(void) {
     sahara_packet_reset_resp *sahara_reset_resp = (sahara_packet_reset_resp *)sahara_data.rx_buffer;
 
     sahara_data.state = SAHARA_WAIT_HELLO;
-    kickstart_options.verbose = 1;	
+    kickstart_options.verbose = 1;
 
     while (1)
     {
@@ -354,8 +351,9 @@ static bool sahara_start(void) {
         {
         case SAHARA_WAIT_HELLO:
           dbg(LOG_EVENT, "STATE <-- SAHARA_WAIT_HELLO");
-          if (false == sahara_rx_data(0))	// size 0 means we don't know what to expect. So we'll just try to read the 8 byte header 
+          if (false == sahara_rx_data(0))	// size 0 means we don't know what to expect. So we'll just try to read the 8 byte header
             {
+                return false;  //false is returned if capture fails in dump
                 sahara_tx_data(1);
                 if (false == sahara_rx_data(0))
                     return false;
@@ -499,14 +497,14 @@ static bool sahara_start(void) {
                         dbg(LOG_ERROR, "Length of memory table converted to 64-bit entries is greater than size of intermediate buffer");
                         return false;
                     }
-            
+
                     for (i = 0; i < num_debug_entries; ++i) {
                         sahara_memory_table[i].save_pref = (uint64_t) qlog_le32(sahara_memory_table_rx[i].save_pref);
                         sahara_memory_table[i].mem_base = (uint64_t) qlog_le32(sahara_memory_table_rx[i].mem_base);
                         sahara_memory_table[i].length = (uint64_t) qlog_le32(sahara_memory_table_rx[i].length);
                         strncpy(sahara_memory_table[i].filename, sahara_memory_table_rx[i].filename, DLOAD_DEBUG_STRLEN_BYTES);
                         strncpy(sahara_memory_table[i].desc, sahara_memory_table_rx[i].desc, DLOAD_DEBUG_STRLEN_BYTES);
-                    } // end for (i = 0; i < num_debug_entries; ++i) 
+                    } // end for (i = 0; i < num_debug_entries; ++i)
                 }
             }
 
@@ -527,8 +525,8 @@ static bool sahara_start(void) {
                     strcat(full_filename, "/");
                 }
                 strcat(full_filename, sahara_memory_table[i].filename);
-                    
-                fd = open(full_filename, O_CREAT | O_WRONLY | O_TRUNC, 0444);
+
+                fd = qlog_logfile_create_fullname(0, full_filename, sahara_memory_table[i].length, 1);
                 if (fd==-1)  {
                     dbg(LOG_ERROR, "ERROR: Your file '%s' does not exist or cannot be created\n\n",sahara_memory_table[num_debug_entries].filename);
                     exit(0);
@@ -542,40 +540,43 @@ static bool sahara_start(void) {
                         kickstart_options.verbose = 1;
                     else
                         kickstart_options.verbose = 0;
-                    
+
                     retval =  send_memory_read_packet(sahara_memory_table[i].mem_base + cur, len);
                     if (false == retval) {
+                        dbg(LOG_ERROR, "send_memory_read_packet failed: %s", strerror(errno));
+                        qlog_logfile_close(fd);
                         return false;
                     }
 
                     retval = sahara_rx_data((size_t)len);
                     if (false == retval) {
-						system("fuser /dev/ttyUSB0");
                         if ( sahara_data.max_ram_dump_read > (16*1024)) {
                             sahara_data.max_ram_dump_read = sahara_data.max_ram_dump_read / 2;
                             continue;
                         }
+                        dbg(LOG_ERROR, "sahara_rx_data failed: %s", strerror(errno));
+                        qlog_logfile_close(fd);
                         return false;
                     }
 
                     cur += len;
+                    retval = qlog_logfile_save(fd, sahara_data.rx_buffer, len);
 
-                    retval = write(fd, sahara_data.rx_buffer, (unsigned int)len);
                     if (retval < 0) {
                         dbg(LOG_ERROR, "file write failed: %s", strerror(errno));
+                        qlog_logfile_close(fd);
                         return false;
                     }
                     if ((uint32_t) retval != len) {
                         dbg(LOG_WARN, "Wrote only %d of 0x%08"PRIX64" bytes", retval, memory_table_length);
-                    }        
-                }                    
-
+                    }
+                }
 
                 kickstart_options.verbose = 1;
                 dbg(LOG_STATUS, "Received file '%s'", sahara_memory_table[i].filename);
-                close(fd);
+                qlog_logfile_close(fd);
                 gettimeofday(&time_end, NULL);
-                time_throughput_calculate(&time_start, &time_end, sahara_memory_table[i].length);                                            
+                time_throughput_calculate(&time_start, &time_end, sahara_memory_table[i].length);
             }
 
             if ( kickstart_options.do_reset) {
@@ -630,13 +631,13 @@ static bool sahara_start(void) {
 
     sahara_data.rx_buffer = malloc (SAHARA_RAW_BUFFER_SIZE);
     sahara_data.tx_buffer = malloc (2048);
-    sahara_data.misc_buffer = malloc (2048);
+    sahara_data.misc_buffer = malloc (SAHARA_RAW_BUFFER_SIZE); //2048 is not enough for SDX62 Memory Table Length: 0x000007EC
 
     if (NULL == sahara_data.rx_buffer || NULL == sahara_data.tx_buffer || NULL == sahara_data.misc_buffer) {
         dbg(LOG_ERROR, "Failed to allocate sahara buffers");
         return false;
     }
-	
+
     retval = sahara_start();
     if (false == retval) {
         dbg(LOG_ERROR, "Sahara protocol error");
@@ -655,6 +656,6 @@ static bool sahara_start(void) {
         dbg(LOG_INFO, "Catch DUMP using Sahara protocol failed\n\n");
     else
         dbg(LOG_INFO, "Catch DUMP using Sahara protocol successful\n\n");
-            
+
     return retval;
 }
