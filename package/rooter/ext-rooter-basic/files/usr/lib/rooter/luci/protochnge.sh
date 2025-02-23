@@ -76,7 +76,7 @@ chkquectel() {
 
 log "Protocol Change to $NEWMOD"
 
-CURRMODEM=$(uci get modem.general.modemnum)
+CURRMODEM=$(uci get modem.general.miscnum)
 CPORT=$(uci get modem.modem$CURRMODEM.commport)
 idV=$(uci get modem.modem$CURRMODEM.uVid)
 idP=$(uci get modem.modem$CURRMODEM.uPid)
