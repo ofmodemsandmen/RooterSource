@@ -19,6 +19,8 @@ rm -rf "${LOCKDIR}"
 idV=$(uci -q get modem.modem$CURRMODEM.idV)
 idP=$(uci -q get modem.modem$CURRMODEM.idP)
 MODEMID="$idV${idP:0:3}"
+MODEL=$(uci -q get modem.modem$CURRMODEM.model)
+MODEL="${MODEL:0:4}"
 
 ATCMDD="AT+CMGF=0"
 OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
@@ -84,7 +86,7 @@ while true; do
 				SX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 				USED=$(echo "$SX" | cut -d, -f1 | grep -o "[0-9]\{1,3\}")
 				MAXED=$(echo "$SX" | cut -d, -f2 | grep -o "[0-9]\{1,3\}")
-				if [ $USED == $MAXED -a $MEM3 == "SM" ]; then
+				if [ $USED == $MAXED -a $MEM3 == "SM" -a $MODEL != "L860" ]; then
 					ATCMDD="AT+CPMS=\"SM\",\"SM\",\"ME\""
 					OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 					MEM3="ME"
