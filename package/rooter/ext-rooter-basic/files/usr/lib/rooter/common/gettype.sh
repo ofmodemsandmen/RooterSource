@@ -191,6 +191,13 @@ if [ "$IDV" == "2c7c" ]; then
 		ATCMDD="AT+QCFG=\"ims/ut\",1,1,1"
 		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	fi
+	ATCMDD="AT+QNVFR=\"/nv/item_files/modem/mmode/sms_domain_pref\""
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	IMSdisabled=$(echo "$OX" | grep "00")
+	if [ -n "$IMSdisabled" ]; then
+		ATCMDD="AT+QNVFW=\"/nv/item_files/modem/mmode/sms_domain_pref\",01"
+		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	fi
 fi
 ATCMDD="AT+CIMI"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")

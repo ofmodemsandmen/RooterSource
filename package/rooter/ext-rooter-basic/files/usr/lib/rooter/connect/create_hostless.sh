@@ -316,10 +316,10 @@ elif [ $idV = 2cd2 ]; then
 	log "MikroTik R11e ECM"
 	SP=7
 elif [ $idV = 0e8d -a $idP = 7127  ]; then
-	log "RM350 ECM"
+	log "FM350 ECM"
 	SP=8
 elif [ $idV = 0e8d -a $idP = 7126  ]; then
-	log "RM350 ECM"
+	log "FM350 ECM"
 	SP=9
 elif [ $idV = 0e8d -a $idP = 2028  ]; then
 	log "FG370 ECM"
@@ -663,7 +663,7 @@ do
 	if [ $SP = 8 -o  $SP = 9 ]; then
 		log "FM350 Connection Command"
 		uci commit modem
-		if [ "$NAUTH" = "0" ]; then
+		if [ "$NAUTH" = "0" -a "$NUSER" = "NIL" -a "$NPASS" = "NIL" ]; then
 			ATCMDD="AT+CGAUTH=1,$NAUTH"
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			log "$OX"
