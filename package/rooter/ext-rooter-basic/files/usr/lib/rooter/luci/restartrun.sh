@@ -185,6 +185,10 @@ else
 	fi
 fi
 
+uci delete modem.modeminfo$CURRMODEM
+uci set modem.modeminfo$CURRMODEM=minfo$CURRMODEM
+uci commit modem
+
 ifdown wan$INTER
 uci delete network.wan$CURRMODEM
 uci set network.wan$CURRMODEM=interface
