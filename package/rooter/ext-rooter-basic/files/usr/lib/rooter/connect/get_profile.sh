@@ -19,6 +19,12 @@ IMEI=$(uci get modem.modem$CURRMODEM.imei)
 IMSI=$(uci -q get modem.modem$CURRMODEM.imsi)
 ICCID=$(uci get modem.modem$CURRMODEM.iccid)
 
+TO=$(echo "$MANUF $MODEL" | grep "TIMEOUT")
+if [ ! -z "$TO" ]; then
+	sleep 10 && touch /etc/banner
+	reboot -f
+	exit 0
+fi
 log "Modem $CURRMODEM is $MANUF $MODEL"
 
 rm -f /tmp/profile$CURRMODEM

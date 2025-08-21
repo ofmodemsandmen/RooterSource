@@ -41,7 +41,14 @@ end
 	ms.rmempty = true;
 	ms.default = ""
 
+ds1 = m:section(TypedSection, "simmiss", translate("Missing SIM"), translate("Action to take if SIM is missing"))
+ds1.anonymous = true
 
+ms1 = ds1:option(ListValue, "action", translate("Action to Take :")); 
+ms1:value("0", translate("Stop Connection"))
+ms1:value("1", translate("Restart Modem"))
+ms1:value("2", translate("Reboot Router"))
+ms1.default = "0"
 
 -- 
 -- Default profile
