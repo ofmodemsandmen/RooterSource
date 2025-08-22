@@ -18,7 +18,7 @@ define Package/ext-rooter-lite
 		+luci-app-rootervpn +ext-wireguard \
 		+bwmon +464xlat +webconsole \
 		+ext-theme +luci-theme-argon +luci-theme-argondark +ext-login \
-		+luci-theme-tomato +ext-zertotier \
+		+luci-theme-tomato +ext-zerotier \
 		+ca-bundle +ca-certificates \
 		+luci-app-ksmbd +usb-storage \
 		+ext-p910nd +luci-app-sqm +kmod-sched-cake +luci-app-nft-qos \
