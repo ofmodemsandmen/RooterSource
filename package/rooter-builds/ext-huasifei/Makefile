@@ -18,7 +18,7 @@ define Package/ext-huasifei
 		+luci-app-ddns +ddns-scripts \
 		+luci-app-rootervpn +ext-wireguard \
 		+webconsole +bwmon +464xlat \
-		+iptables-mod-hashlimit \
+		+iptables-mod-hashlimit +ext-zertotier \
 		+ca-bundle +ca-certificates \
 		+luci-app-ksmbd +usb-storage \
 		+ext-p910nd +kmod-sched-cake +luci-app-nft-qos \
