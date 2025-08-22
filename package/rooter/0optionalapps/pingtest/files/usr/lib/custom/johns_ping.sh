@@ -80,11 +80,12 @@ uci commit ping
 	
 CURRMODEM=1
 CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
-DELAY=$(uci get ping.ping.delay)
-TIMEOUT=$(uci get ping.ping.timeout)
+DELAY=$(uci -q get ping.ping.delay)
+TIMEOUT=$(uci -q get ping.ping.timeout)
 if [ -z "$TIMEOUT" ]; then
 	TIMEOUT=5
 fi
+RE=$(uci -q get ping.ping.reboot)
 
 doping
 
@@ -95,6 +96,10 @@ if [[ "$RETURN_CODE_1" != "200" &&  "$RETURN_CODE_2" != "200" &&  "$RETURN_CODE_
 		log "Second Bad Ping Test"
 		uci set ping.ping.conn="3"
 		uci commit ping
+		if [ "$RE" = "1" ]; then
+			touch /etc/banner && reboot -f
+			exit 0
+		fi
 		log "Restart Network"
 		/usr/lib/rooter/luci/restart.sh $CURRMODEM 10
 		sleep $DELAY

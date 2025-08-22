@@ -789,6 +789,13 @@ if file ~= nil then
 				if m_text == "::reboot!!" then
 					os.execute("(sleep 60; /usr/lib/rooter/luci/rebootmodem.sh) &")
 					delslots = delslots .. m_index .. " "
+				elseif m_text == "::restartzt!!" then
+					local filez = io.open("/etc/init.d/zerotier restart", "r")
+					if filez ~= nil then
+						filez:close()
+						os.execute("(sleep 60; /etc/init.d/zerotier restart) &")
+					end
+					delslots = delslots .. m_index .. " "
 				elseif m_text == "::pwrtoggle!!" then
 					os.execute("(sleep 60; /usr/lib/rooter/pwrtoggle.sh 3) &")
 					delslots = delslots .. m_index .. " "

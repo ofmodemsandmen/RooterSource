@@ -26,6 +26,11 @@ type:value("0", translate("Ping"))
 type:value("1", translate("Page Retrieval"))
 type.default=1
 
+re = d:option(Flag, "reboot", translate("Reboot Only"),translate("Reboot router on failed ping without restarting modem"));
+re.default="0"
+re.optional=false;
+
+
 d1 = d:option(ListValue, "delay", translate("Reconnection Delay"),translate("Delay in seconds after restarting modem before checking for connection"));
 d1:value("40", "40 seconds")
 d1:value("45", "45 seconds")
