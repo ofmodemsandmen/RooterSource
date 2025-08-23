@@ -38,4 +38,5 @@ start() {
 		gr_backup=`grep "^/etc/config/zerotier" /etc/sysupgrade.conf`
 		[ -z $gr_backup ] && echo "/etc/config/zerotier" >> /etc/sysupgrade.conf
 	fi
+	/usr/lib/zerotier/keepa.sh &
 }
