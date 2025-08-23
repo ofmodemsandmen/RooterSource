@@ -7,8 +7,8 @@ log() {
 
 ID=$2
 
-uci delete zerotier.zerotier.join
-uci add_list zerotier.zerotier.join=$ID
+uci delete zerotier.zerotier.id
+uci add_list zerotier.zerotier.id=$ID
 uci commit zerotier
 uci set custom.zerotier.networkid=$ID
 uci commit custom

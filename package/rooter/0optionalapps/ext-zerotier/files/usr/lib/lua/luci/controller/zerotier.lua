@@ -16,13 +16,13 @@ end
 
 function action_getid()
 	local rv = {}
-	id = luci.model.uci.cursor():get("zerotier", "zerotier", "join")
+	id = luci.model.uci.cursor():get("zerotier", "zerotier", "id")
 	rv["netid"] = id
-	secret = luci.model.uci.cursor():get("zerotier", "zerotier", "secret")
+	secret = luci.model.uci.cursor():get("zerotier", "global", "secret")
 	if secret == nil then
 		secret = "xxxxxxxxxx"
 	end
-	rv["enable"] = luci.model.uci.cursor():get("zerotier", "zerotier", "enabled")
+	rv["enable"] = luci.model.uci.cursor():get("zerotier", "global", "enabled")
 	rv["routerid"] = string.sub(secret,1,10)
 	rv["password"] = luci.model.uci.cursor():get("custom", "zerotier", "password")
 	rv["cust"] = luci.model.uci.cursor():get("zerotier", "zerotier", "cust")
@@ -35,7 +35,7 @@ function action_sendid()
 	local rv = {}
 	local set = luci.http.formvalue("set")
 	os.execute("/usr/lib/zerotier/netid.sh 1 " .. set)
-	secret = luci.model.uci.cursor():get("zerotier", "zerotier", "secret")
+	secret = luci.model.uci.cursor():get("zerotier", "global", "secret")
 	if secret == nil then
 		secret = "xxxxxxxxxx"
 	end
@@ -49,7 +49,7 @@ function action_sendenable()
 	local rv = {}
 	local set = luci.http.formvalue("set")
 	os.execute("/usr/lib/zerotier/enable.sh 1 " .. set)
-	secret = luci.model.uci.cursor():get("zerotier", "zerotier", "secret")
+	secret = luci.model.uci.cursor():get("zerotier", "global", "secret")
 	if secret == nil then
 		secret = "xxxxxxxxxx"
 	end
@@ -61,9 +61,9 @@ end
 
 function action_get_ids()
 	local rv = {}
-	id = luci.model.uci.cursor():get("zerotier", "zerotier", "join")
+	id = luci.model.uci.cursor():get("zerotier", "zerotier", "id")
 	rv["netid"] = id
-	secret = luci.model.uci.cursor():get("zerotier", "zerotier", "secret")
+	secret = luci.model.uci.cursor():get("zerotier", "global", "secret")
 	if secret ~= nil then
 		rv["routerid"] = string.sub(secret,1,10)
 	else

@@ -1,5 +1,8 @@
 
-config zerotier 'zerotier'
+config zerotier 'global'
 	option enabled 0
-	list join 'xxxxxxxxxxxxxxxx'
+	option secret ''
+
+config network 'zerotier'
+	option id 'xxxxxxxxxxxxxxxx'
 

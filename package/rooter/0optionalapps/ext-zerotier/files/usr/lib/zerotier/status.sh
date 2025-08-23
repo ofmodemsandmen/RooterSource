@@ -5,7 +5,7 @@ log() {
 	logger -t "NetID" "$@"
 }
 
-enb=$(uci -q get zerotier.zerotier.enabled)
+enb=$(uci -q get zerotier.global.enabled)
 if [ "$enb" = "0" ]; then
 	status="0"
 	ip="---"
