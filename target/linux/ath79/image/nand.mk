@@ -31,7 +31,7 @@ define Device/glinet_gl-x1200-nor-nand
   VID_HDR_OFFSET := 2048
   IMAGES := factory.img sysupgrade.tar
   IMAGE/sysupgrade.tar := sysupgrade-tar | append-metadata
-  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi | append-metadata
+  IMAGE/factory.img := append-kernel | pad-to $$$$(KERNEL_SIZE) | append-ubi
   SUPPORTED_DEVICES += gl-x1200 glinet,gl-x1200
 endef
 TARGET_DEVICES += glinet_gl-x1200-nor-nand
