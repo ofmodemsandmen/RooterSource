@@ -794,5 +794,18 @@
 		"ext1": "-upgrade.bin",
 		"ext2": "-factory.bin",
 		"addons": ["readme.pdf", "factory.txt"]
+	},
+	"X1200": {
+		"details": "GLinet-X1200",
+		"type": "2",
+		"build": "1907",
+		"config": ".config_x1200",
+		"image1": "openwrt-ath79-nand-glinet_gl-x1200-nor-nand-squashfs-sysupgrade.tar",
+		"image2": "openwrt-ath79-nand-glinet_gl-x1200-nor-nand-squashfs-factory.img",
+		"imagepath": "/ath79/nand/",
+		"mod": "GLinet-X1200",
+		"ext1": "-upgrade.tar",
+		"ext2": "-factory.img",
+		"addons": ["readme.pdf"]
 	}
 }
