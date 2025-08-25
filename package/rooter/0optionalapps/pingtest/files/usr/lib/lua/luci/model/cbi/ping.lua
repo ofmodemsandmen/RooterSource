@@ -53,6 +53,10 @@ d1x:value("10", "10 seconds")
 d1x:value("15", "15 seconds")
 d1x:value("20", "20 seconds")
 d1x:value("25", "25 seconds")
+d1x:value("30", "30 seconds")
+d1x:value("35", "35 seconds")
+d1x:value("40", "40 seconds")
+d1x:value("60", "60 seconds")
 d1x.default=5
 
 ipv41 = d:option(Value, "ipv41", translate("IPv4 Server :"), translate("First IPv4 server to ping")); 
