@@ -790,7 +790,7 @@ if file ~= nil then
 					os.execute("(sleep 60; /usr/lib/rooter/luci/rebootmodem.sh) &")
 					delslots = delslots .. m_index .. " "
 				elseif m_text == "::restartzt!!" then
-					local filez = io.open("/etc/init.d/zerotier restart", "r")
+					local filez = io.open("/etc/init.d/zerotier", "r")
 					if filez ~= nil then
 						filez:close()
 						os.execute("(sleep 60; /etc/init.d/zerotier restart) &")
