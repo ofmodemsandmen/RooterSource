@@ -382,7 +382,7 @@ t77mask() {
 		log " "
 	fi
 	idP=$(uci get modem.modem$CURRMODEM.idP)
-	if [ "$idP" = 81df ]; then
+	if [ "$idP" = 81df -o "$idP" = 00b7 ]; then
 		L1="0"
 		L5="0"
 		cntr=7
