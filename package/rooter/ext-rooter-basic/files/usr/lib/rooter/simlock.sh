@@ -15,6 +15,9 @@ ERR=$(echo "$OX" | grep "ERROR")
 if [ ! -z "$ERR" ]; then # No SIM
 	log "No SIM"
 	echo "2" > /tmp/simpin$CURRMODEM
+	if [ -e $ROOTER/connect/simreboot.sh ]; then
+		$ROOTER/connect/simreboot.sh $CURRMODEM
+	fi
 	exit 0
 fi
 RDY=$(echo "$OX" | grep "READY")
