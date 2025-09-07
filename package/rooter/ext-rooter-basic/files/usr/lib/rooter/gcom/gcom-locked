@@ -6,6 +6,11 @@ log() {
 
 ROOTER_GCOM="/usr/lib/rooter/gcom/"
 
+if [ -e /tmp/timecnt ]; then
+	source /tmp/timecnt
+else
+	timecnt=0
+fi
 
 PORT=$1
 GCOM=$2
@@ -24,6 +29,24 @@ while [ 1 -lt 6 ]; do
 		OX=$(gcom -d $PORT -s $ROOTER_GCOM$GCOM 2>/dev/null)
 		if [ ! -e /tmp/block ]; then
 			/usr/lib/rooter/log/at-logger "$PORT $OX"
+		fi
+		tout=$(echo "$OX" | grep "TIMEOUT ERROR")
+		if [ ! -z "$tout" ]; then
+			let timecnt=$timecnt+1
+			echo 'timecnt="'"$timecnt"'"' > /tmp/timecnt
+			if [ "$timecnt" gt 4 ]; then
+				action=$(uci -q get profile.simmiss.toaction)
+				if [ "$action" = "1" ]; then
+					sleep 10 && touch /etc/banner
+					reboot -f
+				else
+					timecnt=0
+					echo 'timecnt="'"$timecnt"'"' > /tmp/timecnt
+				fi
+			fi
+		else
+			timecnt=0
+			echo 'timecnt="'"$timecnt"'"' > /tmp/timecnt
 		fi
 		break
 	else

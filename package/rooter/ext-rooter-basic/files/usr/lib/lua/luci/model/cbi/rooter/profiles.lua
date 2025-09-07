@@ -50,6 +50,14 @@ ms1:value("1", translate("Restart Modem"))
 ms1:value("2", translate("Reboot Router"))
 ms1.default = "0"
 
+ds2 = m:section(TypedSection, "simmiss", translate("AT Command TIMEOUT ERROR"), translate("Action to take if TIMEOUT ERROR occurs"))
+ds2.anonymous = true
+
+ms2 = ds2:option(ListValue, "toaction", translate("Action to Take :")); 
+ms2:value("0", translate("Nothing"))
+ms2:value("1", translate("Reboot Router"))
+ms2.default = "0"
+
 -- 
 -- Default profile
 --
