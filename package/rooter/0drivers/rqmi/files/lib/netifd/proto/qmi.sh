@@ -276,6 +276,9 @@ proto_qmi_setup() {
 					;;
 				esac
 			fi
+			if [ "$IPVAR" = "IPV4" ]; then
+				IPVAR="IP"
+			fi
 			ATCMDD="AT+CGDCONT=$CID,\"$IPVAR\",\"$NAPN\""
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=$CFUNOFF")

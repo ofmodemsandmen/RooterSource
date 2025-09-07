@@ -51,7 +51,9 @@ check_apn() {
 			break
 		fi
 	done
-
+	if [ "$IPVAR" = "IPV4" ]; then
+		IPVAR="IP"
+	fi
 	uci set modem.modem$CURRMODEM.pdptype=$IPVAR
 	uci commit modem
 

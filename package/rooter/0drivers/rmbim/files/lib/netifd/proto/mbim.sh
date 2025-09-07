@@ -308,6 +308,10 @@ _proto_mbim_setup() {
 				CFUNOFF="4"
 			fi
 			IPUP=$(echo $IPVAR | tr 'a-z' 'A-Z')
+			IPUP=$(echo $IPVAR | tr 'a-z' 'A-Z')
+			if [ "$IPUP" = "IPV4" ]; then
+				IPUP="IP"
+			fi
 			ATCMDD="AT+CGDCONT=$CID,\"$IPUP\",\"$NAPN\""
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$COMMPORT" "run-at.gcom" "$CURRMODEM" "AT+CFUN=$CFUNOFF")
