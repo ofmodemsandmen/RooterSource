@@ -958,7 +958,7 @@ if [ -n "$CHKPORT" ]; then
 	IPVAR=$(uci -q get modem.modeminfo$CURRMODEM.pdptype)
 	case "$IPVAR" in
 		"IP" )
-			pdptype="IPV4"
+			pdptype="IP"
 		;;
 		"IPV6" )
 			pdptype="IPV6"
