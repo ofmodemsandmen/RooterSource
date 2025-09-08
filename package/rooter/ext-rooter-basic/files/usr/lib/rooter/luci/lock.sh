@@ -420,7 +420,7 @@ case $uVid in
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		fi
 	;;
-	"413c" )
+	"413c"|"1e2d" )
 		MODT="3"
 		case $uPid in
 
@@ -441,7 +441,7 @@ case $uVid in
 					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 				fi
 			;;
-			"81df")
+			"81df"|"00b7"|"00b3")
 				if [ ! -z $mask ]; then
 					ATCMDD="AT^BAND_PREF"
 					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
