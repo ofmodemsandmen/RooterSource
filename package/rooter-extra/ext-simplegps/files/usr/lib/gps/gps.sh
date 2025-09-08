@@ -40,6 +40,11 @@ idV=$(uci -q get modem.modem$CURRMODEM.idV)
 idP=$(uci -q get modem.modem$CURRMODEM.idP)
 CPORT=$(uci get modem.modem$CURRMODEM.commport)
 
+enable=$(uci -q get gps.configuration.enabled)
+if [ $enable = "0" ]; then
+	exit 0
+fi
+
 log "Running GPS script"
 
 QUECTEL=false

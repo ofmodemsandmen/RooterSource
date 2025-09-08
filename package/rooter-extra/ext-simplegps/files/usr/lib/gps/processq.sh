@@ -7,6 +7,9 @@ log() {
 	logger -t "Quectel GPS" "$@"
 }
 
+convert=$(uci -q get gps.configuration.convert)
+datefor=$(uci -q get gps.configuration.datefor)
+
 OX=$1
 
 if [ -z "$OX" ]; then
@@ -26,8 +29,50 @@ if [ -z "$O" ]; then
 fi
 OX=$(echo $O" " | tr ":" ",")
 
+TIME=$(echo $OX | cut -d, -f2)
 LAT=$(echo $OX | cut -d, -f3)
 LON=$(echo $OX | cut -d, -f4)
+HOP=$(echo $OX | cut -d, -f5)
+ALT=$(echo $OX | cut -d, -f6)
+FIX=$(echo $OX | cut -d, -f7)
+COG=$(echo $OX | cut -d, -f8)
+HSPD=$(echo $OX | cut -d, -f9)
+DATE=$(echo $OX | cut -d, -f11)
+NSAT=$(echo $OX | cut -d, -f12)
+
+TIME="${TIME#"${TIME%%[! ]*}"}"
+hr=${TIME:0:2}
+min=${TIME:2:2}
+sec=${TIME:4:2}
+if [ $hr -lt 12 ]; then
+	apm="AM"
+else
+	apm="PM"
+fi
+day=${DATE:0:2}
+mon=${DATE:2:2}
+year=${DATE:4:2}
+if [ $datefor = '0' ]; then
+	date="20"$year"-"$mon"-"$day" "$hr":"$min":"$sec" "$apm" (UTC)"
+else
+	date=$day"/"$mon"/20"$year" "$hr":"$min":"$sec" "$apm" (UTC)"
+fi
+
+altitude=$ALT" M"
+numsat=$NSAT
+numsat="${numsat#"${numsat%%[!0]*}"}"
+horizp=$HOP
+hspd=$HSPD" Km/h"
+if [ $FIX = "2" ]; then
+	fix="2D Fix"
+else
+	fix="3D Fix"
+fi
+if [ -z $COG ]; then
+	heading="0.0 Deg from North"
+else
+	heading=$COG" Deg from North"
+fi
 
 llen=$(expr length "$LAT")
 if [ $llen -eq 10 ]; then
@@ -59,7 +104,13 @@ let "latsecd=$latsec*6/1000"
 let "lonsecd=$lonsec*6/1000"
 
 latdeg="${latdeg#"${latdeg%%[!0]*}"}"
+if [ -z "$latdeg" ]; then
+	latdeg="0"
+fi
 latmin="${latmin#"${latmin%%[!0]*}"}"
+if [ -z "$latmin" ]; then
+	latmin="0"
+fi
 if [ $lathemi = "S" ]; then
 	lathemi="South"
 else
@@ -72,7 +123,13 @@ else
 	lonhemi="West"
 fi
 londeg="${londeg#"${londeg%%[!0]*}"}"
+if [ -z "$londeg" ]; then
+	londeg="0"
+fi
 lonmin="${lonmin#"${lonmin%%[!0]*}"}"
+if [ -z "$lonmin" ]; then
+	lonmin="0"
+fi
 delongitude=$londeg" Deg "$lonmin" Min "$lonsecd" Sec "$lonhemi
 /usr/lib/gps/convert.lua $latdeg $latmin $latsec $lathemid
 source /tmp/latlon
@@ -81,11 +138,32 @@ dlatitude=$CONVERT
 source /tmp/latlon
 dlongitude=$CONVERT
 
+if [ $convert = '0' ]; then
+	latitude=$latdeg" Deg "$latmin" Min "$latsecd" Sec "$lathemi
+	longitude=$londeg" Deg "$lonmin" Min "$lonsecd" Sec "$lonhemi
+else
+	latitude=$dlatitude
+	longitude=$dlongitude
+fi
+
+
+echo $date > /tmp/gpsdata
+echo $altitude >> /tmp/gpsdata
+echo $latitude >> /tmp/gpsdata
+echo $longitude >> /tmp/gpsdata
+echo $numsat >> /tmp/gpsdata
+echo $horizp >> /tmp/gpsdata
+echo $fix >> /tmp/gpsdata
+echo $heading >> /tmp/gpsdata
+echo $hspd >> /tmp/gpsdata
+echo "0.0 Km/h" >> /tmp/gpsdata
+echo $dlatitude >> /tmp/gpsdata
+echo $dlongitude >> /tmp/gpsdata
+echo $delatitude >> /tmp/gpsdata
+echo $delongitude >> /tmp/gpsdata
+
 lat="$delatitude ( $dlatitude )"
 long="$delongitude ( $dlongitude )"
-echo 'LATITUDE="'"$lat"'"' >> /tmp/gpsdata
-echo 'LONGITUDE="'"$long"'"' >> /tmp/gpsdata
-
 echo "$lat" > /tmp/gpsdata1
 echo "$long" >> /tmp/gpsdata1
 

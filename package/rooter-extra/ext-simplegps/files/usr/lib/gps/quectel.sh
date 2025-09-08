@@ -13,6 +13,9 @@ if [ -e /etc/newstyle ]; then
 fi
 
 CURRMODEM=$1
+if [ $CURRMODEM = "2" ]; then
+	exit 0
+fi
 CPORT=$(uci get modem.modem$CURRMODEM.commport)
 rm -f /tmp/gps
 rm -f /tmp/lastgps
@@ -26,6 +29,7 @@ err=$(echo "$OX" | grep "+QGPS: 1")
 if [ -z "$err" ]; then
 	ATCMDD="AT+QGPS=1"
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+	log "$OX"
 fi
 
 log "GPS setup and waiting"
@@ -41,15 +45,36 @@ ATCMDD="AT+QGPSCFG=\"outport\",\"none\""
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 
 while true; do
-	refresh=30
+	refresh=$(uci -q get gps.configuration.refresh)
 	ATCMDD="AT+QGPSLOC=0"
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	err=$(echo "$OX" | grep "ERROR")
 	if [ -z "$err" ]; then
+		EN2=$(uci -q get gps.configuration.type2)
+		if [ $EN2 = "1" ]; then
+			result=`ps | grep -i "movement.sh" | grep -v "grep" | wc -l`
+			if [ $result -lt 1 ]; then
+				/usr/lib/gps/movement.sh &
+			fi
+		else
+			PID=$(ps |grep "movement.sh" | grep -v grep |head -n 1 | awk '{print $1}')
+			if [ ! -z "$PID" ]; then
+				kill -9 $PID
+			fi
+		fi
 		echo "$OX" > /tmp/gpsox
 		result=`ps | grep -i "processq.sh" | grep -v "grep" | wc -l`
 		if [ $result -lt 1 ]; then
 			/usr/lib/gps/processq.sh 1
+		fi
+		if [ ! -e /tmp/gpsboot ]; then
+			if [ -e /tmp/gps ]; then
+				CONN=$(uci get modem.modem$CURRMODEM.connected)
+				if [ $CONN = "1" ]; then
+					echo "0" > /tmp/gpsboot
+					/usr/lib/gps/sendreport.sh
+				fi
+			fi
 		fi
 		sleep $refresh
 	else

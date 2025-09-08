@@ -1,0 +1,258 @@
+<%+header%>
+<script type="text/javascript" src="<%=resource%>/xhr.js"></script>
+<script type="text/javascript">//<![CDATA[
+
+	function refresh()
+	{
+		document.getElementById("idf").style.visibility="visible";
+		document.getElementById("idf").style.display = "block";
+		document.getElementById("idn").style.visibility="hidden";
+		document.getElementById("idn").style.display = "none";
+		document.getElementById("settings").style.visibility="hidden";
+		document.getElementById("settings").style.display = "none";
+		document.getElementById("submail").style.visibility="hidden";
+		document.getElementById("submail").style.display = "none";
+		XHR.get('<%=luci.dispatcher.build_url("admin", "gps", "getmail")%>',
+			null,
+				function(x, rv)
+				{
+					document.getElementById("smtp").value=rv.smtp;
+					document.getElementById("euser").value=rv.euser;
+					document.getElementById("epass").value=rv.epass;
+					document.getElementById("password").value = rv.password; 
+				}
+			);	
+	}
+	
+	function done() { 
+		document.getElementById("popup").style.display = "none";	
+		passw = document.getElementById("password").value;
+		r = document.getElementById("pass").value;
+		if ( r == null )
+		{
+			document.getElementById("pass").value="";
+			return false;
+		}
+		if ( r == passw )
+		{
+			// correct password
+			document.getElementById("pass").value="";
+			document.getElementById("idn").style.visibility="visible";
+			document.getElementById("idn").style.display = "block";
+			document.getElementById("idf").style.visibility="hidden";
+			document.getElementById("idf").style.display = "none";
+			document.getElementById("settings").style.visibility="visible";
+			document.getElementById("settings").style.display = "block";
+			document.getElementById("submail").style.visibility="visible";
+			document.getElementById("submail").style.display = "block";
+		}
+		else
+		{
+			alert("<%:Incorrect Password!!!%>");
+			document.getElementById("pass").value="";
+		}
+		document.getElementById("lockbtn").disabled=false;
+		document.getElementById("unlockbtn").disabled=false;
+		return false;
+	};
+	
+	function unlock(btn)
+	{
+		document.getElementById("popup").style.display = "block";
+		document.getElementById("lockbtn").disabled=true;
+		document.getElementById("unlockbtn").disabled=true;
+		document.getElementById("pass").value = "";
+		document.getElementById("pass").focus();
+		return false;
+	}
+	
+	function lock(btn)
+	{
+		refresh();
+		document.getElementById("lockbtn").disabled=false;
+		document.getElementById("unlockbtn").disabled=false;
+		document.getElementById("pass").value="";
+		return false;
+	}
+	
+	function restm(btn)
+	{
+		XHR.get('<%=luci.dispatcher.build_url("admin", "gps", "getmail")%>',
+			null,
+				function(x, rv)
+				{
+					document.getElementById("smtp").value=rv.smtp;
+					document.getElementById("euser").value=rv.euser;
+					document.getElementById("epass").value=rv.epass;
+				}
+			);	
+	}
+	
+	function submitm(btn)
+	{
+		var smtp = document.getElementById("smtp").value;
+		var euser = document.getElementById("euser").value;
+		var epass = document.getElementById("epass").value;
+		if ( smtp.length == 0 )
+		{
+			alert("<%:You must enter an SMTP Host!!%>");
+			return false;
+		}
+		if ( euser.length == 0 )
+		{
+			alert("<%:You must enter a User Name!!%>");
+			return false;
+		}
+		if ( epass.length == 0 )
+		{
+			alert("<%:You must enter a Password!!%>");
+			return false;
+		}
+		var s = smtp + "," + euser + "," + epass+ ",";
+		
+		XHR.get('<%=luci.dispatcher.build_url("admin", "gps", "setmail")%>',
+			{ set: s },
+				function()
+				{
+					alert("<%:Settings Submitted%>");
+					XHR.get('<%=luci.dispatcher.build_url("admin", "gps", "getmail")%>',
+						null,
+							function(x, rv)
+							{
+								document.getElementById("smtp").value=rv.smtp;
+								document.getElementById("euser").value=rv.euser;
+								document.getElementById("epass").value=rv.epass;
+							}
+						);	
+				}
+			);
+	}
+	
+	function sndcmd(event)
+	{
+		var x = event.key;
+    	if (x == "Enter")
+		{
+			document.getElementById("popbtn").focus();
+			return false;
+		}
+		return false;
+	}
+					
+//]]></script>
+<form method="post" action="<%=REQUEST_URI%>">
+<div class="cbi-map" id="cbi-misc">
+<h2><a id="content" name="content"><%:GPS Mail Server Settings%></a></h2>
+<div class="cbi-map-descr"><%:Settings for SMTP server to send reports by email%></div>
+<body onload="refresh();"></body>
+<head>
+     <style>
+	  #popup {
+		width:560px;
+		height:190px;
+		padding:20px;
+		background-color:gainsboro;  
+		border-style : solid;	
+		position:fixed;
+		top : 40%;
+		margin-left: auto;
+		margin-right: auto;
+		left: 0;
+		right: 0;
+		text-align: center;
+		display:none;
+	}
+    </style>
+</head>
+<fieldset id="interface_field" class="cbi-section">
+
+	<table style="visibility:hidden" width="700" border="0" id="atpass">
+	<tr>
+		<td width="10%"><div id="password" align="right"></div></td>
+	</tr>
+	</table>
+	
+	<div id="popup">
+		<table width="500" border="0">
+			<tr>
+				<td width="50px"><div><%:Enter Password to Change Mail Server%></div></td>
+			</tr>
+			<tr>
+				<td width="200px"><input id="pass" type="password"  onkeydown="sndcmd(event)"/></td>
+			</tr>
+			<tr>
+				<td><input type="image" id="popbtn" src="<%=resource%>/icons/lock1.png" style="width:48px;height:48px;" onclick="return done()" /></td>
+			</tr>
+		</table>
+	</div>
+	
+	<table width="465" border="0" id="idf">
+		<tr>
+			<td width="15%"></td>
+			<td width="20%"><div align="center" style="font-size:1.5em" id="netidt"><strong><%:Mail Server Settings are Locked.%></strong></div></td>
+			<td width="5%"></td>
+			<td width="60%"></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><div align="center"><strong><%:Click button to enter password.%></strong></div></td>
+			<td><input type="image" align="center" id="lockbtn" name="lockbtn" src="<%=resource%>/icons/unlock1.png" style="width:48px;height:48px;" onclick="return unlock(this)" /></td>
+			<td></td>
+		</tr>
+	</table>
+	
+	<table width="465" border="0" id="idn" style="visibility:hidden">
+		<tr>
+			<td width="15%"></td>
+			<td width="20%"><div align="center" style="font-size:1.5em" id="netidt"><strong><%:Mail Server Settings are Unlocked.%></strong></div></td>
+			<td width="5%"></td>
+			<td width="60%"></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><div align="center"><strong><%:Click button to lock the settings.%></strong></div></td>
+			<td><input type="image" align="center" id="unlockbtn" name="unlockbtn" src="<%=resource%>/icons/lock1.png" style="width:48px;height:48px;" onclick="return lock(this)" /></td>
+			<td></td>
+		</tr>
+	</table>
+	
+	<table width="700" border="0" id="tab11">
+	<tr>
+		<td>&nbsp;</td>
+		</tr>
+	</table>
+	
+	<table width="900" border="0" id="settings">
+		<tr>
+			<td width="20%"></td>
+			<td width="10%"><div align="right" style="font-size:1.1em" id="smtpt"><strong><%:SMTP Host%></strong></div></td>
+			<td width="70%"><input id="smtp" size="50"/></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><div align="right" style="font-size:1.1em" id="usert"><strong><%:User Name%></strong></div></td>
+			<td><input id="euser" size="50"/></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><div align="right" style="font-size:1.1em" id="passt"><strong><%:Password%></strong></div></td>
+			<td><input id="epass" size="50"/></td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
+	</table>
+	
+	<table width="550"  border="0" id="submail" style="visibility:hidden">
+		<tr>
+			<td width="30%">&nbsp;</td>
+			<td width="20%"><input type="button" id="submit" class="cbi-button cbi-button-success" value="<%:Submit Changes%>" onclick="return submitm(this)" /></td>
+			<td width="17%"><input type="button" id="reset" class="cbi-button cbi-button-remove" value="<%:Reset%>" onclick="return restm(this)" /></td>
+			<td width="33%">&nbsp;</td>
+		</tr>
+	</table>
+	
+</fieldset>
+</div>
+</form>
+<%+footer%>

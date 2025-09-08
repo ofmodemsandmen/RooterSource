@@ -47,15 +47,36 @@ ATCMDD="AT!GPSTRACK=1,240,30,1000,5"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 
 while true; do
-	refresh=30
+	refresh=$(uci -q get gps.configuration.refresh)
 	ATCMDD="at!gpsloc?"
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	err=$(echo "$OX" | grep "Not Available")
 	if [ -z "$err" ]; then
+		EN=$(uci -q get gps.configuration.type2)
+		if [ $EN = "1" ]; then
+			result=`ps | grep -i "movement.sh" | grep -v "grep" | wc -l`
+			if [ $result -lt 1 ]; then
+				/usr/lib/gps/movement.sh &
+			fi
+		else
+			PID=$(ps |grep "movement.sh" | grep -v grep |head -n 1 | awk '{print $1}')
+			if [ ! -z "$PID" ]; then
+				kill -9 $PID
+			fi
+		fi
 		echo "$OX" > /tmp/gpsox
 		result=`ps | grep -i "processs.sh" | grep -v "grep" | wc -l`
 		if [ $result -lt 1 ]; then
 			/usr/lib/gps/processs.sh 1
+		fi
+		if [ ! -e /tmp/gpsboot ]; then
+			if [ -e /tmp/gps ]; then
+				CONN=$(uci get modem.modem$CURRMODEM.connected)
+				if [ $CONN = "1" ]; then
+					echo "0" > /tmp/gpsboot
+					/usr/lib/gps/sendreport.sh
+				fi
+			fi
 		fi
 		sleep $refresh
 	else

@@ -7,6 +7,9 @@ log() {
 	logger -t "Quectel GPS" "$@"
 }
 
+convert=$(uci -q get gps.configuration.convert)
+datefor=$(uci -q get gps.configuration.datefor)
+
 OX=$1
 
 if [ -z "$OX" ]; then
@@ -47,6 +50,12 @@ LONH=$(echo $OX | cut -d, -f18)
 lathemid=$LATH
 lonhemid=$LONH
 
+TIME=$(echo $OX | cut -d, -f25)
+year=$(echo $OY | cut -d, -f6)
+YEAR="${year#"${year%%[!(]*}"}"
+MON=$(echo $OY | cut -d, -f7)
+DAY=$(echo $OY | cut -d, -f8)
+
 if [ $LATH = "S" ]; then
 	LATH="South"
 else
@@ -66,11 +75,57 @@ dlatitude=$CONVERT
 source /tmp/latlon
 dlongitude=$CONVERT
 
+if [ $convert = '0' ]; then
+	latitude=$LATD" Deg "$LATM" Min "$LATS" Sec "$LATH
+	longitude=$LOND" Deg "$LONM" Min "$LONS" Sec "$LONH
+else
+	latitude=$dlatitude
+	longitude=$dlongitude
+fi
+
+
+if [ $datefor = '0' ]; then
+	date=$YEAR"-"$MON"-"$DAY" "$TIME" (UTC)"
+else
+	date=$DAY"/"$MON"/"$YEAR" "$TIME" (UTC)"
+fi
+
+FIX=$(echo $OX | cut -d, -f39)
+fix=$FIX" Fix"
+ALT=$(echo $OX | cut -d, -f42)
+altitude=$ALT" M"
+COG=$(echo $OX | cut -d, -f48)
+if [ -z $COG ]; then
+	heading="Stationary"
+else
+	heading=$COG" Deg from North"
+fi
+HOP=$(echo $OX | cut -d, -f51)
+hspd=$HOP" M/second"
+VOP=$(echo $OX | cut -d, -f54)
+vertp=$VOP" M/second"
+Prec=$(echo $OX | cut -d, -f37)
+horizp=$Prec" M"
+
+numsat=$(echo $OY | cut -d, -f5)
+
+echo $date > /tmp/gpsdata
+echo $altitude >> /tmp/gpsdata
+echo $latitude >> /tmp/gpsdata
+echo $longitude >> /tmp/gpsdata
+echo $numsat >> /tmp/gpsdata
+echo $horizp >> /tmp/gpsdata
+echo $fix >> /tmp/gpsdata
+echo $heading >> /tmp/gpsdata
+echo $hspd >> /tmp/gpsdata
+echo $vertp >> /tmp/gpsdata
+echo $dlatitude >> /tmp/gpsdata
+echo $dlongitude >> /tmp/gpsdata
+echo $delatitude >> /tmp/gpsdata
+echo $delongitude >> /tmp/gpsdata
+
 lat="$delatitude ( $dlatitude )"
 long="$delongitude ( $dlongitude )"
-echo 'LATITUDE="'"$lat"'"' >> /tmp/gpsdata
-echo 'LONGITUDE="'"$long"'"' >> /tmp/gpsdata
-
 echo "$lat" > /tmp/gpsdata1
 echo "$long" >> /tmp/gpsdata1
 

@@ -1,0 +1,23 @@
+
+config configuration 'configuration'
+	option report '1'
+	option datefor '0'
+	option zoom '15'
+	option convert '1'
+	option refresh '30'
+	option type2 '0'
+	option interval '30'
+	option sendby '2'
+	option phone '12223334444'
+	option minterval '30'
+	option precision '20'
+	option msendby '2'
+	option mphone '12223334444'
+	option smtp 'mail.antennafreak.de'
+	option euser 'goldenorb@antennafreak.de'
+	option epass 'xxxxx'
+	option enabled '1'
+	option times '0'
+	option password '!A7?'
+
+

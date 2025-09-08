@@ -14,7 +14,6 @@ define Package/ext-simplegps
   SECTION:=utils
   CATEGORY:=ROOter
   SUBMENU:=Optional Applications
-  DEPENDS:=+msmtp
   TITLE:=support for gps
   PKGARCH:=all
 endef

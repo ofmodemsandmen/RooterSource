@@ -1,0 +1,214 @@
+<script type="text/javascript" src="<%=resource%>/xhr.js"></script>
+<script type="text/javascript">//<![CDATA[
+
+	//window.onload = startInterval;
+    function startInterval()
+    {
+        setInterval("startTime();",5000);
+    }
+    
+    function startTime()
+    {
+         $('#map_canvas').load(document.URL +  ' #map_canvas'); 
+    }
+	
+	oldlatitude = "0";
+	oldlongitude = "0";
+	incr = 0;
+	cnt = 6;
+	
+	XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "gps", "getcfg")%>', null,
+		function(x, rv)
+		{
+			enabled = rv.enabled;
+			data = rv.data;
+			if (enabled == "1")
+			{
+				document.getElementById('hotenb').checked=true;
+				document.getElementById("simwarn").style.display="none";
+				document.getElementById("gps_text").style.fontSize = 'large';
+				document.getElementById("gps_text1").style.fontSize = 'large';
+				if ( data == "1" )
+				{
+					document.getElementById("gpsinfo").style.display="none";
+					document.getElementById("gpsinfo1").style.display="block";
+					document.getElementById("gpsinfo2").style.display="block";
+					document.getElementById("gpsinfo3").style.display="block";
+					document.getElementById("gpsinfo4").style.display="block";
+					document.getElementById("gps_lat").innerHTML = rv.latitude;
+					document.getElementById("gps_lat").style.fontWeight = 'bold';
+					document.getElementById("gps_long").innerHTML = rv.longitude;
+					document.getElementById("gps_long").style.fontWeight = 'bold';
+					document.getElementById("gps_alt").innerHTML = rv.altitude;
+					document.getElementById("gps_alt").style.fontWeight = 'bold';
+					document.getElementById("gps_date").innerHTML = rv.date;
+					document.getElementById("gps_date").style.fontWeight = 'bold';
+					document.getElementById("gps_nsat").innerHTML = rv.numsat;
+					document.getElementById("gps_nsat").style.fontWeight = 'bold';
+					document.getElementById("gps_mode").innerHTML = rv.fix;
+					document.getElementById("gps_mode").style.fontWeight = 'bold';
+					document.getElementById("gps_horizp").innerHTML = rv.horizp;
+					document.getElementById("gps_horizp").style.fontWeight = 'bold';
+					document.getElementById("gps_heading").innerHTML = rv.heading;
+					document.getElementById("gps_heading").style.fontWeight = 'bold';
+					document.getElementById("gps_hspd").innerHTML = rv.hspd;
+					document.getElementById("gps_hspd").style.fontWeight = 'bold';
+					document.getElementById("gps_vspd").innerHTML = rv.vspd;
+					document.getElementById("gps_vspd").style.fontWeight = 'bold';
+					
+					zoom = rv.zoom;
+					if ( zoom == "" )
+					{
+						zoom = "15";
+					}
+					dlongitude = rv.dlongitude;
+					dlatitude = rv.dlatitude;
+					//dlongitude = String(parseFloat(dlongitude) + incr);
+					//incr = incr + 0.005;
+					connected = rv.connected;
+					if ( connected == "1" )
+					{
+						if ( oldlatitude != dlatitude || oldlongitude != dlongitude )
+						{
+							oldlatitude = dlatitude;
+							oldlongitude = dlongitude;
+							let canvas = document.getElementById("map_canvas");
+							url_string = "https://maps.google.com/maps";
+							qstr = dlatitude + ", " + dlongitude;
+							let adsURL = url_string+"?q="+qstr+"&z="+zoom+"&output=embed";
+							canvas.src = adsURL; 
+						}
+					}
+				}
+				else
+				{
+					document.getElementById("gpsinfo1").style.display="none";
+					document.getElementById("gpsinfo2").style.display="none";
+					document.getElementById("gpsinfo3").style.display="none";
+					document.getElementById("gpsinfo4").style.display="none";
+					document.getElementById("gpsinfo").style.display="block";
+				}
+			}
+			else
+			{
+				document.getElementById('hotenb').checked=false;
+				document.getElementById("simwarn").style.display="block";
+				document.getElementById("gpsinfo").style.display="none";
+				document.getElementById("gpsinfo1").style.display="none";
+				document.getElementById("gpsinfo2").style.display="none";
+				document.getElementById("gpsinfo3").style.display="none";
+				document.getElementById("gpsinfo4").style.display="none";
+				document.getElementById("mdl").innerHTML = "<%:GPS not Enabled%>";
+				document.getElementById("mdl").style.fontWeight = 'bold';
+				document.getElementById("mdl").style.fontSize = 'large';
+			}
+		}
+	);
+
+	function hotenable(btn)
+	{
+		dx = 0;
+		if ( btn.checked == true )
+		{
+			dx = 1;
+		}
+		XHR.get('<%=luci.dispatcher.build_url("admin", "gps", "enable")%>',
+			{ set: dx },
+			function()
+			{
+			}
+		);
+	}	
+			
+//]]></script>
+
+<fieldset id="interface_field" class="cbi-section">
+	
+	<table width="550"  border="0">
+		<tr>
+			<td width="8%">&nbsp;</td>
+			<td width="17%"><div align="right" style="font-size : 20px"><strong><%:Enable GPS %></strong></div></td>
+			<td width="8%">
+				<input type="checkbox" id="hotenb" onclick="hotenable(this)" />
+			</td>
+			<td width="67%">&nbsp;</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
+	</table>
+	
+	<table width="900" id="simwarn"  border="0" >
+		<tr>
+			<td width="40%"></td>
+			<td width="25%" id="mdl" ><div align="left"></div></td>
+		</tr>
+	</table>
+	
+	<table width="900" id="gpsinfo"  border="0" >
+		<tr>
+			<tr>
+				<td width="30%"></td>
+				<td width="35%" id="gps_text"><img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>" style="vertical-align:middle" /><strong><%:Aquiring GPS Satellite...%></strong>
+				</td>
+			</tr>
+		</tr>
+	</table>
+	
+	<table width="100%" id="gpsinfo1"  border="0" >
+		<tr>
+				<td width="5%"></td>
+				<td width="35%" id="gps_text1"><div style="font-size : 25px"><strong><%:GPS Information%></strong></div>
+				</td>
+		</tr>
+	</table>
+	
+	<table width="100%" id="gpsinfo3"  border="0" >
+		<tr>
+			<td width="32%">&nbsp;</td>
+		</tr>
+	</table>
+			
+	<table width="100%" id="gpsinfo2"  border="0" >
+		<tr>
+				<td width="8%"><div><strong><%:Date%></strong></div></td>
+				<td width="20%" id="gps_date"><div></div></td>
+				<td width="12%"><div><strong><%:Number of Satellites%></strong></div></td>
+				<td width="20%" id="gps_nsat"><div></div></td>
+				<td width="12%"></td>
+				<td width="20%"></td>
+		</tr>
+		<tr>
+				<td><div><strong><%:Latitude%></strong></div></td>
+				<td id="gps_lat"><div></div></td>
+				<td><div><strong><%:Longitude%></strong></div></td>
+				<td id="gps_long"><div></div></td>
+		</tr>
+		<tr>
+				<td><div><strong><%:Altitude%></strong></div></td>
+				<td id="gps_alt"><div></div></td>
+		</tr>
+		<tr>
+				<td><div><strong><%:Precision%></strong></div></td>
+				<td id="gps_horizp"><div></div></td>
+				<td><div><strong><%:Positioning Mode%></strong></div></td>
+				<td id="gps_mode"><div></div></td>
+		</tr>
+		<tr>
+				<td><div><strong><%:Heading%></strong></div></td>
+				<td id="gps_heading"><div></div></td>
+				<td><div><strong><%:Horizontal Speed%></strong></div></td>
+				<td id="gps_hspd"><div></div></td>
+				<td><div><strong><%:Vertical Speed%></strong></div></td>
+				<td id="gps_vspd"><div></div></td>
+		</tr>
+	</table>
+	
+	<table width="100%" id="gpsinfo4"  border="0" >
+		<tr>
+			<td width="10%"><div>&nbsp;</div></td>
+			<td width="90%"><div><iframe id="map_canvas"  width="900" height="600" frameborder="0" style="border:0"></iframe></div></td>
+		</tr>
+	</table>
+	
+</fieldset>
