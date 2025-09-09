@@ -263,20 +263,6 @@
 		"ext2": "-factory.bin",
 		"addons": ["readme.pdf", "archer.txt"]
 	},	
-	"WDR4300": {
-		"details": "TP-Link WDR4300",
-		"type": "2",
-		"build": "1907",
-		"flash": "8",
-		"config": ".config_wdr4300",
-		"image1": "openwrt-ath79-generic-tplink_tl-wdr4300-v1-squashfs-sysupgrade.bin",
-		"image2": "openwrt-ath79-generic-tplink_tl-wdr4300-v1-squashfs-factory.bin",
-		"imagepath": "/ath79/generic/",
-		"mod": "TP-Link-WDR4300",
-		"ext1": "-upgrade.bin",
-		"ext2": "-factory.bin",
-		"addons": ["readme.pdf", "archer.txt"]
-	},	
 	"WDR4310": {
 		"details": "TP-Link WDR4310",
 		"type": "2",
