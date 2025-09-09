@@ -13,9 +13,7 @@ if [ -e /etc/newstyle ]; then
 fi
 
 CURRMODEM=$1
-if [ $CURRMODEM = "2" ]; then
-	exit 0
-fi
+
 CPORT=$(uci get modem.modem$CURRMODEM.commport)
 rm -f /tmp/gps
 rm -f /tmp/lastgps
