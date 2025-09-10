@@ -39,6 +39,22 @@ CURRMODEM=$1
 idV=$(uci -q get modem.modem$CURRMODEM.idV)
 idP=$(uci -q get modem.modem$CURRMODEM.idP)
 CPORT=$(uci get modem.modem$CURRMODEM.commport)
+MCC=$(uci get modem.modem$CURRMODEM.mcc)
+if [ -z "$MCC" ]; then
+	MCC='0'
+fi
+MNC=$(uci get modem.modem$CURRMODEM.mnc)
+MNC=${MNC:1}
+if [ -z "$MNC" ]; then
+	MNC='0'
+fi
+connect=$(uci get modem.modem$CURRMODEM.connected)
+if [ -z "$connect" ]; then
+	connect='0'
+fi
+echo "$connect" > /tmp/gpscon
+echo "$MCC" >> /tmp/gpscon
+echo "$MNC" >> /tmp/gpscon
 
 enable=$(uci -q get gps.configuration.enabled)
 if [ $enable = "0" ]; then

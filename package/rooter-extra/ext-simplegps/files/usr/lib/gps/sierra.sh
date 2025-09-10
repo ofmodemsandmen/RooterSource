@@ -47,6 +47,22 @@ ATCMDD="AT!GPSTRACK=1,240,30,1000,5"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 
 while true; do
+	MCC=$(uci get modem.modem$CURRMODEM.mcc)
+	if [ -z "$MCC" ]; then
+		MCC='0'
+	fi
+	MNC=$(uci get modem.modem$CURRMODEM.mnc)
+	MNC=${MNC:1}
+	if [ -z "$MNC" ]; then
+		MNC='0'
+	fi
+	connect=$(uci get modem.modem$CURRMODEM.connected)
+	if [ -z "$connect" ]; then
+		connect='0'
+	fi
+	echo "$connect" > /tmp/gpscon
+	echo "$MCC" >> /tmp/gpscon
+	echo "$MNC" >> /tmp/gpscon
 	refresh=$(uci -q get gps.configuration.refresh)
 	ATCMDD="at!gpsloc?"
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")

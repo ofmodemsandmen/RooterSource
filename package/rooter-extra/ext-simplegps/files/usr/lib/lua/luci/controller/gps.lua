@@ -38,11 +38,18 @@ function action_getcfg()
 		zoom = "15"
 	end
 	rv["zoom"] = zoom
-	connect = luci.model.uci.cursor():get("modem", "modem1", "connected")
-	if connect == nil then
-		connect = "0"
+	
+	file = io.open("/tmp/gpscon", "r")
+	if file ~= nil then
+		rv["connected"] = file:read("*line")
+		rv["mcc"] = file:read("*line")
+		rv["mnc"] = file:read("*line")
+		file:close()
+	else
+		rv["connected"] = "0"
+		rv["mcc"] = "0"
+		rv["mnc"] = "0"
 	end
-	rv["connected"] = connect
 	
 	file = io.open("/tmp/gps", "r")
 	if file ~= nil then

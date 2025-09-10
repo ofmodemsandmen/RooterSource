@@ -16,6 +16,8 @@
 	oldlongitude = "0";
 	incr = 0;
 	cnt = 6;
+	mcc = "0";
+	mnc = "0";
 	
 	XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "gps", "getcfg")%>', null,
 		function(x, rv)
@@ -66,6 +68,8 @@
 					//dlongitude = String(parseFloat(dlongitude) + incr);
 					//incr = incr + 0.005;
 					connected = rv.connected;
+					mcc = rv.mcc;
+					mnc = rv.mnc;
 					if ( connected == "1" )
 					{
 						if ( oldlatitude != dlatitude || oldlongitude != dlongitude )
@@ -119,6 +123,21 @@
 			}
 		);
 	}	
+	
+	function applyc(btn)
+	{
+		url = "https://www.cellmapper.net/map?";
+		//mcc;
+		//mnc;
+		// MCC=302&MNC=490&type=LTE
+		url = url + "MCC="+mcc+"&MNC="+mnc+"&type=LTE";
+		//dlongitude;
+		//dlatitude;
+		// &latitude=49.11706402687034&longitude=-122.66453386229367
+		url = url + "&latitude="+dlatitude+"&longitude="+dlongitude;
+		url = url + "&zoom=14.239003003651355&showTowers=true&showIcons=true&showTowerLabels=true&clusterEnabled=true&tilesEnabled=true&showOrphans=false&showNoFrequencyOnly=false&showFrequencyOnly=false&showBandwidthOnly=false&DateFilterType=Last&showHex=false&showVerifiedOnly=false&showUnverifiedOnly=false&showLTECAOnly=false&showENDCOnly=false&showBand=0&showSectorColours=true&mapType=roadmap&darkMode=false&imperialUnits=false"
+		window.open(url);
+	}
 			
 //]]></script>
 
@@ -210,5 +229,11 @@
 			<td width="90%"><div><iframe id="map_canvas"  width="900" height="600" frameborder="0" style="border:0"></iframe></div></td>
 		</tr>
 	</table>
+	
+	<table id="apply1" border="0">
+		<tr>
+			<td><input type="button" id="apply1" class="cbi-button cbi-button-apply" value="<%:Open Cellmapper.net%>" onclick="return applyc(this)" /></td>
+		</tr>
+ 	</table>
 	
 </fieldset>
