@@ -36,7 +36,8 @@
 					document.getElementById("gpsinfo1").style.display="block";
 					document.getElementById("gpsinfo2").style.display="block";
 					document.getElementById("gpsinfo3").style.display="block";
-					document.getElementById("gpsinfo4").style.display="block";
+					document.getElementById("gpsinfo4").style.display="none";
+					document.getElementById("apply1").style.display="none";
 					document.getElementById("gps_lat").innerHTML = rv.latitude;
 					document.getElementById("gps_lat").style.fontWeight = 'bold';
 					document.getElementById("gps_long").innerHTML = rv.longitude;
@@ -72,6 +73,8 @@
 					mnc = rv.mnc;
 					if ( connected == "1" )
 					{
+						document.getElementById("apply1").style.display="block";
+						document.getElementById("gpsinfo4").style.display="block";
 						if ( oldlatitude != dlatitude || oldlongitude != dlongitude )
 						{
 							oldlatitude = dlatitude;
@@ -90,6 +93,7 @@
 					document.getElementById("gpsinfo2").style.display="none";
 					document.getElementById("gpsinfo3").style.display="none";
 					document.getElementById("gpsinfo4").style.display="none";
+					document.getElementById("apply1").style.display="none";
 					document.getElementById("gpsinfo").style.display="block";
 				}
 			}
@@ -102,6 +106,7 @@
 				document.getElementById("gpsinfo2").style.display="none";
 				document.getElementById("gpsinfo3").style.display="none";
 				document.getElementById("gpsinfo4").style.display="none";
+				document.getElementById("apply1").style.display="none";
 				document.getElementById("mdl").innerHTML = "<%:GPS not Enabled%>";
 				document.getElementById("mdl").style.fontWeight = 'bold';
 				document.getElementById("mdl").style.fontSize = 'large';
@@ -232,7 +237,7 @@
 	
 	<table id="apply1" border="0">
 		<tr>
-			<td><input type="button" id="apply1" class="cbi-button cbi-button-apply" value="<%:Open Cellmapper.net%>" onclick="return applyc(this)" /></td>
+			<td><input type="button" id="apply11" class="cbi-button cbi-button-apply" value="<%:Open Cellmapper.net%>" onclick="return applyc(this)" /></td>
 		</tr>
  	</table>
 	

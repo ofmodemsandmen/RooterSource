@@ -38,19 +38,7 @@ function action_getcfg()
 		zoom = "15"
 	end
 	rv["zoom"] = zoom
-	
-	file = io.open("/tmp/gpscon", "r")
-	if file ~= nil then
-		rv["connected"] = file:read("*line")
-		rv["mcc"] = file:read("*line")
-		rv["mnc"] = file:read("*line")
-		file:close()
-	else
-		rv["connected"] = "0"
-		rv["mcc"] = "0"
-		rv["mnc"] = "0"
-	end
-	
+
 	file = io.open("/tmp/gps", "r")
 	if file ~= nil then
 		rv["data"] = "1"
@@ -69,10 +57,18 @@ function action_getcfg()
 			rv["vspd"] = file:read("*line")
 			rv["dlatitude"] = file:read("*line")
 			rv["dlongitude"] = file:read("*line")
+			rv["delatitude"] = file:read("*line")
+			rv["delongitude"] = file:read("*line")
+			rv["connected"] = file:read("*line")
+			rv["mcc"] = file:read("*line")
+			rv["mnc"] = file:read("*line")
 			file:close()
 		end
 	else
 		rv["data"] = "0"
+		rv["connected"] = "0"
+		rv["mcc"] = "0"
+		rv["mnc"] = "0"
 	end
 	
 	

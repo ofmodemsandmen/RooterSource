@@ -11,6 +11,21 @@ convert=$(uci -q get gps.configuration.convert)
 datefor=$(uci -q get gps.configuration.datefor)
 
 OX=$1
+CURRMODEM=$2
+
+MCC=$(uci get modem.modem$CURRMODEM.mcc)
+if [ -z "$MCC" ]; then
+	MCC='0'
+fi
+MNC=$(uci get modem.modem$CURRMODEM.mnc)
+MNC=${MNC:1}
+if [ -z "$MNC" ]; then
+	MNC='0'
+fi
+connect=$(uci get modem.modem$CURRMODEM.connected)
+if [ -z "$connect" ]; then
+	connect='0'
+fi
 
 if [ -z "$OX" ]; then
 	if [ -e /tmp/lastgps ]; then
@@ -161,6 +176,9 @@ echo $dlatitude >> /tmp/gpsdata
 echo $dlongitude >> /tmp/gpsdata
 echo $delatitude >> /tmp/gpsdata
 echo $delongitude >> /tmp/gpsdata
+echo "$connect" >> /tmp/gpsdata
+echo "$MCC" >> /tmp/gpsdata
+echo "$MNC" >> /tmp/gpsdata
 
 lat="$delatitude ( $dlatitude )"
 long="$delongitude ( $dlongitude )"
