@@ -7,6 +7,16 @@ log() {
 	logger -t "Quectel GPS" "$@"
 }
 
+tping() {
+	hp=$(httping $2 -t $TIMEOUT -c 3 -s $1)
+	pingg=$(echo $hp" " | grep -o "round-trip .\+ ms ")
+	if [ -z "$pingg" ]; then
+		tmp=0
+	else
+		tmp=200
+	fi
+}
+
 convert=$(uci -q get gps.configuration.convert)
 datefor=$(uci -q get gps.configuration.datefor)
 
@@ -25,6 +35,16 @@ fi
 connect=$(uci get modem.modem$CURRMODEM.connected)
 if [ -z "$connect" ]; then
 	connect='0'
+fi
+if [ "$connect" = "0" ]; then
+	TIMEOUT=10
+	ipv41="http://www.google.com/"
+	tping "$ipv41"; RETURN_CODE_1=$tmp
+	if [ "$RETURN_CODE_1" != "200" ]; then
+		connect='0'
+	else
+		connect='1'
+	fi
 fi
 
 if [ -z "$OX" ]; then

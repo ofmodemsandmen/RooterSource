@@ -838,6 +838,10 @@ if [ -n "$CHKPORT" ]; then
 		$ROOTER/simlock.sh $CURRMODEM
 	fi
 
+	if [ -e /usr/lib/gps/gps.sh ]; then
+		/usr/lib/gps/gps.sh $CURRMODEM &
+	fi
+	
 	$ROOTER/common/gettype.sh $CURRMODEM
 	$ROOTER/connect/get_profile.sh $CURRMODEM
 	detect=$(uci -q get modem.modeminfo$CURRMODEM.detect)
@@ -863,10 +867,7 @@ if [ -n "$CHKPORT" ]; then
 		fi
 		exit 0
 	fi
-	
-	if [ -e /usr/lib/gps/gps.sh ]; then
-		/usr/lib/gps/gps.sh $CURRMODEM &
-	fi
+
 	INTER=$(uci -q get modem.modeminfo$CURRMODEM.inter)
 	[ $INTER = 5 ] && log "Modem $CURRMODEM disabled in Connection Profile" && exit 1
 	$ROOTER/sms/check_sms.sh $CURRMODEM &

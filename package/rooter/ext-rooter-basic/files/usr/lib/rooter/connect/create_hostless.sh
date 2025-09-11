@@ -448,6 +448,11 @@ if [ -e $ROOTER/modem-led.sh ]; then
 	$ROOTER/modem-led.sh $CURRMODEM 2
 fi
 
+
+if [ -e /usr/lib/gps/gps.sh ]; then
+	/usr/lib/gps/gps.sh $CURRMODEM &
+fi
+	
 $ROOTER/connect/get_profile.sh $CURRMODEM
 detect=$(uci -q get modem.modeminfo$CURRMODEM.detect)
 if [ "$detect" = "1" ]; then
@@ -470,9 +475,6 @@ if [ $SP -gt 0 ]; then
 		exit 0
 	fi
 
-	if [ -e /usr/lib/gps/gps.sh ]; then
-		/usr/lib/gps/gps.sh $CURRMODEM &
-	fi
 fi
 
 if [ -e $ROOTER/connect/chkconn.sh ]; then
