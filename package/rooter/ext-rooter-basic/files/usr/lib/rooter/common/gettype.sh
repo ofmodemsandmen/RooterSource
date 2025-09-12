@@ -72,13 +72,13 @@ if [ -z "$MODEL" ]; then
 	MODEL=$(uci get modem.modem$CURRMODEM.model)
 fi
 
-dell=$(echo "$MANUF" | grep "DELL")
-if [ ! -z "$dell" ]; then
+#dell=$(echo "$MANUF" | grep "DELL")
+#if [ ! -z "$dell" ]; then
 	if [ "$MODEL" = "4116" ]; then
-		MANUF="Dell"
+		#MANUF="Dell"
 		MODEL="DW5821e/T77W968"
 	fi
-fi
+#fi
 uci set modem.modem$CURRMODEM.manuf="$MANUF"
 uci set modem.modem$CURRMODEM.model="$MODEL"
 uci commit modem
