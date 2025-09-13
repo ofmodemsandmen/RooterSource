@@ -525,7 +525,7 @@ function action_get_csq()
 		file:close()
 	end
 	
-	gpsdata = "/tmp/gpsdata1"
+	gpsdata = "/tmp/gpsdata" .. modnum
 	file = io.open(gpsdata, "r")
 	if file == nil then
 		rv["lat"] = "-"

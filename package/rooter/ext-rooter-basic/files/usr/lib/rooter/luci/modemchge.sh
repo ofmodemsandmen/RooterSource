@@ -1,5 +1,9 @@
 #!/bin/sh
 
+log() {
+	modlog "ModemChange $CURRMODEM" "$@"
+ }
+ 
 TYPE=$1
 DIREC=$2
 source /tmp/modcnt
@@ -14,6 +18,12 @@ case $TYPE in
 	;;
 "misc" )
 	MODENUM=$(uci get modem.general.miscnum)
+	;;
+"gps" )
+	MODENUM=$(uci get modem.general.gpsnum)
+	if [ -z "$MODENUM" ]; then
+		MODENUM="1"
+	fi
 	;;
 esac
 
@@ -40,6 +50,9 @@ case $TYPE in
 	uci set modem.general.miscnum=$MODENUM
 	uci commit modem
 	/usr/lib/rooter/luci/mask.sh
+	;;
+"gps" )
+	uci set modem.general.gpsnum=$MODENUM
 	;;
 esac
 uci commit modem

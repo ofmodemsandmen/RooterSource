@@ -26,6 +26,7 @@
 			data = rv.data;
 			if (enabled == "1")
 			{
+				document.getElementById("conntype").innerHTML=rv.conntype;
 				document.getElementById('hotenb').checked=true;
 				document.getElementById("simwarn").style.display="none";
 				document.getElementById("gps_text").style.fontSize = 'large';
@@ -71,6 +72,8 @@
 					connected = rv.connected;
 					mcc = rv.mcc;
 					mnc = rv.mnc;
+					document.getElementById("mccd").innerHTML = mcc;
+					document.getElementById("mncd").innerHTML = mnc;
 					if ( connected == "1" )
 					{
 						document.getElementById("apply1").style.display="block";
@@ -143,6 +146,44 @@
 		url = url + "&zoom=14.239003003651355&showTowers=true&showIcons=true&showTowerLabels=true&clusterEnabled=true&tilesEnabled=true&showOrphans=false&showNoFrequencyOnly=false&showFrequencyOnly=false&showBandwidthOnly=false&DateFilterType=Last&showHex=false&showVerifiedOnly=false&showUnverifiedOnly=false&showLTECAOnly=false&showENDCOnly=false&showBand=0&showSectorColours=true&mapType=roadmap&darkMode=false&imperialUnits=false"
 		window.open(url);
 	}
+	
+	function modemtoggle(btn)
+	{
+		bnds = "0" ;
+		chnge = 1 ;
+		btn.disabled = true;
+		btn.value    = '<%:Changing...%>';
+		XHR.get('<%=luci.dispatcher.build_url("admin", "gps", "change_misc")%>',
+			null,
+			function(x, rv)
+			{
+				btn.disabled = false;
+				btn.value    = '<%:Next Modem%>';
+				bnds = "0" ;
+			}
+		);
+
+		return false;
+	}
+
+	function modemtoggledn(btn)
+	{
+		bnds = "0" ;
+		chnge = 1 ;
+		btn.disabled = true;
+		btn.value    = '<%:Changing...%>';
+		XHR.get('<%=luci.dispatcher.build_url("admin", "gps", "change_miscdn")%>',
+			null,
+			function(x, rv)
+			{
+				btn.disabled = false;
+				btn.value    = '<%:Prev Modem%>';
+				bnds = "0" ;
+			}
+		);
+
+		return false;
+	}
 			
 //]]></script>
 
@@ -167,6 +208,19 @@
 			<td width="40%"></td>
 			<td width="25%" id="mdl" ><div align="left"></div></td>
 		</tr>
+	</table>
+	
+	<table width="550"  border="0">
+  	<tr>
+    		<td width="20%"><ul id="active"></ul></td>
+    		<td width="17%" style="font-size : 20px"><strong id="conntype"></strong></td>
+		<td width="12%">
+			<input type="button" class="cbi-button cbi-button-apply" value="<%:Prev Modem%>" onclick="return modemtoggledn(this)" />
+		</td>
+		<td width="31%">
+			<input type="button" class="cbi-button cbi-button-apply" value="<%:Next Modem%>" onclick="return modemtoggle(this)" />
+		</td>
+  	</tr>
 	</table>
 	
 	<table width="900" id="gpsinfo"  border="0" >
@@ -237,7 +291,12 @@
 	
 	<table id="apply1" border="0">
 		<tr>
-			<td><input type="button" id="apply11" class="cbi-button cbi-button-apply" value="<%:Open Cellmapper.net%>" onclick="return applyc(this)" /></td>
+			<td width="30%"><input type="button" id="apply11" class="cbi-button cbi-button-apply" value="<%:Open Cellmapper.net%>" onclick="return applyc(this)" /></td>
+			<td width="5%"><div><strong><%:MCC%></strong></div></td>
+			<td width="5%" id="mccd"><div align="left"></div></td>
+			<td width="5%"><div><strong><%:MNC%></strong></div></td>
+			<td width="5%" id="mncd"><div align="left"></div></td>
+			<td width="50%"></td>
 		</tr>
  	</table>
 	

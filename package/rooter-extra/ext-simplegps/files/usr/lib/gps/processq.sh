@@ -23,11 +23,11 @@ datefor=$(uci -q get gps.configuration.datefor)
 OX=$1
 CURRMODEM=$2
 
-MCC=$(uci get modem.modem$CURRMODEM.mcc)
+MCC=$(sed -n '12p' /tmp/status$CURRMODEM.file)
 if [ -z "$MCC" ]; then
 	MCC='0'
 fi
-MNC=$(uci get modem.modem$CURRMODEM.mnc)
+MNC=$(sed -n '13p' /tmp/status$CURRMODEM.file)
 MNC=${MNC:1}
 if [ -z "$MNC" ]; then
 	MNC='0'
@@ -183,27 +183,27 @@ else
 fi
 
 
-echo $date > /tmp/gpsdata
-echo $altitude >> /tmp/gpsdata
-echo $latitude >> /tmp/gpsdata
-echo $longitude >> /tmp/gpsdata
-echo $numsat >> /tmp/gpsdata
-echo $horizp >> /tmp/gpsdata
-echo $fix >> /tmp/gpsdata
-echo $heading >> /tmp/gpsdata
-echo $hspd >> /tmp/gpsdata
-echo "0.0 Km/h" >> /tmp/gpsdata
-echo $dlatitude >> /tmp/gpsdata
-echo $dlongitude >> /tmp/gpsdata
-echo $delatitude >> /tmp/gpsdata
-echo $delongitude >> /tmp/gpsdata
-echo "$connect" >> /tmp/gpsdata
-echo "$MCC" >> /tmp/gpsdata
-echo "$MNC" >> /tmp/gpsdata
+echo $date > /tmp/gpsdatax$CURRMODEM
+echo $altitude >> /tmp/gpsdatax$CURRMODEM
+echo $latitude >> /tmp/gpsdatax$CURRMODEM
+echo $longitude >> /tmp/gpsdatax$CURRMODEM
+echo $numsat >> /tmp/gpsdatax$CURRMODEM
+echo $horizp >> /tmp/gpsdatax$CURRMODEM
+echo $fix >> /tmp/gpsdatax$CURRMODEM
+echo $heading >> /tmp/gpsdatax$CURRMODEM
+echo $hspd >> /tmp/gpsdatax$CURRMODEM
+echo "0.0 Km/h" >> /tmp/gpsdatax$CURRMODEM
+echo $dlatitude >> /tmp/gpsdatax$CURRMODEM
+echo $dlongitude >> /tmp/gpsdatax$CURRMODEM
+echo $delatitude >> /tmp/gpsdatax$CURRMODEM
+echo $delongitude >> /tmp/gpsdatax$CURRMODEM
+echo "$connect" >> /tmp/gpsdatax$CURRMODEM
+echo "$MCC" >> /tmp/gpsdatax$CURRMODEM
+echo "$MNC" >> /tmp/gpsdatax$CURRMODEM
 
 lat="$delatitude ( $dlatitude )"
 long="$delongitude ( $dlongitude )"
-echo "$lat" > /tmp/gpsdata1
-echo "$long" >> /tmp/gpsdata1
+echo "$lat" > /tmp/gpsdata$CURRMODEM
+echo "$long" >> /tmp/gpsdata$CURRMODEM
 
-echo "0" > /tmp/gps
+echo "0" > /tmp/gps$CURRMODEM

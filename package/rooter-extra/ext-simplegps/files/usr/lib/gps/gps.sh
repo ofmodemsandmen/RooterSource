@@ -58,7 +58,7 @@ elif [ "$idV" = "05c6" ]; then
 fi
 if $QUECTEL; then
 	if [ -e /usr/lib/gps/quectel.sh ]; then
-		result=`ps | grep -i "quectel.sh" | grep -v "grep" | wc -l`
+		result=`ps | grep -i "quectel.sh $CURRMODEM" | grep -v "grep" | wc -l`
 		if [ $result -lt 1 ]; then
 			/usr/lib/gps/quectel.sh $CURRMODEM &
 		fi
@@ -69,7 +69,7 @@ fi
 chksierra
 if [ $SIERRAID -eq 1 ]; then
 	if [ -e /usr/lib/gps/sierra.sh ]; then
-		result=`ps | grep -i "sierra.sh" | grep -v "grep" | wc -l`
+		result=`ps | grep -i "sierra.sh $CURRMODEM" | grep -v "grep" | wc -l`
 		if [ $result -lt 1 ]; then
 			/usr/lib/gps/sierra.sh $CURRMODEM &
 		fi

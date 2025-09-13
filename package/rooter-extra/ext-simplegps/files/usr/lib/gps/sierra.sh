@@ -14,7 +14,7 @@ fi
 
 CURRMODEM=$1
 CPORT=$(uci get modem.modem$CURRMODEM.commport)
-rm -f /tmp/gps
+rm -f /tmp/gps$CURRMODEM
 rm -f /tmp/lastgps
 if [ -z "$CPORT" ]; then
 	exit 0

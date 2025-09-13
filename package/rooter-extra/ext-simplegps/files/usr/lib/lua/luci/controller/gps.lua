@@ -10,6 +10,8 @@ function index()
 	entry({"admin", "gps", "enable"}, call("action_enable"))
 	entry({"admin", "gps", "getmail"}, call("action_getmail"))
 	entry({"admin", "gps", "setmail"}, call("action_setmail"))
+	entry({"admin", "gps", "change_misc"}, call("action_change_misc"))
+	entry({"admin", "gps", "change_miscdn"}, call("action_change_miscdn"))
 end
 
 function action_getmail()
@@ -27,6 +29,13 @@ end
 function action_getcfg()
 	local rv ={}
 	
+	miscnum = luci.model.uci.cursor():get("modem", "general", "gpsnum")
+	if miscnum == nil then
+		miscnum = "1"
+	end
+	conn = "Modem #" .. miscnum
+	rv["conntype"] = conn
+	
 	enable = luci.model.uci.cursor():get("gps", "configuration", "enabled")
 	if enable == nil then
 		enable = "0"
@@ -39,11 +48,11 @@ function action_getcfg()
 	end
 	rv["zoom"] = zoom
 
-	file = io.open("/tmp/gps", "r")
+	file = io.open("/tmp/gps" .. miscnum, "r")
 	if file ~= nil then
 		rv["data"] = "1"
 		file:close()
-		file = io.open("/tmp/gpsdata", "r")
+		file = io.open("/tmp/gpsdatax" .. miscnum, "r")
 		if file ~= nil then
 			rv["date"] = file:read("*line")
 			rv["altitude"] = file:read("*line")
@@ -85,4 +94,12 @@ end
 function action_setmail()
 	local set = luci.http.formvalue("set")
 	os.execute("/usr/lib/gps/mail.sh " .. set)
+end
+
+function action_change_misc()
+	os.execute("/usr/lib/rooter/luci/modemchge.sh gps 1")
+end
+
+function action_change_miscdn()
+	os.execute("/usr/lib/rooter/luci/modemchge.sh gps 0")
 end
