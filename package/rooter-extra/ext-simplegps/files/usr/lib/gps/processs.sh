@@ -25,12 +25,12 @@ CURRMODEM=$2
 
 MCC=$(sed -n '12p' /tmp/status$CURRMODEM.file)
 if [ -z "$MCC" ]; then
-	MCC='0'
+	MCC='-'
 fi
 MNC=$(sed -n '13p' /tmp/status$CURRMODEM.file)
 MNC=${MNC:1}
 if [ -z "$MNC" ]; then
-	MNC='0'
+	MNC='-'
 fi
 connect=$(uci get modem.modem$CURRMODEM.connected)
 if [ -z "$connect" ]; then
