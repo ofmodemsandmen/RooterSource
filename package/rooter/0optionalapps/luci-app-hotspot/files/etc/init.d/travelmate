@@ -111,6 +111,7 @@ log "Hotspot Firewall"
 	uci set travelmate.global.delay="30"
 	uci set travelmate.global.state='0'
 	uci commit travelmate
+	wifi up
 }
 
 

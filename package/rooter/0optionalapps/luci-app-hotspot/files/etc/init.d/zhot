@@ -2,7 +2,7 @@
 
 . /lib/functions.sh
 
-START=60
+START=99
 
 log() {
 	wifilog "Z-Hotspot " "$@"
@@ -13,5 +13,6 @@ start()
 	uci set travelmate.global.lost="0"
 	uci set travelmate.global.delay="30"
 	uci commit travelmate
+	wifi up
 	/usr/lib/hotspot/travelmate.sh &
 }
