@@ -364,14 +364,14 @@ t77mask() {
 	enb=$(uci -q get custom.bandlock.enabled)
 	ATCMDD='AT^SLBAND?'
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-	ebs=$(echo "$OX" | grep "LTE,Enable Bands")
-	if ! -z "$ebs" ]; then
-		OXE=${OX//WCDMA,Enable Bands :/"^SLBAND: WCDMA,Enabled,"}
-		OXE=${OXE//,LTE,Enable Bands :/" ^SLBAND: LTE,Enabled,"}
-		OX=${OXE//, LTE,Enable Bands :/" ^SLBAND: LTE,Enabled,"}
-		OX=${OX//,OK/" OK"}
-		OX=${OX//, OK/" OK"}
-	fi
+	#ebs=$(echo "$OX" | grep "LTE,Enable Bands")
+	#if ! -z "$ebs" ]; then
+	#	OXE=${OX//WCDMA,Enable Bands :/"^SLBAND: WCDMA,Enabled,"}
+	#	OXE=${OXE//,LTE,Enable Bands :/" ^SLBAND: LTE,Enabled,"}
+	#	OX=${OXE//, LTE,Enable Bands :/" ^SLBAND: LTE,Enabled,"}
+	#	OX=${OX//,OK/" OK"}
+	#	OX=${OX//, OK/" OK"}
+	#fi
 	if [ $enb == "1" ]; then
 		log " "
 		log "T77 Response : $OX"
