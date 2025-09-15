@@ -361,6 +361,9 @@ fibomask() {
 }
 
 t77mask() {
+	let NMEA=$CPORT+2
+	uci set modem.modem$CURRMODEM.nmeaport=$NMEA
+	uci commit modem
 	enb=$(uci -q get custom.bandlock.enabled)
 	ATCMDD='AT^SLBAND?'
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")

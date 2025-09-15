@@ -35,6 +35,23 @@ chksierra() {
 	fi
 }
 
+chkT77() {
+	T77=0
+	if [ $idV = 1e2d ]; then
+		T77=1
+	elif [ $idV = 413c -a $idP = 81d7 ]; then
+		T77=1
+	elif [ $idV = 413c -a $idP = 81d8 ]; then
+		T77=1
+	elif [ $idV = 0489 -a $idP = e0b4 ]; then
+		T77=1
+	elif [ $idV = 0489 -a $idP = e0b5 ]; then
+		T77=1
+	elif [ $idV = 1bc7 -a $idP = 1910 ]; then
+		T77=1
+	fi
+}
+
 CURRMODEM=$1
 idV=$(uci -q get modem.modem$CURRMODEM.idV)
 idP=$(uci -q get modem.modem$CURRMODEM.idP)
@@ -77,4 +94,14 @@ if [ $SIERRAID -eq 1 ]; then
 	return
 fi
 
+chkT77
+if [ $T77 -eq 1 ]; then
+	if [ -e /usr/lib/gps/t77.sh ]; then
+		result=`ps | grep -i "t77.sh $CURRMODEM" | grep -v "grep" | wc -l`
+		if [ $result -lt 1 ]; then
+			/usr/lib/gps/t77.sh $CURRMODEM &
+		fi
+	fi
+	return
+fi
 

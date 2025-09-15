@@ -17,3 +17,8 @@ if [ -n "$PID" ]; then
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 	rm -f /tmp/gps
 fi
+PID=$(ps | grep "[t]77.sh $CURRMODEM" | awk '{print $1}')
+if [ -n "$PID" ]; then
+	kill -9 $PID
+	rm -f /tmp/gps
+fi
