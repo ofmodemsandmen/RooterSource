@@ -68,7 +68,7 @@ LAT=$(echo $OX | cut -d, -f3)
 LON=$(echo $OX | cut -d, -f4)
 ALT=$(echo $OX | cut -d, -f8)
 NSAT=$(echo $OX | cut -d, -f6)
-HOP=$(echo $OX | cut -d, -f5)
+HOP=$(echo $OX | cut -d, -f7)
 
 altitude=$ALT" M"
 if [ -z "$ALT" ]; then
@@ -79,35 +79,6 @@ fi
 numsat=$NSAT
 numsat="${numsat#"${numsat%%[!0]*}"}"
 horizp=$HOP
-case $HOP in
-	"0" )
-		horizp="Invalid"
-	;;
-	"1" )
-		horizp="GPS"
-	;;
-	"2" )
-		horizp="DGPS"
-	;;
-	"3" )
-		horizp="PPS"
-	;;
-	"4" )
-		horizp="RTK"
-	;;
-	"5" )
-		horizp="Float RTK"
-	;;
-	"6" )
-		horizp="Estimated"
-	;;
-	"7" )
-		horizp="Manual"
-	;;
-	"8" )
-		horizp="Simulator"
-	;;
-esac	
 
 TIME="${TIME#"${TIME%%[! ]*}"}"
 hr=${TIME:0:2}
