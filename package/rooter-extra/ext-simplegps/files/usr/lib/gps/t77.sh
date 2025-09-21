@@ -21,12 +21,10 @@ rm -f /tmp/lastgps
 if [ -z "$CPORT" ]; then
 	exit 0
 fi
-log "Run T77"
 ATCMDD="AT^GPS_STOP"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 ATCMDD="AT^GPS_START=0"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-log "$OX"
 err=$(echo "$OX" | grep "ERROR")
 if [ ! -z "$err" ]; then
 	log "GPS won't start" 
@@ -59,7 +57,6 @@ while true; do
 		fi
 		sleep $refresh
 	else
-		log "Waiting GPS_INFO"
 		sleep 5
 	fi
 	

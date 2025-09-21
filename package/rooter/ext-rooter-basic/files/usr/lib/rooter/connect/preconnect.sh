@@ -47,8 +47,8 @@ if [ $T77 -eq 1 ]; then
 	err=$(echo "$OX" | grep "Disable")
 	if [ ! -z "$err" ]; then
 		ATCMDD="AT+GPS=1"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		/usr/lib/rooter/luci/restart.sh $CURRMODEM 11
+		#OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+		#/usr/lib/rooter/luci/restart.sh $CURRMODEM 11
 		exit 0
 	fi
 fi
