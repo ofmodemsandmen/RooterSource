@@ -374,9 +374,9 @@ up:depends("alive", "2")
 up:depends("alive", "3")
 up:depends("alive", "4")
 
-cb2 = di:taboption(this_tab, DynamicList, "trackip", translate("Tracking IP"),
-		translate("This IP address will be pinged to dermine if the link is up or down."))
-cb2.datatype = "ipaddr"
+cb2 = di:taboption(this_tab, DynamicList, "trackip", translate("Tracking IP/URL"),
+		translate("This IP address or URL will be pinged to determine if the link is up or down."))
+--cb2.datatype = "ipaddr"
 cb2:depends("alive", "1")
 cb2:depends("alive", "2")
 cb2:depends("alive", "3")
