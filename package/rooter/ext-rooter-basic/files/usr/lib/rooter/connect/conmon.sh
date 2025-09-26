@@ -96,32 +96,58 @@ config_load modem
 config_list_foreach "pinginfo$CURRMODEM" "trackip" list_track_ips
 
 while [ true ]; do
-	CP=$(uci -q get ping.ping.enable)
-	if [ "$CP" = "1" ]; then
-		echo 'MONSTAT="'"Custom Ping Test"'"' > /tmp/monstat$CURRMODEM
-		sleep 60
-	else
-		# check to see if modem iface has an IP address, if not try a reconnect
-		OX=$(ip address show $IFNAME 2>&1)
-		ip4=$(echo "$OX" | grep 'inet ' | cut -d' ' -f6)
-		ip6=$(echo "$OX" | grep 'inet6' | grep global | cut -d' ' -f6)
-		if [ -z "$ip4" -a -z "$ip6" ]; then
-log "No IP Address, Exiting"
-			echo 'MONSTAT="'"DOWN (no IP address)"'"' > /tmp/monstat$CURRMODEM
-			/usr/lib/rooter/luci/restart.sh $CURRMODEM 11
-			exit 0
+	mw=$(uci -q get mwan3.wan$CURRMODEM.enabled)
+	if [ "$mw" = "1" ]; then
+		status=$(cat /tmp/run/mwan3track/wan$CURRMODEM/STATUS)
+		# nil
+		# connecting
+		# online
+		# disconnecting
+		# offline
+		if [ "$status" = "connecting" ]; then
+			echo 'MONSTAT="'"Connecting)"'"' > /tmp/monstat$CURRMODEM
 		fi
-		pingtest
-		if [ $RESTART = "1" ]; then  # fail first ping test
-log "Bad Ping Test, Restart"
+		if [ "$status" = "disconnecting" -o "$status" = "offline" ]; then
+			uci set mwan3.wan$CURRMODEM.enabled='0'
+			uci commit mwan3
 			echo 'MONSTAT="'"DOWN Bad Ping)"'"' > /tmp/monstat$CURRMODEM
 			restart
 		fi
+		echo 'MONSTAT="'"UP ($CURSOR) (using MWan3)"'"' > /tmp/monstat$CURRMODEM
 		if [ $CURSOR = "-" ]; then
 			CURSOR="+"
 		else
 			CURSOR="-"
 		fi
-		sleep $INTERVAL
+		sleep 10
+	else
+		CP=$(uci -q get ping.ping.enable)
+		if [ "$CP" = "1" ]; then
+			echo 'MONSTAT="'"Custom Ping Test"'"' > /tmp/monstat$CURRMODEM
+			sleep 60
+		else
+			# check to see if modem iface has an IP address, if not try a reconnect
+			OX=$(ip address show $IFNAME 2>&1)
+			ip4=$(echo "$OX" | grep 'inet ' | cut -d' ' -f6)
+			ip6=$(echo "$OX" | grep 'inet6' | grep global | cut -d' ' -f6)
+			if [ -z "$ip4" -a -z "$ip6" ]; then
+	log "No IP Address, Exiting"
+				echo 'MONSTAT="'"DOWN (no IP address)"'"' > /tmp/monstat$CURRMODEM
+				/usr/lib/rooter/luci/restart.sh $CURRMODEM 11
+				exit 0
+			fi
+			pingtest
+			if [ $RESTART = "1" ]; then  # fail first ping test
+	log "Bad Ping Test, Restart"
+				echo 'MONSTAT="'"DOWN Bad Ping)"'"' > /tmp/monstat$CURRMODEM
+				restart
+			fi
+			if [ $CURSOR = "-" ]; then
+				CURSOR="+"
+			else
+				CURSOR="-"
+			fi
+			sleep $INTERVAL
+		fi
 	fi
 done

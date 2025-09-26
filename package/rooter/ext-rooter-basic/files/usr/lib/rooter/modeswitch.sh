@@ -207,6 +207,8 @@ if [ "$ACTION" = add ]; then
 		exit 0
 	elif [ $uVid = 2109 -a $uPid = 8822 ]; then
 		exit 0
+	elif [ $uVid = 248a -a $uPid = 8379 ]; then
+		exit 0
 	fi
 	
 	CNTR=0
