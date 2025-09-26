@@ -10,6 +10,7 @@ M2=$(echo "$ATCMDD" | sed -e "s#~#\"#g")
 COPS="+cops=?"
 QOPS="+qops?"
 QSCAN="+qscan"
+CLAT="+clat"
 M3=$(echo "$M2" | awk '{print tolower($0)}')
 if `echo ${M3} | grep "${COPS}" 1>/dev/null 2>&1`; then
 	export TIMEOUT="120"
@@ -17,6 +18,8 @@ elif `echo ${M3} | grep "${QOPS}" 1>/dev/null 2>&1`; then
 	export TIMEOUT="120"
 elif `echo ${M3} | grep "${QSCAN}" 1>/dev/null 2>&1`; then
 	export TIMEOUT="130"
+elif `echo ${M3} | grep "${CLAT}" 1>/dev/null 2>&1`; then
+	export TIMEOUT="120"
 else
 	export TIMEOUT="5"
 fi
