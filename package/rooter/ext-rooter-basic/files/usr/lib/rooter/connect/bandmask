@@ -25,7 +25,7 @@ sierrabandmask() {
 	OX=$(echo $OX | tr " " '\x0a')
 	echo "$OX" > /tmp/sierrabm
 	idP=$(uci get modem.modem$CURRMODEM.idP)
-	if [ "$idP" = "90d3" -o "$idP" = "90d2" ]; then
+	if [ "$idP" = "90d3" -o "$idP" = "90d2" -o "$idP" = "90e1" -o "$idP" = "90e3" ]; then
 		while IFS= read -r line; do
 			for i in $(seq 14); do
 				read -r line

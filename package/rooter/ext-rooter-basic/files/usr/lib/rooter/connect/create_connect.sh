@@ -245,7 +245,7 @@ chksierra() {
 			"68aa"|"68a2"|"68a3"|"68a9"|"68b0"|"68b1" )
 				SIERRAID=1
 			;;
-			"68c0"|"9040"|"9041"|"9051"|"9054"|"9056"|"90d3" )
+			"68c0"|"9040"|"9041"|"9051"|"9054"|"9056"|"90d3"|"90d2"|"90e1"|"90e3" )
 				SIERRAID=1
 			;;
 			"9070"|"907b"|"9071"|"9079"|"901c"|"9091"|"901f"|"90b1" )
@@ -578,7 +578,7 @@ uci commit modem.modem$CURRMODEM
 			fi
 			get_tty $IFNUM
 			if [ -z "$CPORT" ]; then
-				if [ $idP = "90d3" ]; then
+				if [ $idP = "90d3" -o $idP = "90d2" -o $idP = "90e1" -o $idP = "90e3" ]; then
 					get_tty_fix 0
 					lua $ROOTER/common/modemchk.lua "$idV" "$idP" "$CPORT" "$CPORT"
 					source /tmp/parmpass

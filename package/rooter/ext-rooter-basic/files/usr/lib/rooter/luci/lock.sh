@@ -298,7 +298,7 @@ case $uVid in
 			"9090"|"9091"|"90b1" )
 				M2='AT!BAND=11,"Test",0,'$mask64','$maskl2',0,0,0'
 			;;
-			"90d2"|"90d3" )
+			"90d2"|"90d3"|"90e1"|"90e3" )
 				OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "run-at.gcom" "$CURRMODEM" "$M1")
 				log "$OX"
 				m64=${maskxx:0:64}
