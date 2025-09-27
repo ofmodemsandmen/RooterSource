@@ -47,6 +47,15 @@ pwrtoggle() {
 		toggle="1"
 		return
 	fi
+	bnx=$(echo "$bn" | grep "x750")
+	if [ ! -z "$bnx" ]; then
+		echo "0" > /sys/class/gpio/pci_power/value
+		sleep 2
+		echo "1" > /sys/class/gpio/pci_power/value
+		log "Power Toggle"
+		toggle="1"
+		return
+	fi
 	bnx=$(echo "$bn" | grep "z8102ax-128m")
 	if [ ! -z "$bnx" ]; then
 		DEV=$(uci get modem.modem$CURRMODEM.device)
