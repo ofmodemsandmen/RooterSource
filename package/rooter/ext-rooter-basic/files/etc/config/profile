@@ -35,3 +35,7 @@ config default 'default'
 
 config disable 'disable'
 
+config simpin 'simpin'
+
+config simmiss 'simmiss'
+
