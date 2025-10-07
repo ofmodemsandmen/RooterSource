@@ -34,7 +34,7 @@ COMMPORT=$2
 OX=$($ROOTER/gcom/gcom-locked "$COMMPORT" "sierrainfo.gcom" "$CURRMODEM")
 
 OX=$(echo $OX | tr 'a-z' 'A-Z')
-
+echo "$OX" > /tmp/sierradata
 CSQ=$(echo $OX | grep -o "+CSQ: [0-9]\{1,2\}" | grep -o "[0-9]\{1,2\}")
 if [ -z "$CSQ" ] || [ "$CSQ" = "99" ]; then
 	CSQ="-"

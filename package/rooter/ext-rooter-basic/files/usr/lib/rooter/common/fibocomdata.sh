@@ -62,6 +62,7 @@ OX=$(echo $OX | tr 'a-z' 'A-Z')
 echo "$OX" > /tmp/sccone1
 sed -i 's/SCC 1/SCC1/g' /tmp/sccone1
 OX=$(cat /tmp/sccone1)
+echo "$OX" > /tmp/fibdata
 rm -f /tmp/sccone
 SERVING=$(echo $OX | grep -o "+GTCCINFO:.\+GTRAT")
 echo "$SERVING" > /tmp/sccone
