@@ -31,7 +31,7 @@ if [ ! -z "$err" ]; then
 	exit 0
 fi
 /usr/lib/gps/t77cat.sh $NMEA &
-
+rm -f /tmp/t77gps
 while true; do
 	refresh=$(uci -q get gps.configuration.refresh)
 	ATCMDD="AT+GPS_INFO"
