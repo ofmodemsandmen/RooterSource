@@ -272,7 +272,7 @@ if [ -n "$GTCCDATA" ]; then
 			BAND=${BAND:1}
 			if [ "$CELLTYPE" -eq 1 ]; then
 				if [ -z "$BAND" ]; then
-					BAND=B$(/usr/lib/rooter/chan2band.sh $CHAN)" (Not Showing)"
+					BAND=$(/usr/lib/rooter/chan2band.sh $CHAN)" (Not Showing)"
 				else
 					BAND="B"$(echo $BAND | sed 's/^0*//')" (Bandwidth: "$BW" MHz)"
 				fi
