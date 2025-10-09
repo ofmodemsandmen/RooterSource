@@ -30,8 +30,8 @@ if [ ! -z "$err" ]; then
 	log "GPS won't start" 
 	exit 0
 fi
-/usr/lib/gps/t77cat.sh $NMEA &
-rm -f /tmp/t77gps
+#/usr/lib/gps/t77cat.sh $NMEA &
+
 while true; do
 	refresh=$(uci -q get gps.configuration.refresh)
 	ATCMDD="AT+GPS_INFO"
@@ -44,7 +44,7 @@ while true; do
 				OX="$line"
 				break
 			fi
-		done < /tmp/t77gps
+		done < /dev/ttyUSB$NMEA
 		
 		#OX='$GPGGA,184806.00,3752.295133,N,12216.720941,W,1,03,1.4,52.4,M,-26.0,M,,*62'
 
