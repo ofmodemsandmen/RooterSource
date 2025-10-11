@@ -95,6 +95,7 @@ list_track_ips() {
 config_load modem
 config_list_foreach "pinginfo$CURRMODEM" "trackip" list_track_ips
 
+cnt=1
 while [ true ]; do
 	mw=$(uci -q get mwan3.wan$CURRMODEM.enabled)
 	if [ "$mw" = "1" ]; then
@@ -108,16 +109,25 @@ while [ true ]; do
 			echo 'MONSTAT="'"Connecting)"'"' > /tmp/monstat$CURRMODEM
 		fi
 		if [ "$status" = "disconnecting" -o "$status" = "offline" ]; then
-			uci set mwan3.wan$CURRMODEM.enabled='0'
-			uci commit mwan3
-			echo 'MONSTAT="'"DOWN Bad Ping)"'"' > /tmp/monstat$CURRMODEM
-			restart
-		fi
-		echo 'MONSTAT="'"UP ($CURSOR) (using MWan3)"'"' > /tmp/monstat$CURRMODEM
-		if [ $CURSOR = "-" ]; then
-			CURSOR="+"
+			if [ "$cnt" -gt 2 ]; then
+				uci set mwan3.wan$CURRMODEM.enabled='0'
+				uci commit mwan3
+				echo 'MONSTAT="'"DOWN Bad Ping)"'"' > /tmp/monstat$CURRMODEM
+				log "Down Bad Ping"
+				restart
+				cnt=1
+			else
+				log "Bad Ping x $cnt"
+				let cnt=$cnt+1
+			fi
 		else
-			CURSOR="-"
+			echo 'MONSTAT="'"UP ($CURSOR) (using MWan3)"'"' > /tmp/monstat$CURRMODEM
+			cnt=1
+			if [ $CURSOR = "-" ]; then
+				CURSOR="+"
+			else
+				CURSOR="-"
+			fi
 		fi
 		sleep 10
 	else
