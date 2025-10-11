@@ -199,8 +199,8 @@ else
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 		fi
 		log "Hard modem reset done $OX"
-		pwrtoggle
 	fi
+	pwrtoggle
 fi
 
 uci delete modem.modeminfo$CURRMODEM
