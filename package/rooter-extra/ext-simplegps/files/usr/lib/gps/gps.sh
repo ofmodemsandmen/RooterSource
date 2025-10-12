@@ -43,6 +43,8 @@ chkT77() {
 		T77=1
 	elif [ $idV = 413c -a $idP = 81d8 ]; then
 		T77=1
+	elif [ $idV = 413c -a $idP = 81df ]; then
+		T77=1
 	elif [ $idV = 0489 -a $idP = e0b4 ]; then
 		T77=1
 	elif [ $idV = 0489 -a $idP = e0b5 ]; then
