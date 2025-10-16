@@ -30,6 +30,9 @@ re = d:option(Flag, "reboot", translate("Reboot Only"),translate("Reboot router 
 re.default="0"
 re.optional=false;
 
+re1 = d:option(Flag, "logging", translate("Enable Logging"),translate("Enable logging for ping tests"));
+re1.default="0"
+re1.optional=false;
 
 d1 = d:option(ListValue, "delay", translate("Reconnection Delay"),translate("Delay in seconds after restarting modem before checking for connection"));
 d1:value("40", "40 seconds")

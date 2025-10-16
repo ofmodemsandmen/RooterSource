@@ -22,12 +22,16 @@ tping() {
 doping() {
 	TYPE=$(uci get ping.ping.type)
 	if [ $TYPE = "1" ]; then
-	log "Curl"
+		if [ "$LOGGING" = "1" ]; then
+			log "Curl"
+		fi
 		RETURN_CODE_1=$(curl -s --connect-timeout $TIMEOUT -m 10 -s -o /dev/null -w "%{http_code}" $ipv41)
 		RETURN_CODE_2=$(curl -s --connect-timeout $TIMEOUT --ipv6 -m 10 -s -o /dev/null -w "%{http_code}" $ipv6)
 		RETURN_CODE_3=$(curl -s --connect-timeout $TIMEOUT -m 10 -s -o /dev/null -w "%{http_code}" $ipv42)
 	else
-	log "Ping"
+		if [ "$LOGGING" = "1" ]; then
+			log "Ping"
+		fi
 		tping "$ipv41"; RETURN_CODE_1=$tmp
 		tping "$ipv6" "-6"; RETURN_CODE_2=$tmp
 		tping "$ipv42"; RETURN_CODE_3=$tmp
@@ -50,7 +54,9 @@ ptest() {
 				status=1
 				return
 			fi
-			log "Second Ping Test Good"
+			if [ "$LOGGING" = "1" ]; then
+				log "Second Ping Test Good"
+			fi
 			uci set ping.ping.conn="2"
 			uci commit ping
 			status=0
@@ -82,6 +88,7 @@ CURRMODEM=1
 CPORT=$(uci -q get modem.modem$CURRMODEM.commport)
 DELAY=$(uci -q get ping.ping.delay)
 TIMEOUT=$(uci -q get ping.ping.timeout)
+LOGGING=$(uci -q get ping.ping.logging)
 if [ -z "$TIMEOUT" ]; then
 	TIMEOUT=5
 fi
@@ -90,31 +97,43 @@ RE=$(uci -q get ping.ping.reboot)
 doping
 
 if [[ "$RETURN_CODE_1" != "200" &&  "$RETURN_CODE_2" != "200" &&  "$RETURN_CODE_3" != "200" ]]; then
-	log "Bad Ping Test"
+	if [ "$LOGGING" = "1" ]; then
+		log "Bad Ping Test"
+	fi
 	doping
 	if [[ "$RETURN_CODE_1" != "200" &&  "$RETURN_CODE_2" != "200" &&  "$RETURN_CODE_3" != "200" ]]; then
-		log "Second Bad Ping Test"
+		if [ "$LOGGING" = "1" ]; then
+			log "Second Bad Ping Test"
+		fi
 		uci set ping.ping.conn="3"
 		uci commit ping
 		if [ "$RE" = "1" ]; then
 			touch /etc/banner && reboot -f
 			exit 0
 		fi
-		log "Restart Network"
+		if [ "$LOGGING" = "1" ]; then
+			log "Restart Network"
+		fi
 		/usr/lib/rooter/luci/restart.sh $CURRMODEM 10
 		sleep $DELAY
 		ptest 3
 		if [ $status -eq 0 ]; then
-			log "Good Ping after Network Restart"
+			if [ "$LOGGING" = "1" ]; then
+				log "Good Ping after Network Restart"
+			fi
 			uci set ping.ping.conn="2"
 			uci commit ping
 			exit 0
 		else
-			log "Hard Restart"
+			if [ "$LOGGING" = "1" ]; then
+				log "Hard Restart"
+			fi
 			/usr/lib/rooter/luci/restart.sh $CURRMODEM 11
 			ptest 9
 			if [ $status -eq 0 ]; then
-				log "Good Ping after Hard Restart"
+				if [ "$LOGGING" = "1" ]; then
+					log "Good Ping after Hard Restart"
+				fi
 				uci set ping.ping.conn="2"
 				uci commit ping
 				exit 0
@@ -124,7 +143,9 @@ if [[ "$RETURN_CODE_1" != "200" &&  "$RETURN_CODE_2" != "200" &&  "$RETURN_CODE_
 		fi
 	fi
 else
-	log "Good Ping"
+	if [ "$LOGGING" = "1" ]; then
+		log "Good Ping"
+	fi
 	uci set ping.ping.conn="2"
 	uci commit ping
 fi
