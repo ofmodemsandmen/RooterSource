@@ -102,6 +102,23 @@ find_empty() {
 	remresult=0
 }
 
+find_devicen() {
+	local COUNTER=1
+	DN=$1
+	while [ $COUNTER -le $MODCNT ]; do
+		EMPTY=$(uci get modem.modem$COUNTER.empty)
+		if [ $EMPTY -eq 0 ]; then
+			dv=$(uci -q get modem.modem$COUNTER.device)
+			if [ "$dv" = "$DN" ]; then
+				remresultn=1
+				return
+			fi
+		fi
+		let COUNTER=COUNTER+1
+	done
+	remresultn=0
+}
+
 #
 # check if all modems are inactive or empty
 # delete all if nothing active
@@ -310,6 +327,11 @@ if [ "$ACTION" = add ]; then
 	find_empty
 	if [ "$remresult" = "0" ]; then
 		log "Exceeded Maximum Number of Modems"
+		exit 0
+	fi
+	find_devicen $DEVICENAME
+	if [ "$remresultn" = "1" ]; then
+		log "Duplicate Entry"
 		exit 0
 	fi
 	log "CURRMODEM $remresult"
