@@ -427,6 +427,17 @@ if [ $SP -gt 0 ]; then
 
 	$ROOTER/sms/check_sms.sh $CURRMODEM &
 
+	if [ -e /etc/config/wizard ]; then
+		wiz=$(uci -q get wizard.basic.wizard)
+		if [ "$wiz" = "1" ]; then
+			uci set wizard.basic.detect="2"
+			uci commit wizard
+			exit 0
+		fi
+		uci set wizard.basic.detect="1"
+		uci commit wizard
+	fi
+
 	if [ -e $ROOTER/connect/preconnect.sh ]; then
 		$ROOTER/connect/preconnect.sh $CURRMODEM
 	fi
@@ -528,6 +539,10 @@ if [ $SP -gt 0 ]; then
 		log " SIM Error"
 		if [ -e $ROOTER/simerr.sh ]; then
 			$ROOTER/simerr.sh $CURRMODEM
+		fi
+		if [ -e /etc/config/wizard]; then
+			uci set wizard.basic.detect="2"
+			uci commit wizard
 		fi
 		if [ -e $ROOTER/connect/simreboot.sh ]; then
 			$ROOTER/connect/simreboot.sh $CURRMODEM
@@ -728,7 +743,7 @@ log "$SP"
 	if [ $SP = 8 -o  $SP = 9 ]; then
 		log "FM350 Connection Command"
 		uci commit modem
-		log "Setting Up Connection Data"
+		log "Setting Up Connection Data using $NAPN"
 		BRK=0
 		IPVAR="IP"
 		ATCMDD="AT+CREG=0;+CGREG=0;+CEREG=0;+C5GREG=3;+CGEREP=2,1"
@@ -784,6 +799,7 @@ log "$SP"
 					if [ ! -z "$cgev" ]; then
 						break;
 					fi
+					log "Activating"
 					let cntr=$cntr+1
 					if [ "$cntr" -gt 2 ]; then
 						BRK=1
@@ -791,11 +807,13 @@ log "$SP"
 					fi
 					sleep 5
 				done	
-				if "$BRK" -eq 1 ]; then
-					log "Failed to activate PDP context"
+				if [ "$BRK" -eq 1 ]; then
+					log "Failed to activate PDP context with $NAPN"
 				else
+					log "PDP context activated"
 					ATCMDD="AT+CGPADDR=1"
 					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+					log "$OX"
 					URCvalue=$(echo $OX | sed -e 's/"//g')
 					IPaddress1=$(echo $URCvalue | awk -F ',' '{print $2}')
 					IPaddress2=$(echo $URCvalue | awk -F ',' '{print $3}')
@@ -833,9 +851,6 @@ log "$SP"
 			fi
 		fi
 		rm -f /tmp/usbwait
-		if [ $BRK -eq 1 ]; then
-			/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 1
-		fi
 	fi
 
 	if [ $SP = 5 ]; then
@@ -977,6 +992,9 @@ done
 
 if [ $BRK = 1 ]; then
 	log "Did not connect"
+	if [ $SP = 8 -o  $SP = 9 ]; then
+		/usr/lib/rooter/luci/restart.sh $CURRMODEM 11 1
+	fi
 	exit 0
 fi
 
