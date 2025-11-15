@@ -171,17 +171,6 @@
 		"ext2": "-tftp-recovery.bin",
 		"addons": ["readme.pdf", "archer.txt"]
 	},	
-	"MT300NV2": {
-		"details": "Gl.iNet MT300N-V2",
-		"type": "1",
-		"build": "1907",
-		"config": ".config_mt300nv2",
-		"image": "openwrt-ramips-mt76x8-gl-mt300n-v2-squashfs-sysupgrade.bin",
-		"imagepath": "/ramips/mt76x8/",
-		"mod": "GL-MT300N-V2",
-		"ext": "-upgrade.bin",
-		"addons": ["readme.pdf", "glinet.txt"]
-	},
 	"MW4530": {
 		"details": "Mercury MW4530R",
 		"type": "2",
