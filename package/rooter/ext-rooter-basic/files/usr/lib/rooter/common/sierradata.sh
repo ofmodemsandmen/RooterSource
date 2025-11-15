@@ -6,7 +6,7 @@ log() {
 	logger -t "Sierra Data" "$@"
 }
 
-read_ssc() {
+read_lte_ssc() {
 	SLBAND=$(echo $OX | grep -o "LTE "$SSCx" BAND: B[0-9]\+ LTE "$SSCx" BW :")
 	SLBAND=$(echo $SLBAND | grep -o " BAND: B[0-9]\+ ")
 	if [ -n "$SLBAND" ]; then
@@ -21,6 +21,29 @@ read_ssc() {
 		fi
 		LBAND=$LBAND$SLBAND
 		XTRACHAN=$(echo $OX | grep -o " LTE "$SSCx" CHAN: [0-9]\+")
+		XTRACHAN=$(echo "$XTRACHAN" | grep -o "[0-9]\{2,6\}")
+		if [ -n "$XTRACHAN" ]; then
+			CHANNEL=$(echo "$CHANNEL", "$XTRACHAN")
+		fi
+	fi
+}
+
+read_nr_ssc() {
+	SLBAND=$(echo $OX | grep -o $SSCx" NR5G BAND: N[0-9]\+ "$SSCx" NR5G BW:")
+	SLBAND=$(echo $SLBAND | grep -o " BAND: N[0-9]\+ ")
+	if [ -n "$SLBAND" ]; then
+		SLBAND=$(echo $SLBAND | grep -o "[0-9]\+")
+		SLBAND=$(printf "<br />n%d" $SLBAND)
+		BWD=$(echo "$OX" | grep -o "$SSCx NR5G BW: [0-9]\{1,3\} MHZ")
+		BWD=$(echo "$BWD" | grep -o "BW: [0-9]\{1,3\}")
+		BWD=$(echo "$BWD" | grep -o "[0-9]\{1,3\}")
+		if [ -n "$BWD" ]; then
+			SLBAND=$SLBAND$(printf " (CA, Bandwidth %s MHz)" $BWD)
+		else
+			SLBAND=$SLBAND$(printf " (CA, Bandwidth unknown)")
+		fi
+		LBAND=$LBAND$SLBAND
+		XTRACHAN=$(echo $OX | grep -o $SSCx" NR5G RX CHAN: [0-9]\{6\}")
 		XTRACHAN=$(echo "$XTRACHAN" | grep -o "[0-9]\{2,6\}")
 		if [ -n "$XTRACHAN" ]; then
 			CHANNEL=$(echo "$CHANNEL", "$XTRACHAN")
@@ -119,7 +142,7 @@ case $RAT in
 		SSCLIST=$(echo $OX | grep -o "LTE S[CS]C[0-9] STATE:[ ]\?ACTIVE" | grep -o "[0-9]")
 		for SSCVAL in $(echo "$SSCLIST"); do
 			SSCx="S[CS]C"$SSCVAL
-			read_ssc
+			read_lte_ssc
 		done
 		if [ -n "$LTEINFO" ]; then
 			RSCP=$(echo $LTEINFO | cut -d, -f12 | grep -o "[-][.0-9]\{2,5\}")
@@ -155,9 +178,15 @@ case $RAT in
 			CHANNEL=$CHANNEL", "$NCHAN
 		fi
 		SSCLIST=$(echo $OX | grep -o "LTE S[CS]C[0-9] STATE:[ ]\?ACTIVE" | grep -o "[0-9]")
+
 		for SSCVAL in $(echo "$SSCLIST"); do
 			SSCx="S[CS]C"$SSCVAL
-			read_ssc
+			read_lte_ssc
+		done
+		SSCLIST=$(echo $OX | grep -o "SCC[0-9] NR5G BAND: N[0-9]\{1,3\}" | grep -o "SCC[0-9] NR" | grep -o "[0-9]")
+		for SSCVAL in $(echo "$SSCLIST"); do
+			SSCx="SCC"$SSCVAL
+			read_nr_ssc
 		done
 		RSCP=$(echo $OX | grep -o "PCC RXM RSRP: -[0-9]\{2,3\} " | cut -d' ' -f4)
 		RSCP1=$(echo $OX | grep -o "NR5G RSRP (DBM): -[0-9]\{2,3\} " | cut -d' ' -f4)
