@@ -608,7 +608,16 @@ uci commit modem
 hostless=$(uci -q get modem.modeminfo$CURRMODEM.hostless)
 $ROOTER/connect/handlettl.sh $CURRMODEM "$hostless" &
 
-autoapn=$(uci -q get profile.disable.autoapn)
+mode=$(uci -q get profile.disable.mode)
+if [ -z "$mode" ]; then
+	autoapn=$(uci -q get profile.disable.autoapn)
+else
+	if [ "$mode" = "0" ]; then
+		autoapn="1"
+	else
+		autoapn=""
+	fi
+fi
 imsi=$(uci -q get modem.modem$CURRMODEM.imsi)
 mcc6=${imsi:0:6}
 mcc5=${imsi:0:5}
@@ -639,6 +648,7 @@ case "$IPVAR" in
 	;;
 esac
 if [ "$autoapn" = "1" -a $apd -eq 1 ]; then
+	log "Use AutoAPN"
 	isplist=$(grep -F "$mcc6" '/usr/lib/autoapn/apn.data')
 	if [ -z "$isplist" ]; then
 		isplist=$(grep -F "$mcc5" '/usr/lib/autoapn/apn.data')
@@ -654,6 +664,7 @@ if [ "$autoapn" = "1" -a $apd -eq 1 ]; then
 	fi
 else
 	if [ -z "$apndata" ]; then
+		log "Use Profile Data"
 		isplist=$apndata"000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
 		if [ ! -z "$NAPN2" ]; then
 			isplist=$isplist" 000000,$NAPN2,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
@@ -662,6 +673,7 @@ else
 			isplist=$isplist" 000000,$NAPN3,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
 		fi
 	else
+		log "Use APN Database"
 		isplist=$apndata
 	fi
 fi
@@ -745,106 +757,189 @@ log "$SP"
 		uci commit modem
 		log "Setting Up Connection Data using $NAPN"
 		BRK=0
-		IPVAR="IP"
-		ATCMDD="AT+CREG=0;+CGREG=0;+CEREG=0;+C5GREG=3;+CGEREP=2,1"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		ATCMDD="AT+CGPIAF=1,0,0,0"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		ATCMDD="AT+COPS=2;+COPS=3,0"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		ATCMDD="AT+CGDCONT=0,\"$IPVAR\",\"$NAPN\""
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		ATCMDD="AT+EIAAPN=\"$NAPN\",0,\"$IPVAR\",\"$IPVAR\",$NAUTH,\"$NUSER\",\"$NPASS\""
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		ATCMDD="AT+CGDCONT=1,\"$IPVAR\",\"$NAPN\""
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		sleep 3
-		log "Checking Registration"
-		ATCMDD="AT+COPS=0"
-		OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-		while [ true ]; do
-			ATCMDD="AT+CEREG?"
-			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			cgev=$(echo "$OX" | grep -o "+CEREG: [0-9],[0-9]" )
-			cgev=$(echo "$cgev" | cut -d, -f2 )
-			if [ "$cgev" = "1" ]; then
-				log "Registered"
-				break;
+		if [ -e /etc/world ]; then
+			if [ "$NAUTH" = "0" -a "$NUSER" = "NIL" -a "$NPASS" = "NIL" ]; then
+				ATCMDD="AT+CGAUTH=1,$NAUTH"
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				log "$OX"
+				ATCMDD="AT+CGAUTH=0,$NAUTH"
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				log "$OX"
+			else
+				ATCMDD="AT+CGAUTH=1,$NAUTH,\"$NUSER\",\"$NPASS\""
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				log "$OX"
+				ATCMDD="AT+CGAUTH=0,$NAUTH,\"$NUSER\",\"$NPASS\""
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				log "$OX"
 			fi
-			log "Registering"
-			let cntr=$cntr+1
-			if [ "$cntr" -gt 2 ]; then
-				BRK=1
-				break
-			fi
-			sleep 5
-		done
-		if "$BRK" -eq 1 ]; then
-			log "Failed to Register"
-		else
-			log "Attach to packet domain"
-			ATCMDD="AT+CGATT=1"
+			export SETAPN=$NAPN
+			BRK=1
+			ATCMDD="AT+CGPIAF=1,0,0,0;+CGDCONT=1"
 			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-			ERROR="ERROR"
+			log "$OX"
+			ATCMDD='AT+CGDCONT=1,"IP","'$NAPN'",,0,0,0,0,0,0,0'
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			chcklog "$OX"
+			log " "
+			log "Fibocom Connect : $OX"
+			log " "
+			ERROR="ERRORX"
 			if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
 			then
-				log "Failed to attach to packet domain"
+				$ROOTER/signal/status.sh $CURRMODEM "$MAN $MOD" "Failed to Connect : Retrying"
+				log "Failed to Connect"
 			else
-				log "Activate PDP context"
+				BRK=0
+				ATCMDD="AT+CGACT=0"
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				log "$OX"
+				ATCMDD="AT+CGPADDR=0"
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				log "$OX"
 				cntr=0
 				while [ true ]; do
 					ATCMDD="AT+CGACT=1,1"
 					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+					log "$OX"
 					cgev=$(echo "$OX" | grep "+CGEV")
 					if [ ! -z "$cgev" ]; then
 						break;
 					fi
-					log "Activating"
 					let cntr=$cntr+1
-					if [ "$cntr" -gt 2 ]; then
-						BRK=1
+					if [ "$cntr" -gt 1 ]; then
 						break
 					fi
 					sleep 5
-				done	
-				if [ "$BRK" -eq 1 ]; then
-					log "Failed to activate PDP context with $NAPN"
+				done
+				
+				ATCMDD="AT+CGPADDR=1"
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				log "$OX"
+				OX=$(echo "$OX" | grep "^+CGPADDR: 1," | cut -d'"' -f2)
+				ip4=$(echo $OX | cut -d, -f1 | grep "\.")
+				ip6=$(echo $OX | cut -d, -f2 | grep ":")
+				log "IP address(es) obtained: $ip4 $ip6"
+				if [ -z "$ip4" ]; then
+					BRK=1
+					log "No IP Address"
 				else
-					log "PDP context activated"
-					ATCMDD="AT+CGPADDR=1"
-					OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-					log "$OX"
-					URCvalue=$(echo $OX | sed -e 's/"//g')
-					IPaddress1=$(echo $URCvalue | awk -F ',' '{print $2}')
-					IPaddress2=$(echo $URCvalue | awk -F ',' '{print $3}')
-					if [ -z "$IPaddress1" ]; then
-						BRK=1
-						log "No IP Address"
-					else
-						if [ $(IPversion $IPaddress1) = 'IPv4' ]; then
-							v4address=$IPaddress1
-							v4netmask=$(subnet_calc $v4address)
-							v4gateway=$(echo $v4netmask | awk -F ' ' '{print $2}')
-							v4netmask=$(echo $v4netmask | awk -F ' ' '{print $1}')
-							log "IPv4 address : $v4address"
-							log "IPv4 gateway : $v4gateway"
-							ATCMDD="AT+CGCONTRDP=1"
-							OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
-							URCvalue=$(echo $OX | sed -e 's/"//g')
-							dns1=$(echo $URCvalue | awk -F ',' '{print $6}')
-							log "DNS : $dns1"
-							uci set network.wan$INTER.proto='static'
-							uci set network.wan$INTER.ipaddr="$v4address"
-							uci set network.wan$INTER.netmask='255.255.255.0'
-							uci set network.wan$INTER.gateway="$v4gateway"
-							uci set network.wan$INTER.dns="$dns1"
-							uci set network.wan$INTER.peerdns=0
-							set_dns
-							uci commit network
-							ifup wan$INTER
-						else
+					check_ip
+					gtw=$(echo "$ip4" | cut -d. -f1)"."$(echo "$ip4" | cut -d. -f2)"."$(echo "$ip4" | cut -d. -f3)".1"
+					uci set network.wan$INTER.proto='static'
+					uci set network.wan$INTER.ipaddr="$ip4"
+					uci set network.wan$INTER.netmask='255.255.255.0'
+					uci set network.wan$INTER.gateway="$gtw"
+					uci set network.wan$INTER.dns="1.1.1.1"
+					uci set network.wan$INTER.peerdns=0
+					set_dns
+					uci commit network
+					ifup wan$INTER
+					rm -f /tmp/usbwait
+				fi
+			fi
+		else
+			IPVAR="IP"
+			ATCMDD="AT+CREG=0;+CGREG=0;+CEREG=0;+C5GREG=3;+CGEREP=2,1"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			ATCMDD="AT+CGPIAF=1,0,0,0"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			ATCMDD="AT+COPS=2;+COPS=3,0"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			ATCMDD="AT+CGDCONT=0,\"$IPVAR\",\"$NAPN\""
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			ATCMDD="AT+EIAAPN=\"$NAPN\",0,\"$IPVAR\",\"$IPVAR\",$NAUTH,\"$NUSER\",\"$NPASS\""
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			ATCMDD="AT+CGDCONT=1,\"$IPVAR\",\"$NAPN\""
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			sleep 3
+			log "Checking Registration"
+			ATCMDD="AT+COPS=0"
+			OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+			while [ true ]; do
+				ATCMDD="AT+CEREG?"
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				cgev=$(echo "$OX" | grep -o "+CEREG: [0-9],[0-9]" )
+				cgev=$(echo "$cgev" | cut -d, -f2 )
+				if [ "$cgev" = "1" ]; then
+					log "Registered"
+					break;
+				fi
+				log "Registering"
+				let cntr=$cntr+1
+				if [ "$cntr" -gt 2 ]; then
+					BRK=1
+					break
+				fi
+				sleep 5
+			done
+			if "$BRK" -eq 1 ]; then
+				log "Failed to Register"
+			else
+				log "Attach to packet domain"
+				ATCMDD="AT+CGATT=1"
+				OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+				ERROR="ERROR"
+				if `echo ${OX} | grep "${ERROR}" 1>/dev/null 2>&1`
+				then
+					log "Failed to attach to packet domain"
+				else
+					log "Activate PDP context"
+					cntr=0
+					while [ true ]; do
+						ATCMDD="AT+CGACT=1,1"
+						OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+						cgev=$(echo "$OX" | grep "+CGEV")
+						if [ ! -z "$cgev" ]; then
+							break;
+						fi
+						log "Activating"
+						let cntr=$cntr+1
+						if [ "$cntr" -gt 2 ]; then
 							BRK=1
-							log "No IPV4 Address"
+							break
+						fi
+						sleep 5
+					done	
+					if [ "$BRK" -eq 1 ]; then
+						log "Failed to activate PDP context with $NAPN"
+					else
+						log "PDP context activated"
+						ATCMDD="AT+CGPADDR=1"
+						OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+						log "$OX"
+						URCvalue=$(echo $OX | sed -e 's/"//g')
+						IPaddress1=$(echo $URCvalue | awk -F ',' '{print $2}')
+						IPaddress2=$(echo $URCvalue | awk -F ',' '{print $3}')
+						if [ -z "$IPaddress1" ]; then
+							BRK=1
+							log "No IP Address"
+						else
+							if [ $(IPversion $IPaddress1) = 'IPv4' ]; then
+								v4address=$IPaddress1
+								v4netmask=$(subnet_calc $v4address)
+								v4gateway=$(echo $v4netmask | awk -F ' ' '{print $2}')
+								v4netmask=$(echo $v4netmask | awk -F ' ' '{print $1}')
+								log "IPv4 address : $v4address"
+								log "IPv4 gateway : $v4gateway"
+								ATCMDD="AT+CGCONTRDP=1"
+								OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+								URCvalue=$(echo $OX | sed -e 's/"//g')
+								dns1=$(echo $URCvalue | awk -F ',' '{print $6}')
+								log "DNS : $dns1"
+								uci set network.wan$INTER.proto='static'
+								uci set network.wan$INTER.ipaddr="$v4address"
+								uci set network.wan$INTER.netmask='255.255.255.0'
+								uci set network.wan$INTER.gateway="$v4gateway"
+								uci set network.wan$INTER.dns="$dns1"
+								uci set network.wan$INTER.peerdns=0
+								set_dns
+								uci commit network
+								ifup wan$INTER
+							else
+								BRK=1
+								log "No IPV4 Address"
+							fi
 						fi
 					fi
 				fi

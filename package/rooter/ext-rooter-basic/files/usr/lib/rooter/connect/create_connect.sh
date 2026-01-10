@@ -938,7 +938,16 @@ if [ -n "$CHKPORT" ]; then
 		$ROOTER/changedevice.sh $ifname
 	fi
 
-	autoapn=$(uci -q get profile.disable.autoapn)
+	mode=$(uci -q get profile.disable.mode)
+	if [ -z "$mode" ]; then
+		autoapn=$(uci -q get profile.disable.autoapn)
+	else
+		if [ "$mode" = "0" ]; then
+			autoapn="1"
+		else
+			autoapn=""
+		fi
+	fi
 	imsi=$(uci -q get modem.modem$CURRMODEM.imsi)
 	mcc6=${imsi:0:6}
 	mcc5=${imsi:0:5}
@@ -969,6 +978,7 @@ if [ -n "$CHKPORT" ]; then
 		;;
 	esac
 	if [ "$autoapn" = "1" -a $apd -eq 1 ]; then
+		log "Use AutoAPN"
 		isplist=$(grep -F "$mcc6" '/usr/lib/autoapn/apn.data')
 		if [ -z "$isplist" ]; then
 			isplist=$(grep -F "$mcc5" '/usr/lib/autoapn/apn.data')
@@ -984,6 +994,7 @@ if [ -n "$CHKPORT" ]; then
 		fi
 	else
 		if [ -z "$apndata" ]; then
+			log "Use Profile Data"
 			isplist=$apndata"000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
 			if [ ! -z "$NAPN2" ]; then
 				isplist=$isplist"  000000,$NAPN2,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
@@ -993,6 +1004,7 @@ if [ -n "$CHKPORT" ]; then
 			fi
 			log "$isplist"
 		else
+			log "Use APN Database"
 			isplist=$apndata
 		fi
 		 log "$isplist"

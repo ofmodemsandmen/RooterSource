@@ -445,6 +445,9 @@ if [ "$ACTION" = add ]; then
 	if [ $idV != 12d1 -a $retval = 24 ]; then
 		retval=5
 	fi
+	if [ $idV = 19d2 -a $idP = 1485 ]; then
+		retval=2
+	fi
 	display_top; display "ProtoFind returns : $retval"; display_bottom
 	rm -f /tmp/wdrv
 
