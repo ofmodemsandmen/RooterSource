@@ -157,6 +157,13 @@ if [ -n "$PBzero" ]; then
 	ATCMDD="AT\$QCPBMPREF=1"
 	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 fi
+ATCMDD="AT+CASIMS?"
+OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+IMSoff=$(echo "$OX" | grep "0")
+if [ -n "$IMSoff" ]; then
+	ATCMDD="AT+CASIMS=1"
+	OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
+fi
 ATCMDD="AT+CGDCONT?"
 OX=$($ROOTER/gcom/gcom-locked "/dev/ttyUSB$CPORT" "run-at.gcom" "$CURRMODEM" "$ATCMDD")
 ATCMDD="AT\$QCPDPIMSCFGE?"
