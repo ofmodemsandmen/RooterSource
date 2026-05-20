@@ -608,6 +608,10 @@ uci commit modem
 hostless=$(uci -q get modem.modeminfo$CURRMODEM.hostless)
 $ROOTER/connect/handlettl.sh $CURRMODEM "$hostless" &
 
+if [ -e $ROOTER/connect/quic_bypass.sh ]; then
+	$ROOTER/connect/quic_bypass.sh $CURRMODEM
+fi
+
 mode=$(uci -q get profile.disable.mode)
 if [ -z "$mode" ]; then
 	autoapn=$(uci -q get profile.disable.autoapn)

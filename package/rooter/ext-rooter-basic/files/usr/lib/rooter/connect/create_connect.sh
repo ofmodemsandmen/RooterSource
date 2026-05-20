@@ -542,7 +542,7 @@ uci commit modem.modem$CURRMODEM
 			get_tty 03
 		else
 			if [ $idV = 2c7c ]; then
-				QUEIF2="0121 0125 0306 0296 0512 0620 0800 030b 0801 0900"
+				QUEIF2="0121 0125 0306 0296 0512 0620 0800 030b 0801 0900 0122"
 				if [[ $(echo "$QUEIF2" | grep -o -i "$idP") ]]; then
 					TPORT=2
 				fi
@@ -933,21 +933,16 @@ if [ -n "$CHKPORT" ]; then
 	fi
 
 	$ROOTER/connect/handlettl.sh $CURRMODEM 0 &
+	
+	if [ -e $ROOTER/connect/quic_bypass.sh ]; then
+		$ROOTER/connect/quic_bypass.sh $CURRMODEM
+	fi
 
 	if [ -e $ROOTER/changedevice.sh ]; then
 		$ROOTER/changedevice.sh $ifname
 	fi
 
-	mode=$(uci -q get profile.disable.mode)
-	if [ -z "$mode" ]; then
-		autoapn=$(uci -q get profile.disable.autoapn)
-	else
-		if [ "$mode" = "0" ]; then
-			autoapn="1"
-		else
-			autoapn=""
-		fi
-	fi
+	autoapn=$(uci -q get profile.disable.autoapn)
 	imsi=$(uci -q get modem.modem$CURRMODEM.imsi)
 	mcc6=${imsi:0:6}
 	mcc5=${imsi:0:5}
@@ -978,7 +973,6 @@ if [ -n "$CHKPORT" ]; then
 		;;
 	esac
 	if [ "$autoapn" = "1" -a $apd -eq 1 ]; then
-		log "Use AutoAPN"
 		isplist=$(grep -F "$mcc6" '/usr/lib/autoapn/apn.data')
 		if [ -z "$isplist" ]; then
 			isplist=$(grep -F "$mcc5" '/usr/lib/autoapn/apn.data')
@@ -994,7 +988,6 @@ if [ -n "$CHKPORT" ]; then
 		fi
 	else
 		if [ -z "$apndata" ]; then
-			log "Use Profile Data"
 			isplist=$apndata"000000,$NAPN,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
 			if [ ! -z "$NAPN2" ]; then
 				isplist=$isplist"  000000,$NAPN2,Default,$NPASS,$CID,$NUSER,$NAUTH,$pdptype"
@@ -1004,7 +997,6 @@ if [ -n "$CHKPORT" ]; then
 			fi
 			log "$isplist"
 		else
-			log "Use APN Database"
 			isplist=$apndata
 		fi
 		 log "$isplist"
